@@ -313,7 +313,11 @@ onUnmounted(() => {
     font-size: 0.95rem;
   }
   .now-playing-dropdown-list {
-    width: 140px;
+    width: 100%;
+    min-width: 200px;
+    max-width: 100vw;
+    left: 0;
+    right: 0;
     font-size: 0.95rem;
   }
   #audio-visualizer {
@@ -332,7 +336,11 @@ onUnmounted(() => {
     font-size: 0.8rem;
   }
   .now-playing-dropdown-list {
-    width: 90px;
+    width: 100%;
+    min-width: 180px;
+    max-width: 100vw;
+    left: 0;
+    right: 0;
     font-size: 0.8rem;
   }
   #audio-visualizer {

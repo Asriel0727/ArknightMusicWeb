@@ -97,9 +97,14 @@ const handleSearch = () => {
 }
 
 @media (max-width: 900px) {
+  .search-container {
+    max-width: 100%;
+    margin: 0;
+  }
   .search-topbar {
-    min-width: 120px;
-    max-width: 180px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
   .search-topbar input {
     font-size: 0.95rem;
@@ -117,9 +122,14 @@ const handleSearch = () => {
 }
 
 @media (max-width: 600px) {
+  .search-container {
+    max-width: 100%;
+    margin: 0;
+  }
   .search-topbar {
-    min-width: 60px;
-    max-width: 100px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     padding: 4px;
   }
   .search-topbar input {

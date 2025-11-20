@@ -9,6 +9,12 @@
     --border-color: #30363d;
 }
 
+/* 文字乱码动画样式 */
+.text-glitching {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;

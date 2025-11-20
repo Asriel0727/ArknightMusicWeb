@@ -50,6 +50,10 @@ const handleSearch = (query) => {
     align-items: stretch;
     gap: 10px;
   }
+  
+  .topbar-right {
+    width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
