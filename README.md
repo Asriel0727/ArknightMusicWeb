@@ -24,14 +24,23 @@ MonsterSirenWebpage-main/
 │   │   └── player.js       # 播放器狀態
 │   ├── utils/              # 工具函數
 │   │   ├── time.js         # 時間格式化
-│   │   └── lyrics.js       # 歌詞解析
+│   │   ├── lyrics.js       # 歌詞解析
+│   │   └── textGlitch.js   # 文字亂碼動畫工具
+│   ├── directives/         # Vue 指令
+│   │   └── textGlitch.js   # 文字亂碼動畫指令
+│   ├── composables/        # 組合式函數
+│   │   └── useTextGlitch.js # 文字亂碼動畫組合式函數
 │   ├── App.vue             # 主應用組件
 │   └── main.js             # 入口文件
 ├── public/
 │   └── styles.css          # 全局樣式
+├── .github/
+│   └── workflows/
+│       └── deploy.yml      # GitHub Actions 部署配置
 ├── index.html              # HTML 模板
 ├── package.json            # 項目配置
 ├── vite.config.js          # Vite 配置
+├── DEPLOY.md               # 部署指南
 └── README.md              # 說明文檔
 ```
 
@@ -43,6 +52,11 @@ MonsterSirenWebpage-main/
 - 📱 響應式設計
 - 💾 緩存機制優化性能
 - 🎨 現代化 UI 設計
+- ✨ 文字亂碼動畫效果（頁面加載時文字從亂碼逐漸解碼）
+- 🖱️ 點擊正在播放的音樂標題打開播放器視圖
+- 📋 下拉式選單支持快速切換歌曲
+- 🎯 智能分頁系統（每頁顯示適量專輯）
+- 🚀 GitHub Pages 自動部署
 
 ## 安裝和運行
 
@@ -83,6 +97,8 @@ npm run preview
 3. **服務層分離**：API 調用和業務邏輯分離
 4. **工具函數**：可復用的工具函數獨立管理
 5. **響應式設計**：適配各種屏幕尺寸
+6. **文字動畫效果**：獨特的亂碼解碼動畫，增強視覺體驗
+7. **GitHub Pages 部署**：自動化部署流程，支持 GitHub Pages
 
 ## 開發說明
 
@@ -112,11 +128,45 @@ npm run preview
 - `fetchSongDetails()`: 獲取歌曲詳情
 - `fetchLyrics()`: 獲取歌詞
 
+## 新功能詳情
+
+### 文字亂碼動畫效果
+- 頁面首次加載時，所有文字會從亂碼逐漸解碼為正常文字
+- 動畫持續 3 秒，提供獨特的視覺體驗
+- 支持中文、日文、英文和符號的智能解碼
+- 動畫僅在首次加載時執行一次
+
+### 交互改進
+- **點擊正在播放的音樂標題**：直接打開播放器視圖，查看詳細信息和歌詞
+- **下拉式選單**：
+  - 點擊按鈕顯示所有歌曲列表
+  - 按鈕圖標會根據選單狀態切換（向上/向下箭頭）
+  - 在小屏幕上自動調整寬度，確保完整顯示
+- **搜索欄優化**：在小屏幕上自動占滿可用寬度，不再居中顯示
+
+### 響應式設計增強
+- 搜索欄在手機端自動適配寬度
+- 下拉選單在小屏幕上自動調整大小
+- 專輯列表支持分頁瀏覽
+- 所有組件都針對移動設備進行了優化
+
+### 圖片路徑修復
+- 所有圖片路徑都支持 GitHub Pages 的 base 路徑
+- 自動適配不同的部署環境
+
 ## 部署
 
-本项目已配置 GitHub Pages 自动部署。每次推送到 main 分支时，GitHub Actions 会自动构建并部署网站。
+本專案已配置 GitHub Pages 自動部署。每次推送到 main 分支時，GitHub Actions 會自動建構並部署網站。
 
 网站地址：https://asriel0727.github.io/ArknightMusicWeb/
+
+### 部署配置
+
+- **構建工具**：Vite
+- **部署方式**：GitHub Actions
+- **Base 路徑**：`/ArknightMusicWeb/`（在 `vite.config.js` 中配置）
+
+詳細部署說明請參考 `DEPLOY.md` 文件。
 
 ## 許可證
 
