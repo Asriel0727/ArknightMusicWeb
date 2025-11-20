@@ -7,8 +7,8 @@ import vue from '@vitejs/plugin-vue'
 // ⚠️ 重要：请根据你的实际 GitHub 仓库名修改下面的 base 值（包括大小写必须完全匹配）
 export default defineConfig({
   plugins: [vue()],
-  // 请将 'MonsterSirenWebpage-main' 替换为你的实际 GitHub 仓库名
-  base: process.env.NODE_ENV === 'production' ? '/MonsterSirenWebpage-main/' : '/',
+  // GitHub 仓库名：ArknightMusicWeb
+  base: process.env.NODE_ENV === 'production' ? '/ArknightMusicWeb/' : '/',
   server: {
     port: 3000,
     open: true
