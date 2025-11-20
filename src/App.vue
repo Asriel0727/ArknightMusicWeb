@@ -25,6 +25,7 @@ import { decodeText } from './utils/textGlitch.js';
 
 const audioPlayerRef = ref(null);
 const albumListRef = ref(null);
+const hasGlitchAnimationRun = ref(false);
 
 const handleSearch = (query) => {
   if (albumListRef.value && albumListRef.value.handleSearch) {
@@ -47,7 +48,13 @@ const handleModalClose = () => {
 };
 
 // 应用文字乱码动画效果
-const applyTextGlitch = () => {
+const applyTextGlitch = (force = false) => {
+  // 如果已经执行过且不是强制执行，则跳过
+  if (hasGlitchAnimationRun.value && !force) {
+    return;
+  }
+  
+  hasGlitchAnimationRun.value = true;
   const duration = 3000; // 3秒
   const startTime = performance.now();
   
@@ -146,37 +153,7 @@ const applyTextGlitch = () => {
   requestAnimationFrame(animate);
 };
 
-// 监听模态框打开，当专辑详情加载时也应用动画
-watch(() => [modalState.isOpen, modalState.currentView, albumState.currentAlbumDetails], 
-  ([isOpen, view, albumDetails]) => {
-    if (isOpen && view === 'album' && albumDetails) {
-      // 清除模态框内元素的动画标记，允许重新应用动画
-      nextTick(() => {
-        const modalElements = document.querySelectorAll('#modal-body [data-glitch-processed]');
-        modalElements.forEach(el => {
-          delete el.dataset.glitchProcessed;
-        });
-        
-        setTimeout(() => {
-          applyTextGlitch();
-        }, 200);
-      });
-    }
-  },
-  { deep: true }
-);
-
-// 监听专辑列表加载完成，应用动画到新加载的专辑卡片
-watch(() => albumState.allAlbums.length, (newLength, oldLength) => {
-  if (newLength > oldLength && oldLength === 0) {
-    // 首次加载专辑列表时，应用动画
-    nextTick(() => {
-      setTimeout(() => {
-        applyTextGlitch();
-      }, 300);
-    });
-  }
-});
+// 移除模态框和专辑列表的监听器，因为动画只执行一次
 
 onMounted(() => {
   if (audioPlayerRef.value) {
