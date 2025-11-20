@@ -4,12 +4,14 @@
       <div class="page-title">塞壬唱片專輯一覽</div>
     </div>
     <div class="navbar-right">
-      <img src="/logo.png" alt="明日方舟" class="logo-img" />
+      <img :src="`${baseUrl}logo.png`" alt="明日方舟" class="logo-img" />
     </div>
   </nav>
 </template>
 
 <script setup>
+// 使用 Vite 的 BASE_URL 来支持 GitHub Pages 的 base 路径
+const baseUrl = import.meta.env.BASE_URL;
 </script>
 
 <style scoped>
