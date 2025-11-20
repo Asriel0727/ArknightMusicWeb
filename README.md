@@ -112,6 +112,12 @@ npm run preview
 - `fetchSongDetails()`: 獲取歌曲詳情
 - `fetchLyrics()`: 獲取歌詞
 
+## 部署
+
+本项目已配置 GitHub Pages 自动部署。每次推送到 main 分支时，GitHub Actions 会自动构建并部署网站。
+
+网站地址：https://asriel0727.github.io/ArknightMusicWeb/
+
 ## 許可證
 
 ISC
