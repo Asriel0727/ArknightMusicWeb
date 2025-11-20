@@ -8,7 +8,11 @@
         :style="{ height: bar.height + '%' }"
       ></div>
     </div>
-    <div class="now-playing-marquee-container">
+    <div 
+      class="now-playing-marquee-container"
+      @click="handleTitleClick"
+      :class="{ clickable: playerState.currentSong }"
+    >
       <span 
         id="now-playing-title" 
         ref="titleRef"
@@ -21,7 +25,7 @@
       class="now-playing-dropdown" 
       @click="toggleDropdown"
     >
-      <i class="fa-solid fa-chevron-down"></i>
+      <i :class="dropdownState.isOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
     </button>
     <div 
       class="now-playing-dropdown-list" 
@@ -44,7 +48,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
-import { playerState, dropdownState } from '../stores/player.js';
+import { playerState, dropdownState, modalState } from '../stores/player.js';
 import { playSongFromMasterList } from '../stores/player.js';
 import { fetchSongs } from '../services/api.js';
 
@@ -136,6 +140,16 @@ const handleSongClick = (song) => {
   dropdownState.isOpen = false;
 };
 
+// 處理標題點擊，打開播放器視圖
+const handleTitleClick = (event) => {
+  event.stopPropagation(); // 防止觸發外部點擊事件
+  if (playerState.currentSong) {
+    modalState.currentView = 'player';
+    modalState.isOpen = true;
+    dropdownState.isOpen = false; // 關閉下拉菜單（如果打開的話）
+  }
+};
+
 // 點擊外部關閉下拉列表
 const handleClickOutside = (event) => {
   if (barRef.value && !barRef.value.contains(event.target)) {
@@ -180,6 +194,15 @@ onUnmounted(() => {
   white-space: nowrap;
   color: var(--primary-color);
   font-weight: 500;
+}
+
+.now-playing-marquee-container.clickable {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.now-playing-marquee-container.clickable:hover {
+  opacity: 0.8;
 }
 
 #now-playing-title {

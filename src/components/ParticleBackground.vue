@@ -24,8 +24,7 @@ const PARTICLE_WIDTH = 200;
 const PARTICLE_HEIGHT = 200;
 
 // 图片路径列表
-// 使用 Vite 的 BASE_URL 来支持 GitHub Pages 的 base 路径
-const BASEURL = import.meta.env.BASE_URL + "images/";
+const BASEURL = "/images/";
 const suffix = ".png";
 const imgList = ["logo_kazimierz", "logo_rhine", "logo_yan", "logo_victoria"];
 
