@@ -23,12 +23,24 @@ import { watch } from 'vue';
 import AlbumDetails from './AlbumDetails.vue';
 import PlayerView from './PlayerView.vue';
 import { modalState, albumState, playerState } from '../stores/player.js';
+import { fetchAlbumDetails } from '../services/api.js';
 
 const emit = defineEmits(['close']);
 
-const handleClose = () => {
+const handleClose = async () => {
   if (modalState.currentView === 'player') {
-    // 返回專輯詳情
+    // 返回專輯詳情 - 確保返回的是當前播放歌曲的專輯
+    const currentSong = playerState.currentSong;
+    if (currentSong && currentSong.albumCid) {
+      // 如果當前專輯詳情不是播放歌曲所屬的專輯，則獲取正確的專輯
+      if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== currentSong.albumCid) {
+        try {
+          albumState.currentAlbumDetails = await fetchAlbumDetails(currentSong.albumCid);
+        } catch (error) {
+          console.error('獲取專輯詳情失敗:', error);
+        }
+      }
+    }
     modalState.currentView = 'album';
   } else {
     // 關閉Modal

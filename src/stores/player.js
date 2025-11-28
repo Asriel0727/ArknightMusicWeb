@@ -92,7 +92,8 @@ export async function playSong(song, coverUrl, coverDeUrl) {
       artistes: song.artistes || songDetails.artistes || ['未知演出者'],
       coverUrl: coverUrl || song.coverUrl || songDetails.coverUrl,
       coverDeUrl: coverDeUrl || song.coverDeUrl || songDetails.coverDeUrl,
-      audioUrl: songDetails.sourceUrl || ''
+      audioUrl: songDetails.sourceUrl || '',
+      albumCid: song.albumCid || songDetails.albumCid // 確保保留專輯ID
     };
     
     console.log('完整歌曲信息:', fullSong);
@@ -142,6 +143,7 @@ export async function playSongFromAlbum(index, albumId) {
       artistes: song.artistes || album.artistes || ['未知演出者'],
       coverUrl: album.coverUrl,
       coverDeUrl: album.coverDeUrl,
+      albumCid: album.cid, // 保存專輯ID以便導航時使用
     }));
     
     playerState.currentPlaylist = albumState.currentAlbumSongs;

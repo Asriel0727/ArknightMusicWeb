@@ -87,11 +87,17 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, setUserScrolled } from '../stores/player.js';
+import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute } from '../stores/player.js';
 import { formatTime } from '../utils/time.js';
 
 const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);
+let lyricsAnimationFrame = null;
+let isUserScrolling = false;
+let userScrollTimeout = null;
+
+// 歌詞時間偏移量（秒），正值表示提前顯示歌詞
+const LYRICS_TIME_OFFSET = 0.5;
 
 const progressPercent = computed(() => {
   if (!playerState.duration || playerState.duration === 0) return 0;
@@ -140,54 +146,87 @@ const handleVolumeChange = (event) => {
 const syncLyricsHighlight = (currentTime) => {
   if (!playerState.lyrics || playerState.lyrics.length === 0) return;
   if (!lyricsContainerRef.value) return;
-  if (playerState.isUserScrolled) return;
+
+  // 添加時間偏移量，讓歌詞提前顯示
+  const adjustedTime = currentTime + LYRICS_TIME_OFFSET;
 
   let newActiveIndex = -1;
   for (let i = 0; i < playerState.lyrics.length; i++) {
-    if (playerState.lyrics[i].time <= currentTime) {
+    if (playerState.lyrics[i].time <= adjustedTime) {
       newActiveIndex = i;
     } else {
       break;
     }
   }
 
-  // 更新高亮状态
+  // 始終更新高亮狀態（不管用戶是否在滾動）
   if (newActiveIndex !== activeLyricIndex.value && newActiveIndex !== -1) {
     activeLyricIndex.value = newActiveIndex;
-  }
-
-  // 持续更新滚动位置，确保歌词跟随音乐
-  if (newActiveIndex !== -1) {
-    const activeElement = lyricsContainerRef.value.querySelector(
-      `.lyrics-line[data-time="${playerState.lyrics[newActiveIndex].time}"]`
-    );
     
-    if (activeElement) {
-      const containerHeight = lyricsContainerRef.value.clientHeight;
-      const lineTop = activeElement.offsetTop;
-      const lineHeight = activeElement.clientHeight;
-      const targetScroll = lineTop - containerHeight / 2 + lineHeight / 2;
+    // 只有在用戶沒有主動滾動時才自動滾動
+    if (!isUserScrolling) {
+      const activeElement = lyricsContainerRef.value.querySelector(
+        `.lyrics-line[data-time="${playerState.lyrics[newActiveIndex].time}"]`
+      );
+      
+      if (activeElement) {
+        const containerHeight = lyricsContainerRef.value.clientHeight;
+        const lineTop = activeElement.offsetTop;
+        const lineHeight = activeElement.clientHeight;
+        const targetScroll = lineTop - containerHeight / 2 + lineHeight / 2;
 
-      // 使用 requestAnimationFrame 实现即时滚动，避免 smooth 动画延迟
-      requestAnimationFrame(() => {
-        if (lyricsContainerRef.value && !playerState.isUserScrolled) {
-          lyricsContainerRef.value.scrollTo({
-            top: targetScroll,
-            behavior: 'auto' // 改为 auto 实现即时滚动
-          });
-        }
-      });
+        lyricsContainerRef.value.scrollTo({
+          top: targetScroll,
+          behavior: 'smooth'
+        });
+      }
     }
   }
 };
 
-const handleLyricsScroll = () => {
-  setUserScrolled(true);
+// 使用 requestAnimationFrame 實現高頻率歌詞同步
+const startLyricsSync = () => {
+  const sync = () => {
+    if (playerState.audioPlayer && playerState.isPlaying) {
+      // 直接從 audio 元素獲取當前時間，更準確
+      const currentTime = playerState.audioPlayer.currentTime;
+      syncLyricsHighlight(currentTime);
+    }
+    lyricsAnimationFrame = requestAnimationFrame(sync);
+  };
+  lyricsAnimationFrame = requestAnimationFrame(sync);
 };
 
-watch(() => playerState.currentTime, (newTime) => {
-  syncLyricsHighlight(newTime);
-});
+const stopLyricsSync = () => {
+  if (lyricsAnimationFrame) {
+    cancelAnimationFrame(lyricsAnimationFrame);
+    lyricsAnimationFrame = null;
+  }
+};
+
+const handleLyricsScroll = () => {
+  // 用戶主動滾動時，暫時停止自動滾動但繼續更新高亮
+  isUserScrolling = true;
+  
+  // 清除之前的超時
+  if (userScrollTimeout) {
+    clearTimeout(userScrollTimeout);
+  }
+  
+  // 3秒後恢復自動滾動
+  userScrollTimeout = setTimeout(() => {
+    isUserScrolling = false;
+  }, 3000);
+};
+
+// 監聽播放狀態，控制歌詞同步循環
+watch(() => playerState.isPlaying, (isPlaying) => {
+  if (isPlaying) {
+    startLyricsSync();
+  } else {
+    stopLyricsSync();
+  }
+}, { immediate: true });
 
 watch(() => playerState.currentSong, (newSong) => {
   console.log('當前歌曲更新:', newSong);
@@ -200,7 +239,24 @@ watch(() => playerState.currentSong, (newSong) => {
 
 watch(() => playerState.lyrics, (newLyrics) => {
   console.log('歌詞更新:', newLyrics?.length || 0, '條');
+  // 歌詞更新時重置高亮索引
+  activeLyricIndex.value = -1;
 }, { deep: true });
+
+// 組件掛載時，如果正在播放則啟動同步
+onMounted(() => {
+  if (playerState.isPlaying) {
+    startLyricsSync();
+  }
+});
+
+// 組件卸載時清理動畫循環和超時
+onUnmounted(() => {
+  stopLyricsSync();
+  if (userScrollTimeout) {
+    clearTimeout(userScrollTimeout);
+  }
+});
 </script>
 
 <style scoped>

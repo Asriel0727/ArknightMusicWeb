@@ -19,6 +19,11 @@ let nowImg = 0;
 let animationFrameId = null;
 let circleAnimationId = null;
 
+// 檢測是否為觸摸設備（沒有精確指針）
+const isTouchDevice = () => {
+  return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+};
+
 // 粒子区域大小（右下角区域，调整为与按钮差不多大小）
 const PARTICLE_WIDTH = 200;
 const PARTICLE_HEIGHT = 200;
@@ -319,7 +324,11 @@ const run = () => {
   initCanvasSize();
   timer = setInterval(update, 5000);
   draw();
-  circle();
+  
+  // 只在非觸摸設備上顯示鼠標圓圈
+  if (!isTouchDevice()) {
+    circle();
+  }
 };
 
 onMounted(() => {
@@ -329,13 +338,17 @@ onMounted(() => {
     });
   }
   
-  if (mouseCanvasRef.value) {
+  // 只在非觸摸設備上初始化鼠標畫布
+  if (mouseCanvasRef.value && !isTouchDevice()) {
     mouseCtx = mouseCanvasRef.value.getContext("2d");
   }
   
-  if (canvasRef.value && mouseCanvasRef.value) {
+  if (canvasRef.value) {
     run();
-    window.addEventListener("mousemove", handleMouseMove);
+    // 只在非觸摸設備上監聽鼠標移動
+    if (!isTouchDevice()) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("resize", handleResize);
   }
@@ -377,6 +390,13 @@ onUnmounted(() => {
   height: 100%;
   z-index: 9999;
   pointer-events: none;
+}
+
+/* 在觸摸設備上隱藏鼠標圓圈 */
+@media (hover: none) and (pointer: coarse) {
+  .mouse-canvas {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
