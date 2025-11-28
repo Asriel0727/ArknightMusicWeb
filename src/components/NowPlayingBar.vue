@@ -77,8 +77,9 @@ const updateMarquee = () => {
   if (!titleRef.value) return;
   
   setTimeout(() => {
+    if (!titleRef.value) return;
     const container = titleRef.value.parentElement;
-    if (!container || !titleRef.value) return;
+    if (!container) return;
     
     const hasOverflow = titleRef.value.scrollWidth > container.clientWidth + 1;
     isScrolling.value = hasOverflow;

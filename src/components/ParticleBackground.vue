@@ -57,7 +57,7 @@ const initCanvasSize = () => {
 
 // 清空画布
 const clear = () => {
-  if (!ctx) return;
+  if (!ctx || !canvasRef.value) return;
   ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
 };
 

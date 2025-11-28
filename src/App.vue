@@ -1,10 +1,20 @@
 <template>
   <div id="app">
     <ParticleBackground />
-    <Navbar />
-    <TopBar @search="handleSearch" />
-    <AlbumList ref="albumListRef" @view-album="handleViewAlbum" />
-    <Modal @close="handleModalClose" />
+    <Navbar :currentPage="currentPage" @change-page="handlePageChange" />
+    
+    <!-- 專輯頁面 -->
+    <template v-if="currentPage === 'albums'">
+      <TopBar @search="handleSearch" />
+      <AlbumList ref="albumListRef" @view-album="handleViewAlbum" />
+      <Modal @close="handleModalClose" />
+    </template>
+    
+    <!-- 角色圖鑑頁面 -->
+    <template v-else-if="currentPage === 'characters'">
+      <CharacterList />
+    </template>
+    
     <audio ref="audioPlayerRef" style="display:none;"></audio>
     <footer>
       <p>明日方舟音樂播放器 &copy;</p>
@@ -19,6 +29,7 @@ import Navbar from './components/Navbar.vue';
 import TopBar from './components/TopBar.vue';
 import AlbumList from './components/AlbumList.vue';
 import Modal from './components/Modal.vue';
+import CharacterList from './components/CharacterList.vue';
 import { initAudioPlayer, modalState, albumState } from './stores/player.js';
 import { fetchAlbumDetails } from './services/api.js';
 import { decodeText } from './utils/textGlitch.js';
@@ -26,6 +37,11 @@ import { decodeText } from './utils/textGlitch.js';
 const audioPlayerRef = ref(null);
 const albumListRef = ref(null);
 const hasGlitchAnimationRun = ref(false);
+const currentPage = ref('albums'); // 'albums' 或 'characters'
+
+const handlePageChange = (page) => {
+  currentPage.value = page;
+};
 
 const handleSearch = (query) => {
   if (albumListRef.value && albumListRef.value.handleSearch) {
@@ -61,7 +77,7 @@ const applyTextGlitch = (force = false) => {
   // 选择所有包含文本的元素（排除input、button内的文本，因为它们会动态变化）
   const textSelectors = [
     '.page-title',
-    'button:not(.control-btn):not(.pagination-btn):not(.page-number):not(.modal-close)',
+    'button:not(.control-btn):not(.pagination-btn):not(.page-number):not(.modal-close):not(.nav-tab):not(.filter-buttons button)',
     'p:not(.no-lyrics)',
     'h1, h2, h3, h4, h5, h6',
     '.dropdown-song-item span',
@@ -172,4 +188,3 @@ onMounted(() => {
 <style>
 /* 全局樣式將從 styles.css 導入 */
 </style>
-
