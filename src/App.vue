@@ -18,7 +18,7 @@
     
     <audio ref="audioPlayerRef" style="display:none;"></audio>
     <footer>
-      <p>明日方舟音樂播放器 &copy;</p>
+      <p>明日方舟網站 &copy;</p>
     </footer>
   </div>
 </template>
