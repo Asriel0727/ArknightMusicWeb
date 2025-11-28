@@ -8,14 +8,14 @@
           <button 
             v-for="star in [6, 5, 4, 3, 2, 1]" 
             :key="star"
-            :class="{ active: selectedRarity === star }"
+            :class="{ active: selectedRarity.includes(star) }"
             @click="toggleRarity(star)"
           >
             {{ star }}★
           </button>
           <button 
-            :class="{ active: selectedRarity === null }"
-            @click="selectedRarity = null"
+            :class="{ active: selectedRarity.length === 0 }"
+            @click="selectedRarity = []"
           >
             全部
           </button>
@@ -59,7 +59,7 @@
     <!-- 載入中 -->
     <div v-if="isLoading" class="loading-container">
       <div class="spinner"></div>
-      <p>正在載入角色數據...</p>
+      <p>正在載入角色資料...</p>
     </div>
 
     <!-- 錯誤提示 -->
@@ -76,6 +76,7 @@
         :key="char.id"
         class="character-card"
         :class="`rarity-${getRarityStars(char.rarity)}`"
+        @click="handleCharacterClick(char)"
       >
         <div class="character-avatar">
           <img 
@@ -98,13 +99,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { fetchCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls } from '../services/api.js';
+import { fetchCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls, fetchCharacterDetails } from '../services/api.js';
+import { modalState, characterState } from '../stores/player.js';
 
 const characters = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 const searchQuery = ref('');
-const selectedRarity = ref(null);
+const selectedRarity = ref([]); // 改為數組，支援多選
 const selectedProfession = ref(null);
 
 // 記錄每個角色當前使用的圖片來源索引（使用 reactive Map）
@@ -161,10 +163,10 @@ const filteredCharacters = computed(() => {
       if (!matchName && !matchAppellation) return false;
     }
     
-    // 稀有度篩選
-    if (selectedRarity.value !== null) {
+    // 稀有度篩選（支援多選）
+    if (selectedRarity.value.length > 0) {
       const charStars = getRarityStars(char.rarity);
-      if (charStars !== selectedRarity.value) {
+      if (!selectedRarity.value.includes(charStars)) {
         return false;
       }
     }
@@ -179,7 +181,14 @@ const filteredCharacters = computed(() => {
 });
 
 const toggleRarity = (rarity) => {
-  selectedRarity.value = selectedRarity.value === rarity ? null : rarity;
+  const index = selectedRarity.value.indexOf(rarity);
+  if (index > -1) {
+    // 如果已選中，則移除
+    selectedRarity.value.splice(index, 1);
+  } else {
+    // 如果未選中，則添加
+    selectedRarity.value.push(rarity);
+  }
 };
 
 const toggleProfession = (profession) => {
@@ -208,6 +217,18 @@ const handleImageError = (event, char) => {
   img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%2330363d" width="100" height="100"/><text fill="%238b949e" x="50" y="55" text-anchor="middle" font-size="12">No Image</text></svg>';
 };
 
+const handleCharacterClick = async (char) => {
+  try {
+    // 獲取角色詳細資料
+    characterState.currentCharacterDetails = await fetchCharacterDetails(char.id);
+    modalState.currentView = 'character';
+    modalState.isOpen = true;
+  } catch (error) {
+    console.error('獲取角色詳情失敗:', error);
+    alert('無法載入角色詳情，請稍後再試');
+  }
+};
+
 const loadCharacters = async () => {
   isLoading.value = true;
   error.value = null;
@@ -221,7 +242,7 @@ const loadCharacters = async () => {
       avatarIndexMap.value.set(char.id, 0);
     });
   } catch (e) {
-    error.value = '無法載入角色數據，請稍後再試';
+          error.value = '無法載入角色資料，請稍後再試';
     console.error(e);
   } finally {
     isLoading.value = false;

@@ -34,10 +34,15 @@ export const searchState = reactive({
   filteredAlbums: []
 });
 
+// 角色狀態
+export const characterState = reactive({
+  currentCharacterDetails: null,
+});
+
 // Modal狀態
 export const modalState = reactive({
   isOpen: false,
-  currentView: 'album', // 'album' 或 'player'
+  currentView: 'album', // 'album', 'player', 或 'character'
 });
 
 // 下拉列表狀態

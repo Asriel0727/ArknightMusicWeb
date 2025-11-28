@@ -13,6 +13,11 @@
           @play-song="handlePlaySong"
         />
         <PlayerView v-else-if="modalState.currentView === 'player'" />
+        <CharacterDetails 
+          v-else-if="modalState.currentView === 'character' && characterState.currentCharacterDetails"
+          :key="characterState.currentCharacterDetails?.id || 'character'"
+          :character="characterState.currentCharacterDetails"
+        />
       </div>
     </div>
   </div>
@@ -22,7 +27,8 @@
 import { watch } from 'vue';
 import AlbumDetails from './AlbumDetails.vue';
 import PlayerView from './PlayerView.vue';
-import { modalState, albumState, playerState } from '../stores/player.js';
+import CharacterDetails from './CharacterDetails.vue';
+import { modalState, albumState, playerState, characterState } from '../stores/player.js';
 import { fetchAlbumDetails } from '../services/api.js';
 
 const emit = defineEmits(['close']);

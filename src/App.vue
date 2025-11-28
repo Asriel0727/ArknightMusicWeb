@@ -13,6 +13,7 @@
     <!-- 角色圖鑑頁面 -->
     <template v-else-if="currentPage === 'characters'">
       <CharacterList />
+      <Modal @close="handleModalClose" />
     </template>
     
     <audio ref="audioPlayerRef" style="display:none;"></audio>
