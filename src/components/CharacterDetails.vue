@@ -4,7 +4,7 @@
     <div class="character-details-header">
       <div class="character-avatar-large">
         <img 
-          :src="getAvatarUrl(character.id)" 
+          :src="currentAvatarUrl" 
           :alt="character.name"
           @error="handleImageError"
         />
@@ -295,6 +295,18 @@ const currentPortraitIndex = ref(0);
 const currentPortraitUrlIndex = ref(0);
 const expandedStories = ref([0]); // 預設展開第一個檔案
 
+// 詳細資料頭像多來源索引
+const avatarIndex = ref(0);
+
+// 取得當前角色可用的所有頭像 URL
+const avatarUrls = computed(() => getCharacterAvatarUrls(props.character.id));
+
+// 目前應顯示的頭像 URL（會隨錯誤自動切換來源）
+const currentAvatarUrl = computed(() => {
+  const urls = avatarUrls.value || [];
+  return urls[avatarIndex.value] || urls[0] || '';
+});
+
 const professions = {
   'PIONEER': '先鋒',
   'WARRIOR': '近衛',
@@ -344,7 +356,8 @@ const allPortraits = computed(() => {
   
   console.log('[組件調試] 最終allPortraits:', list);
   
-  return list.length > 0 ? list : [{ name: '立繪', urls: [getAvatarUrl(props.character.id)] }];
+  // 如果沒有從 API 解析出的立繪，就使用頭像多來源作為備用立繪
+  return list.length > 0 ? list : [{ name: '立繪', urls: avatarUrls.value }];
 });
 
 const currentPortraitUrl = computed(() => {
@@ -408,11 +421,6 @@ const getRarityStars = (rarity) => {
   return numRarity + 1;
 };
 
-const getAvatarUrl = (charId) => {
-  const urls = getCharacterAvatarUrls(charId);
-  return urls[0] || '';
-};
-
 const getAttribute = (phase, attrName) => {
   if (!phase.attributesKeyFrames || phase.attributesKeyFrames.length === 0) {
     return '-';
@@ -466,7 +474,19 @@ const getCellStyle = (grid, allGrids) => {
 };
 
 const handleImageError = (event) => {
-  event.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect fill="%2330363d" width="200" height="200"/><text fill="%238b949e" x="100" y="110" text-anchor="middle" font-size="16">No Image</text></svg>';
+  const img = event.target;
+  const urls = avatarUrls.value || [];
+  const nextIndex = avatarIndex.value + 1;
+
+  // 嘗試下一個頭像來源
+  if (nextIndex < urls.length) {
+    avatarIndex.value = nextIndex;
+    img.src = urls[nextIndex];
+    return;
+  }
+
+  // 所有來源都失敗才顯示占位圖
+  img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect fill="%2330363d" width="200" height="200"/><text fill="%238b949e" x="100" y="110" text-anchor="middle" font-size="16">No Image</text></svg>';
 };
 
 const handlePortraitLoad = (event) => {
