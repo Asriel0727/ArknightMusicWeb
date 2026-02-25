@@ -242,7 +242,7 @@ npm run preview
 
 本專案已配置 GitHub Pages 自動部署。每次推送到 main 分支時，GitHub Actions 會自動建構並部署網站。
 
-网站地址：https://asriel0727.github.io/ArknightMusicWeb/
+網站地址：https://asriel0727.github.io/ArknightMusicWeb/
 
 ### 部署配置
 
