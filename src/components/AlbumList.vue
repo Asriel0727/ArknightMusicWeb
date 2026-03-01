@@ -98,7 +98,7 @@ const albumsPerPage = computed(() => {
   const perPage = cardsPerRow * rowsPerPage;
   
   // 設置最小和最大值
-  return Math.max(4, Math.min(perPage, 24)); // 最少4個，最多24個
+  return Math.max(5, Math.min(perPage, 25)); // 最少4個，最多24個
 });
 
 // 計算總頁數
@@ -217,6 +217,7 @@ main {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 25px;
   padding: 20px 0;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .loading-spinner {
@@ -372,7 +373,7 @@ main {
 
 @media (max-width: 900px) {
   .albums-container {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
   }
   
