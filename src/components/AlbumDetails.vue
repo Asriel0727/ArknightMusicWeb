@@ -6,6 +6,8 @@
         :src="proxyImageUrl(album.coverUrl)" 
         :alt="album.name" 
         class="album-grid-cover"
+        decoding="async"
+        fetchpriority="high"
         @load="handleImageLoad"
         @error="handleImageError"
       >
@@ -20,6 +22,8 @@
         :alt="album.name" 
         class="album-grid-visual"
         loading="eager"
+        decoding="async"
+        fetchpriority="high"
         @load="handleImageLoad"
         @error="handleImageError"
       >
@@ -115,7 +119,11 @@ const preloadImage = (url) => {
 
 // 監聽專輯變化時預加載圖片
 watch(() => props.album, (newAlbum) => {
-  if (newAlbum && newAlbum.coverDeUrl) {
+  if (!newAlbum) return;
+  if (newAlbum.coverUrl) {
+    preloadImage(newAlbum.coverUrl);
+  }
+  if (newAlbum.coverDeUrl) {
     preloadImage(newAlbum.coverDeUrl);
   }
 }, { immediate: true });

@@ -84,6 +84,8 @@
             :alt="char.name"
             :data-char-id="char.id"
             loading="lazy"
+            decoding="async"
+            fetchpriority="low"
             @error="handleImageError($event, char)"
           />
           <div class="rarity-badge">{{ getRarityStars(char.rarity) }}★</div>

@@ -11,6 +11,8 @@ export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/ArknightMusicWeb/' : '/',
   server: {
     port: 3000,
+    // 3000 被占用時自動改用下一個可用埠（終端機會印出實際網址）
+    strictPort: false,
     open: true
   }
 })

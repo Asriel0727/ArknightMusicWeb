@@ -8,6 +8,8 @@
               v-if="playerState.currentSong && playerState.currentSong.coverUrl"
               :src="proxyImageUrl(playerState.currentSong.coverUrl)" 
               :alt="playerState.currentSong.name"
+              decoding="async"
+              fetchpriority="high"
               @load="handleImageLoad"
               @error="handleImageError"
             >
@@ -61,6 +63,8 @@
         :src="proxyImageUrl(playerState.currentSong.coverDeUrl)" 
         :alt="playerState.currentSong.name" 
         class="album-grid-visual-small"
+        decoding="async"
+        fetchpriority="high"
         @load="handleImageLoad"
         @error="handleImageError"
       >

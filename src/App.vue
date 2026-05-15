@@ -16,7 +16,7 @@
       <Modal @close="handleModalClose" />
     </template>
     
-    <audio ref="audioPlayerRef" style="display:none;"></audio>
+    <audio ref="audioPlayerRef" preload="auto" style="display:none;"></audio>
     <footer>
       <p>明日方舟網站 &copy;</p>
     </footer>

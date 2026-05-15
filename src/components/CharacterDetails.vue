@@ -6,6 +6,8 @@
         <img 
           :src="currentAvatarUrl" 
           :alt="character.name"
+          decoding="async"
+          fetchpriority="high"
           @error="handleImageError"
         />
         <div class="rarity-badge-large">{{ getRarityStars(character.rarity) }}★</div>
@@ -28,7 +30,7 @@
         <div class="portrait-tabs">
           <button 
             v-for="(portrait, index) in allPortraits" 
-            :key="index"
+            :key="portrait.skinId || `portrait-${index}`"
             :class="{ active: currentPortraitIndex === index }"
             @click="selectPortrait(index)"
           >
@@ -39,6 +41,8 @@
           <img 
             :src="currentPortraitUrl" 
             :alt="allPortraits[currentPortraitIndex]?.name || '立繪'"
+            decoding="async"
+            fetchpriority="high"
             @error="handlePortraitError"
             class="portrait-image"
             @load="handlePortraitLoad"
@@ -200,6 +204,8 @@
                 <img 
                   :src="item.iconUrl" 
                   :alt="item.name"
+                  loading="lazy"
+                  decoding="async"
                   @error="handleMaterialError"
                   class="material-icon"
                 />
@@ -224,6 +230,8 @@
                 <img 
                   :src="item.iconUrl" 
                   :alt="item.name"
+                  loading="lazy"
+                  decoding="async"
                   @error="handleMaterialError"
                   class="material-icon"
                 />
@@ -349,7 +357,8 @@ const allPortraits = computed(() => {
       console.log('[組件調試] 添加立繪:', p.name, 'URLs:', p.urls);
       list.push({
         name: p.name,
-        urls: p.urls
+        urls: p.urls,
+        skinId: p.skinId ?? null
       });
     });
   }

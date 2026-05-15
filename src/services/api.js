@@ -3,6 +3,14 @@ import { parseLRC } from '../utils/lyrics.js';
 
 const API_BASE = 'https://monstersiren-web-api.vercel.app/api';
 
+/** 歌曲詳情記憶體快取（切歌／重播會重複請求同一 cid） */
+const SONG_DETAILS_CACHE_TTL_MS = 45 * 60 * 1000;
+const songDetailsCache = new Map();
+
+/** 歌詞記憶體快取（同一首多次開播放器不重打 proxy） */
+const LYRICS_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const lyricsCache = new Map();
+
 /**
  * 獲取所有專輯列表
  * @returns {Promise<Array>} 專輯列表
@@ -41,9 +49,14 @@ export async function fetchSongs() {
  * @returns {Promise<Object>} 歌曲詳情
  */
 export async function fetchSongDetails(songId) {
+  const hit = songDetailsCache.get(songId);
+  if (hit && Date.now() - hit.t < SONG_DETAILS_CACHE_TTL_MS) {
+    return hit.data;
+  }
   const response = await fetch(`${API_BASE}/song/${songId}`);
   if (!response.ok) throw new Error('Network response was not ok');
   const { data } = await response.json();
+  songDetailsCache.set(songId, { data, t: Date.now() });
   return data;
 }
 
@@ -54,30 +67,29 @@ export async function fetchSongDetails(songId) {
  */
 export async function fetchLyrics(lyricUrl) {
   if (!lyricUrl) {
-    console.warn('歌詞URL為空');
     return [];
   }
-  
+
+  const cacheHit = lyricsCache.get(lyricUrl);
+  if (cacheHit && Date.now() - cacheHit.t < LYRICS_CACHE_TTL_MS) {
+    return cacheHit.lines;
+  }
+
   try {
-    // 使用和原本一樣的方法構建代理URL
-    const proxyUrl = `https://monstersiren-web-api.vercel.app/proxy-lyrics?url=${encodeURIComponent(lyricUrl)}`;
-    console.log('請求歌詞URL:', proxyUrl);
-    
+    const proxyUrl = `${API_BASE}/proxy-lyrics?url=${encodeURIComponent(lyricUrl)}`;
     const response = await fetch(proxyUrl);
     if (!response.ok) {
-      // 404或其他錯誤時，返回空數組而不是拋出錯誤
       if (response.status === 404) {
-        console.warn('歌詞不存在 (404):', lyricUrl);
+        lyricsCache.set(lyricUrl, { lines: [], t: Date.now() });
         return [];
       }
       throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
     }
     const lrcText = await response.text();
     const parsedLyrics = parseLRC(lrcText);
-    console.log('歌詞解析成功，共', parsedLyrics.length, '行');
+    lyricsCache.set(lyricUrl, { lines: parsedLyrics, t: Date.now() });
     return parsedLyrics;
   } catch (error) {
-    // 捕獲所有錯誤，返回空數組而不是拋出錯誤
     console.warn('歌詞加載失敗:', error.message);
     return [];
   }
@@ -96,13 +108,64 @@ export function getProxyImageUrl(imageUrl) {
 
 const GAMEDATA_BASE = 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel';
 
+/** 角色頭像／立繪／道具圖等主要圖床（較完整，優先使用） */
+const ARKNIGHT_IMAGES_BASE =
+  'https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main';
+/** 與上者路徑相同的備援鏡像 */
+const ARKNIGHT_IMAGES_MIRROR_ACESHIP =
+  'https://raw.githubusercontent.com/Aceship/Arknight-Images/main';
+
+/** skin_table 快取有效時間（毫秒），過期後下次取得詳情會重新下載 */
+const SKIN_TABLE_CACHE_TTL_MS = 60 * 60 * 1000;
+
+/** skin_table 體積大，用記憶體＋進行中共用 Promise 快取（避免 sessionStorage 配額與重複下載） */
+let skinTableMemoryCache;
+let skinTableCachedAt = 0;
+let skinTableLoadingPromise;
+
+function isSkinTableCacheFresh() {
+  return (
+    skinTableMemoryCache != null &&
+    typeof skinTableMemoryCache === 'object' &&
+    skinTableMemoryCache.charSkins &&
+    Date.now() - skinTableCachedAt < SKIN_TABLE_CACHE_TTL_MS
+  );
+}
+
+async function getSkinTableShared() {
+  if (isSkinTableCacheFresh()) {
+    return skinTableMemoryCache;
+  }
+  if (!skinTableLoadingPromise) {
+    skinTableLoadingPromise = fetch(`${GAMEDATA_BASE}/skin_table.json`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.charSkins) {
+          skinTableMemoryCache = data;
+          skinTableCachedAt = Date.now();
+        } else {
+          skinTableMemoryCache = null;
+          skinTableCachedAt = Date.now();
+        }
+        return skinTableMemoryCache;
+      })
+      .catch(() => {
+        skinTableMemoryCache = null;
+        skinTableCachedAt = Date.now();
+        return null;
+      })
+      .finally(() => {
+        skinTableLoadingPromise = null;
+      });
+  }
+  return skinTableLoadingPromise;
+}
+
 // 多個圖片來源（按優先順序）
 const AVATAR_SOURCES = [
-  // 來源1: Aceship (最常用)
-  (id) => `https://raw.githubusercontent.com/Aceship/Arknight-Images/main/avatars/${id}.png`,
-  // 來源2: yuanyan3060 的資源庫
+  (id) => `${ARKNIGHT_IMAGES_BASE}/avatars/${id}.png`,
+  (id) => `${ARKNIGHT_IMAGES_MIRROR_ACESHIP}/avatars/${id}.png`,
   (id) => `https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/avatar/${id}.png`,
-  // 來源3: 另一個備用來源
   (id) => `https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charavatars/${id}.png`,
 ];
 
@@ -271,14 +334,15 @@ function formatPotentialBuff(buff) {
 export async function fetchCharacterDetails(charId) {
   try {
     // 並行獲取所有需要的數據
-    const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes] = await Promise.all([
+    const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes, skinTable] = await Promise.all([
       fetch(`${GAMEDATA_BASE}/character_table.json`),
       fetch(`${GAMEDATA_BASE}/skill_table.json`).catch(() => null),
       fetch(`${GAMEDATA_BASE}/building_data.json`).catch(() => null),
       fetch(`${GAMEDATA_BASE}/uniequip_table.json`).catch(() => null),
       fetch(`${GAMEDATA_BASE}/handbook_info_table.json`).catch(() => null),
       fetch(`${GAMEDATA_BASE}/item_table.json`).catch(() => null),
-      fetch(`${GAMEDATA_BASE}/range_table.json`).catch(() => null)
+      fetch(`${GAMEDATA_BASE}/range_table.json`).catch(() => null),
+      getSkinTableShared()
     ]);
     
     if (!charTableRes.ok) throw new Error('無法獲取角色資料');
@@ -315,7 +379,7 @@ export async function fetchCharacterDetails(charId) {
         name: item?.name || itemId,
         iconId: item?.iconId || itemId,
         rarity: item?.rarity || 0,
-        iconUrl: `https://raw.githubusercontent.com/Aceship/Arknight-Images/main/items/${item?.iconId || itemId}.png`
+        iconUrl: `${ARKNIGHT_IMAGES_BASE}/items/${item?.iconId || itemId}.png`
       };
     };
     
@@ -454,119 +518,131 @@ export async function fetchCharacterDetails(charId) {
     // 處理幹員檔案
     const handbookData = handbookInfo?.handbookDict?.[charId] || {};
     
+    // 立繪檔名可能含 # 等字元，需編碼後再放入 URL path（否則 # 會被當成 fragment）
+    const encodePortraitFileId = (id) => encodeURIComponent(id);
+
     // 獲取立繪 URL（使用多個來源和備用 URL）
     const getPortraitUrls = (portraitId, alternativeIds = []) => {
       if (!portraitId) return [];
-      
+
       // 合併主要 ID 和備用 ID
       const allIds = [portraitId, ...alternativeIds].filter(Boolean);
       const urls = [];
-      
+
       // 為每個 ID 生成所有來源的 URL
       allIds.forEach(id => {
+        const enc = encodePortraitFileId(id);
         urls.push(
-          `https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/${id}.png`,
-          `https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/${id}.png`,
-          `https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/${id}.png`,
-          `https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/${id}.png`
+          `${ARKNIGHT_IMAGES_BASE}/characters/${enc}.png`,
+          `https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/${enc}.png`,
+          `${ARKNIGHT_IMAGES_MIRROR_ACESHIP}/characters/${enc}.png`,
+          `https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/${enc}.png`,
+          `https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/${enc}.png`
         );
       });
-      
+
       return urls;
     };
     
-    // 構建立繪列表（不包含初始，只包含精一、精二）
+    // 構建立繪列表（不包含初始：精一、精二 + skin_table 時裝）
     const portraits = [];
-    
-    console.log(`[立繪調試] 角色ID: ${charId}`);
-    console.log(`[立繪調試] phases數量: ${charData.phases?.length || 0}`);
-    console.log(`[立繪調試] phases數據:`, charData.phases);
-    
-    // 從 displaySkins 獲取立繪信息（如果有的話）
     const displaySkins = charData.displaySkins || [];
-    console.log(`[立繪調試] displaySkins數量: ${displaySkins.length}`);
-    console.log(`[立繪調試] displaySkins數據:`, displaySkins);
-    
+
     // 精一立繪
     if (charData.phases && charData.phases.length > 1) {
       const phase1 = charData.phases[1];
-      console.log(`[立繪調試] 精一 phase1數據:`, phase1);
-      
-      // 優先使用 displaySkins 中的信息
       let displayId1 = null;
-      
-      // 查找對應的 displaySkin（通常第一個是精一）
       if (displaySkins.length > 0) {
-        const elite1Skin = displaySkins.find(skin => 
+        const elite1Skin = displaySkins.find(skin =>
           skin.portraitId && (skin.portraitId.includes('_1') || skin.portraitId.includes('#1'))
         ) || displaySkins[0];
         displayId1 = elite1Skin?.portraitId;
-        console.log(`[立繪調試] 精一 從displaySkins找到:`, elite1Skin);
       }
-      
-      // 如果沒有找到，嘗試從 phase 獲取或使用默認格式
       if (!displayId1) {
         displayId1 = phase1.displayId || `${charId}_1`;
-        console.log(`[立繪調試] 精一 使用默認格式: ${displayId1}`);
       }
-      
-      // 生成多種可能的格式作為備用（因為不同來源可能使用不同格式）
       const alternativeIds1 = [
-        `${charId}_1+`,  // 嘗試 _1+ 格式
-        `${charId}_1`,   // 嘗試 _1 格式（最常見）
-        `${charId}#1`,   // 嘗試 #1 格式
-        phase1.displayId // 如果有 displayId 也加入
-      ].filter(id => id && id !== displayId1); // 過濾掉重複的
-      
-      const urls1 = getPortraitUrls(displayId1, alternativeIds1);
-      console.log(`[立繪調試] 精一 portraitId: ${displayId1}`);
-      console.log(`[立繪調試] 精一 備用IDs:`, alternativeIds1);
-      console.log(`[立繪調試] 精一 URLs數量:`, urls1.length);
-      console.log(`[立繪調試] 精一 前5個URLs:`, urls1.slice(0, 5));
-      
+        `${charId}_1+`,
+        `${charId}_1`,
+        `${charId}#1`,
+        phase1.displayId
+      ].filter(id => id && id !== displayId1);
+
       portraits.push({
         name: '精一',
         portraitId: displayId1,
-        urls: urls1
+        urls: getPortraitUrls(displayId1, alternativeIds1),
+        skinId: null
       });
     }
-    
+
     // 精二立繪
     if (charData.phases && charData.phases.length > 2) {
       const phase2 = charData.phases[2];
-      console.log(`[立繪調試] 精二 phase2數據:`, phase2);
-      
-      // 優先使用 displaySkins 中的信息
       let displayId2 = null;
-      
-      // 查找對應的 displaySkin（通常第二個是精二）
       if (displaySkins.length > 1) {
-        const elite2Skin = displaySkins.find(skin => 
+        const elite2Skin = displaySkins.find(skin =>
           skin.portraitId && (skin.portraitId.includes('_2') || skin.portraitId.includes('#2'))
         ) || displaySkins[1];
         displayId2 = elite2Skin?.portraitId;
-        console.log(`[立繪調試] 精二 從displaySkins找到:`, elite2Skin);
       }
-      
-      // 如果沒有找到，嘗試從 phase 獲取或使用默認格式
       if (!displayId2) {
         displayId2 = phase2.displayId || `${charId}_2`;
-        console.log(`[立繪調試] 精二 使用默認格式: ${displayId2}`);
       }
-      
-      const urls2 = getPortraitUrls(displayId2);
-      console.log(`[立繪調試] 精二 portraitId: ${displayId2}`);
-      console.log(`[立繪調試] 精二 URLs:`, urls2);
-      
+
       portraits.push({
         name: '精二',
         portraitId: displayId2,
-        urls: urls2
+        urls: getPortraitUrls(displayId2),
+        skinId: null
       });
     }
-    
-    console.log(`[立繪調試] 最終portraits:`, portraits);
-    
+
+    const elitePortraitIds = new Set(portraits.map(p => p.portraitId).filter(Boolean));
+
+    // 時裝：charSkins 內 charId 相符者，排除預設戰鬥立繪群 ILLUST_*（對應初始／精一／精二美術）
+    const charSkinsMap = skinTable?.charSkins;
+    if (charSkinsMap && typeof charSkinsMap === 'object') {
+      const isDefaultSkinGroup = (gid) => typeof gid === 'string' && gid.startsWith('ILLUST_');
+      const costumeRows = [];
+
+      for (const skin of Object.values(charSkinsMap)) {
+        if (!skin || skin.charId !== charId) continue;
+        const gid = skin.displaySkin?.skinGroupId;
+        if (isDefaultSkinGroup(gid)) continue;
+
+        const portraitId = skin.portraitId;
+        if (!portraitId || elitePortraitIds.has(portraitId)) continue;
+
+        const ds = skin.displaySkin || {};
+        const rawLabel = [ds.skinName, ds.skinGroupName].find(Boolean) || skin.skinId || portraitId;
+        const labelStr = String(rawLabel);
+        const tabName = labelStr.startsWith('時裝') ? labelStr : `時裝 · ${labelStr}`;
+
+        costumeRows.push({
+          skinId: skin.skinId,
+          portraitId,
+          tabName,
+          sortId: typeof ds.sortId === 'number' ? ds.sortId : 0
+        });
+      }
+
+      costumeRows.sort((a, b) => a.sortId - b.sortId || String(a.skinId).localeCompare(String(b.skinId)));
+
+      const seenPortrait = new Set();
+      for (const row of costumeRows) {
+        if (seenPortrait.has(row.portraitId)) continue;
+        seenPortrait.add(row.portraitId);
+
+        portraits.push({
+          name: row.tabName,
+          portraitId: row.portraitId,
+          urls: getPortraitUrls(row.portraitId),
+          skinId: row.skinId
+        });
+      }
+    }
+
     // 獲取攻擊範圍數據
     const getRangeData = (rangeId) => {
       if (!rangeId || !rangeTable[rangeId]) return null;

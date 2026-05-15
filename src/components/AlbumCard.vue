@@ -5,6 +5,8 @@
       :alt="album.name"
       @load="handleImageLoad"
       loading="lazy"
+      decoding="async"
+      fetchpriority="low"
     >
     <div class="marquee-container" ref="marqueeContainer">
       <div class="marquee-content" ref="marqueeContent">

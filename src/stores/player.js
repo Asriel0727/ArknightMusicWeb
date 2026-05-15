@@ -85,49 +85,55 @@ export function initAudioPlayer(audioElement) {
   }
 }
 
-// 播放歌曲
+// 播放歌曲（音訊優先：不等待歌詞；已有 sourceUrl 時不重複請求詳情）
 export async function playSong(song, coverUrl, coverDeUrl) {
   try {
-    console.log('開始播放歌曲:', song);
-    const songDetails = await fetchSongDetails(song.cid);
-    console.log('歌曲詳情:', songDetails);
-    
+    let songDetails = song;
+    if (!song.sourceUrl) {
+      songDetails = await fetchSongDetails(song.cid);
+    }
+
     const fullSong = {
       ...songDetails,
       artistes: song.artistes || songDetails.artistes || ['未知演出者'],
       coverUrl: coverUrl || song.coverUrl || songDetails.coverUrl,
       coverDeUrl: coverDeUrl || song.coverDeUrl || songDetails.coverDeUrl,
       audioUrl: songDetails.sourceUrl || '',
-      albumCid: song.albumCid || songDetails.albumCid // 確保保留專輯ID
+      albumCid: song.albumCid || songDetails.albumCid
     };
-    
-    console.log('完整歌曲信息:', fullSong);
-    console.log('封面URL:', fullSong.coverUrl);
-    console.log('視覺圖URL:', fullSong.coverDeUrl);
-    
+
+    const idx = playerState.currentSongIndex;
+    const pl = playerState.currentPlaylist;
+    if (pl[idx] && pl[idx].cid === fullSong.cid) {
+      Object.assign(pl[idx], songDetails);
+    }
+
     playerState.currentSong = fullSong;
     playerState.lyrics = [];
-    
-    // 載入歌詞
+
     if (fullSong.lyricUrl) {
-      console.log('開始載入歌詞:', fullSong.lyricUrl);
-      // fetchLyrics 現在會返回空數組而不是拋出錯誤
-      playerState.lyrics = await fetchLyrics(fullSong.lyricUrl);
-      if (playerState.lyrics.length > 0) {
-        console.log('歌詞載入成功，共', playerState.lyrics.length, '行');
-      } else {
-        console.log('歌曲沒有歌詞或歌詞載入失敗');
-      }
-    } else {
-      console.log('歌曲沒有歌詞URL');
-      playerState.lyrics = [];
+      fetchLyrics(fullSong.lyricUrl)
+        .then((lines) => {
+          playerState.lyrics = lines;
+        })
+        .catch(() => {
+          playerState.lyrics = [];
+        });
     }
-    
-    // 設置音頻源並播放
-    if (playerState.audioPlayer) {
+
+    if (playerState.audioPlayer && fullSong.audioUrl) {
       playerState.audioPlayer.src = fullSong.audioUrl;
       playerState.audioPlayer.load();
       await playerState.audioPlayer.play();
+    }
+
+    // 預熱下一首詳情（不打斷播放，方便連續切歌）
+    const nextIdx = playerState.currentSongIndex + 1;
+    if (nextIdx < playerState.currentPlaylist.length) {
+      const nextSong = playerState.currentPlaylist[nextIdx];
+      if (nextSong?.cid && !nextSong.sourceUrl) {
+        fetchSongDetails(nextSong.cid).catch(() => {});
+      }
     }
   } catch (error) {
     console.error('播放歌曲時出錯:', error);
@@ -164,28 +170,22 @@ export async function playSongFromAlbum(index, albumId) {
 // 從主列表播放歌曲
 export async function playSongFromMasterList(song) {
   try {
-    console.log('從主列表播放歌曲:', song);
     const songDetails = await fetchSongDetails(song.cid);
-    console.log('歌曲詳情:', songDetails);
-    
     const albumCid = songDetails.albumCid;
     if (!albumCid) {
       console.error('歌曲沒有專輯ID');
       return;
     }
-    
+
     const albumDetails = await fetchAlbumDetails(albumCid);
-    console.log('專輯詳情:', albumDetails);
-    console.log('專輯封面URL:', albumDetails.coverUrl);
-    console.log('專輯視覺圖URL:', albumDetails.coverDeUrl);
-    
+
     const songToPlay = {
       ...songDetails,
       artistes: songDetails.artistes || albumDetails.artistes || song.artistes || ['未知演出者'],
       coverUrl: albumDetails.coverUrl,
       coverDeUrl: albumDetails.coverDeUrl
     };
-    
+
     playerState.currentPlaylist = [songToPlay];
     playerState.currentSongIndex = 0;
     await playSong(songToPlay, albumDetails.coverUrl, albumDetails.coverDeUrl);
