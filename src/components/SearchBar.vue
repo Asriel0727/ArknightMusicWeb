@@ -4,7 +4,7 @@
       type="text" 
       v-model="searchQuery"
       @keypress.enter="handleSearch"
-      placeholder="搜尋專輯或歌曲..."
+      :placeholder="$t('searchBar.albumPlaceholder')"
     >
     <button @click="handleSearch">
       <i class="fas fa-search"></i>

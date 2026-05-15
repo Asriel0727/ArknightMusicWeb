@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "albums": "塞壬唱片",
+    "characters": "干员图鉴",
+    "logoAlt": "明日方舟"
+  },
+  "footer": {
+    "credit": "明日方舟网站 ©"
+  },
+  "meta": {
+    "documentTitle": "明日方舟音乐播放器"
+  },
+  "language": {
+    "label": "语言",
+    "zhTW": "繁体中文",
+    "zhCN": "简体中文",
+    "en": "English",
+    "ja": "日本語",
+    "ko": "한국어"
+  },
+  "common": {
+    "all": "全部",
+    "unknownArtist": "未知演出者",
+    "unknownSong": "未知歌曲",
+    "noCover": "无封面",
+    "noLyrics": "暂无歌词",
+    "noIntro": "暂无介绍",
+    "noNowPlaying": "暂无播放",
+    "loading": "载入中…"
+  },
+  "album": {
+    "pageTitle": "塞壬唱片专辑",
+    "noResults": "没有找到专辑",
+    "prevPage": "上一页",
+    "nextPage": "下一页",
+    "pageOf": "第 {current} / {total} 页",
+    "perPageCount": "（每页 {n} 个）",
+    "viewAlbum": "查看专辑",
+    "trackList": "曲目列表",
+    "play": "播放",
+    "pageIndicator": "第 {current} / {total} 页"
+  },
+  "character": {
+    "pageTitle": "干员图鉴",
+    "rarity": "稀有度",
+    "profession": "职业",
+    "search": "搜索",
+    "searchPlaceholder": "输入角色名称…",
+    "count": "共 {n} 位干员",
+    "loadList": "正在载入角色资料…",
+    "loadListError": "无法载入角色资料，请稍后再试",
+    "loadDetailError": "无法载入角色详情，请稍后再试",
+    "retry": "重试",
+    "melee": "近战",
+    "ranged": "远程",
+    "sections": {
+      "portrait": "1. 干员立绘",
+      "trait": "2. 特性",
+      "obtain": "3. 获得方式",
+      "stats": "4. 属性",
+      "range": "5. 攻击范围",
+      "talents": "6. 天赋",
+      "potential": "7. 潜能提升",
+      "skills": "8. 技能",
+      "logistics": "9. 后勤技能",
+      "evolve": "10. 精英化材料",
+      "skillCost": "11. 技能升级材料",
+      "modules": "12. 模组",
+      "handbook": "13. 干员档案"
+    },
+    "stats": {
+      "phase": "等级",
+      "hp": "生命",
+      "atk": "攻击",
+      "def": "防御",
+      "res": "法抗",
+      "respawn": "再部署",
+      "cost": "费用",
+      "block": "阻挡"
+    },
+    "phaseLabel": "精英{phase}",
+    "eliteRangeTitle": "精英 {phase}",
+    "talentFallback": "天赋 {n}",
+    "unlockLine": "精英{elite} Lv{level}",
+    "potentialReq": "潜能{rank}",
+    "potentialLevel": "潜能 {n}",
+    "improveDefault": "提升能力",
+    "skillIndex": "技能 {n}",
+    "spCost": "SP消耗",
+    "initSp": "初始SP",
+    "duration": "持续",
+    "logisticsDefault": "基建技能",
+    "evolveTitle": "精英化 {phase}",
+    "skillRankTitle": "技能等级 {from} → {to}",
+    "noMaterials": "无需材料",
+    "moduleDefault": "模组",
+    "unlockModule": "解锁条件",
+    "trust": "信赖{points}",
+    "storyFallback": "档案 {n}",
+    "noHandbook": "暂无档案资料",
+    "portraitLoading": "载入中…",
+    "portraitLoadFailed": "立绘载入失败",
+    "portraitFallback": "立绘"
+  },
+  "profession": {
+    "PIONEER": "先锋",
+    "WARRIOR": "近卫",
+    "TANK": "重装",
+    "SNIPER": "狙击",
+    "CASTER": "术师",
+    "MEDIC": "医疗",
+    "SUPPORT": "辅助",
+    "SPECIAL": "特种"
+  },
+  "roomType": {
+    "CONTROL": "控制中枢",
+    "POWER": "发电站",
+    "MANUFACTURE": "制造站",
+    "TRADING": "贸易站",
+    "DORMITORY": "宿舍",
+    "MEETING": "会客室",
+    "HIRE": "人力办公室",
+    "TRAINING": "训练室",
+    "WORKSHOP": "加工站"
+  },
+  "spType": {
+    "1": "自动回复",
+    "2": "攻击回复",
+    "4": "受击回复",
+    "8": "被动",
+    "default": "自动回复"
+  },
+  "searchBar": {
+    "albumPlaceholder": "搜索专辑或歌曲…"
+  }
+}

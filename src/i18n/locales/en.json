@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "albums": "Monster Siren",
+    "characters": "Operators",
+    "logoAlt": "Arknights"
+  },
+  "footer": {
+    "credit": "Arknights fan site ©"
+  },
+  "meta": {
+    "documentTitle": "Arknights Music Player"
+  },
+  "language": {
+    "label": "Language",
+    "zhTW": "Traditional Chinese",
+    "zhCN": "Simplified Chinese",
+    "en": "English",
+    "ja": "Japanese",
+    "ko": "Korean"
+  },
+  "common": {
+    "all": "All",
+    "unknownArtist": "Unknown artist",
+    "unknownSong": "Unknown track",
+    "noCover": "No cover",
+    "noLyrics": "No lyrics",
+    "noIntro": "No description",
+    "noNowPlaying": "Nothing playing",
+    "loading": "Loading…"
+  },
+  "album": {
+    "pageTitle": "Monster Siren albums",
+    "noResults": "No albums found",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "pageOf": "Page {current} / {total}",
+    "perPageCount": "({n} per page)",
+    "viewAlbum": "View album",
+    "trackList": "Track list",
+    "play": "Play",
+    "pageIndicator": "Page {current} / {total}"
+  },
+  "character": {
+    "pageTitle": "Operator archive",
+    "rarity": "Rarity",
+    "profession": "Class",
+    "search": "Search",
+    "searchPlaceholder": "Operator name…",
+    "count": "{n} operators",
+    "loadList": "Loading operators…",
+    "loadListError": "Could not load operators. Please try again.",
+    "loadDetailError": "Could not load operator details. Please try again.",
+    "retry": "Retry",
+    "melee": "Melee",
+    "ranged": "Ranged",
+    "sections": {
+      "portrait": "1. Artwork",
+      "trait": "2. Trait",
+      "obtain": "3. How to obtain",
+      "stats": "4. Stats",
+      "range": "5. Attack range",
+      "talents": "6. Talents",
+      "potential": "7. Potential",
+      "skills": "8. Skills",
+      "logistics": "9. Base skills",
+      "evolve": "10. Promotion materials",
+      "skillCost": "11. Skill level materials",
+      "modules": "12. Modules",
+      "handbook": "13. Records"
+    },
+    "stats": {
+      "phase": "Phase",
+      "hp": "HP",
+      "atk": "ATK",
+      "def": "DEF",
+      "res": "RES",
+      "respawn": "Redeploy",
+      "cost": "Cost",
+      "block": "Block"
+    },
+    "phaseLabel": "Elite {phase}",
+    "eliteRangeTitle": "Elite {phase}",
+    "talentFallback": "Talent {n}",
+    "unlockLine": "Elite {elite} Lv{level}",
+    "potentialReq": "Pot.{rank}",
+    "potentialLevel": "Potential {n}",
+    "improveDefault": "Stat increase",
+    "skillIndex": "Skill {n}",
+    "spCost": "SP cost",
+    "initSp": "Initial SP",
+    "duration": "Duration",
+    "logisticsDefault": "Base skill",
+    "evolveTitle": "Promotion {phase}",
+    "skillRankTitle": "Skill level {from} → {to}",
+    "noMaterials": "No materials",
+    "moduleDefault": "Module",
+    "unlockModule": "Unlock",
+    "trust": "Trust {points}",
+    "storyFallback": "File {n}",
+    "noHandbook": "No record text",
+    "portraitLoading": "Loading…",
+    "portraitLoadFailed": "Could not load artwork",
+    "portraitFallback": "Artwork"
+  },
+  "profession": {
+    "PIONEER": "Vanguard",
+    "WARRIOR": "Guard",
+    "TANK": "Defender",
+    "SNIPER": "Sniper",
+    "CASTER": "Caster",
+    "MEDIC": "Medic",
+    "SUPPORT": "Supporter",
+    "SPECIAL": "Specialist"
+  },
+  "roomType": {
+    "CONTROL": "Control center",
+    "POWER": "Power plant",
+    "MANUFACTURE": "Factory",
+    "TRADING": "Trading post",
+    "DORMITORY": "Dormitory",
+    "MEETING": "Reception room",
+    "HIRE": "HR office",
+    "TRAINING": "Training room",
+    "WORKSHOP": "Workshop"
+  },
+  "spType": {
+    "1": "Auto recovery",
+    "2": "Offensive recovery",
+    "4": "Defensive recovery",
+    "8": "Passive",
+    "default": "Auto recovery"
+  },
+  "searchBar": {
+    "albumPlaceholder": "Search albums or tracks…"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "albums": "몬스터 사이렌",
+    "characters": "오퍼레이터",
+    "logoAlt": "명일방주"
+  },
+  "footer": {
+    "credit": "명일방주 팬 사이트 ©"
+  },
+  "meta": {
+    "documentTitle": "명일방주 뮤직 플레이어"
+  },
+  "language": {
+    "label": "언어",
+    "zhTW": "번체 중국어",
+    "zhCN": "간체 중국어",
+    "en": "English",
+    "ja": "日本語",
+    "ko": "한국어"
+  },
+  "common": {
+    "all": "전체",
+    "unknownArtist": "알 수 없는 아티스트",
+    "unknownSong": "알 수 없는 곡",
+    "noCover": "표지 없음",
+    "noLyrics": "가사 없음",
+    "noIntro": "소개 없음",
+    "noNowPlaying": "재생 중인 곡 없음",
+    "loading": "불러오는 중…"
+  },
+  "album": {
+    "pageTitle": "몬스터 사이렌 앨범",
+    "noResults": "앨범을 찾을 수 없습니다",
+    "prevPage": "이전",
+    "nextPage": "다음",
+    "pageOf": "{current} / {total} 페이지",
+    "perPageCount": "(페이지당 {n}개)",
+    "viewAlbum": "앨범 보기",
+    "trackList": "트랙 목록",
+    "play": "재생",
+    "pageIndicator": "{current} / {total} 페이지"
+  },
+  "character": {
+    "pageTitle": "오퍼레이터 도감",
+    "rarity": "희귀도",
+    "profession": "직업",
+    "search": "검색",
+    "searchPlaceholder": "오퍼레이터 이름…",
+    "count": "오퍼레이터 {n}명",
+    "loadList": "오퍼레이터 불러오는 중…",
+    "loadListError": "오퍼레이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
+    "loadDetailError": "상세 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
+    "retry": "다시 시도",
+    "melee": "근거리",
+    "ranged": "원거리",
+    "sections": {
+      "portrait": "1. 초상화",
+      "trait": "2. 특성",
+      "obtain": "3. 획득 방법",
+      "stats": "4. 능력치",
+      "range": "5. 공격 범위",
+      "talents": "6. 재능",
+      "potential": "7. 잠재능력",
+      "skills": "8. 스킬",
+      "logistics": "9. 기반 시설 스킬",
+      "evolve": "10. 정예화 재료",
+      "skillCost": "11. 스킬 강화 재료",
+      "modules": "12. 모듈",
+      "handbook": "13. 기록"
+    },
+    "stats": {
+      "phase": "단계",
+      "hp": "HP",
+      "atk": "공격",
+      "def": "방어",
+      "res": "예술 저항",
+      "respawn": "재배치",
+      "cost": "코스트",
+      "block": "블록"
+    },
+    "phaseLabel": "정예 {phase}",
+    "eliteRangeTitle": "정예 {phase}",
+    "talentFallback": "재능 {n}",
+    "unlockLine": "정예{elite} Lv{level}",
+    "potentialReq": "잠재{rank}",
+    "potentialLevel": "잠재 {n}",
+    "improveDefault": "능력치 상승",
+    "skillIndex": "스킬 {n}",
+    "spCost": "SP 소모",
+    "initSp": "초기 SP",
+    "duration": "지속",
+    "logisticsDefault": "기반 시설 스킬",
+    "evolveTitle": "정예화 {phase}",
+    "skillRankTitle": "스킬 레벨 {from} → {to}",
+    "noMaterials": "재료 없음",
+    "moduleDefault": "모듈",
+    "unlockModule": "해금 조건",
+    "trust": "신뢰{points}",
+    "storyFallback": "파일 {n}",
+    "noHandbook": "기록 텍스트 없음",
+    "portraitLoading": "불러오는 중…",
+    "portraitLoadFailed": "초상화를 불러올 수 없습니다",
+    "portraitFallback": "초상화"
+  },
+  "profession": {
+    "PIONEER": "뱅가드",
+    "WARRIOR": "가드",
+    "TANK": "디펜더",
+    "SNIPER": "스나이퍼",
+    "CASTER": "캐스터",
+    "MEDIC": "메딕",
+    "SUPPORT": "서포터",
+    "SPECIAL": "스페셜리스트"
+  },
+  "roomType": {
+    "CONTROL": "관제 센터",
+    "POWER": "발전소",
+    "MANUFACTURE": "제조소",
+    "TRADING": "무역소",
+    "DORMITORY": "숙소",
+    "MEETING": "응접실",
+    "HIRE": "인사 사무소",
+    "TRAINING": "훈련실",
+    "WORKSHOP": "가공소"
+  },
+  "spType": {
+    "1": "자동 회복",
+    "2": "공격 회복",
+    "4": "피격 회복",
+    "8": "패시브",
+    "default": "자동 회복"
+  },
+  "searchBar": {
+    "albumPlaceholder": "앨범 또는 곡 검색…"
+  }
+}

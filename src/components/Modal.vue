@@ -8,14 +8,14 @@
       <div id="modal-body">
         <AlbumDetails 
           v-if="modalState.currentView === 'album' && albumState.currentAlbumDetails"
-          :key="albumState.currentAlbumDetails?.cid || 'album'"
+          :key="(albumState.currentAlbumDetails?.cid || 'album') + '-' + locale"
           :album="albumState.currentAlbumDetails"
           @play-song="handlePlaySong"
         />
-        <PlayerView v-else-if="modalState.currentView === 'player'" />
+        <PlayerView v-else-if="modalState.currentView === 'player'" :key="'player-' + locale" />
         <CharacterDetails 
           v-else-if="modalState.currentView === 'character' && characterState.currentCharacterDetails"
-          :key="characterState.currentCharacterDetails?.id || 'character'"
+          :key="characterDetailsKey"
           :character="characterState.currentCharacterDetails"
         />
       </div>
@@ -24,12 +24,20 @@
 </template>
 
 <script setup>
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AlbumDetails from './AlbumDetails.vue';
 import PlayerView from './PlayerView.vue';
 import CharacterDetails from './CharacterDetails.vue';
 import { modalState, albumState, playerState, characterState } from '../stores/player.js';
 import { fetchAlbumDetails } from '../services/api.js';
+
+const { locale } = useI18n();
+
+const characterDetailsKey = computed(() => {
+  const id = characterState.currentCharacterDetails?.id;
+  return id ? `character-${id}-${locale.value}` : 'character';
+});
 
 const emit = defineEmits(['close']);
 

@@ -1,5 +1,10 @@
 import { ref, reactive, computed } from 'vue';
 import { fetchSongDetails, fetchLyrics, fetchAlbumDetails } from '../services/api.js';
+import { i18n } from '../i18n/index.js';
+
+function unknownArtistLabel() {
+  return i18n.global.t('common.unknownArtist');
+}
 
 // 播放器狀態
 export const playerState = reactive({
@@ -95,7 +100,7 @@ export async function playSong(song, coverUrl, coverDeUrl) {
 
     const fullSong = {
       ...songDetails,
-      artistes: song.artistes || songDetails.artistes || ['未知演出者'],
+      artistes: song.artistes || songDetails.artistes || [unknownArtistLabel()],
       coverUrl: coverUrl || song.coverUrl || songDetails.coverUrl,
       coverDeUrl: coverDeUrl || song.coverDeUrl || songDetails.coverDeUrl,
       audioUrl: songDetails.sourceUrl || '',
@@ -151,7 +156,7 @@ export async function playSongFromAlbum(index, albumId) {
     const album = albumState.currentAlbumDetails;
     albumState.currentAlbumSongs = album.songs.map((song) => ({
       ...song,
-      artistes: song.artistes || album.artistes || ['未知演出者'],
+      artistes: song.artistes || album.artistes || [unknownArtistLabel()],
       coverUrl: album.coverUrl,
       coverDeUrl: album.coverDeUrl,
       albumCid: album.cid, // 保存專輯ID以便導航時使用
@@ -181,7 +186,7 @@ export async function playSongFromMasterList(song) {
 
     const songToPlay = {
       ...songDetails,
-      artistes: songDetails.artistes || albumDetails.artistes || song.artistes || ['未知演出者'],
+      artistes: songDetails.artistes || albumDetails.artistes || song.artistes || [unknownArtistLabel()],
       coverUrl: albumDetails.coverUrl,
       coverDeUrl: albumDetails.coverDeUrl
     };

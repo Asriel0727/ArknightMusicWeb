@@ -1,9 +1,10 @@
 <template>
-  <div class="character-page">
+  <div class="character-page" :key="locale">
+    <h1 class="page-title">{{ t('character.pageTitle') }}</h1>
     <!-- 篩選區域 -->
     <div class="filter-section">
       <div class="filter-group">
-        <label>稀有度</label>
+        <label>{{ t('character.rarity') }}</label>
         <div class="filter-buttons">
           <button 
             v-for="star in [6, 5, 4, 3, 2, 1]" 
@@ -17,12 +18,12 @@
             :class="{ active: selectedRarity.length === 0 }"
             @click="selectedRarity = []"
           >
-            全部
+            {{ t('common.all') }}
           </button>
         </div>
       </div>
       <div class="filter-group">
-        <label>職業</label>
+        <label>{{ t('character.profession') }}</label>
         <div class="filter-buttons">
           <button 
             v-for="prof in professions" 
@@ -36,16 +37,16 @@
             :class="{ active: selectedProfession === null }"
             @click="selectedProfession = null"
           >
-            全部
+            {{ t('common.all') }}
           </button>
         </div>
       </div>
       <div class="filter-group search-group">
-        <label>搜尋</label>
+        <label>{{ t('character.search') }}</label>
         <input 
           type="text" 
           v-model="searchQuery" 
-          placeholder="輸入角色名稱..."
+          :placeholder="t('character.searchPlaceholder')"
           class="search-input"
         />
       </div>
@@ -53,20 +54,20 @@
 
     <!-- 角色數量統計 -->
     <div class="character-count">
-      共 {{ filteredCharacters.length }} 位幹員
+      {{ t('character.count', { n: filteredCharacters.length }) }}
     </div>
 
     <!-- 載入中 -->
     <div v-if="isLoading" class="loading-container">
       <div class="spinner"></div>
-      <p>正在載入角色資料...</p>
+      <p>{{ t('character.loadList') }}</p>
     </div>
 
     <!-- 錯誤提示 -->
     <div v-else-if="error" class="error-container">
       <i class="fas fa-exclamation-triangle"></i>
       <p>{{ error }}</p>
-      <button @click="loadCharacters">重試</button>
+      <button @click="loadCharacters">{{ t('character.retry') }}</button>
     </div>
 
     <!-- 角色列表 -->
@@ -100,9 +101,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { fetchCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls, fetchCharacterDetails } from '../services/api.js';
 import { modalState, characterState } from '../stores/player.js';
+
+const { t, locale } = useI18n();
 
 const characters = ref([]);
 const isLoading = ref(true);
@@ -121,19 +125,19 @@ const getCurrentAvatarUrl = (char) => {
   return urls[currentIndex] || urls[0] || '';
 };
 
-const professions = [
-  { value: 'PIONEER', label: '先鋒' },
-  { value: 'WARRIOR', label: '近衛' },
-  { value: 'TANK', label: '重裝' },
-  { value: 'SNIPER', label: '狙擊' },
-  { value: 'CASTER', label: '術師' },
-  { value: 'MEDIC', label: '醫療' },
-  { value: 'SUPPORT', label: '輔助' },
-  { value: 'SPECIAL', label: '特種' },
-];
+const professions = computed(() => [
+  { value: 'PIONEER', label: t('profession.PIONEER') },
+  { value: 'WARRIOR', label: t('profession.WARRIOR') },
+  { value: 'TANK', label: t('profession.TANK') },
+  { value: 'SNIPER', label: t('profession.SNIPER') },
+  { value: 'CASTER', label: t('profession.CASTER') },
+  { value: 'MEDIC', label: t('profession.MEDIC') },
+  { value: 'SUPPORT', label: t('profession.SUPPORT') },
+  { value: 'SPECIAL', label: t('profession.SPECIAL') },
+]);
 
 const getProfessionName = (profession) => {
-  const found = professions.find(p => p.value === profession);
+  const found = professions.value.find(p => p.value === profession);
   return found ? found.label : profession;
 };
 
@@ -227,7 +231,7 @@ const handleCharacterClick = async (char) => {
     modalState.isOpen = true;
   } catch (error) {
     console.error('獲取角色詳情失敗:', error);
-    alert('無法載入角色詳情，請稍後再試');
+    alert(t('character.loadDetailError'));
   }
 };
 
@@ -244,7 +248,7 @@ const loadCharacters = async () => {
       avatarIndexMap.value.set(char.id, 0);
     });
   } catch (e) {
-          error.value = '無法載入角色資料，請稍後再試';
+          error.value = t('character.loadListError');
     console.error(e);
   } finally {
     isLoading.value = false;
@@ -254,6 +258,23 @@ const loadCharacters = async () => {
 onMounted(() => {
   loadCharacters();
 });
+
+watch(locale, async () => {
+  await loadCharacters();
+  if (
+    modalState.isOpen &&
+    modalState.currentView === 'character' &&
+    characterState.currentCharacterDetails?.id
+  ) {
+    try {
+      characterState.currentCharacterDetails = await fetchCharacterDetails(
+        characterState.currentCharacterDetails.id
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  }
+});
 </script>
 
 <style scoped>
@@ -261,6 +282,13 @@ onMounted(() => {
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.character-page > .page-title {
+  margin: 0 0 16px 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 /* 篩選區域 */

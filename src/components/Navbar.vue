@@ -8,7 +8,7 @@
           @click="changePage('albums')"
         >
           <i class="fas fa-compact-disc"></i>
-          <span>塞壬唱片</span>
+          <span>{{ $t('nav.albums') }}</span>
         </button>
         <button 
           class="nav-tab" 
@@ -16,18 +16,38 @@
           @click="changePage('characters')"
         >
           <i class="fas fa-users"></i>
-          <span>幹員圖鑑</span>
+          <span>{{ $t('nav.characters') }}</span>
         </button>
       </div>
     </div>
     <div class="navbar-right">
-      <img :src="`${baseUrl}logo.png`" alt="明日方舟" class="logo-img" />
+      <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />
+      <label class="nav-locale-wrap">
+        <span class="nav-locale-label">{{ $t('language.label') }}</span>
+        <select v-model="localeModel" class="nav-locale">
+          <option value="zh-TW">{{ $t('language.zhTW') }}</option>
+          <option value="zh-CN">{{ $t('language.zhCN') }}</option>
+          <option value="en">{{ $t('language.en') }}</option>
+          <option value="ja">{{ $t('language.ja') }}</option>
+          <option value="ko">{{ $t('language.ko') }}</option>
+        </select>
+      </label>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAppLocale } from '../composables/useAppLocale.js';
+
+const { locale } = useI18n();
+const { setLocale } = useAppLocale();
+
+const localeModel = computed({
+  get: () => locale.value,
+  set: (v) => setLocale(v),
+});
 
 // 使用 Vite 的 BASE_URL 来支持 GitHub Pages 的 base 路径
 const baseUrl = import.meta.env.BASE_URL;
@@ -65,6 +85,50 @@ const changePage = (page) => {
 .navbar-left {
   display: flex;
   align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.navbar-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nav-locale-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.nav-locale-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.nav-locale {
+  appearance: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-color);
+  font-size: 0.72rem;
+  padding: 3px 6px;
+  cursor: pointer;
+  max-width: 118px;
+  line-height: 1.3;
+}
+
+.nav-locale:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .nav-tabs {
@@ -143,6 +207,16 @@ const changePage = (page) => {
   
   .nav-tab span {
     display: none;
+  }
+
+  .nav-locale-label {
+    display: none;
+  }
+
+  .nav-locale {
+    max-width: 108px;
+    font-size: 0.7rem;
+    padding: 4px 6px;
   }
   
   .nav-tab i {

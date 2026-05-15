@@ -40,7 +40,7 @@
         @click="handleSongClick(song)"
       >
         <span>{{ song.name }}</span>
-        <span style="color:#8b949e;font-size:0.9em;">- {{ song.artistes?.join(', ') || '未知演出者' }}</span>
+        <span style="color:#8b949e;font-size:0.9em;">- {{ song.artistes?.join(', ') || t('common.unknownArtist') }}</span>
       </div>
     </div>
   </div>
@@ -48,9 +48,12 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { playerState, dropdownState, modalState } from '../stores/player.js';
 import { playSongFromMasterList } from '../stores/player.js';
 import { fetchSongs } from '../services/api.js';
+
+const { t } = useI18n();
 
 const barRef = ref(null);
 const titleRef = ref(null);
@@ -65,7 +68,7 @@ const visualizerBars = ref([
 ]);
 
 const currentTitle = computed(() => {
-  return playerState.currentSong?.name || '暫無播放';
+  return playerState.currentSong?.name || t('common.noNowPlaying');
 });
 
 const isCurrentSong = (song) => {
@@ -127,7 +130,7 @@ const loadAllSongs = async () => {
     dropdownState.allSongs = songs.map(song => ({
       cid: song.cid,
       name: song.name,
-      artistes: song.artists || ['未知演出者']
+      artistes: song.artists || [t('common.unknownArtist')]
     }));
     dropdownState.isLoaded = true;
   } catch (error) {

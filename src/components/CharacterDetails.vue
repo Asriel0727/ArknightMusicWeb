@@ -17,7 +17,7 @@
         <p class="character-appellation">{{ character.appellation || character.id }}</p>
         <div class="character-tags">
           <span class="tag profession">{{ getProfessionName(character.profession) }}</span>
-          <span class="tag position">{{ character.position === 'MELEE' ? '近戰' : '遠程' }}</span>
+          <span class="tag position">{{ character.position === 'MELEE' ? t('character.melee') : t('character.ranged') }}</span>
           <span v-if="character.nation" class="tag nation">{{ character.nation }}</span>
         </div>
       </div>
@@ -26,7 +26,7 @@
     <div class="character-details-content">
       <!-- 1. 幹員立繪 -->
       <div class="detail-section" v-if="allPortraits.length > 0">
-        <h3><i class="fas fa-user"></i> 1. 幹員立繪</h3>
+        <h3><i class="fas fa-user"></i> {{ t('character.sections.portrait') }}</h3>
         <div class="portrait-tabs">
           <button 
             v-for="(portrait, index) in allPortraits" 
@@ -40,7 +40,7 @@
         <div class="portrait-display" v-if="currentPortraitUrl">
           <img 
             :src="currentPortraitUrl" 
-            :alt="allPortraits[currentPortraitIndex]?.name || '立繪'"
+            :alt="allPortraits[currentPortraitIndex]?.name || t('character.portraitFallback')"
             decoding="async"
             fetchpriority="high"
             @error="handlePortraitError"
@@ -49,42 +49,42 @@
           />
         </div>
         <div v-else class="portrait-loading">
-          <p>載入中...</p>
+          <p>{{ t('character.portraitLoading') }}</p>
         </div>
       </div>
 
       <!-- 2. 特性 -->
       <div class="detail-section" v-if="character.traitDescription">
-        <h3><i class="fas fa-star"></i> 2. 特性</h3>
-        <p class="trait-text">{{ character.traitDescription }}</p>
+        <h3><i class="fas fa-star"></i> {{ t('character.sections.trait') }}</h3>
+        <p class="trait-text api-pre-line">{{ character.traitDescription }}</p>
       </div>
 
       <!-- 3. 獲得方式 -->
       <div class="detail-section" v-if="character.obtainApproach">
-        <h3><i class="fas fa-gift"></i> 3. 獲得方式</h3>
-        <p>{{ character.obtainApproach }}</p>
+        <h3><i class="fas fa-gift"></i> {{ t('character.sections.obtain') }}</h3>
+        <p class="api-pre-line">{{ character.obtainApproach }}</p>
       </div>
 
       <!-- 4. 屬性 -->
       <div class="detail-section" v-if="character.phases && character.phases.length > 0">
-        <h3><i class="fas fa-chart-bar"></i> 4. 屬性</h3>
+        <h3><i class="fas fa-chart-bar"></i> {{ t('character.sections.stats') }}</h3>
         <div class="attributes-table-wrapper">
           <table class="attributes-table">
             <thead>
               <tr>
-                <th>等級</th>
-                <th>生命</th>
-                <th>攻擊</th>
-                <th>防禦</th>
-                <th>法抗</th>
-                <th>再部署</th>
-                <th>費用</th>
-                <th>阻擋</th>
+                <th>{{ t('character.stats.phase') }}</th>
+                <th>{{ t('character.stats.hp') }}</th>
+                <th>{{ t('character.stats.atk') }}</th>
+                <th>{{ t('character.stats.def') }}</th>
+                <th>{{ t('character.stats.res') }}</th>
+                <th>{{ t('character.stats.respawn') }}</th>
+                <th>{{ t('character.stats.cost') }}</th>
+                <th>{{ t('character.stats.block') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(phase, phaseIndex) in character.phases" :key="phaseIndex">
-                <td class="phase-label">精英{{ phaseIndex }}</td>
+                <td class="phase-label">{{ t('character.phaseLabel', { phase: phaseIndex }) }}</td>
                 <td>{{ getAttribute(phase, 'maxHp') }}</td>
                 <td>{{ getAttribute(phase, 'atk') }}</td>
                 <td>{{ getAttribute(phase, 'def') }}</td>
@@ -100,10 +100,10 @@
 
       <!-- 5. 攻擊範圍 -->
       <div class="detail-section" v-if="character.phaseRanges && character.phaseRanges.length > 0">
-        <h3><i class="fas fa-crosshairs"></i> 5. 攻擊範圍</h3>
+        <h3><i class="fas fa-crosshairs"></i> {{ t('character.sections.range') }}</h3>
         <div class="range-phases">
           <div v-for="range in character.phaseRanges" :key="range.phase" class="range-phase-item">
-            <h4>精英 {{ range.phase }}</h4>
+            <h4>{{ t('character.eliteRangeTitle', { phase: range.phase }) }}</h4>
             <div class="range-grid" :style="getRangeGridStyle(range.grids)">
               <div 
                 v-for="(grid, idx) in range.grids" 
@@ -119,7 +119,7 @@
 
       <!-- 6. 天賦 -->
       <div class="detail-section" v-if="character.talents && character.talents.length > 0">
-        <h3><i class="fas fa-magic"></i> 6. 天賦</h3>
+        <h3><i class="fas fa-magic"></i> {{ t('character.sections.talents') }}</h3>
         <div class="talents-list">
           <template v-for="(talent, tIndex) in character.talents" :key="tIndex">
             <div 
@@ -128,15 +128,15 @@
               class="talent-card"
             >
               <div class="talent-header">
-                <span class="talent-name">{{ candidate.name || `天賦 ${tIndex + 1}` }}</span>
+                <span class="talent-name">{{ candidate.name || t('character.talentFallback', { n: tIndex + 1 }) }}</span>
                 <span class="talent-unlock">
-                  精英{{ candidate.unlockCondition?.phase || 0 }} Lv{{ candidate.unlockCondition?.level || 1 }}
+                  {{ t('character.unlockLine', { elite: candidate.unlockCondition?.phase || 0, level: candidate.unlockCondition?.level || 1 }) }}
                   <span v-if="candidate.requiredPotentialRank > 0" class="potential-req">
-                    潛能{{ candidate.requiredPotentialRank }}
+                    {{ t('character.potentialReq', { rank: candidate.requiredPotentialRank }) }}
                   </span>
                 </span>
               </div>
-              <p class="talent-desc">{{ candidate.description }}</p>
+              <p class="talent-desc api-pre-line">{{ candidate.description }}</p>
             </div>
           </template>
         </div>
@@ -144,12 +144,12 @@
 
       <!-- 7. 潛能提升 -->
       <div class="detail-section" v-if="character.potentialRanks && character.potentialRanks.length > 0">
-        <h3><i class="fas fa-arrow-up"></i> 7. 潛能提升</h3>
+        <h3><i class="fas fa-arrow-up"></i> {{ t('character.sections.potential') }}</h3>
         <div class="potential-list">
           <div v-for="(rank, index) in character.potentialRanks" :key="index" class="potential-item">
-            <span class="potential-level">潛能 {{ index + 2 }}</span>
-            <span class="potential-effect">
-              {{ rank.description || rank.buffDescription || '提升能力' }}
+            <span class="potential-level">{{ t('character.potentialLevel', { n: index + 2 }) }}</span>
+            <span class="potential-effect api-pre-line">
+              {{ rank.description || rank.buffDescription || t('character.improveDefault') }}
             </span>
           </div>
         </div>
@@ -157,18 +157,18 @@
 
       <!-- 8. 技能 -->
       <div class="detail-section" v-if="character.skills && character.skills.length > 0">
-        <h3><i class="fas fa-bolt"></i> 8. 技能</h3>
+        <h3><i class="fas fa-bolt"></i> {{ t('character.sections.skills') }}</h3>
         <div class="skills-list">
           <div v-for="(skill, index) in character.skills" :key="skill.id" class="skill-card">
             <div class="skill-header">
-              <span class="skill-index">技能 {{ index + 1 }}</span>
+              <span class="skill-index">{{ t('character.skillIndex', { n: index + 1 }) }}</span>
               <span class="skill-name">{{ skill.name }}</span>
             </div>
-            <p class="skill-desc">{{ skill.description }}</p>
+            <p class="skill-desc api-pre-line">{{ skill.description }}</p>
             <div class="skill-stats">
-              <span v-if="skill.spData?.spCost"><i class="fas fa-bolt"></i> SP消耗: {{ skill.spData.spCost }}</span>
-              <span v-if="skill.spData?.initSp"><i class="fas fa-play"></i> 初始SP: {{ skill.spData.initSp }}</span>
-              <span v-if="skill.duration > 0"><i class="fas fa-clock"></i> 持續: {{ skill.duration }}s</span>
+              <span v-if="skill.spData?.spCost"><i class="fas fa-bolt"></i> {{ t('character.spCost') }}: {{ skill.spData.spCost }}</span>
+              <span v-if="skill.spData?.initSp"><i class="fas fa-play"></i> {{ t('character.initSp') }}: {{ skill.spData.initSp }}</span>
+              <span v-if="skill.duration > 0"><i class="fas fa-clock"></i> {{ t('character.duration') }}: {{ skill.duration }}s</span>
               <span v-if="skill.spData?.spType !== undefined"><i class="fas fa-sync"></i> {{ getSpTypeName(skill.spData.spType) }}</span>
             </div>
           </div>
@@ -177,16 +177,16 @@
 
       <!-- 9. 後勤技能 -->
       <div class="detail-section" v-if="character.buildingSkills && character.buildingSkills.length > 0">
-        <h3><i class="fas fa-building"></i> 9. 後勤技能</h3>
+        <h3><i class="fas fa-building"></i> {{ t('character.sections.logistics') }}</h3>
         <div class="building-skills-list">
           <div v-for="skill in character.buildingSkills" :key="skill.id" class="building-skill-card">
             <div class="building-skill-header">
-              <span class="building-skill-name">{{ skill.name || '基建技能' }}</span>
+              <span class="building-skill-name">{{ skill.name || t('character.logisticsDefault') }}</span>
               <span class="building-skill-room" v-if="skill.roomType">{{ getRoomTypeName(skill.roomType) }}</span>
             </div>
-            <p class="building-skill-desc">{{ skill.description }}</p>
+            <p class="building-skill-desc api-pre-line">{{ skill.description }}</p>
             <div class="building-skill-unlock" v-if="skill.cond">
-              <span v-if="skill.cond.phase !== undefined">精英{{ skill.cond.phase }}</span>
+              <span v-if="skill.cond.phase !== undefined">{{ t('character.phaseLabel', { phase: skill.cond.phase }) }}</span>
               <span v-if="skill.cond.level">Lv{{ skill.cond.level }}</span>
             </div>
           </div>
@@ -195,10 +195,10 @@
 
       <!-- 10. 精英化材料 -->
       <div class="detail-section" v-if="character.evolveCosts && character.evolveCosts.length > 0">
-        <h3><i class="fas fa-level-up-alt"></i> 10. 精英化材料</h3>
+        <h3><i class="fas fa-level-up-alt"></i> {{ t('character.sections.evolve') }}</h3>
         <div class="evolve-costs">
           <div v-for="(cost, index) in character.evolveCosts" :key="index" class="evolve-phase">
-            <h4>精英化 {{ cost.phase }}</h4>
+            <h4>{{ t('character.evolveTitle', { phase: cost.phase }) }}</h4>
             <div class="materials-grid">
               <div v-for="(item, itemIndex) in cost.cost" :key="itemIndex" class="material-item">
                 <img 
@@ -221,10 +221,10 @@
 
       <!-- 11. 技能升級材料 -->
       <div class="detail-section" v-if="character.skillUpgradeCosts && character.skillUpgradeCosts.length > 0">
-        <h3><i class="fas fa-cogs"></i> 11. 技能升級材料</h3>
+        <h3><i class="fas fa-cogs"></i> {{ t('character.sections.skillCost') }}</h3>
         <div class="skill-upgrade-costs">
           <div v-for="(upgrade, index) in character.skillUpgradeCosts" :key="index" class="upgrade-level">
-            <h4>技能等級 {{ upgrade.level - 1 }} → {{ upgrade.level }}</h4>
+            <h4>{{ t('character.skillRankTitle', { from: upgrade.level - 1, to: upgrade.level }) }}</h4>
             <div class="materials-grid" v-if="upgrade.lvlUpCost && upgrade.lvlUpCost.length > 0">
               <div v-for="(item, itemIndex) in upgrade.lvlUpCost" :key="itemIndex" class="material-item">
                 <img 
@@ -241,26 +241,26 @@
                 </div>
               </div>
             </div>
-            <p v-else class="no-cost">無需材料</p>
+            <p v-else class="no-cost">{{ t('character.noMaterials') }}</p>
           </div>
         </div>
       </div>
 
       <!-- 12. 模組 -->
       <div class="detail-section" v-if="character.modules && character.modules.length > 0">
-        <h3><i class="fas fa-puzzle-piece"></i> 12. 模組</h3>
+        <h3><i class="fas fa-puzzle-piece"></i> {{ t('character.sections.modules') }}</h3>
         <div class="modules-list">
           <div v-for="module in character.modules" :key="module.id" class="module-card">
             <div class="module-header">
-              <span class="module-name">{{ module.uniEquipName || '模組' }}</span>
+              <span class="module-name">{{ module.uniEquipName || t('character.moduleDefault') }}</span>
               <span class="module-type" v-if="module.typeName1 || module.typeName2">
                 {{ module.typeName1 }}{{ module.typeName2 ? ` - ${module.typeName2}` : '' }}
               </span>
             </div>
-            <p class="module-desc" v-if="module.uniEquipDesc">{{ module.uniEquipDesc }}</p>
+            <p class="module-desc api-pre-line" v-if="module.uniEquipDesc">{{ module.uniEquipDesc }}</p>
             <div class="module-unlock">
-              <span>解鎖條件: 精英{{ module.unlockEvolvePhase }} Lv{{ module.unlockLevel }}</span>
-              <span v-if="module.unlockFavorPoint"> 信賴{{ module.unlockFavorPoint }}</span>
+              <span>{{ t('character.unlockModule') }}: {{ t('character.phaseLabel', { phase: module.unlockEvolvePhase }) }} Lv{{ module.unlockLevel }}</span>
+              <span v-if="module.unlockFavorPoint"> {{ t('character.trust', { points: module.unlockFavorPoint }) }}</span>
             </div>
           </div>
         </div>
@@ -268,20 +268,20 @@
 
       <!-- 13. 幹員檔案 -->
       <div class="detail-section" v-if="character.handbook && hasHandbookContent">
-        <h3><i class="fas fa-book"></i> 13. 幹員檔案</h3>
+        <h3><i class="fas fa-book"></i> {{ t('character.sections.handbook') }}</h3>
         <div class="handbook-content">
           <div v-if="character.handbook.storyTextAudio && character.handbook.storyTextAudio.length > 0" class="handbook-stories">
             <div v-for="(story, index) in character.handbook.storyTextAudio" :key="index" class="story-card">
               <h4 @click="toggleStory(index)" class="story-title">
                 <i :class="expandedStories.includes(index) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
-                {{ story.storyTitle || `檔案 ${index + 1}` }}
+                {{ story.storyTitle || t('character.storyFallback', { n: index + 1 }) }}
               </h4>
-              <p v-if="expandedStories.includes(index)" class="story-content">
+              <p v-if="expandedStories.includes(index)" class="story-content api-pre-line">
                 {{ story.stories?.[0]?.storyText || '' }}
               </p>
             </div>
           </div>
-          <p v-else class="no-data">暫無檔案資料</p>
+          <p v-else class="no-data">{{ t('character.noHandbook') }}</p>
         </div>
       </div>
     </div>
@@ -290,7 +290,10 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { getCharacterAvatarUrls } from '../services/api.js';
+
+const { t } = useI18n();
 
 const props = defineProps({
   character: {
@@ -315,36 +318,6 @@ const currentAvatarUrl = computed(() => {
   return urls[avatarIndex.value] || urls[0] || '';
 });
 
-const professions = {
-  'PIONEER': '先鋒',
-  'WARRIOR': '近衛',
-  'TANK': '重裝',
-  'SNIPER': '狙擊',
-  'CASTER': '術師',
-  'MEDIC': '醫療',
-  'SUPPORT': '輔助',
-  'SPECIAL': '特種'
-};
-
-const roomTypes = {
-  'CONTROL': '控制中樞',
-  'POWER': '發電站',
-  'MANUFACTURE': '製造站',
-  'TRADING': '貿易站',
-  'DORMITORY': '宿舍',
-  'MEETING': '會客室',
-  'HIRE': '人力辦公室',
-  'TRAINING': '訓練室',
-  'WORKSHOP': '加工站'
-};
-
-const spTypes = {
-  1: '自動回復',
-  2: '攻擊回復',
-  4: '受擊回復',
-  8: '被動'
-};
-
 // 獲取立繪列表
 const allPortraits = computed(() => {
   const list = [];
@@ -366,7 +339,7 @@ const allPortraits = computed(() => {
   console.log('[組件調試] 最終allPortraits:', list);
   
   // 如果沒有從 API 解析出的立繪，就使用頭像多來源作為備用立繪
-  return list.length > 0 ? list : [{ name: '立繪', urls: avatarUrls.value }];
+  return list.length > 0 ? list : [{ name: t('character.portraitFallback'), urls: avatarUrls.value }];
 });
 
 const currentPortraitUrl = computed(() => {
@@ -403,15 +376,21 @@ const toggleStory = (index) => {
 };
 
 const getProfessionName = (profession) => {
-  return professions[profession] || profession;
+  const key = `profession.${profession}`;
+  const translated = t(key);
+  return translated === key ? profession : translated;
 };
 
 const getRoomTypeName = (roomType) => {
-  return roomTypes[roomType] || roomType;
+  const key = `roomType.${roomType}`;
+  const translated = t(key);
+  return translated === key ? roomType : translated;
 };
 
 const getSpTypeName = (spType) => {
-  return spTypes[spType] || '自動回復';
+  const key = `spType.${String(spType)}`;
+  const translated = t(key);
+  return translated === key ? t('spType.default') : translated;
 };
 
 const getRarityStars = (rarity) => {
@@ -498,6 +477,12 @@ const handleImageError = (event) => {
   img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect fill="%2330363d" width="200" height="200"/><text fill="%238b949e" x="100" y="110" text-anchor="middle" font-size="16">No Image</text></svg>';
 };
 
+const portraitFailedDataUrl = () => {
+  const msg = t('character.portraitLoadFailed');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect fill="#30363d" width="400" height="600"/><text fill="#8b949e" x="200" y="310" text-anchor="middle" font-size="18">${msg}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+};
+
 const handlePortraitLoad = (event) => {
   console.log('[組件調試] 立繪載入成功:', event?.target?.src);
 };
@@ -535,11 +520,11 @@ const handlePortraitError = (event) => {
     
     // 所有 URL 都失敗，顯示佔位符
     console.log('[組件調試] 所有URL都失敗，顯示佔位符。已嘗試:', currentPortraitUrlIndex.value + 1, '個URL');
-    event.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect fill="%2330363d" width="400" height="600"/><text fill="%238b949e" x="200" y="310" text-anchor="middle" font-size="20">立繪載入失敗</text></svg>';
+    event.target.src = portraitFailedDataUrl();
   } else {
     // 沒有立繪數據
     console.log('[組件調試] 沒有立繪數據');
-    event.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect fill="%2330363d" width="400" height="600"/><text fill="%238b949e" x="200" y="310" text-anchor="middle" font-size="20">立繪載入失敗</text></svg>';
+    event.target.src = portraitFailedDataUrl();
   }
 };
 
@@ -1142,5 +1127,9 @@ const handleMaterialError = (event) => {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.api-pre-line {
+  white-space: pre-line;
 }
 </style>

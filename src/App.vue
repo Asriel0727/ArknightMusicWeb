@@ -18,13 +18,14 @@
     
     <audio ref="audioPlayerRef" preload="auto" style="display:none;"></audio>
     <footer>
-      <p>明日方舟網站 &copy;</p>
+      <p>{{ $t('footer.credit') }}</p>
     </footer>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ParticleBackground from './components/ParticleBackground.vue';
 import Navbar from './components/Navbar.vue';
 import TopBar from './components/TopBar.vue';
@@ -34,6 +35,25 @@ import CharacterList from './components/CharacterList.vue';
 import { initAudioPlayer, modalState, albumState } from './stores/player.js';
 import { fetchAlbumDetails } from './services/api.js';
 import { decodeText } from './utils/textGlitch.js';
+
+const { t, locale } = useI18n();
+
+const HTML_LANG = {
+  'zh-TW': 'zh-Hant',
+  'zh-CN': 'zh-Hans',
+  en: 'en',
+  ja: 'ja',
+  ko: 'ko',
+};
+
+watch(
+  locale,
+  () => {
+    document.title = t('meta.documentTitle');
+    document.documentElement.setAttribute('lang', HTML_LANG[locale.value] || 'en');
+  },
+  { immediate: true }
+);
 
 const audioPlayerRef = ref(null);
 const albumListRef = ref(null);
@@ -78,7 +98,7 @@ const applyTextGlitch = (force = false) => {
   // 选择所有包含文本的元素（排除input、button内的文本，因为它们会动态变化）
   const textSelectors = [
     '.page-title',
-    'button:not(.control-btn):not(.pagination-btn):not(.page-number):not(.modal-close):not(.nav-tab):not(.filter-buttons button)',
+    'button:not(.control-btn):not(.pagination-btn):not(.page-number):not(.modal-close):not(.nav-tab):not(.filter-buttons button):not(.nav-locale)',
     'p:not(.no-lyrics)',
     'h1, h2, h3, h4, h5, h6',
     '.dropdown-song-item span',

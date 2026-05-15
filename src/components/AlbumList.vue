@@ -1,11 +1,12 @@
 <template>
-  <main>
+  <main class="album-list-main" :key="locale">
+    <h1 class="page-title">{{ t('album.pageTitle') }}</h1>
     <div v-if="albumState.isLoading && !albumState.isInitialFetchDone" class="loading-spinner">
       <div class="spinner"></div>
-      <p>加載中...</p>
+      <p>{{ t('common.loading') }}</p>
     </div>
     <div v-else-if="displayAlbums.length === 0" class="no-results">
-      <p>沒有找到專輯</p>
+      <p>{{ t('album.noResults') }}</p>
     </div>
     <div v-else>
       <div class="albums-container" ref="containerRef">
@@ -26,12 +27,12 @@
             @click="goToPage(albumState.currentPage - 1)"
           >
             <i class="fas fa-chevron-left"></i>
-            上一頁
+            {{ t('album.prevPage') }}
           </button>
           
           <div class="pagination-info">
-            <span>第 {{ albumState.currentPage }} / {{ totalPages }} 頁</span>
-            <span class="pagination-count">（每頁 {{ albumsPerPage }} 個）</span>
+            <span>{{ t('album.pageOf', { current: albumState.currentPage, total: totalPages }) }}</span>
+            <span class="pagination-count">{{ t('album.perPageCount', { n: albumsPerPage }) }}</span>
           </div>
           
           <button 
@@ -39,7 +40,7 @@
             :disabled="albumState.currentPage === totalPages"
             @click="goToPage(albumState.currentPage + 1)"
           >
-            下一頁
+            {{ t('album.nextPage') }}
             <i class="fas fa-chevron-right"></i>
           </button>
         </div>
@@ -63,10 +64,12 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AlbumCard from './AlbumCard.vue';
 import { albumState, searchState } from '../stores/player.js';
 import { fetchAlbums } from '../services/api.js';
 
+const { t, locale } = useI18n();
 const containerRef = ref(null);
 const windowWidth = ref(window.innerWidth);
 
@@ -193,6 +196,22 @@ onMounted(() => {
   handleResize();
 });
 
+watch(locale, async () => {
+  if (!albumState.isInitialFetchDone) return;
+  albumState.isLoading = true;
+  try {
+    albumState.allAlbums = await fetchAlbums();
+    searchState.query = '';
+    searchState.filteredAlbums = [];
+    albumState.currentPage = 1;
+    albumState.currentAlbumDetails = null;
+  } catch (e) {
+    console.error('Refetch albums after locale change failed:', e);
+  } finally {
+    albumState.isLoading = false;
+  }
+});
+
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
 });
@@ -210,6 +229,13 @@ main {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+main .page-title {
+  margin: 0 0 16px 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .albums-container {

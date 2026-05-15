@@ -13,11 +13,11 @@
               @load="handleImageLoad"
               @error="handleImageError"
             >
-            <div v-else class="no-cover">無封面</div>
+            <div v-else class="no-cover">{{ t('common.noCover') }}</div>
           </div>
           <div class="player-info">
-            <h4>{{ playerState.currentSong?.name || '未知歌曲' }}</h4>
-            <p>{{ playerState.currentSong?.artistes?.join(', ') || '未知演出者' }}</p>
+            <h4>{{ playerState.currentSong?.name || t('common.unknownSong') }}</h4>
+            <p>{{ playerState.currentSong?.artistes?.join(', ') || t('common.unknownArtist') }}</p>
           </div>
         </div>
         <div class="player-controls">
@@ -84,15 +84,18 @@
           {{ line.text }}
         </div>
       </div>
-      <p v-else class="no-lyrics">暫無歌詞</p>
+      <p v-else class="no-lyrics">{{ t('common.noLyrics') }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute } from '../stores/player.js';
 import { formatTime } from '../utils/time.js';
+
+const { t } = useI18n();
 
 const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);

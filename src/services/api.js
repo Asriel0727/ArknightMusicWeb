@@ -1,11 +1,29 @@
 import { fetchWithCache } from './cache.js';
 import { parseLRC } from '../utils/lyrics.js';
+import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
+import {
+  toTraditionalGameDataText,
+  toTraditionalMusicApiText,
+  transformMusicApiPayload,
+} from '../utils/s2tApiText.js';
+import {
+  getGameDataExcelBase,
+  getGameDataFolder,
+  getApiBuiltLabels,
+  shouldApplyS2tGameData,
+} from './gameDataSource.js';
 
-const API_BASE = 'https://monstersiren-web-api.vercel.app/api';
+const API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
+/** 專輯／歌曲等 JSON API（Express 掛在 /api） */
+const API_BASE = `${API_ORIGIN}/api`;
+/** 圖片／歌詞 proxy 在網站根路徑（/api/proxy-* 會 404） */
 
 /** 歌曲詳情記憶體快取（切歌／重播會重複請求同一 cid） */
 const SONG_DETAILS_CACHE_TTL_MS = 45 * 60 * 1000;
 const songDetailsCache = new Map();
+
+/** 歌詞快取鍵版本（路徑修正後需重取，避免舊的「proxy 404 → 空歌詞」快取） */
+const LYRICS_CACHE_KEY_PREFIX = 'v2:';
 
 /** 歌詞記憶體快取（同一首多次開播放器不重打 proxy） */
 const LYRICS_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
@@ -19,7 +37,7 @@ export async function fetchAlbums() {
   const response = await fetch(`${API_BASE}/albums`);
   if (!response.ok) throw new Error('Network response was not ok');
   const { data } = await response.json();
-  return data;
+  return transformMusicApiPayload(data);
 }
 
 /**
@@ -29,7 +47,7 @@ export async function fetchAlbums() {
  */
 export async function fetchAlbumDetails(albumId) {
   const { data } = await fetchWithCache(`${API_BASE}/album/${albumId}/detail`);
-  return data;
+  return transformMusicApiPayload(data);
 }
 
 /**
@@ -40,7 +58,7 @@ export async function fetchSongs() {
   const response = await fetch(`${API_BASE}/songs`);
   if (!response.ok) throw new Error('無法獲取歌曲列表');
   const { data } = await response.json();
-  return data.list;
+  return transformMusicApiPayload(data.list);
 }
 
 /**
@@ -51,13 +69,13 @@ export async function fetchSongs() {
 export async function fetchSongDetails(songId) {
   const hit = songDetailsCache.get(songId);
   if (hit && Date.now() - hit.t < SONG_DETAILS_CACHE_TTL_MS) {
-    return hit.data;
+    return transformMusicApiPayload(JSON.parse(JSON.stringify(hit.data)));
   }
   const response = await fetch(`${API_BASE}/song/${songId}`);
   if (!response.ok) throw new Error('Network response was not ok');
   const { data } = await response.json();
   songDetailsCache.set(songId, { data, t: Date.now() });
-  return data;
+  return transformMusicApiPayload(JSON.parse(JSON.stringify(data)));
 }
 
 /**
@@ -65,30 +83,39 @@ export async function fetchSongDetails(songId) {
  * @param {string} lyricUrl - 歌詞URL
  * @returns {Promise<Array>} 解析後的歌詞數組
  */
+function mapLyricLinesForUi(lines) {
+  if (!Array.isArray(lines)) return [];
+  return lines.map((line) => ({
+    ...line,
+    text: toTraditionalMusicApiText(line.text),
+  }));
+}
+
 export async function fetchLyrics(lyricUrl) {
   if (!lyricUrl) {
     return [];
   }
 
-  const cacheHit = lyricsCache.get(lyricUrl);
+  const cacheKey = LYRICS_CACHE_KEY_PREFIX + lyricUrl;
+  const cacheHit = lyricsCache.get(cacheKey);
   if (cacheHit && Date.now() - cacheHit.t < LYRICS_CACHE_TTL_MS) {
-    return cacheHit.lines;
+    return mapLyricLinesForUi(cacheHit.lines);
   }
 
   try {
-    const proxyUrl = `${API_BASE}/proxy-lyrics?url=${encodeURIComponent(lyricUrl)}`;
+    const proxyUrl = `${API_ORIGIN}/proxy-lyrics?url=${encodeURIComponent(lyricUrl)}`;
     const response = await fetch(proxyUrl);
     if (!response.ok) {
       if (response.status === 404) {
-        lyricsCache.set(lyricUrl, { lines: [], t: Date.now() });
+        lyricsCache.set(cacheKey, { lines: [], t: Date.now() });
         return [];
       }
       throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
     }
     const lrcText = await response.text();
     const parsedLyrics = parseLRC(lrcText);
-    lyricsCache.set(lyricUrl, { lines: parsedLyrics, t: Date.now() });
-    return parsedLyrics;
+    lyricsCache.set(cacheKey, { lines: parsedLyrics, t: Date.now() });
+    return mapLyricLinesForUi(parsedLyrics);
   } catch (error) {
     console.warn('歌詞加載失敗:', error.message);
     return [];
@@ -101,12 +128,10 @@ export async function fetchLyrics(lyricUrl) {
  * @returns {string} 代理後的圖片URL
  */
 export function getProxyImageUrl(imageUrl) {
-  return `${API_BASE}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+  return `${API_ORIGIN}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
 }
 
 // ========== 明日方舟角色相關 API ==========
-
-const GAMEDATA_BASE = 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel';
 
 /** 角色頭像／立繪／道具圖等主要圖床（較完整，優先使用） */
 const ARKNIGHT_IMAGES_BASE =
@@ -123,6 +148,15 @@ let skinTableMemoryCache;
 let skinTableCachedAt = 0;
 let skinTableLoadingPromise;
 
+/** 切換遊戲資料語系時清空，避免混用舊快取 */
+export function invalidateArknightsCaches() {
+  skinTableMemoryCache = undefined;
+  skinTableCachedAt = 0;
+  skinTableLoadingPromise = undefined;
+  songDetailsCache.clear();
+  lyricsCache.clear();
+}
+
 function isSkinTableCacheFresh() {
   return (
     skinTableMemoryCache != null &&
@@ -137,7 +171,7 @@ async function getSkinTableShared() {
     return skinTableMemoryCache;
   }
   if (!skinTableLoadingPromise) {
-    skinTableLoadingPromise = fetch(`${GAMEDATA_BASE}/skin_table.json`)
+    skinTableLoadingPromise = fetch(`${getGameDataExcelBase()}/skin_table.json`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && data.charSkins) {
@@ -175,7 +209,7 @@ const AVATAR_SOURCES = [
  */
 export async function fetchCharacters() {
   try {
-    const response = await fetch(`${GAMEDATA_BASE}/character_table.json`);
+    const response = await fetch(`${getGameDataExcelBase()}/character_table.json`);
     if (!response.ok) throw new Error('無法獲取角色數據');
     const data = await response.json();
     
@@ -213,12 +247,12 @@ export async function fetchCharacters() {
         const rarity = parseRarity(char.rarity);
         return {
           id,
-          name: char.name,
+          name: toTraditionalGameDataText(char.name),
           appellation: char.appellation, // 代號/英文名
           profession: char.profession,   // 職業
           rarity: rarity,                // 稀有度 (0-5 對應 1-6星)
           position: char.position,       // 位置 (MELEE/RANGED)
-          tagList: char.tagList || [],   // 標籤
+          tagList: (char.tagList || []).map((tag) => toTraditionalGameDataText(tag)),   // 標籤
           nation: char.nationId,         // 國家/陣營
           // 使用第一個圖片來源
           avatarUrl: AVATAR_SOURCES[0](id)
@@ -264,10 +298,12 @@ export function getCharacterAvatarFallbackUrl(charId, index = 1) {
   return null;
 }
 
-// 清理描述中的特殊標籤並替換變量
+// 清理描述中的特殊標籤並替換變量（保留換行，供前端 pre-line 顯示）
 function cleanDescription(text, blackboard = []) {
   if (!text) return '';
-  
+
+  let result = normalizeEscapedNewlines(text);
+
   // 建立變量映射
   const varMap = {};
   if (blackboard && blackboard.length > 0) {
@@ -284,22 +320,49 @@ function cleanDescription(text, blackboard = []) {
       }
     });
   }
-  
-  return text
-    .replace(/<@[^>]+>/g, '')  // 移除 <@xxx> 開始標籤
-    .replace(/<\/>/g, '')       // 移除 </> 結束標籤
-    .replace(/<\$[^>]+>/g, '')  // 移除 <$xxx> 標籤
-    .replace(/\{([^}:]+)(?::([^}]+))?\}/g, (match, varName, format) => {
-      // 處理變量如 {atk}、{atk:0%}
+
+  result = result
+    .replace(/<@[^>]+>/g, '') // 移除 <@xxx> 開始標籤
+    .replace(/<\/>/g, '') // 移除 </> 結束標籤
+    .replace(/<\$[^>]+>/g, '') // 移除 <$xxx> 標籤
+    .replace(/\{([^}:]+)(?::([^}]+))?\}/g, (match, varName) => {
       const key = varName.toLowerCase();
       if (varMap[key] !== undefined) {
-        return varMap[key];
+        return String(varMap[key]);
       }
-      // 如果找不到變量，返回空或原始格式提示
       return '';
-    })
-    .replace(/\s+/g, ' ')  // 清理多餘空格
+    });
+
+  // 逐行收斂空白，保留換行
+  const trimmed = result
+    .split('\n')
+    .map((line) => line.replace(/[ \t\f\v]+/g, ' ').trimEnd())
+    .join('\n')
     .trim();
+  return toTraditionalGameDataText(trimmed);
+}
+
+function normalizeHandbookStoryText(handbook) {
+  if (!handbook || !Array.isArray(handbook.storyTextAudio)) {
+    return handbook;
+  }
+  return {
+    ...handbook,
+    storyTextAudio: handbook.storyTextAudio.map((story) => ({
+      ...story,
+      storyTitle: story.storyTitle
+        ? toTraditionalGameDataText(normalizeEscapedNewlines(String(story.storyTitle)))
+        : story.storyTitle,
+      stories: Array.isArray(story.stories)
+        ? story.stories.map((s) => ({
+            ...s,
+            storyText: toTraditionalGameDataText(
+              normalizeEscapedNewlines(s?.storyText || '')
+            ),
+          }))
+        : story.stories,
+    })),
+  };
 }
 
 // 格式化潛能提升效果
@@ -309,15 +372,7 @@ function formatPotentialBuff(buff) {
   const modifiers = buff.attributes.attributeModifiers;
   if (!modifiers || modifiers.length === 0) return null;
   
-  const typeNames = {
-    'COST': '部署費用',
-    'ATK': '攻擊力',
-    'DEF': '防禦力',
-    'MAX_HP': '生命上限',
-    'ATTACK_SPEED': '攻擊速度',
-    'MAGIC_RESISTANCE': '法術抗性',
-    'RESPAWN_TIME': '再部署時間'
-  };
+  const typeNames = getApiBuiltLabels().potential;
   
   return modifiers.map(mod => {
     const typeName = typeNames[mod.attributeType] || mod.attributeType;
@@ -334,14 +389,15 @@ function formatPotentialBuff(buff) {
 export async function fetchCharacterDetails(charId) {
   try {
     // 並行獲取所有需要的數據
+    const excel = getGameDataExcelBase();
     const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes, skinTable] = await Promise.all([
-      fetch(`${GAMEDATA_BASE}/character_table.json`),
-      fetch(`${GAMEDATA_BASE}/skill_table.json`).catch(() => null),
-      fetch(`${GAMEDATA_BASE}/building_data.json`).catch(() => null),
-      fetch(`${GAMEDATA_BASE}/uniequip_table.json`).catch(() => null),
-      fetch(`${GAMEDATA_BASE}/handbook_info_table.json`).catch(() => null),
-      fetch(`${GAMEDATA_BASE}/item_table.json`).catch(() => null),
-      fetch(`${GAMEDATA_BASE}/range_table.json`).catch(() => null),
+      fetch(`${excel}/character_table.json`),
+      fetch(`${excel}/skill_table.json`).catch(() => null),
+      fetch(`${excel}/building_data.json`).catch(() => null),
+      fetch(`${excel}/uniequip_table.json`).catch(() => null),
+      fetch(`${excel}/handbook_info_table.json`).catch(() => null),
+      fetch(`${excel}/item_table.json`).catch(() => null),
+      fetch(`${excel}/range_table.json`).catch(() => null),
       getSkinTableShared()
     ]);
     
@@ -376,7 +432,7 @@ export async function fetchCharacterDetails(charId) {
       const item = itemTable?.items?.[itemId];
       return {
         id: itemId,
-        name: item?.name || itemId,
+        name: toTraditionalGameDataText(item?.name || itemId),
         iconId: item?.iconId || itemId,
         rarity: item?.rarity || 0,
         iconUrl: `${ARKNIGHT_IMAGES_BASE}/items/${item?.iconId || itemId}.png`
@@ -396,7 +452,9 @@ export async function fetchCharacterDetails(charId) {
           const blackboard = maxLevel.blackboard || [];
           skills.push({
             id: skillId,
-            name: maxLevel.name || skill.skillId || '未知技能',
+            name: toTraditionalGameDataText(
+              maxLevel.name || skill.skillId || getApiBuiltLabels().unknownSkill
+            ),
             description: cleanDescription(maxLevel.description || '', blackboard),
             skillType: maxLevel.skillType || '',
             spData: maxLevel.spData || {},
@@ -412,7 +470,7 @@ export async function fetchCharacterDetails(charId) {
     // 處理天賦（更詳細，清理標籤，傳入 blackboard）
     const talents = (charData.talents || []).map(talent => {
       const candidates = (talent.candidates || []).map(candidate => ({
-        name: candidate.name || '',
+        name: toTraditionalGameDataText(candidate.name || ''),
         description: cleanDescription(candidate.description || '', candidate.blackboard || []),
         unlockCondition: candidate.unlockCondition || {},
         requiredPotentialRank: candidate.requiredPotentialRank || 0,
@@ -477,7 +535,7 @@ export async function fetchCharacterDetails(charId) {
               if (buffDetail) {
                 buildingSkills.push({
                   id: buff.buffId,
-                  name: buffDetail.buffName || '',
+                  name: toTraditionalGameDataText(buffDetail.buffName || ''),
                   description: cleanDescription(buffDetail.description || ''),
                   roomType: buffDetail.roomType || '',
                   buffCategory: buffDetail.buffCategory || '',
@@ -499,10 +557,10 @@ export async function fetchCharacterDetails(charId) {
         if (equipData.charId === charId) {
           modules.push({
             id: equipId,
-            uniEquipName: equipData.uniEquipName || '',
+            uniEquipName: toTraditionalGameDataText(equipData.uniEquipName || ''),
             uniEquipDesc: cleanDescription(equipData.uniEquipDesc || ''),
-            typeName1: equipData.typeName1 || '',
-            typeName2: equipData.typeName2 || '',
+            typeName1: toTraditionalGameDataText(equipData.typeName1 || ''),
+            typeName2: toTraditionalGameDataText(equipData.typeName2 || ''),
             typeIcon: equipData.typeIcon || '',
             equipShiningColor: equipData.equipShiningColor || '',
             unlockEvolvePhase: equipData.unlockEvolvePhase || 0,
@@ -516,7 +574,7 @@ export async function fetchCharacterDetails(charId) {
     }
     
     // 處理幹員檔案
-    const handbookData = handbookInfo?.handbookDict?.[charId] || {};
+    const handbookData = normalizeHandbookStoryText(handbookInfo?.handbookDict?.[charId] || {});
     
     // 立繪檔名可能含 # 等字元，需編碼後再放入 URL path（否則 # 會被當成 fragment）
     const encodePortraitFileId = (id) => encodeURIComponent(id);
@@ -549,6 +607,8 @@ export async function fetchCharacterDetails(charId) {
     const displaySkins = charData.displaySkins || [];
 
     // 精一立繪
+    const eliteLabels = getApiBuiltLabels();
+
     if (charData.phases && charData.phases.length > 1) {
       const phase1 = charData.phases[1];
       let displayId1 = null;
@@ -569,7 +629,7 @@ export async function fetchCharacterDetails(charId) {
       ].filter(id => id && id !== displayId1);
 
       portraits.push({
-        name: '精一',
+        name: eliteLabels.elite1,
         portraitId: displayId1,
         urls: getPortraitUrls(displayId1, alternativeIds1),
         skinId: null
@@ -591,7 +651,7 @@ export async function fetchCharacterDetails(charId) {
       }
 
       portraits.push({
-        name: '精二',
+        name: eliteLabels.elite2,
         portraitId: displayId2,
         urls: getPortraitUrls(displayId2),
         skinId: null
@@ -616,8 +676,17 @@ export async function fetchCharacterDetails(charId) {
 
         const ds = skin.displaySkin || {};
         const rawLabel = [ds.skinName, ds.skinGroupName].find(Boolean) || skin.skinId || portraitId;
-        const labelStr = String(rawLabel);
-        const tabName = labelStr.startsWith('時裝') ? labelStr : `時裝 · ${labelStr}`;
+        let labelStr = String(rawLabel);
+        if (shouldApplyS2tGameData()) {
+          labelStr = toTraditionalGameDataText(labelStr);
+        }
+        const lb = getApiBuiltLabels();
+        const tabName =
+          getGameDataFolder() === 'zh_CN'
+            ? labelStr.startsWith('時裝')
+              ? labelStr
+              : `時裝 · ${labelStr}`
+            : `${lb.costumePrefix}${labelStr}`;
 
         costumeRows.push({
           skinId: skin.skinId,
@@ -681,18 +750,22 @@ export async function fetchCharacterDetails(charId) {
     
     return {
       id: charId,
-      name: charData.name,
+      name: toTraditionalGameDataText(charData.name),
       appellation: charData.appellation,
       profession: charData.profession,
       subProfessionId: charData.subProfessionId || '',
       rarity: rarity,
       position: charData.position,
-      tagList: charData.tagList || [],
+      tagList: (charData.tagList || []).map((tag) => toTraditionalGameDataText(tag)),
       nation: charData.nationId,
-      description: charData.itemUsage || charData.itemDesc || '',
-      itemUsage: charData.itemUsage || '',
-      itemDesc: charData.itemDesc || '',
-      itemObtainApproach: charData.itemObtainApproach || '',
+      description: toTraditionalGameDataText(
+        normalizeEscapedNewlines(charData.itemUsage || charData.itemDesc || '')
+      ),
+      itemUsage: toTraditionalGameDataText(normalizeEscapedNewlines(charData.itemUsage || '')),
+      itemDesc: toTraditionalGameDataText(normalizeEscapedNewlines(charData.itemDesc || '')),
+      itemObtainApproach: toTraditionalGameDataText(
+        normalizeEscapedNewlines(charData.itemObtainApproach || '')
+      ),
       
       // 1. 干员信息（立繪）
       portraits: portraits,
@@ -701,7 +774,9 @@ export async function fetchCharacterDetails(charId) {
       traitDescription: traitDescription,
       
       // 3. 獲得方式
-      obtainApproach: charData.itemObtainApproach || '',
+      obtainApproach: toTraditionalGameDataText(
+        normalizeEscapedNewlines(charData.itemObtainApproach || '')
+      ),
       
       // 4. 屬性（各等級）
       phases: charData.phases || [],

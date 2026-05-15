@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "albums": "モンスターサイレン",
+    "characters": "オペレーター",
+    "logoAlt": "アークナイツ"
+  },
+  "footer": {
+    "credit": "アークナイツ ファンサイト ©"
+  },
+  "meta": {
+    "documentTitle": "アークナイツ ミュージックプレイヤー"
+  },
+  "language": {
+    "label": "言語",
+    "zhTW": "繁体字中国語",
+    "zhCN": "簡体字中国語",
+    "en": "English",
+    "ja": "日本語",
+    "ko": "한국어"
+  },
+  "common": {
+    "all": "すべて",
+    "unknownArtist": "アーティスト不明",
+    "unknownSong": "曲名不明",
+    "noCover": "ジャケットなし",
+    "noLyrics": "歌詞なし",
+    "noIntro": "紹介文なし",
+    "noNowPlaying": "再生中の曲はありません",
+    "loading": "読み込み中…"
+  },
+  "album": {
+    "pageTitle": "モンスターサイレン アルバム",
+    "noResults": "アルバムが見つかりません",
+    "prevPage": "前へ",
+    "nextPage": "次へ",
+    "pageOf": "{current} / {total} ページ",
+    "perPageCount": "（1ページ {n} 件）",
+    "viewAlbum": "アルバムを見る",
+    "trackList": "トラックリスト",
+    "play": "再生",
+    "pageIndicator": "{current} / {total} ページ"
+  },
+  "character": {
+    "pageTitle": "オペレーター図鑑",
+    "rarity": "レアリティ",
+    "profession": "職業",
+    "search": "検索",
+    "searchPlaceholder": "オペレーター名…",
+    "count": "オペレーター {n} 人",
+    "loadList": "オペレーターを読み込み中…",
+    "loadListError": "オペレーターを読み込めませんでした。しばらくしてから再度お試しください。",
+    "loadDetailError": "詳細を読み込めませんでした。しばらくしてから再度お試しください。",
+    "retry": "再試行",
+    "melee": "近距離",
+    "ranged": "遠距離",
+    "sections": {
+      "portrait": "1. 立ち絵",
+      "trait": "2. 特性",
+      "obtain": "3. 入手方法",
+      "stats": "4. ステータス",
+      "range": "5. 攻撃範囲",
+      "talents": "6. 天賦",
+      "potential": "7. 潜在能力",
+      "skills": "8. スキル",
+      "logistics": "9. 基地スキル",
+      "evolve": "10. 昇進素材",
+      "skillCost": "11. スキル強化素材",
+      "modules": "12. モジュール",
+      "handbook": "13. 記録"
+    },
+    "stats": {
+      "phase": "段階",
+      "hp": "HP",
+      "atk": "攻撃",
+      "def": "防御",
+      "res": "術耐性",
+      "respawn": "再配置",
+      "cost": "コスト",
+      "block": "ブロック"
+    },
+    "phaseLabel": "昇進{phase}",
+    "eliteRangeTitle": "昇進 {phase}",
+    "talentFallback": "天賦 {n}",
+    "unlockLine": "昇進{elite} Lv{level}",
+    "potentialReq": "潜在{rank}",
+    "potentialLevel": "潜在 {n}",
+    "improveDefault": "ステータス上昇",
+    "skillIndex": "スキル {n}",
+    "spCost": "SP消費",
+    "initSp": "初期SP",
+    "duration": "持続",
+    "logisticsDefault": "基地スキル",
+    "evolveTitle": "昇進 {phase}",
+    "skillRankTitle": "スキルレベル {from} → {to}",
+    "noMaterials": "素材なし",
+    "moduleDefault": "モジュール",
+    "unlockModule": "解放条件",
+    "trust": "信頼{points}",
+    "storyFallback": "ファイル {n}",
+    "noHandbook": "記録テキストなし",
+    "portraitLoading": "読み込み中…",
+    "portraitLoadFailed": "立ち絵を読み込めませんでした",
+    "portraitFallback": "立ち絵"
+  },
+  "profession": {
+    "PIONEER": "先鋒",
+    "WARRIOR": "前衛",
+    "TANK": "重装",
+    "SNIPER": "狙撃",
+    "CASTER": "術師",
+    "MEDIC": "医療",
+    "SUPPORT": "補助",
+    "SPECIAL": "特殊"
+  },
+  "roomType": {
+    "CONTROL": "制御中枢",
+    "POWER": "発電所",
+    "MANUFACTURE": "製造所",
+    "TRADING": "貿易所",
+    "DORMITORY": "宿舎",
+    "MEETING": "応接室",
+    "HIRE": "人事部",
+    "TRAINING": "訓練室",
+    "WORKSHOP": "加工所"
+  },
+  "spType": {
+    "1": "自動回復",
+    "2": "攻撃回復",
+    "4": "被ダメージ回復",
+    "8": "パッシブ",
+    "default": "自動回復"
+  },
+  "searchBar": {
+    "albumPlaceholder": "アルバムや曲を検索…"
+  }
+}

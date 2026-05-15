@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "albums": "塞壬唱片",
+    "characters": "幹員圖鑑",
+    "logoAlt": "明日方舟"
+  },
+  "footer": {
+    "credit": "明日方舟網站 ©"
+  },
+  "meta": {
+    "documentTitle": "明日方舟音樂播放器"
+  },
+  "language": {
+    "label": "語言",
+    "zhTW": "繁體中文",
+    "zhCN": "简体中文",
+    "en": "English",
+    "ja": "日本語",
+    "ko": "한국어"
+  },
+  "common": {
+    "all": "全部",
+    "unknownArtist": "未知演出者",
+    "unknownSong": "未知歌曲",
+    "noCover": "無封面",
+    "noLyrics": "暫無歌詞",
+    "noIntro": "暫無介紹",
+    "noNowPlaying": "暫無播放",
+    "loading": "載入中…"
+  },
+  "album": {
+    "pageTitle": "塞壬唱片專輯",
+    "noResults": "沒有找到專輯",
+    "prevPage": "上一頁",
+    "nextPage": "下一頁",
+    "pageOf": "第 {current} / {total} 頁",
+    "perPageCount": "（每頁 {n} 個）",
+    "viewAlbum": "查看專輯",
+    "trackList": "曲目列表",
+    "play": "播放",
+    "pageIndicator": "第 {current} / {total} 頁"
+  },
+  "character": {
+    "pageTitle": "幹員圖鑑",
+    "rarity": "稀有度",
+    "profession": "職業",
+    "search": "搜尋",
+    "searchPlaceholder": "輸入角色名稱…",
+    "count": "共 {n} 位幹員",
+    "loadList": "正在載入角色資料…",
+    "loadListError": "無法載入角色資料，請稍後再試",
+    "loadDetailError": "無法載入角色詳情，請稍後再試",
+    "retry": "重試",
+    "melee": "近戰",
+    "ranged": "遠程",
+    "sections": {
+      "portrait": "1. 幹員立繪",
+      "trait": "2. 特性",
+      "obtain": "3. 獲得方式",
+      "stats": "4. 屬性",
+      "range": "5. 攻擊範圍",
+      "talents": "6. 天賦",
+      "potential": "7. 潛能提升",
+      "skills": "8. 技能",
+      "logistics": "9. 後勤技能",
+      "evolve": "10. 精英化材料",
+      "skillCost": "11. 技能升級材料",
+      "modules": "12. 模組",
+      "handbook": "13. 幹員檔案"
+    },
+    "stats": {
+      "phase": "等級",
+      "hp": "生命",
+      "atk": "攻擊",
+      "def": "防禦",
+      "res": "法抗",
+      "respawn": "再部署",
+      "cost": "費用",
+      "block": "阻擋"
+    },
+    "phaseLabel": "精英{phase}",
+    "eliteRangeTitle": "精英 {phase}",
+    "talentFallback": "天賦 {n}",
+    "unlockLine": "精英{elite} Lv{level}",
+    "potentialReq": "潛能{rank}",
+    "potentialLevel": "潛能 {n}",
+    "improveDefault": "提升能力",
+    "skillIndex": "技能 {n}",
+    "spCost": "SP消耗",
+    "initSp": "初始SP",
+    "duration": "持續",
+    "logisticsDefault": "基建技能",
+    "evolveTitle": "精英化 {phase}",
+    "skillRankTitle": "技能等級 {from} → {to}",
+    "noMaterials": "無需材料",
+    "moduleDefault": "模組",
+    "unlockModule": "解鎖條件",
+    "trust": "信賴{points}",
+    "storyFallback": "檔案 {n}",
+    "noHandbook": "暫無檔案資料",
+    "portraitLoading": "載入中…",
+    "portraitLoadFailed": "立繪載入失敗",
+    "portraitFallback": "立繪"
+  },
+  "profession": {
+    "PIONEER": "先鋒",
+    "WARRIOR": "近衛",
+    "TANK": "重裝",
+    "SNIPER": "狙擊",
+    "CASTER": "術師",
+    "MEDIC": "醫療",
+    "SUPPORT": "輔助",
+    "SPECIAL": "特種"
+  },
+  "roomType": {
+    "CONTROL": "控制中樞",
+    "POWER": "發電站",
+    "MANUFACTURE": "製造站",
+    "TRADING": "貿易站",
+    "DORMITORY": "宿舍",
+    "MEETING": "會客室",
+    "HIRE": "人力辦公室",
+    "TRAINING": "訓練室",
+    "WORKSHOP": "加工站"
+  },
+  "spType": {
+    "1": "自動回復",
+    "2": "攻擊回復",
+    "4": "受擊回復",
+    "8": "被動",
+    "default": "自動回復"
+  },
+  "searchBar": {
+    "albumPlaceholder": "搜尋專輯或歌曲…"
+  }
+}

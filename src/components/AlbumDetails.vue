@@ -13,7 +13,7 @@
       >
       <h2>{{ album.name }}</h2>
       <h3>{{ album.belong }}</h3>
-      <p class="album-intro">{{ album.intro || '暫無介紹' }}</p>
+      <p class="album-intro api-pre-line">{{ introForDisplay }}</p>
     </div>
     <div class="album-details-right">
       <img 
@@ -29,20 +29,20 @@
       >
       <div class="song-list">
         <div v-if="totalPages > 1" class="song-list-header">
-          <h3>曲目列表</h3>
+          <h3>{{ t('album.trackList') }}</h3>
           <div class="pagination-controls">
             <button 
               :disabled="currentPage === 1"
               @click="changePage(-1)"
             >&lt;</button>
-            <span>第 {{ currentPage }} / {{ totalPages }} 頁</span>
+            <span>{{ t('album.pageIndicator', { current: currentPage, total: totalPages }) }}</span>
             <button 
               :disabled="currentPage === totalPages"
               @click="changePage(1)"
             >&gt;</button>
           </div>
         </div>
-        <h3 v-else>曲目列表</h3>
+        <h3 v-else>{{ t('album.trackList') }}</h3>
         <div id="song-list-content">
           <div 
             v-for="(song, index) in currentPageSongs" 
@@ -55,7 +55,7 @@
             </div>
             <div class="song-artist">{{ song.artistes.join(', ') }}</div>
             <div class="song-action">
-              <button @click="handlePlaySong(getSongIndex(index))">播放</button>
+              <button @click="handlePlaySong(getSongIndex(index))">{{ t('album.play') }}</button>
             </div>
           </div>
         </div>
@@ -66,13 +66,23 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
 import { playSongFromAlbum } from '../stores/player.js';
+
+const { t } = useI18n();
 
 const props = defineProps({
   album: {
     type: Object,
     required: true
   }
+});
+
+const introForDisplay = computed(() => {
+  const raw = props.album?.intro;
+  if (raw == null || !String(raw).trim()) return t('common.noIntro');
+  return normalizeEscapedNewlines(raw);
 });
 
 const emit = defineEmits(['play-song']);
@@ -457,6 +467,10 @@ onMounted(() => {
   100% {
     transform: translateX(-100%);
   }
+}
+
+.api-pre-line {
+  white-space: pre-line;
 }
 
 @media (max-width: 900px) {

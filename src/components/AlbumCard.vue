@@ -14,12 +14,15 @@
       </div>
     </div>
     <p>{{ album.artistes.join(', ') }}</p>
-    <button @click="$emit('view-album', album.cid)">查看專輯</button>
+    <button @click="$emit('view-album', album.cid)">{{ t('album.viewAlbum') }}</button>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
   album: {
