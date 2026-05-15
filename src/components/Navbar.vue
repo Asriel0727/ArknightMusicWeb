@@ -18,6 +18,14 @@
           <i class="fas fa-users"></i>
           <span>{{ $t('nav.characters') }}</span>
         </button>
+        <button
+          class="nav-tab"
+          :class="{ active: currentPage === 'recruit' }"
+          @click="changePage('recruit')"
+        >
+          <i class="fas fa-id-card"></i>
+          <span>{{ $t('nav.recruit') }}</span>
+        </button>
       </div>
     </div>
     <div class="navbar-right">

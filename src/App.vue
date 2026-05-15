@@ -15,6 +15,11 @@
       <CharacterList />
       <Modal @close="handleModalClose" />
     </template>
+
+    <!-- 招募卡製作 -->
+    <template v-else-if="currentPage === 'recruit'">
+      <RecruitCardMaker />
+    </template>
     
     <audio ref="audioPlayerRef" preload="auto" style="display:none;"></audio>
     <footer>
@@ -32,6 +37,7 @@ import TopBar from './components/TopBar.vue';
 import AlbumList from './components/AlbumList.vue';
 import Modal from './components/Modal.vue';
 import CharacterList from './components/CharacterList.vue';
+import RecruitCardMaker from './components/RecruitCardMaker.vue';
 import { initAudioPlayer, modalState, albumState } from './stores/player.js';
 import { fetchAlbumDetails } from './services/api.js';
 import { decodeText } from './utils/textGlitch.js';

@@ -14,6 +14,11 @@ import {
   shouldApplyS2tGameData,
 } from './gameDataSource.js';
 import { resolveFactionId } from '../utils/faction.js';
+import {
+  factionIdToLogoKey,
+  professionToClassSlug,
+  RECRUIT_FACTION_LOGO_OPTIONS,
+} from '../utils/recruitCard.js';
 
 const API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 /** 專輯／歌曲等 JSON API（Express 掛在 /api） */
@@ -180,6 +185,20 @@ const ARKNIGHT_IMAGES_BASE =
 /** 與上者路徑相同的備援鏡像 */
 const ARKNIGHT_IMAGES_MIRROR_ACESHIP =
   'https://raw.githubusercontent.com/Aceship/Arknight-Images/main';
+
+/** 招募卡：陣營 logo（Arknight-Images/factions） */
+export function getRecruitFactionLogoUrl(logoKey) {
+  const key = logoKey?.startsWith('logo_') ? logoKey : factionIdToLogoKey(logoKey);
+  return `${ARKNIGHT_IMAGES_BASE}/factions/${key}.png`;
+}
+
+/** 招募卡：職業 icon（Arknight-Images/classes） */
+export function getRecruitProfessionIconUrl(profession) {
+  const slug = professionToClassSlug(profession);
+  return `${ARKNIGHT_IMAGES_BASE}/classes/class_${slug}.png`;
+}
+
+export { RECRUIT_FACTION_LOGO_OPTIONS, factionIdToLogoKey, professionToClassSlug };
 
 /** skin_table 快取有效時間（毫秒），過期後下次取得詳情會重新下載 */
 const SKIN_TABLE_CACHE_TTL_MS = 60 * 60 * 1000;

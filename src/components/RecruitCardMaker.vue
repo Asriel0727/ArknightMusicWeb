@@ -1,0 +1,932 @@
+<template>
+  <div class="recruit-maker" :key="locale">
+    <header class="recruit-header">
+      <h1 class="recruit-title">{{ t('recruit.pageTitle') }}</h1>
+      <div class="recruit-header-actions">
+        <button type="button" class="btn-secondary" :disabled="isLoadingChars" @click="pickRandomOperator">
+          {{ t('recruit.random') }}
+        </button>
+        <button type="button" class="btn-primary" :disabled="isExporting" @click="exportCard">
+          {{ isExporting ? t('recruit.exporting') : t('recruit.export') }}
+        </button>
+      </div>
+    </header>
+
+    <div class="recruit-body">
+      <aside class="recruit-sidebar">
+        <nav class="recruit-tabs" role="tablist">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            type="button"
+            role="tab"
+            :aria-selected="activeTab === tab.id"
+            :class="{ active: activeTab === tab.id }"
+            @click="activeTab = tab.id"
+          >
+            {{ t(tab.labelKey) }}
+          </button>
+        </nav>
+
+        <div class="recruit-panel">
+          <!-- 立绘 -->
+          <div v-show="activeTab === 'appearance'" class="tab-pane">
+            <p class="panel-hint">{{ t('recruit.appearanceHint') }}</p>
+            <label class="field">
+              <span>{{ t('recruit.uploadPortrait') }}</span>
+              <input type="file" accept="image/png,image/jpeg,image/webp" @change="onPortraitUpload" />
+            </label>
+            <label class="field">
+              <span>{{ t('recruit.scale') }}</span>
+              <input
+                v-model.number="portraitScale"
+                type="range"
+                min="0.5"
+                max="3"
+                step="0.05"
+                :disabled="!portraitSrc"
+              />
+              <small v-if="!portraitSrc">{{ t('recruit.scaleDisabled') }}</small>
+            </label>
+            <label class="field">
+              <span>{{ t('recruit.uploadBackground') }}</span>
+              <input type="file" accept="image/png,image/jpeg,image/webp" @change="onBackgroundUpload" />
+              <button v-if="customBgUrl" type="button" class="link-btn" @click="clearBackground">
+                {{ t('recruit.resetBackground') }}
+              </button>
+            </label>
+          </div>
+
+          <!-- 阵营 -->
+          <div v-show="activeTab === 'organization'" class="tab-pane">
+            <label class="field">
+              <span>{{ t('recruit.factionLogo') }}</span>
+              <select v-model="factionLogoKey">
+                <option v-for="key in factionLogoOptions" :key="key" :value="key">
+                  {{ factionOptionLabel(key) }}
+                </option>
+              </select>
+            </label>
+            <label class="field checkbox-field">
+              <input v-model="showVoucherDecor" type="checkbox" />
+              <span>{{ t('recruit.showVoucherDecor') }}</span>
+            </label>
+          </div>
+
+          <!-- 角色 -->
+          <div v-show="activeTab === 'role'" class="tab-pane">
+            <label class="field">
+              <span>{{ t('recruit.searchOperator') }}</span>
+              <input v-model="charSearch" type="search" :placeholder="t('recruit.searchPlaceholder')" />
+            </label>
+            <div v-if="isLoadingChars" class="panel-loading">{{ t('common.loading') }}</div>
+            <ul v-else class="char-pick-list">
+              <li
+                v-for="char in filteredCharacters"
+                :key="char.id"
+                :class="{ active: selectedCharId === char.id }"
+              >
+                <button type="button" @click="applyCharacter(char)">
+                  <img :src="char.avatarUrl" :alt="char.name" loading="lazy" @error="onAvatarError($event, char.id)" />
+                  <span>{{ char.name }}</span>
+                  <small>{{ getRarityStars(char.rarity) }}★</small>
+                </button>
+              </li>
+            </ul>
+            <label class="field">
+              <span>{{ t('character.rarity') }}</span>
+              <div class="star-pick-row">
+                <button
+                  v-for="n in [3, 4, 5, 6]"
+                  :key="n"
+                  type="button"
+                  :class="{ active: starCount === n }"
+                  @click="starCount = n"
+                >
+                  {{ n }}★
+                </button>
+              </div>
+            </label>
+            <label class="field">
+              <span>{{ t('character.profession') }}</span>
+              <select v-model="profession">
+                <option v-for="p in professionOptions" :key="p.value" :value="p.value">
+                  {{ p.label }}
+                </option>
+              </select>
+            </label>
+          </div>
+
+          <!-- 文本 -->
+          <div v-show="activeTab === 'text'" class="tab-pane">
+            <label class="field">
+              <span>{{ t('recruit.nameZh') }}</span>
+              <input v-model="nameZh" type="text" />
+            </label>
+            <label class="field">
+              <span>{{ t('recruit.nameEn') }}</span>
+              <input v-model="nameEn" type="text" />
+            </label>
+            <label class="field">
+              <span>{{ t('recruit.tagline') }}</span>
+              <textarea v-model="tagline" rows="4" />
+            </label>
+          </div>
+        </div>
+      </aside>
+
+      <section ref="previewAreaRef" class="recruit-preview">
+        <div class="preview-scaler" :style="previewScalerStyle">
+          <div
+            ref="cardRef"
+            class="recruit-card"
+            :style="cardBackgroundStyle"
+          >
+            <img
+              v-if="portraitSrc"
+              class="portrait-layer"
+              :src="portraitSrc"
+              alt=""
+              draggable="false"
+              :style="portraitStyle"
+              @mousedown.prevent="startPortraitDrag"
+              @touchstart.prevent="startPortraitDrag"
+            />
+
+            <div class="card-fade" aria-hidden="true" />
+
+            <div class="card-ui">
+              <img
+                class="faction-logo"
+                :src="factionLogoUrl"
+                alt=""
+                crossorigin="anonymous"
+                @error="onFactionLogoError"
+              />
+
+              <div class="stars-row">
+                <img
+                  v-for="i in starCount"
+                  :key="i"
+                  class="star-img"
+                  :src="RECRUIT_STAR_IMAGE_URL"
+                  alt=""
+                />
+              </div>
+
+              <div class="name-block">
+                <img
+                  class="class-icon"
+                  :src="professionIconUrl"
+                  alt=""
+                  crossorigin="anonymous"
+                />
+                <div class="names">
+                  <div class="name-zh">{{ nameZh || t('recruit.nameZhPlaceholder') }}</div>
+                  <div class="name-en">{{ (nameEn || t('recruit.nameEnPlaceholder')).toUpperCase() }}</div>
+                </div>
+              </div>
+
+              <div v-if="showVoucherDecor" class="voucher-decor" aria-hidden="true">
+                <div class="voucher-bar voucher-senior" />
+                <div class="voucher-bar voucher-contract" />
+              </div>
+
+              <div class="tagline-block">
+                <p v-for="(line, idx) in taglineLines" :key="idx">{{ line }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="preview-tip">{{ t('recruit.dragHint') }}</p>
+      </section>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import {
+  fetchCharacters,
+  fetchCharacterDetails,
+  getCharacterAvatarFallbackUrl,
+  getRecruitFactionLogoUrl,
+  getRecruitProfessionIconUrl,
+  RECRUIT_FACTION_LOGO_OPTIONS,
+  syncFactionI18nMessages,
+} from '../services/api.js';
+import {
+  RECRUIT_STAR_IMAGE_URL,
+  RECRUIT_CARD_SIZE,
+  DEFAULT_RECRUIT_BACKGROUND,
+  rarityToStars,
+  factionIdToLogoKey,
+} from '../utils/recruitCard.js';
+
+const i18n = useI18n();
+const { t, locale } = i18n;
+
+const tabs = [
+  { id: 'appearance', labelKey: 'recruit.tabs.appearance' },
+  { id: 'organization', labelKey: 'recruit.tabs.organization' },
+  { id: 'role', labelKey: 'recruit.tabs.role' },
+  { id: 'text', labelKey: 'recruit.tabs.text' },
+];
+
+const activeTab = ref('appearance');
+const previewAreaRef = ref(null);
+const cardRef = ref(null);
+const previewScale = ref(0.12);
+
+const nameZh = ref('中文名稱');
+const nameEn = ref('ENGLISH NAME');
+const tagline = ref(
+  '博士，好久不見。我知道羅德島當前狀況不容樂觀，我會回來提供一份助力。也\n以防你忘記，我依然是羅德島的一員。'
+);
+const starCount = ref(6);
+const profession = ref('PIONEER');
+const factionLogoKey = ref('logo_rhodes');
+const showVoucherDecor = ref(false);
+
+const portraitSrc = ref('');
+const portraitScale = ref(1);
+const portraitPos = ref({ x: 342, y: 190 });
+const customBgUrl = ref('');
+const portraitObjectUrl = ref('');
+
+const characters = ref([]);
+const isLoadingChars = ref(true);
+const charSearch = ref('');
+const selectedCharId = ref('');
+const isExporting = ref(false);
+
+let dragState = null;
+
+const professionOptions = computed(() => [
+  { value: 'PIONEER', label: t('profession.PIONEER') },
+  { value: 'WARRIOR', label: t('profession.WARRIOR') },
+  { value: 'TANK', label: t('profession.TANK') },
+  { value: 'SNIPER', label: t('profession.SNIPER') },
+  { value: 'CASTER', label: t('profession.CASTER') },
+  { value: 'MEDIC', label: t('profession.MEDIC') },
+  { value: 'SUPPORT', label: t('profession.SUPPORT') },
+  { value: 'SPECIAL', label: t('profession.SPECIAL') },
+]);
+
+const factionLogoOptions = RECRUIT_FACTION_LOGO_OPTIONS;
+
+const factionLogoUrl = computed(() => getRecruitFactionLogoUrl(factionLogoKey.value));
+const professionIconUrl = computed(() => getRecruitProfessionIconUrl(profession.value));
+
+const taglineLines = computed(() => {
+  const text = tagline.value || '';
+  return text.split(/\n/).filter((line) => line.length > 0);
+});
+
+const cardBackgroundStyle = computed(() => {
+  if (customBgUrl.value) {
+    return {
+      backgroundImage: `url(${customBgUrl.value})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    };
+  }
+  return { background: DEFAULT_RECRUIT_BACKGROUND };
+});
+
+const portraitStyle = computed(() => ({
+  left: `${portraitPos.value.x}px`,
+  top: `${portraitPos.value.y}px`,
+  width: `${500 * portraitScale.value}px`,
+}));
+
+const previewScalerStyle = computed(() => ({
+  transform: `scale(${previewScale.value})`,
+  transformOrigin: 'center top',
+}));
+
+const filteredCharacters = computed(() => {
+  const q = charSearch.value.trim().toLowerCase();
+  let list = characters.value;
+  if (q) {
+    list = list.filter(
+      (c) =>
+        c.name?.toLowerCase().includes(q) ||
+        c.appellation?.toLowerCase().includes(q) ||
+        c.id?.toLowerCase().includes(q)
+    );
+  }
+  return list.slice(0, 80);
+});
+
+function getRarityStars(rarity) {
+  return rarityToStars(rarity);
+}
+
+function factionOptionLabel(logoKey) {
+  const id = logoKey.replace(/^logo_/, '');
+  const key = `recruit.faction.${id}`;
+  const label = t(key);
+  return label === key ? id : label;
+}
+
+function fitPreview() {
+  const area = previewAreaRef.value;
+  if (!area) return;
+  const pad = 48;
+  const scale = Math.min(
+    (area.clientWidth - pad) / RECRUIT_CARD_SIZE.width,
+    (area.clientHeight - pad) / RECRUIT_CARD_SIZE.height,
+    1
+  );
+  previewScale.value = Math.max(0.08, scale);
+}
+
+function onAvatarError(event, charId) {
+  const el = event.target;
+  if (!el || el.dataset.fallback) return;
+  el.dataset.fallback = '1';
+  el.src = getCharacterAvatarFallbackUrl(charId);
+}
+
+function onFactionLogoError(event) {
+  const el = event.target;
+  if (!el || el.dataset.fallback) return;
+  el.dataset.fallback = '1';
+  el.src = getRecruitFactionLogoUrl('logo_rhodes');
+}
+
+function revokePortraitObjectUrl() {
+  if (portraitObjectUrl.value) {
+    URL.revokeObjectURL(portraitObjectUrl.value);
+    portraitObjectUrl.value = '';
+  }
+}
+
+function setPortraitFromUrl(url, isObjectUrl = false) {
+  revokePortraitObjectUrl();
+  if (isObjectUrl) portraitObjectUrl.value = url;
+  portraitSrc.value = url;
+}
+
+function onPortraitUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  setPortraitFromUrl(URL.createObjectURL(file), true);
+  e.target.value = '';
+}
+
+function onBackgroundUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (customBgUrl.value?.startsWith('blob:')) {
+    URL.revokeObjectURL(customBgUrl.value);
+  }
+  customBgUrl.value = URL.createObjectURL(file);
+  e.target.value = '';
+}
+
+function clearBackground() {
+  if (customBgUrl.value?.startsWith('blob:')) {
+    URL.revokeObjectURL(customBgUrl.value);
+  }
+  customBgUrl.value = '';
+}
+
+function startPortraitDrag(e) {
+  if (!portraitSrc.value) return;
+  const ev = e.touches ? e.touches[0] : e;
+  dragState = {
+    startX: ev.clientX,
+    startY: ev.clientY,
+    originX: portraitPos.value.x,
+    originY: portraitPos.value.y,
+  };
+}
+
+function onPointerMove(e) {
+  if (!dragState) return;
+  const ev = e.touches ? e.touches[0] : e;
+  const dx = (ev.clientX - dragState.startX) / previewScale.value;
+  const dy = (ev.clientY - dragState.startY) / previewScale.value;
+  portraitPos.value = {
+    x: dragState.originX + dx,
+    y: dragState.originY + dy,
+  };
+}
+
+function endPortraitDrag() {
+  dragState = null;
+}
+
+async function loadPortraitFromCharacter(charId) {
+  try {
+    const detail = await fetchCharacterDetails(charId);
+    const portrait = detail.portraits?.[detail.portraits.length - 1] || detail.portraits?.[0];
+    const url = portrait?.urls?.[0];
+    if (url) {
+      setPortraitFromUrl(url);
+      portraitPos.value = { x: 320, y: 120 };
+      portraitScale.value = 1;
+      if (detail.traitDescription) {
+        tagline.value = detail.traitDescription.replace(/\\n/g, '\n').slice(0, 200);
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load portrait', err);
+  }
+}
+
+async function applyCharacter(char) {
+  selectedCharId.value = char.id;
+  nameZh.value = char.name || '';
+  nameEn.value = (char.appellation || char.id || '').toUpperCase();
+  starCount.value = getRarityStars(char.rarity);
+  profession.value = char.profession || 'PIONEER';
+  factionLogoKey.value = factionIdToLogoKey(char.factionId);
+  await loadPortraitFromCharacter(char.id);
+}
+
+async function pickRandomOperator() {
+  if (!characters.value.length) return;
+  const char = characters.value[Math.floor(Math.random() * characters.value.length)];
+  await applyCharacter(char);
+}
+
+async function exportCard() {
+  if (!cardRef.value || isExporting.value) return;
+  isExporting.value = true;
+  try {
+    const { default: html2canvas } = await import('html2canvas');
+    const canvas = await html2canvas(cardRef.value, {
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: null,
+      width: RECRUIT_CARD_SIZE.width,
+      height: RECRUIT_CARD_SIZE.height,
+      scale: 1,
+    });
+    const link = document.createElement('a');
+    link.download = `ark-recruit-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    console.error('Export failed', err);
+    alert(t('recruit.exportFailed'));
+  } finally {
+    isExporting.value = false;
+  }
+}
+
+onMounted(async () => {
+  fitPreview();
+  window.addEventListener('resize', fitPreview);
+  window.addEventListener('mousemove', onPointerMove);
+  window.addEventListener('mouseup', endPortraitDrag);
+  window.addEventListener('touchmove', onPointerMove, { passive: false });
+  window.addEventListener('touchend', endPortraitDrag);
+
+  try {
+    await syncFactionI18nMessages(i18n);
+    characters.value = await fetchCharacters();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    isLoadingChars.value = false;
+  }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', fitPreview);
+  window.removeEventListener('mousemove', onPointerMove);
+  window.removeEventListener('mouseup', endPortraitDrag);
+  window.removeEventListener('touchmove', onPointerMove);
+  window.removeEventListener('touchend', endPortraitDrag);
+  revokePortraitObjectUrl();
+  if (customBgUrl.value?.startsWith('blob:')) {
+    URL.revokeObjectURL(customBgUrl.value);
+  }
+});
+
+watch(locale, () => {
+  syncFactionI18nMessages(i18n);
+});
+</script>
+
+<style scoped>
+.recruit-maker {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px);
+  min-height: 520px;
+  margin: 0 12px 12px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.recruit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.recruit-title {
+  font-size: 1.15rem;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.recruit-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.recruit-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.recruit-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  background: rgba(13, 17, 23, 0.6);
+}
+
+.recruit-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.recruit-tabs button {
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.recruit-tabs button.active {
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.recruit-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.panel-hint,
+.preview-tip {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.field input[type='text'],
+.field input[type='search'],
+.field select,
+.field textarea {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.field input[type='range'] {
+  width: 100%;
+  accent-color: var(--primary-color);
+}
+
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0;
+  text-align: left;
+}
+
+.star-pick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.star-pick-row button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.star-pick-row button.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.char-pick-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.char-pick-list li button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  text-align: left;
+}
+
+.char-pick-list li.active button,
+.char-pick-list li button:hover {
+  background: rgba(88, 166, 255, 0.12);
+}
+
+.char-pick-list img {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.char-pick-list small {
+  margin-left: auto;
+  color: var(--text-secondary);
+}
+
+.panel-loading {
+  padding: 12px;
+  color: var(--text-secondary);
+}
+
+.recruit-preview {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  background: #0d1117;
+  padding: 16px;
+  position: relative;
+}
+
+.preview-scaler {
+  flex-shrink: 0;
+}
+
+.recruit-card {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+}
+
+.portrait-layer {
+  position: absolute;
+  z-index: 2;
+  height: auto;
+  cursor: move;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.card-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.92) 19%,
+    rgba(0, 0, 0, 0) 85%
+  );
+}
+
+.card-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.faction-logo {
+  position: absolute;
+  left: 342px;
+  top: 160px;
+  width: 500px;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+}
+
+.stars-row {
+  position: absolute;
+  left: 565px;
+  top: 560px;
+  display: flex;
+  align-items: center;
+  padding-left: 52px;
+}
+
+.star-img {
+  width: 152px;
+  height: 152px;
+  margin-left: -35px;
+}
+
+.star-img:first-child {
+  margin-left: 0;
+}
+
+.name-block {
+  position: absolute;
+  left: 560px;
+  top: 700px;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.class-icon {
+  width: 260px;
+  margin-top: 10px;
+  margin-right: 4px;
+  filter: brightness(0) invert(1);
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+}
+
+.name-zh {
+  font-size: 120px;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 3px rgba(0, 0, 0, 0.9);
+  paint-order: stroke fill;
+  font-family: 'Source Han Serif TC', 'Noto Serif TC', serif;
+}
+
+.name-en {
+  font-size: 48px;
+  line-height: 1;
+  color: #fff;
+  white-space: nowrap;
+  -webkit-text-stroke: 3px rgba(0, 0, 0, 0.9);
+  paint-order: stroke fill;
+  font-family: 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.voucher-decor {
+  position: absolute;
+  top: 470px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.voucher-bar {
+  width: 338px;
+  height: 80px;
+  border-radius: 4px;
+  opacity: 0.35;
+}
+
+.voucher-senior {
+  background: linear-gradient(90deg, rgba(255, 200, 80, 0.5), rgba(255, 140, 40, 0.2));
+}
+
+.voucher-contract {
+  background: linear-gradient(90deg, rgba(120, 180, 255, 0.5), rgba(60, 100, 200, 0.2));
+}
+
+.tagline-block {
+  position: absolute;
+  left: 320px;
+  top: 900px;
+  width: 1280px;
+  color: #fff;
+  font-size: 36px;
+  line-height: 48px;
+  font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+}
+
+.tagline-block p {
+  margin: 0;
+}
+
+.preview-tip {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 960px) {
+  .recruit-body {
+    flex-direction: column;
+  }
+
+  .recruit-sidebar {
+    width: 100%;
+    max-height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .recruit-tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .recruit-maker {
+    height: auto;
+    min-height: calc(100vh - 100px);
+  }
+}
+</style>
