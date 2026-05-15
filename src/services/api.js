@@ -237,11 +237,20 @@ export async function fetchCharacters() {
     const characters = Object.entries(data)
       .filter(([id, char]) => {
         // 只保留真正的幹員（以 char_ 開頭，且有名字和稀有度）
-        return id.startsWith('char_') && 
-               char.name && 
-               (char.rarity !== undefined || char.rarity !== null) &&
-               char.profession !== 'TOKEN' && // 排除召喚物
-               char.profession !== 'TRAP';    // 排除陷阱
+        if (
+          !id.startsWith('char_') ||
+          !char.name ||
+          char.rarity == null ||
+          char.profession === 'TOKEN' ||
+          char.profession === 'TRAP'
+        ) {
+          return false;
+        }
+        // character_table：isNotObtainable === true 表示無法取得至幹員列表（劇情/NPC/預載等）
+        if (char.isNotObtainable === true) {
+          return false;
+        }
+        return true;
       })
       .map(([id, char]) => {
         const rarity = parseRarity(char.rarity);
