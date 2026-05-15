@@ -52,6 +52,8 @@
     "loadListError": "オペレーターを読み込めませんでした。しばらくしてから再度お試しください。",
     "loadDetailError": "詳細を読み込めませんでした。しばらくしてから再度お試しください。",
     "retry": "再試行",
+    "expandFactions": "陣営を表示",
+    "collapseFactions": "陣営を隠す",
     "melee": "近距離",
     "ranged": "遠距離",
     "sections": {

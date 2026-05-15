@@ -23,25 +23,6 @@
         </div>
       </div>
       <div class="filter-group">
-        <label>{{ t('character.nation') }}</label>
-        <div class="filter-buttons nation-buttons">
-          <button
-            v-for="faction in factionFilterOptions"
-            :key="faction.id"
-            :class="{ active: selectedFactions.includes(faction.id) }"
-            @click="toggleFaction(faction.id)"
-          >
-            {{ faction.label }}
-          </button>
-          <button
-            :class="{ active: selectedFactions.length === 0 }"
-            @click="selectedFactions = []"
-          >
-            {{ t('common.all') }}
-          </button>
-        </div>
-      </div>
-      <div class="filter-group">
         <label>{{ t('character.profession') }}</label>
         <div class="filter-buttons">
           <button 
@@ -58,6 +39,39 @@
           >
             {{ t('common.all') }}
           </button>
+        </div>
+      </div>
+      <div class="filter-group faction-filter-group">
+        <label>{{ t('character.nation') }}</label>
+        <div class="faction-filter-controls">
+          <button
+            type="button"
+            class="filter-toggle-button"
+            :aria-expanded="isFactionFilterExpanded"
+            @click="isFactionFilterExpanded = !isFactionFilterExpanded"
+          >
+            <i :class="isFactionFilterExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+            {{ isFactionFilterExpanded ? t('character.collapseFactions') : t('character.expandFactions') }}
+          </button>
+        </div>
+        <div v-if="isFactionFilterExpanded" class="filter-buttons nation-buttons">
+          <button
+            v-for="faction in factionFilterOptions"
+            :key="faction.id"
+            :class="{ active: selectedFactions.includes(faction.id) }"
+            @click="toggleFaction(faction.id)"
+          >
+            {{ faction.label }}
+          </button>
+          <button
+            :class="{ active: selectedFactions.length === 0 }"
+            @click="selectedFactions = []"
+          >
+            {{ t('common.all') }}
+          </button>
+        </div>
+        <div v-else-if="selectedFactionLabels.length > 0" class="filter-collapsed-summary">
+          {{ selectedFactionLabels.join('、') }}
         </div>
       </div>
       <div class="filter-group search-group">
@@ -138,6 +152,7 @@ const searchQuery = ref('');
 const selectedRarity = ref([]); // 改為數組，支援多選
 const selectedFactions = ref([]);
 const selectedProfession = ref(null);
+const isFactionFilterExpanded = ref(false);
 
 // 記錄每個角色當前使用的圖片來源索引（使用 reactive Map）
 const avatarIndexMap = ref(new Map());
@@ -184,6 +199,12 @@ const factionFilterOptions = computed(() => {
   }
   return [...byId.values()].sort((a, b) => a.order - b.order);
 });
+
+const selectedFactionLabels = computed(() =>
+  selectedFactions.value
+    .map((factionId) => getFactionLabel(factionId))
+    .filter(Boolean)
+);
 
 // 確保稀有度是數字並返回星級
 const getRarityStars = (rarity) => {
@@ -368,16 +389,45 @@ watch(locale, async () => {
   gap: 8px;
 }
 
+.faction-filter-controls {
+  display: flex;
+  align-items: center;
+}
+
 .filter-group label {
   font-size: 0.9rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
+.filter-toggle-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(88, 166, 255, 0.12);
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.filter-toggle-button:hover {
+  background: rgba(88, 166, 255, 0.2);
+}
+
 .filter-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.filter-collapsed-summary {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 .filter-buttons.nation-buttons {
@@ -603,7 +653,7 @@ watch(locale, async () => {
     padding: 5px 10px;
     font-size: 0.8rem;
   }
-  
+
   .character-grid {
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 10px;

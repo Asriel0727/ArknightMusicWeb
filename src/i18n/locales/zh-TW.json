@@ -52,6 +52,8 @@
     "loadListError": "無法載入角色資料，請稍後再試",
     "loadDetailError": "無法載入角色詳情，請稍後再試",
     "retry": "重試",
+    "expandFactions": "展開陣營",
+    "collapseFactions": "收合陣營",
     "melee": "近戰",
     "ranged": "遠程",
     "sections": {

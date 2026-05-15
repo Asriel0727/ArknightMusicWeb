@@ -52,6 +52,8 @@
     "loadListError": "Could not load operators. Please try again.",
     "loadDetailError": "Could not load operator details. Please try again.",
     "retry": "Retry",
+    "expandFactions": "Show factions",
+    "collapseFactions": "Hide factions",
     "melee": "Melee",
     "ranged": "Ranged",
     "sections": {

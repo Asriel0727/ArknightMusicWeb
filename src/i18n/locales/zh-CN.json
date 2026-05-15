@@ -52,6 +52,8 @@
     "loadListError": "无法载入角色资料，请稍后再试",
     "loadDetailError": "无法载入角色详情，请稍后再试",
     "retry": "重试",
+    "expandFactions": "展开阵营",
+    "collapseFactions": "收起阵营",
     "melee": "近战",
     "ranged": "远程",
     "sections": {
