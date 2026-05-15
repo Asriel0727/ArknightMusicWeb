@@ -43,6 +43,7 @@
   "character": {
     "pageTitle": "Operator archive",
     "rarity": "Rarity",
+    "nation": "Faction",
     "profession": "Class",
     "search": "Search",
     "searchPlaceholder": "Operator name…",

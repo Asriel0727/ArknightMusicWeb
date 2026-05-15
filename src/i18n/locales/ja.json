@@ -43,6 +43,7 @@
   "character": {
     "pageTitle": "オペレーター図鑑",
     "rarity": "レアリティ",
+    "nation": "陣営",
     "profession": "職業",
     "search": "検索",
     "searchPlaceholder": "オペレーター名…",

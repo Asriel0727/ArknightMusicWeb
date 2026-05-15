@@ -43,6 +43,7 @@
   "character": {
     "pageTitle": "干员图鉴",
     "rarity": "稀有度",
+    "nation": "阵营",
     "profession": "职业",
     "search": "搜索",
     "searchPlaceholder": "输入角色名称…",

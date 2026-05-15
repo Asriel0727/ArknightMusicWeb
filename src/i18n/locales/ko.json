@@ -43,6 +43,7 @@
   "character": {
     "pageTitle": "오퍼레이터 도감",
     "rarity": "희귀도",
+    "nation": "진영",
     "profession": "직업",
     "search": "검색",
     "searchPlaceholder": "오퍼레이터 이름…",

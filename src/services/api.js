@@ -10,8 +10,10 @@ import {
   getGameDataExcelBase,
   getGameDataFolder,
   getApiBuiltLabels,
+  setGameDataFolderFromUiLocale,
   shouldApplyS2tGameData,
 } from './gameDataSource.js';
+import { resolveFactionId } from '../utils/faction.js';
 
 const API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 /** 專輯／歌曲等 JSON API（Express 掛在 /api） */
@@ -28,6 +30,45 @@ const LYRICS_CACHE_KEY_PREFIX = 'v2:';
 /** 歌詞記憶體快取（同一首多次開播放器不重打 proxy） */
 const LYRICS_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const lyricsCache = new Map();
+
+/** handbook_team_table：依 nationId 顯示陣營名（隨 excel 基底切換而失效） */
+let handbookTeamTableCache = { base: '', data: null };
+
+async function getHandbookTeamTable() {
+  const base = getGameDataExcelBase();
+  if (handbookTeamTableCache.base === base && handbookTeamTableCache.data) {
+    return handbookTeamTableCache.data;
+  }
+  const res = await fetch(`${base}/handbook_team_table.json`);
+  const data = res.ok ? await res.json() : {};
+  handbookTeamTableCache = { base, data };
+  return data;
+}
+
+function factionIdToDisplayName(factionId, teamTable) {
+  if (!factionId) return '';
+  const entry = teamTable?.[factionId];
+  if (!entry) return String(factionId);
+  const raw = entry.powerName || entry.powerCode || factionId;
+  return toTraditionalGameDataText(String(raw));
+}
+
+/** 將當前遊戲資料語系下的陣營名稱合併進 vue-i18n（依 UI 語系切換） */
+export async function syncFactionI18nMessages(i18n) {
+  const uiLocale =
+    typeof i18n.global.locale === 'string' ? i18n.global.locale : i18n.global.locale.value;
+  setGameDataFolderFromUiLocale(uiLocale);
+  handbookTeamTableCache = { base: '', data: null };
+  const table = await getHandbookTeamTable();
+  const nation = {};
+  for (const [id, entry] of Object.entries(table)) {
+    if (!id || id === 'none') continue;
+    const raw = entry?.powerName || entry?.powerCode;
+    if (raw) nation[id] = toTraditionalGameDataText(String(raw));
+  }
+  i18n.global.mergeLocaleMessage(uiLocale, { nation });
+  return table;
+}
 
 /**
  * 獲取所有專輯列表
@@ -153,6 +194,7 @@ export function invalidateArknightsCaches() {
   skinTableMemoryCache = undefined;
   skinTableCachedAt = 0;
   skinTableLoadingPromise = undefined;
+  handbookTeamTableCache = { base: '', data: null };
   songDetailsCache.clear();
   lyricsCache.clear();
 }
@@ -209,7 +251,10 @@ const AVATAR_SOURCES = [
  */
 export async function fetchCharacters() {
   try {
-    const response = await fetch(`${getGameDataExcelBase()}/character_table.json`);
+    const [response, teamTable] = await Promise.all([
+      fetch(`${getGameDataExcelBase()}/character_table.json`),
+      getHandbookTeamTable(),
+    ]);
     if (!response.ok) throw new Error('無法獲取角色數據');
     const data = await response.json();
     
@@ -254,6 +299,8 @@ export async function fetchCharacters() {
       })
       .map(([id, char]) => {
         const rarity = parseRarity(char.rarity);
+        const factionId = resolveFactionId(char);
+        const factionOrder = factionId ? (teamTable[factionId]?.orderNum ?? 9999) : 9999;
         return {
           id,
           name: toTraditionalGameDataText(char.name),
@@ -262,7 +309,10 @@ export async function fetchCharacters() {
           rarity: rarity,                // 稀有度 (0-5 對應 1-6星)
           position: char.position,       // 位置 (MELEE/RANGED)
           tagList: (char.tagList || []).map((tag) => toTraditionalGameDataText(tag)),   // 標籤
-          nation: char.nationId,         // 國家/陣營
+          nation: char.nationId,
+          factionId,
+          factionOrder,
+          nationName: factionIdToDisplayName(factionId, teamTable),
           // 使用第一個圖片來源
           avatarUrl: AVATAR_SOURCES[0](id)
         };
@@ -399,7 +449,7 @@ export async function fetchCharacterDetails(charId) {
   try {
     // 並行獲取所有需要的數據
     const excel = getGameDataExcelBase();
-    const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes, skinTable] = await Promise.all([
+    const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes, skinTable, teamTable] = await Promise.all([
       fetch(`${excel}/character_table.json`),
       fetch(`${excel}/skill_table.json`).catch(() => null),
       fetch(`${excel}/building_data.json`).catch(() => null),
@@ -407,7 +457,8 @@ export async function fetchCharacterDetails(charId) {
       fetch(`${excel}/handbook_info_table.json`).catch(() => null),
       fetch(`${excel}/item_table.json`).catch(() => null),
       fetch(`${excel}/range_table.json`).catch(() => null),
-      getSkinTableShared()
+      getSkinTableShared(),
+      getHandbookTeamTable(),
     ]);
     
     if (!charTableRes.ok) throw new Error('無法獲取角色資料');
@@ -767,6 +818,8 @@ export async function fetchCharacterDetails(charId) {
       position: charData.position,
       tagList: (charData.tagList || []).map((tag) => toTraditionalGameDataText(tag)),
       nation: charData.nationId,
+      factionId: resolveFactionId(charData),
+      nationName: factionIdToDisplayName(resolveFactionId(charData), teamTable),
       description: toTraditionalGameDataText(
         normalizeEscapedNewlines(charData.itemUsage || charData.itemDesc || '')
       ),

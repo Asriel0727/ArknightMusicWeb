@@ -23,6 +23,25 @@
         </div>
       </div>
       <div class="filter-group">
+        <label>{{ t('character.nation') }}</label>
+        <div class="filter-buttons nation-buttons">
+          <button
+            v-for="faction in factionFilterOptions"
+            :key="faction.id"
+            :class="{ active: selectedFactions.includes(faction.id) }"
+            @click="toggleFaction(faction.id)"
+          >
+            {{ faction.label }}
+          </button>
+          <button
+            :class="{ active: selectedFactions.length === 0 }"
+            @click="selectedFactions = []"
+          >
+            {{ t('common.all') }}
+          </button>
+        </div>
+      </div>
+      <div class="filter-group">
         <label>{{ t('character.profession') }}</label>
         <div class="filter-buttons">
           <button 
@@ -94,6 +113,9 @@
         <div class="character-info">
           <h3 class="character-name">{{ char.name }}</h3>
           <p class="character-class">{{ getProfessionName(char.profession) }}</p>
+          <p v-if="getFactionLabel(char.factionId)" class="character-nation" :title="getFactionLabel(char.factionId)">
+            {{ getFactionLabel(char.factionId) }}
+          </p>
         </div>
       </div>
     </div>
@@ -103,8 +125,9 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { fetchCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls, fetchCharacterDetails } from '../services/api.js';
+import { fetchCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls, fetchCharacterDetails, syncFactionI18nMessages } from '../services/api.js';
 import { modalState, characterState } from '../stores/player.js';
+import { i18n } from '../i18n/index.js';
 
 const { t, locale } = useI18n();
 
@@ -113,6 +136,7 @@ const isLoading = ref(true);
 const error = ref(null);
 const searchQuery = ref('');
 const selectedRarity = ref([]); // 改為數組，支援多選
+const selectedFactions = ref([]);
 const selectedProfession = ref(null);
 
 // 記錄每個角色當前使用的圖片來源索引（使用 reactive Map）
@@ -141,6 +165,26 @@ const getProfessionName = (profession) => {
   return found ? found.label : profession;
 };
 
+const getFactionLabel = (factionId) => {
+  if (!factionId) return '';
+  const key = `nation.${factionId}`;
+  const label = t(key);
+  return label === key ? factionId : label;
+};
+
+const factionFilterOptions = computed(() => {
+  const byId = new Map();
+  for (const char of characters.value) {
+    if (!char.factionId || byId.has(char.factionId)) continue;
+    byId.set(char.factionId, {
+      id: char.factionId,
+      order: char.factionOrder ?? 9999,
+      label: getFactionLabel(char.factionId),
+    });
+  }
+  return [...byId.values()].sort((a, b) => a.order - b.order);
+});
+
 // 確保稀有度是數字並返回星級
 const getRarityStars = (rarity) => {
   let numRarity = 0;
@@ -166,7 +210,8 @@ const filteredCharacters = computed(() => {
       const query = searchQuery.value.toLowerCase();
       const matchName = char.name.toLowerCase().includes(query);
       const matchAppellation = char.appellation?.toLowerCase().includes(query);
-      if (!matchName && !matchAppellation) return false;
+      const matchNation = getFactionLabel(char.factionId).toLowerCase().includes(query);
+      if (!matchName && !matchAppellation && !matchNation) return false;
     }
     
     // 稀有度篩選（支援多選）
@@ -177,6 +222,11 @@ const filteredCharacters = computed(() => {
       }
     }
     
+    // 陣營篩選（支援多選）
+    if (selectedFactions.value.length > 0 && !selectedFactions.value.includes(char.factionId)) {
+      return false;
+    }
+
     // 職業篩選
     if (selectedProfession.value !== null && char.profession !== selectedProfession.value) {
       return false;
@@ -194,6 +244,15 @@ const toggleRarity = (rarity) => {
   } else {
     // 如果未選中，則添加
     selectedRarity.value.push(rarity);
+  }
+};
+
+const toggleFaction = (factionId) => {
+  const index = selectedFactions.value.indexOf(factionId);
+  if (index > -1) {
+    selectedFactions.value.splice(index, 1);
+  } else {
+    selectedFactions.value.push(factionId);
   }
 };
 
@@ -260,6 +319,7 @@ onMounted(() => {
 });
 
 watch(locale, async () => {
+  await syncFactionI18nMessages(i18n);
   await loadCharacters();
   if (
     modalState.isOpen &&
@@ -318,6 +378,12 @@ watch(locale, async () => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.filter-buttons.nation-buttons {
+  max-height: 140px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .filter-buttons button {
@@ -510,6 +576,16 @@ watch(locale, async () => {
   font-size: 0.8rem;
   color: var(--text-secondary);
   margin: 0;
+}
+
+.character-nation {
+  font-size: 0.72rem;
+  color: var(--primary-color);
+  margin: 6px 0 0 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 響應式設計 */

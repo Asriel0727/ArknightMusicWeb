@@ -18,7 +18,7 @@
         <div class="character-tags">
           <span class="tag profession">{{ getProfessionName(character.profession) }}</span>
           <span class="tag position">{{ character.position === 'MELEE' ? t('character.melee') : t('character.ranged') }}</span>
-          <span v-if="character.nation" class="tag nation">{{ character.nation }}</span>
+          <span v-if="getFactionLabel(character.factionId)" class="tag nation">{{ getFactionLabel(character.factionId) }}</span>
         </div>
       </div>
     </div>
@@ -379,6 +379,13 @@ const getProfessionName = (profession) => {
   const key = `profession.${profession}`;
   const translated = t(key);
   return translated === key ? profession : translated;
+};
+
+const getFactionLabel = (factionId) => {
+  if (!factionId) return '';
+  const key = `nation.${factionId}`;
+  const translated = t(key);
+  return translated === key ? factionId : translated;
 };
 
 const getRoomTypeName = (roomType) => {

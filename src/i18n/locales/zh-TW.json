@@ -43,6 +43,7 @@
   "character": {
     "pageTitle": "幹員圖鑑",
     "rarity": "稀有度",
+    "nation": "陣營",
     "profession": "職業",
     "search": "搜尋",
     "searchPlaceholder": "輸入角色名稱…",
