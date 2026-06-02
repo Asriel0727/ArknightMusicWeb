@@ -53,6 +53,16 @@
                 @input="handleVolumeChange"
               >
             </div>
+            <label class="lyrics-translation-toggle">
+              <input
+                v-model="playerState.showLyricTranslation"
+                type="checkbox"
+              >
+              <span class="toggle-track" aria-hidden="true">
+                <span class="toggle-thumb"></span>
+              </span>
+              <span class="toggle-label">翻譯</span>
+            </label>
           </div>
         </div>
       </div>
@@ -81,7 +91,15 @@
           :class="{ active: activeLyricIndex === index }"
           :data-time="line.time"
         >
-          {{ line.text }}
+          <div class="lyrics-original">
+            {{ line.text }}
+          </div>
+          <div
+            v-if="playerState.showLyricTranslation && line.translation"
+            class="lyrics-translation"
+          >
+            {{ line.translation }}
+          </div>
         </div>
       </div>
       <p v-else class="no-lyrics">{{ t('common.noLyrics') }}</p>
@@ -437,6 +455,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
 }
 
 .volume-control {
@@ -447,6 +466,62 @@ onUnmounted(() => {
 
 .volume-control input[type="range"] {
   width: 100px;
+}
+
+.lyrics-translation-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.lyrics-translation-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-track {
+  position: relative;
+  width: 42px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--border-color);
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.lyrics-translation-toggle input:checked + .toggle-track {
+  background: rgba(88, 166, 255, 0.32);
+}
+
+.lyrics-translation-toggle input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(20px);
+  background: var(--primary-color);
+}
+
+.lyrics-translation-toggle input:focus-visible + .toggle-track {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.toggle-label {
+  line-height: 1;
 }
 
 .album-grid-visual-small {
@@ -488,6 +563,21 @@ onUnmounted(() => {
   z-index: 1;
 }
 
+.lyrics-original {
+  line-height: 1.5;
+}
+
+.lyrics-translation {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.lyrics-line.active .lyrics-translation {
+  color: rgba(88, 166, 255, 0.85);
+}
+
 .no-lyrics {
   flex-grow: 1;
   display: flex;
@@ -519,4 +609,3 @@ onUnmounted(() => {
   }
 }
 </style>
-

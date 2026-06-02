@@ -1,10 +1,18 @@
 import { ref, reactive, computed } from 'vue';
 import { fetchSongDetails, fetchLyrics, fetchAlbumDetails } from '../services/api.js';
 import { i18n } from '../i18n/index.js';
+import { translateLyricLines } from '../services/lyricsTranslationPlugin.js';
 
 function unknownArtistLabel() {
   return i18n.global.t('common.unknownArtist');
 }
+
+function getCurrentLocale() {
+  const locale = i18n.global.locale;
+  return typeof locale === 'string' ? locale : locale.value;
+}
+
+let lyricLoadToken = 0;
 
 // 播放器狀態
 export const playerState = reactive({
@@ -18,6 +26,8 @@ export const playerState = reactive({
   currentSongIndex: 0,
   currentPlaylist: [],
   lyrics: [],
+  showLyricTranslation: true,
+  isTranslatingLyrics: false,
   isUserScrolled: false,
   scrollTimeout: null
 });
@@ -115,14 +125,41 @@ export async function playSong(song, coverUrl, coverDeUrl) {
 
     playerState.currentSong = fullSong;
     playerState.lyrics = [];
+    playerState.isTranslatingLyrics = false;
+    const currentLyricLoadToken = ++lyricLoadToken;
 
     if (fullSong.lyricUrl) {
       fetchLyrics(fullSong.lyricUrl)
-        .then((lines) => {
-          playerState.lyrics = lines;
+        .then(async (lyrics) => {
+          if (currentLyricLoadToken !== lyricLoadToken) {
+            return;
+          }
+
+          playerState.lyrics = lyrics.map((line) => ({
+            ...line,
+            translation: '',
+          }));
+
+          playerState.isTranslatingLyrics = true;
+          const translatedLyrics = await translateLyricLines(playerState.lyrics, getCurrentLocale());
+
+          if (currentLyricLoadToken !== lyricLoadToken) {
+            return;
+          }
+
+          playerState.lyrics = translatedLyrics;
         })
         .catch(() => {
+          if (currentLyricLoadToken !== lyricLoadToken) {
+            return;
+          }
+
           playerState.lyrics = [];
+        })
+        .finally(() => {
+          if (currentLyricLoadToken === lyricLoadToken) {
+            playerState.isTranslatingLyrics = false;
+          }
         });
     }
 

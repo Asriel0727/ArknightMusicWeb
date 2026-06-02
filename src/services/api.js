@@ -264,6 +264,14 @@ const AVATAR_SOURCES = [
   (id) => `https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charavatars/${id}.png`,
 ];
 
+/** 幹員顯示名：簡中表多有 name；YoStar 表常見 name 為空但 appellation 有值，列表／詳情需一致 */
+function resolveCharacterTableDisplayName(char) {
+  const n = char?.name != null ? String(char.name).trim() : '';
+  if (n) return n;
+  const a = char?.appellation != null ? String(char.appellation).trim() : '';
+  return a;
+}
+
 /**
  * 獲取所有角色數據
  * @returns {Promise<Array>} 角色列表
@@ -300,10 +308,10 @@ export async function fetchCharacters() {
     // 轉換為數組並過濾出可用的幹員（排除敵人、召喚物等）
     const characters = Object.entries(data)
       .filter(([id, char]) => {
-        // 只保留真正的幹員（以 char_ 開頭，且有名字和稀有度）
+        // 只保留真正的幹員（以 char_ 開頭，且有可顯示名稱與稀有度）
         if (
           !id.startsWith('char_') ||
-          !char.name ||
+          !resolveCharacterTableDisplayName(char) ||
           char.rarity == null ||
           char.profession === 'TOKEN' ||
           char.profession === 'TRAP'
@@ -322,7 +330,7 @@ export async function fetchCharacters() {
         const factionOrder = factionId ? (teamTable[factionId]?.orderNum ?? 9999) : 9999;
         return {
           id,
-          name: toTraditionalGameDataText(char.name),
+          name: toTraditionalGameDataText(resolveCharacterTableDisplayName(char)),
           appellation: char.appellation, // 代號/英文名
           profession: char.profession,   // 職業
           rarity: rarity,                // 稀有度 (0-5 對應 1-6星)
@@ -829,7 +837,7 @@ export async function fetchCharacterDetails(charId) {
     
     return {
       id: charId,
-      name: toTraditionalGameDataText(charData.name),
+      name: toTraditionalGameDataText(resolveCharacterTableDisplayName(charData)),
       appellation: charData.appellation,
       profession: charData.profession,
       subProfessionId: charData.subProfessionId || '',
@@ -896,4 +904,3 @@ export async function fetchCharacterDetails(charId) {
     throw error;
   }
 }
-
