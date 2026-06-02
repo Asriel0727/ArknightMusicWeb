@@ -101,6 +101,14 @@ npm run dev
 npm run build
 ```
 
+### 構建可下載成品包
+
+```bash
+npm run build:portable
+```
+
+可下載成品會輸出到 `dist-portable/`，路徑使用相對位置，適合打包成 ZIP 後放到 GitHub Actions artifact、Release，或上傳到任意靜態網站空間。
+
 ### 預覽生產版本
 
 ```bash
@@ -237,6 +245,12 @@ npm run preview
 本專案已配置 GitHub Pages 自動部署。每次推送到 main 分支時，GitHub Actions 會自動建構並部署網站。
 
 網站地址：https://asriel0727.github.io/ArknightMusicWeb/
+
+## 下載即用版本
+
+每次推送到 `main` 分支後，GitHub Actions 也會產生 `ArknightMusicWeb-portable` 成品包。下載後可將內容上傳到任意靜態網站空間使用，不需要另外執行 `npm install` 或手動安裝 `opencc-js`。
+
+如果要發布正式下載版，推送 `v*` tag（例如 `v2.0.1`）後，GitHub Actions 會自動建立 GitHub Release，並附上 `ArknightMusicWeb-portable.zip`。
 
 ### 部署配置
 

@@ -76,6 +76,9 @@ export const RECRUIT_STAR_IMAGE_URL =
 
 export const RECRUIT_CARD_SIZE = { width: 1920, height: 1080 };
 
+export const RECRUIT_DEFAULT_BACKGROUND_URL = `${import.meta.env.BASE_URL}images/recruit/recruit-bg.webp`;
+export const RECRUIT_NEW_BADGE_URL = `${import.meta.env.BASE_URL}images/recruit/recruit-new.webp`;
+
 export const DEFAULT_RECRUIT_BACKGROUND = `linear-gradient(
   165deg,
   #2a3548 0%,

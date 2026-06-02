@@ -1,4 +1,4 @@
-import { ref, reactive, computed } from 'vue';
+import { reactive } from 'vue';
 import { fetchSongDetails, fetchLyrics, fetchAlbumDetails } from '../services/api.js';
 import { i18n } from '../i18n/index.js';
 import { translateLyricLines } from '../services/lyricsTranslationPlugin.js';
@@ -13,6 +13,7 @@ function getCurrentLocale() {
 }
 
 let lyricLoadToken = 0;
+let lyricTranslationToken = 0;
 
 // 播放器狀態
 export const playerState = reactive({
@@ -26,10 +27,8 @@ export const playerState = reactive({
   currentSongIndex: 0,
   currentPlaylist: [],
   lyrics: [],
-  showLyricTranslation: true,
+  showLyricTranslation: false,
   isTranslatingLyrics: false,
-  isUserScrolled: false,
-  scrollTimeout: null
 });
 
 // 專輯和歌曲狀態
@@ -140,14 +139,9 @@ export async function playSong(song, coverUrl, coverDeUrl) {
             translation: '',
           }));
 
-          playerState.isTranslatingLyrics = true;
-          const translatedLyrics = await translateLyricLines(playerState.lyrics, getCurrentLocale());
-
-          if (currentLyricLoadToken !== lyricLoadToken) {
-            return;
+          if (playerState.showLyricTranslation) {
+            await refreshLyricTranslations(currentLyricLoadToken);
           }
-
-          playerState.lyrics = translatedLyrics;
         })
         .catch(() => {
           if (currentLyricLoadToken !== lyricLoadToken) {
@@ -180,6 +174,36 @@ export async function playSong(song, coverUrl, coverDeUrl) {
   } catch (error) {
     console.error('播放歌曲時出錯:', error);
     throw error;
+  }
+}
+
+export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoadToken) {
+  if (!playerState.showLyricTranslation) {
+    return;
+  }
+
+  if (!playerState.lyrics || playerState.lyrics.length === 0) {
+    return;
+  }
+
+  const translationToken = ++lyricTranslationToken;
+  playerState.isTranslatingLyrics = true;
+
+  try {
+    const translatedLyrics = await translateLyricLines(playerState.lyrics, getCurrentLocale());
+
+    if (
+      expectedLyricLoadToken !== lyricLoadToken ||
+      translationToken !== lyricTranslationToken
+    ) {
+      return;
+    }
+
+    playerState.lyrics = translatedLyrics;
+  } finally {
+    if (translationToken === lyricTranslationToken) {
+      playerState.isTranslatingLyrics = false;
+    }
   }
 }
 
@@ -268,7 +292,7 @@ export function playNextSong() {
 export function seek(position) {
   if (!playerState.audioPlayer || isNaN(playerState.audioPlayer.duration)) return;
   playerState.audioPlayer.currentTime = position * playerState.audioPlayer.duration;
-  syncLyrics(playerState.audioPlayer.currentTime, true);
+  syncLyrics(playerState.audioPlayer.currentTime);
 }
 
 export function setVolume(volume) {
@@ -283,24 +307,11 @@ export function toggleMute() {
 }
 
 // 同步歌詞
-export function syncLyrics(currentTime, forceScroll = false) {
+export function syncLyrics(currentTime) {
   if (!playerState.lyrics || playerState.lyrics.length === 0) return;
-  if (playerState.isUserScrolled && !forceScroll) return;
   
   // 這個函數需要在組件中實現，因為需要操作DOM
   // 這裡只更新狀態
 }
 
-// 設置用戶滾動狀態
-export function setUserScrolled(scrolled) {
-  playerState.isUserScrolled = scrolled;
-  if (playerState.scrollTimeout) {
-    clearTimeout(playerState.scrollTimeout);
-  }
-  if (scrolled) {
-    playerState.scrollTimeout = setTimeout(() => {
-      playerState.isUserScrolled = false;
-    }, 5000);
-  }
-}
 

@@ -3,7 +3,6 @@ import { parseLRC } from '../utils/lyrics.js';
 import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
 import {
   toTraditionalGameDataText,
-  toTraditionalMusicApiText,
   transformMusicApiPayload,
 } from '../utils/s2tApiText.js';
 import {
@@ -133,7 +132,7 @@ function mapLyricLinesForUi(lines) {
   if (!Array.isArray(lines)) return [];
   return lines.map((line) => ({
     ...line,
-    text: toTraditionalMusicApiText(line.text),
+    text: String(line.text || ''),
   }));
 }
 

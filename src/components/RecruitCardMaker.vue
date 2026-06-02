@@ -59,6 +59,10 @@
 
           <!-- 阵营 -->
           <div v-show="activeTab === 'organization'" class="tab-pane">
+            <label class="field checkbox-field">
+              <input v-model="showNewBadge" type="checkbox" />
+              <span>{{ t('recruit.showNewBadge') }}</span>
+            </label>
             <label class="field">
               <span>{{ t('recruit.factionLogo') }}</span>
               <select v-model="factionLogoKey">
@@ -157,6 +161,14 @@
 
             <div class="card-ui">
               <img
+                v-if="showNewBadge"
+                class="new-badge"
+                :src="RECRUIT_NEW_BADGE_URL"
+                alt="NEW"
+                crossorigin="anonymous"
+              />
+
+              <img
                 class="faction-logo"
                 :src="factionLogoUrl"
                 alt=""
@@ -221,6 +233,8 @@ import {
   RECRUIT_STAR_IMAGE_URL,
   RECRUIT_CARD_SIZE,
   DEFAULT_RECRUIT_BACKGROUND,
+  RECRUIT_DEFAULT_BACKGROUND_URL,
+  RECRUIT_NEW_BADGE_URL,
   rarityToStars,
   factionIdToLogoKey,
 } from '../utils/recruitCard.js';
@@ -249,6 +263,7 @@ const starCount = ref(6);
 const profession = ref('PIONEER');
 const factionLogoKey = ref('logo_rhodes');
 const showVoucherDecor = ref(false);
+const showNewBadge = ref(true);
 
 const portraitSrc = ref('');
 const portraitScale = ref(1);
@@ -293,7 +308,11 @@ const cardBackgroundStyle = computed(() => {
       backgroundPosition: 'center',
     };
   }
-  return { background: DEFAULT_RECRUIT_BACKGROUND };
+  return {
+    backgroundImage: `url(${RECRUIT_DEFAULT_BACKGROUND_URL}), ${DEFAULT_RECRUIT_BACKGROUND}`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  };
 });
 
 const portraitStyle = computed(() => ({
@@ -522,18 +541,22 @@ watch(locale, () => {
   height: calc(100vh - 120px);
   min-height: 520px;
   margin: 0 12px 12px;
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
-  background: var(--card-bg);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  background:
+    linear-gradient(135deg, rgba(23, 28, 32, 0.96), rgba(10, 12, 14, 0.98)),
+    var(--card-bg);
+  border: 1px solid rgba(221, 226, 229, 0.1);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
 }
 
 .recruit-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(221, 226, 229, 0.1);
+  background: linear-gradient(90deg, rgba(229, 88, 45, 0.14), rgba(43, 188, 201, 0.08), transparent);
   flex-shrink: 0;
 }
 
@@ -550,17 +573,18 @@ watch(locale, () => {
 
 .btn-primary,
 .btn-secondary {
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 9px 14px;
+  border-radius: 4px;
   font-size: 0.9rem;
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   font-weight: 600;
 }
 
 .btn-primary {
-  background: var(--primary-color);
+  background: #e5582d;
   color: #fff;
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .btn-primary:disabled,
@@ -570,9 +594,9 @@ watch(locale, () => {
 }
 
 .btn-secondary {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-color);
-  border: 1px solid var(--border-color);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .recruit-body {
@@ -582,36 +606,36 @@ watch(locale, () => {
 }
 
 .recruit-sidebar {
-  width: 300px;
+  width: 320px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border-color);
-  background: rgba(13, 17, 23, 0.6);
+  border-right: 1px solid rgba(221, 226, 229, 0.1);
+  background: rgba(10, 12, 14, 0.86);
 }
 
 .recruit-tabs {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 4px;
-  padding: 10px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 12px;
+  border-bottom: 1px solid rgba(221, 226, 229, 0.1);
 }
 
 .recruit-tabs button {
-  text-align: left;
-  padding: 10px 12px;
+  text-align: center;
+  padding: 9px 10px;
   border: none;
-  border-radius: 8px;
-  background: transparent;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 0.9rem;
 }
 
 .recruit-tabs button.active {
-  background: rgba(88, 166, 255, 0.15);
-  color: var(--primary-color);
+  background: rgba(43, 188, 201, 0.18);
+  color: #8ee8f0;
   font-weight: 600;
 }
 
@@ -642,9 +666,9 @@ watch(locale, () => {
 .field select,
 .field textarea {
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-color);
+  border-radius: 4px;
+  border: 1px solid rgba(221, 226, 229, 0.14);
+  background: rgba(0, 0, 0, 0.26);
   color: var(--text-color);
   font-size: 0.9rem;
 }
@@ -677,16 +701,16 @@ watch(locale, () => {
 
 .star-pick-row button {
   padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: transparent;
+  border-radius: 3px;
+  border: 1px solid rgba(221, 226, 229, 0.14);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--text-secondary);
   cursor: pointer;
 }
 
 .star-pick-row button.active {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
+  background: #e5582d;
+  border-color: #e5582d;
   color: #fff;
 }
 
@@ -705,7 +729,7 @@ watch(locale, () => {
   width: 100%;
   padding: 6px 8px;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   background: transparent;
   color: var(--text-color);
   cursor: pointer;
@@ -714,13 +738,13 @@ watch(locale, () => {
 
 .char-pick-list li.active button,
 .char-pick-list li button:hover {
-  background: rgba(88, 166, 255, 0.12);
+  background: rgba(43, 188, 201, 0.14);
 }
 
 .char-pick-list img {
   width: 36px;
   height: 36px;
-  border-radius: 6px;
+  border-radius: 4px;
   object-fit: cover;
 }
 
@@ -742,7 +766,9 @@ watch(locale, () => {
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
-  background: #0d1117;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(43, 188, 201, 0.12), transparent 28%),
+    linear-gradient(135deg, #101315, #050607);
   padding: 16px;
   position: relative;
 }
@@ -757,6 +783,17 @@ watch(locale, () => {
   height: 1080px;
   overflow: hidden;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+}
+
+.recruit-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.18) 34%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 38%, rgba(0, 0, 0, 0.5));
 }
 
 .portrait-layer {
@@ -789,6 +826,15 @@ watch(locale, () => {
   inset: 0;
   z-index: 4;
   pointer-events: none;
+}
+
+.new-badge {
+  position: absolute;
+  left: 280px;
+  top: 120px;
+  width: 160px;
+  height: auto;
+  filter: drop-shadow(0 0 22px rgba(255, 47, 47, 0.72));
 }
 
 .faction-logo {

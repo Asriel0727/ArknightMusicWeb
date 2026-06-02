@@ -1,16 +1,78 @@
+import OpenCC from 'opencc-js';
+
 const GOOGLE_TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
 const TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:v1:';
 const LINE_SEPARATOR = '\n';
 const MAX_BATCH_TEXT_LENGTH = 4200;
+const SUPPORTED_LOCALES = new Set(['zh-TW', 'zh-CN', 'en', 'ja', 'ko']);
+
+const cnToTw = OpenCC.Converter({ from: 'cn', to: 'twp' });
+const twToCn = OpenCC.Converter({ from: 'tw', to: 'cn' });
 
 const memoryCache = new Map();
 
 function normalizeTargetLocale(locale) {
-  if (locale === 'zh-CN') {
-    return 'zh-CN';
+  return SUPPORTED_LOCALES.has(locale) ? locale : 'zh-TW';
+}
+
+function sampleLyricsText(lines) {
+  if (!Array.isArray(lines) || lines.length === 0) {
+    return '';
   }
 
-  return 'zh-TW';
+  return lines
+    .map((line) => String(line?.text || '').trim())
+    .filter(Boolean)
+    .slice(0, 24)
+    .join('\n');
+}
+
+function detectLyricsLocale(lines, targetLocale) {
+  const sample = sampleLyricsText(lines);
+  if (!sample) {
+    return null;
+  }
+
+  const hasHangul = /[\uac00-\ud7af]/i.test(sample);
+  if (hasHangul) {
+    return 'ko';
+  }
+
+  const hasKana = /[\u3040-\u30ff\u31f0-\u31ff]/i.test(sample);
+  if (hasKana) {
+    return 'ja';
+  }
+
+  const hasHan = /[\u3400-\u4dbf\u4e00-\u9fff]/i.test(sample);
+  if (hasHan) {
+    if (targetLocale === 'zh-CN') {
+      return twToCn(sample) === sample ? 'zh-CN' : 'zh-TW';
+    }
+    if (targetLocale === 'zh-TW') {
+      return cnToTw(sample) === sample ? 'zh-TW' : 'zh-CN';
+    }
+    return 'zh';
+  }
+
+  const hasLatin = /[a-z]/i.test(sample);
+  if (hasLatin) {
+    return 'en';
+  }
+
+  return null;
+}
+
+function shouldSkipTranslation(lines, targetLocale) {
+  const sourceLocale = detectLyricsLocale(lines, targetLocale);
+  if (!sourceLocale) {
+    return false;
+  }
+
+  if (targetLocale === 'zh-TW' || targetLocale === 'zh-CN') {
+    return sourceLocale === targetLocale;
+  }
+
+  return sourceLocale === targetLocale;
 }
 
 function getCacheKey(text, targetLocale) {
@@ -127,8 +189,12 @@ export async function translateLyricLines(lines, locale) {
   const targetLocale = normalizeTargetLocale(locale);
   const result = lines.map((line) => ({
     ...line,
-    translation: line.translation || '',
+    translation: '',
   }));
+
+  if (shouldSkipTranslation(result, targetLocale)) {
+    return result;
+  }
 
   const batches = createLyricBatches(result);
   for (const batch of batches) {

@@ -57,6 +57,7 @@
               <input
                 v-model="playerState.showLyricTranslation"
                 type="checkbox"
+                @change="handleLyricTranslationToggle"
               >
               <span class="toggle-track" aria-hidden="true">
                 <span class="toggle-thumb"></span>
@@ -110,10 +111,10 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute } from '../stores/player.js';
+import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations } from '../stores/player.js';
 import { formatTime } from '../utils/time.js';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);
@@ -165,6 +166,12 @@ const handleSeek = (event) => {
 
 const handleVolumeChange = (event) => {
   setVolume(event.target.value);
+};
+
+const handleLyricTranslationToggle = () => {
+  if (playerState.showLyricTranslation) {
+    refreshLyricTranslations();
+  }
 };
 
 // 同步歌詞高亮和滾動
@@ -254,8 +261,6 @@ watch(() => playerState.isPlaying, (isPlaying) => {
 }, { immediate: true });
 
 watch(() => playerState.currentSong, (newSong) => {
-  console.log('當前歌曲更新:', newSong);
-  console.log('歌詞數量:', playerState.lyrics?.length || 0);
   activeLyricIndex.value = -1;
   if (lyricsContainerRef.value) {
     lyricsContainerRef.value.scrollTop = 0;
@@ -263,10 +268,15 @@ watch(() => playerState.currentSong, (newSong) => {
 });
 
 watch(() => playerState.lyrics, (newLyrics) => {
-  console.log('歌詞更新:', newLyrics?.length || 0, '條');
   // 歌詞更新時重置高亮索引
   activeLyricIndex.value = -1;
 }, { deep: true });
+
+watch(locale, () => {
+  if (playerState.showLyricTranslation && playerState.lyrics.length > 0) {
+    refreshLyricTranslations();
+  }
+});
 
 // 組件掛載時，如果正在播放則啟動同步
 onMounted(() => {
