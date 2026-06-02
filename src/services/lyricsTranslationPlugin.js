@@ -1,13 +1,9 @@
 const GOOGLE_TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
 const TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:v1:';
-const REQUEST_DELAY_MS = 120;
-const MAX_TEXT_LENGTH = 450;
+const LINE_SEPARATOR = '\n';
+const MAX_BATCH_TEXT_LENGTH = 4200;
 
 const memoryCache = new Map();
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function normalizeTargetLocale(locale) {
   if (locale === 'zh-CN') {
@@ -63,15 +59,45 @@ function readGoogleTranslateResponse(data) {
     .trim();
 }
 
-async function translateText(text, targetLocale) {
+function createLyricBatches(lines) {
+  const batches = [];
+  let currentBatch = [];
+  let currentLength = 0;
+
+  lines.forEach((line, index) => {
+    const text = String(line.text || '').trim();
+    if (!text) {
+      return;
+    }
+
+    const nextLength = currentLength + text.length + LINE_SEPARATOR.length;
+    if (currentBatch.length > 0 && nextLength > MAX_BATCH_TEXT_LENGTH) {
+      batches.push(currentBatch);
+      currentBatch = [];
+      currentLength = 0;
+    }
+
+    currentBatch.push({ index, text });
+    currentLength += text.length + LINE_SEPARATOR.length;
+  });
+
+  if (currentBatch.length > 0) {
+    batches.push(currentBatch);
+  }
+
+  return batches;
+}
+
+async function translateBatch(batch, targetLocale) {
+  const text = batch.map((line) => line.text).join(LINE_SEPARATOR);
   const trimmedText = String(text || '').trim();
   if (!trimmedText) {
-    return '';
+    return [];
   }
 
   const cached = readCachedTranslation(trimmedText, targetLocale);
   if (cached != null) {
-    return cached;
+    return cached.split(LINE_SEPARATOR);
   }
 
   const params = new URLSearchParams({
@@ -79,7 +105,7 @@ async function translateText(text, targetLocale) {
     sl: 'auto',
     tl: targetLocale,
     dt: 't',
-    q: trimmedText.slice(0, MAX_TEXT_LENGTH),
+    q: trimmedText,
   });
 
   const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?${params.toString()}`);
@@ -90,8 +116,7 @@ async function translateText(text, targetLocale) {
   const data = await response.json();
   const translation = readGoogleTranslateResponse(data);
   writeCachedTranslation(trimmedText, targetLocale, translation);
-  await sleep(REQUEST_DELAY_MS);
-  return translation;
+  return translation.split(LINE_SEPARATOR);
 }
 
 export async function translateLyricLines(lines, locale) {
@@ -105,17 +130,15 @@ export async function translateLyricLines(lines, locale) {
     translation: line.translation || '',
   }));
 
-  for (let i = 0; i < result.length; i += 1) {
-    const line = result[i];
-    if (!line.text || line.translation) {
-      continue;
-    }
-
+  const batches = createLyricBatches(result);
+  for (const batch of batches) {
     try {
-      line.translation = await translateText(line.text, targetLocale);
+      const translations = await translateBatch(batch, targetLocale);
+      batch.forEach((line, index) => {
+        result[line.index].translation = translations[index] || '';
+      });
     } catch (error) {
       console.warn('Lyric translation failed:', error.message);
-      line.translation = '';
     }
   }
 
