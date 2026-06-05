@@ -187,6 +187,10 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
   }
 
   const translationToken = ++lyricTranslationToken;
+  playerState.lyrics = playerState.lyrics.map((line) => ({
+    ...line,
+    translation: '',
+  }));
   playerState.isTranslatingLyrics = true;
 
   try {
