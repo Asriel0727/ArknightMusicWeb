@@ -97,6 +97,27 @@
                 </button>
               </li>
             </ul>
+            <div v-if="selectedCharacterDetails" class="selected-character-tools">
+              <div class="selected-character-name">
+                {{ selectedCharacterDetails.name }}
+              </div>
+              <label class="field checkbox-field">
+                <input v-model="useSelectedCharacterFaction" type="checkbox" @change="applySelectedCharacterFaction" />
+                <span>使用該角色陣營</span>
+              </label>
+              <label v-if="selectedCharacterPortraits.length" class="field">
+                <span>角色皮膚</span>
+                <select v-model.number="selectedPortraitIndex" @change="applySelectedPortrait">
+                  <option
+                    v-for="(portrait, index) in selectedCharacterPortraits"
+                    :key="portrait.skinId || portrait.portraitId || index"
+                    :value="index"
+                  >
+                    {{ portrait.name || portrait.portraitId || `Skin ${index + 1}` }}
+                  </option>
+                </select>
+              </label>
+            </div>
             <label class="field">
               <span>{{ t('character.rarity') }}</span>
               <div class="star-pick-row">
@@ -161,14 +182,6 @@
 
             <div class="card-ui">
               <img
-                v-if="showNewBadge"
-                class="new-badge"
-                :src="RECRUIT_NEW_BADGE_URL"
-                alt="NEW"
-                crossorigin="anonymous"
-              />
-
-              <img
                 class="faction-logo"
                 :src="factionLogoUrl"
                 alt=""
@@ -187,12 +200,21 @@
               </div>
 
               <div class="name-block">
-                <img
-                  class="class-icon"
-                  :src="professionIconUrl"
-                  alt=""
-                  crossorigin="anonymous"
-                />
+                <div class="class-column">
+                  <img
+                    class="class-icon"
+                    :src="professionIconUrl"
+                    alt=""
+                    crossorigin="anonymous"
+                  />
+                  <img
+                    v-if="showNewBadge"
+                    class="new-badge"
+                    :src="RECRUIT_NEW_BADGE_URL"
+                    alt="NEW"
+                    crossorigin="anonymous"
+                  />
+                </div>
                 <div class="names">
                   <div class="name-zh">{{ nameZh || t('recruit.nameZhPlaceholder') }}</div>
                   <div class="name-en">{{ (nameEn || t('recruit.nameEnPlaceholder')).toUpperCase() }}</div>
@@ -220,6 +242,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { i18n as globalI18n } from '../i18n/index.js';
 import {
   fetchCharacters,
   fetchCharacterDetails,
@@ -239,8 +262,7 @@ import {
   factionIdToLogoKey,
 } from '../utils/recruitCard.js';
 
-const i18n = useI18n();
-const { t, locale } = i18n;
+const { t, locale } = useI18n();
 
 const tabs = [
   { id: 'appearance', labelKey: 'recruit.tabs.appearance' },
@@ -275,6 +297,9 @@ const characters = ref([]);
 const isLoadingChars = ref(true);
 const charSearch = ref('');
 const selectedCharId = ref('');
+const selectedCharacterDetails = ref(null);
+const selectedPortraitIndex = ref(0);
+const useSelectedCharacterFaction = ref(true);
 const isExporting = ref(false);
 
 let dragState = null;
@@ -340,6 +365,8 @@ const filteredCharacters = computed(() => {
   return list.slice(0, 80);
 });
 
+const selectedCharacterPortraits = computed(() => selectedCharacterDetails.value?.portraits || []);
+
 function getRarityStars(rarity) {
   return rarityToStars(rarity);
 }
@@ -388,6 +415,27 @@ function setPortraitFromUrl(url, isObjectUrl = false) {
   revokePortraitObjectUrl();
   if (isObjectUrl) portraitObjectUrl.value = url;
   portraitSrc.value = url;
+}
+
+function applyPortraitFromDetail(detail, portraitIndex) {
+  const portraits = detail?.portraits || [];
+  const portrait = portraits[portraitIndex] || portraits[portraits.length - 1] || portraits[0];
+  const url = portrait?.urls?.[0];
+  if (!url) return;
+
+  setPortraitFromUrl(url);
+  portraitPos.value = { x: 320, y: 120 };
+  portraitScale.value = 1;
+}
+
+function applySelectedPortrait() {
+  if (!selectedCharacterDetails.value) return;
+  applyPortraitFromDetail(selectedCharacterDetails.value, selectedPortraitIndex.value);
+}
+
+function applySelectedCharacterFaction() {
+  if (!useSelectedCharacterFaction.value || !selectedCharacterDetails.value?.factionId) return;
+  factionLogoKey.value = factionIdToLogoKey(selectedCharacterDetails.value.factionId);
 }
 
 function onPortraitUpload(e) {
@@ -440,18 +488,17 @@ function endPortraitDrag() {
   dragState = null;
 }
 
-async function loadPortraitFromCharacter(charId) {
+async function loadCharacterRecruitData(charId) {
   try {
     const detail = await fetchCharacterDetails(charId);
-    const portrait = detail.portraits?.[detail.portraits.length - 1] || detail.portraits?.[0];
-    const url = portrait?.urls?.[0];
-    if (url) {
-      setPortraitFromUrl(url);
-      portraitPos.value = { x: 320, y: 120 };
-      portraitScale.value = 1;
-      if (detail.traitDescription) {
-        tagline.value = detail.traitDescription.replace(/\\n/g, '\n').slice(0, 200);
-      }
+    selectedCharacterDetails.value = detail;
+    selectedPortraitIndex.value = Math.max(0, (detail.portraits?.length || 1) - 1);
+    applyPortraitFromDetail(detail, selectedPortraitIndex.value);
+    applySelectedCharacterFaction();
+
+    const recruitText = detail.recruitVoiceText || detail.traitDescription || '';
+    if (recruitText) {
+      tagline.value = recruitText.replace(/\\n/g, '\n').slice(0, 200);
     }
   } catch (err) {
     console.warn('Failed to load portrait', err);
@@ -464,8 +511,10 @@ async function applyCharacter(char) {
   nameEn.value = (char.appellation || char.id || '').toUpperCase();
   starCount.value = getRarityStars(char.rarity);
   profession.value = char.profession || 'PIONEER';
-  factionLogoKey.value = factionIdToLogoKey(char.factionId);
-  await loadPortraitFromCharacter(char.id);
+  if (useSelectedCharacterFaction.value) {
+    factionLogoKey.value = factionIdToLogoKey(char.factionId);
+  }
+  await loadCharacterRecruitData(char.id);
 }
 
 async function pickRandomOperator() {
@@ -508,7 +557,7 @@ onMounted(async () => {
   window.addEventListener('touchend', endPortraitDrag);
 
   try {
-    await syncFactionI18nMessages(i18n);
+    await syncFactionI18nMessages(globalI18n);
     characters.value = await fetchCharacters();
   } catch (err) {
     console.error(err);
@@ -530,7 +579,7 @@ onUnmounted(() => {
 });
 
 watch(locale, () => {
-  syncFactionI18nMessages(i18n);
+  syncFactionI18nMessages(globalI18n);
 });
 </script>
 
@@ -668,9 +717,31 @@ watch(locale, () => {
   padding: 8px 10px;
   border-radius: 4px;
   border: 1px solid rgba(221, 226, 229, 0.14);
-  background: rgba(0, 0, 0, 0.26);
-  color: var(--text-color);
+  background: #111820;
+  color: #f3f7fb;
   font-size: 0.9rem;
+  color-scheme: dark;
+}
+
+.field select {
+  cursor: pointer;
+}
+
+.field select:focus {
+  outline: 2px solid #2bbcc9;
+  outline-offset: 2px;
+  border-color: #2bbcc9;
+}
+
+.field select option {
+  background: #0b1016;
+  color: #f3f7fb;
+}
+
+.field select option:checked,
+.field select option:hover {
+  background: #1f6570;
+  color: #ffffff;
 }
 
 .field input[type='range'] {
@@ -753,6 +824,25 @@ watch(locale, () => {
   color: var(--text-secondary);
 }
 
+.selected-character-tools {
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid rgba(221, 226, 229, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.selected-character-tools .field:last-child {
+  margin-bottom: 0;
+}
+
+.selected-character-name {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #8ee8f0;
+}
+
 .panel-loading {
   padding: 12px;
   color: var(--text-secondary);
@@ -828,15 +918,6 @@ watch(locale, () => {
   pointer-events: none;
 }
 
-.new-badge {
-  position: absolute;
-  left: 280px;
-  top: 120px;
-  width: 160px;
-  height: auto;
-  filter: drop-shadow(0 0 22px rgba(255, 47, 47, 0.72));
-}
-
 .faction-logo {
   position: absolute;
   left: 342px;
@@ -871,14 +952,30 @@ watch(locale, () => {
   top: 700px;
   display: flex;
   align-items: flex-start;
-  gap: 4px;
+  gap: 18px;
+}
+
+.class-column {
+  width: 180px;
+  min-height: 186px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .class-icon {
-  width: 260px;
-  margin-top: 10px;
-  margin-right: 4px;
+  width: 180px;
+  max-height: 132px;
+  object-fit: contain;
   filter: brightness(0) invert(1);
+}
+
+.new-badge {
+  width: 132px;
+  height: auto;
+  margin-top: -10px;
+  filter: drop-shadow(0 0 22px rgba(255, 47, 47, 0.72));
 }
 
 .names {
