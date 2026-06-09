@@ -59,8 +59,9 @@ function factionIdToDisplayName(factionId, teamTable) {
 
 /** 將當前遊戲資料語系下的陣營名稱合併進 vue-i18n（依 UI 語系切換） */
 export async function syncFactionI18nMessages(i18n) {
+  const i18nTarget = i18n.global || i18n;
   const uiLocale =
-    typeof i18n.global.locale === 'string' ? i18n.global.locale : i18n.global.locale.value;
+    typeof i18nTarget.locale === 'string' ? i18nTarget.locale : i18nTarget.locale.value;
   setGameDataFolderFromUiLocale(uiLocale);
   handbookTeamTableCache = { base: '', data: null };
   const table = await getHandbookTeamTable();
@@ -70,7 +71,7 @@ export async function syncFactionI18nMessages(i18n) {
     const raw = entry?.powerName || entry?.powerCode;
     if (raw) nation[id] = toTraditionalGameDataText(String(raw));
   }
-  i18n.global.mergeLocaleMessage(uiLocale, { nation });
+  i18nTarget.mergeLocaleMessage(uiLocale, { nation });
   return table;
 }
 
@@ -201,17 +202,24 @@ export { RECRUIT_FACTION_LOGO_OPTIONS, factionIdToLogoKey, professionToClassSlug
 
 /** skin_table 快取有效時間（毫秒），過期後下次取得詳情會重新下載 */
 const SKIN_TABLE_CACHE_TTL_MS = 60 * 60 * 1000;
+const CHARWORD_TABLE_CACHE_TTL_MS = 60 * 60 * 1000;
 
 /** skin_table 體積大，用記憶體＋進行中共用 Promise 快取（避免 sessionStorage 配額與重複下載） */
 let skinTableMemoryCache;
 let skinTableCachedAt = 0;
 let skinTableLoadingPromise;
+let charwordTableMemoryCache;
+let charwordTableCachedAt = 0;
+let charwordTableLoadingPromise;
 
 /** 切換遊戲資料語系時清空，避免混用舊快取 */
 export function invalidateArknightsCaches() {
   skinTableMemoryCache = undefined;
   skinTableCachedAt = 0;
   skinTableLoadingPromise = undefined;
+  charwordTableMemoryCache = undefined;
+  charwordTableCachedAt = 0;
+  charwordTableLoadingPromise = undefined;
   handbookTeamTableCache = { base: '', data: null };
   songDetailsCache.clear();
   lyricsCache.clear();
@@ -253,6 +261,61 @@ async function getSkinTableShared() {
       });
   }
   return skinTableLoadingPromise;
+}
+
+function isCharwordTableCacheFresh() {
+  return (
+    charwordTableMemoryCache != null &&
+    typeof charwordTableMemoryCache === 'object' &&
+    charwordTableMemoryCache.charWords &&
+    Date.now() - charwordTableCachedAt < CHARWORD_TABLE_CACHE_TTL_MS
+  );
+}
+
+async function getCharwordTableShared() {
+  if (isCharwordTableCacheFresh()) {
+    return charwordTableMemoryCache;
+  }
+  if (!charwordTableLoadingPromise) {
+    charwordTableLoadingPromise = fetch(`${getGameDataExcelBase()}/charword_table.json`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.charWords) {
+          charwordTableMemoryCache = data;
+          charwordTableCachedAt = Date.now();
+        } else {
+          charwordTableMemoryCache = null;
+          charwordTableCachedAt = Date.now();
+        }
+        return charwordTableMemoryCache;
+      })
+      .catch(() => {
+        charwordTableMemoryCache = null;
+        charwordTableCachedAt = Date.now();
+        return null;
+      })
+      .finally(() => {
+        charwordTableLoadingPromise = null;
+      });
+  }
+  return charwordTableLoadingPromise;
+}
+
+function resolveRecruitVoiceText(charId, charwordTable) {
+  const words = Object.values(charwordTable?.charWords || {}).filter(
+    (word) => word?.charId === charId && word.voiceText
+  );
+  const recruitWord =
+    words.find((word) => /干员报到|幹員報到|報到|报到/.test(String(word.voiceTitle || ''))) ||
+    words.find((word) => word.voiceId === 'CN_011');
+
+  if (!recruitWord?.voiceText) {
+    return '';
+  }
+
+  return toTraditionalGameDataText(
+    normalizeEscapedNewlines(String(recruitWord.voiceText))
+  );
 }
 
 // 多個圖片來源（按優先順序）
@@ -475,7 +538,7 @@ export async function fetchCharacterDetails(charId) {
   try {
     // 並行獲取所有需要的數據
     const excel = getGameDataExcelBase();
-    const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes, skinTable, teamTable] = await Promise.all([
+    const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes, skinTable, teamTable, charwordTable] = await Promise.all([
       fetch(`${excel}/character_table.json`),
       fetch(`${excel}/skill_table.json`).catch(() => null),
       fetch(`${excel}/building_data.json`).catch(() => null),
@@ -485,6 +548,7 @@ export async function fetchCharacterDetails(charId) {
       fetch(`${excel}/range_table.json`).catch(() => null),
       getSkinTableShared(),
       getHandbookTeamTable(),
+      getCharwordTableShared(),
     ]);
     
     if (!charTableRes.ok) throw new Error('無法獲取角色資料');
@@ -834,6 +898,8 @@ export async function fetchCharacterDetails(charId) {
       traitDescription = cleanDescription(charData.description);
     }
     
+    const recruitVoiceText = resolveRecruitVoiceText(charId, charwordTable);
+
     return {
       id: charId,
       name: toTraditionalGameDataText(resolveCharacterTableDisplayName(charData)),
@@ -860,6 +926,7 @@ export async function fetchCharacterDetails(charId) {
       
       // 2. 特性
       traitDescription: traitDescription,
+      recruitVoiceText: recruitVoiceText,
       
       // 3. 獲得方式
       obtainApproach: toTraditionalGameDataText(

@@ -5,6 +5,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { getRecruitFactionLogoUrl, RECRUIT_FACTION_LOGO_OPTIONS } from '../services/api.js';
 
 const canvasRef = ref(null);
 const mouseCanvasRef = ref(null);
@@ -30,9 +31,7 @@ const PARTICLE_HEIGHT = 200;
 
 // 图片路径列表
 // 使用 Vite 的 BASE_URL 来支持 GitHub Pages 的 base 路径
-const BASEURL = import.meta.env.BASE_URL + "images/";
-const suffix = ".png";
-const imgList = ["logo_kazimierz", "logo_rhine", "logo_yan", "logo_victoria"];
+const imgList = RECRUIT_FACTION_LOGO_OPTIONS.map((logoKey) => getRecruitFactionLogoUrl(logoKey));
 
 // 鼠标周围圆的半径
 const circleR = 20;
@@ -163,7 +162,7 @@ const getPoints = () => {
       const g = data[index + 1];
       const b = data[index + 2];
       const a = data[index + 3];
-      if (r == 255 && g == 255 && b == 255 && a == 255) {
+      if (r > 180 && g > 180 && b > 180 && a > 120) {
         points.push({
           x: i,
           y: j
@@ -175,13 +174,14 @@ const getPoints = () => {
 };
 
 // 更新粒子位置
-const update = () => {
+const update = (failedAttempts = 0) => {
   if (!canvasRef.value || !ctx) return;
+  if (failedAttempts >= imgList.length) return;
 
   // 加载图片
   const img = document.createElement("img");
-  img.src = BASEURL + imgList[nowImg] + suffix;
   img.crossOrigin = "anonymous";
+  img.src = imgList[nowImg];
   nowImg = (nowImg + 1) % imgList.length;
 
   img.onload = function () {
@@ -238,6 +238,10 @@ const update = () => {
         point.ty = y;
       }
     }
+  };
+
+  img.onerror = function () {
+    setTimeout(() => update(failedAttempts + 1), 0);
   };
 };
 
