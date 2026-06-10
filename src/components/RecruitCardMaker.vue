@@ -176,6 +176,7 @@
               :style="portraitStyle"
               @mousedown.prevent="startPortraitDrag"
               @touchstart.prevent="startPortraitDrag"
+              @error="onPortraitError"
             />
 
             <div class="card-fade" aria-hidden="true" />
@@ -247,6 +248,7 @@ import {
   fetchCharacters,
   fetchRecruitCharacterDetails,
   getCharacterAvatarFallbackUrl,
+  getCharacterAvatarUrls,
   syncFactionI18nMessages,
 } from '../services/api.js';
 import {
@@ -305,13 +307,18 @@ const portraitObjectUrl = ref('');
 const characters = ref([]);
 const isLoadingChars = ref(true);
 const charSearch = ref('');
+const debouncedCharSearch = ref('');
 const selectedCharId = ref('');
 const selectedCharacterDetails = ref(null);
 const selectedPortraitIndex = ref(0);
 const useSelectedCharacterFaction = ref(true);
 const isExporting = ref(false);
+const portraitUrlCandidates = ref([]);
+const portraitUrlCandidateIndex = ref(0);
 
 let dragState = null;
+let charSearchDebounceTimer = null;
+const failedImageUrls = new Set();
 
 const professionOptions = computed(() => [
   { value: 'PIONEER', label: t('profession.PIONEER') },
@@ -361,7 +368,7 @@ const previewScalerStyle = computed(() => ({
 }));
 
 const filteredCharacters = computed(() => {
-  const q = charSearch.value.trim().toLowerCase();
+  const q = debouncedCharSearch.value.trim().toLowerCase();
   let list = characters.value;
   if (q) {
     list = list.filter(
@@ -401,9 +408,19 @@ function fitPreview() {
 
 function onAvatarError(event, charId) {
   const el = event.target;
-  if (!el || el.dataset.fallback) return;
-  el.dataset.fallback = '1';
-  el.src = getCharacterAvatarFallbackUrl(charId);
+  if (!el) return;
+
+  if (el.src) {
+    failedImageUrls.add(el.src);
+  }
+
+  const nextIndex = Number(el.dataset.fallbackIndex || 1);
+  const urls = getCharacterAvatarUrls(charId);
+  const nextUrl = urls.slice(nextIndex).find((url) => !failedImageUrls.has(url));
+  if (!nextUrl) return;
+
+  el.dataset.fallbackIndex = String(urls.indexOf(nextUrl) + 1);
+  el.src = nextUrl || getCharacterAvatarFallbackUrl(charId);
 }
 
 function onFactionLogoError(event) {
@@ -426,15 +443,57 @@ function setPortraitFromUrl(url, isObjectUrl = false) {
   portraitSrc.value = url;
 }
 
+function getUsableImageUrls(urls) {
+  return (urls || []).filter((url) => url && !failedImageUrls.has(url));
+}
+
+function preloadImageUrl(url) {
+  if (!url || failedImageUrls.has(url)) return;
+  const img = new Image();
+  img.onload = () => {};
+  img.onerror = () => {
+    failedImageUrls.add(url);
+  };
+  img.src = url;
+}
+
+function preloadPortraits(detail, activePortraitIndex) {
+  const portraits = detail?.portraits || [];
+  portraits.forEach((portrait, index) => {
+    if (index === activePortraitIndex) return;
+    const url = getUsableImageUrls(portrait?.urls)[0];
+    preloadImageUrl(url);
+  });
+}
+
 function applyPortraitFromDetail(detail, portraitIndex) {
   const portraits = detail?.portraits || [];
   const portrait = portraits[portraitIndex] || portraits[portraits.length - 1] || portraits[0];
-  const url = portrait?.urls?.[0];
+  const urls = getUsableImageUrls(portrait?.urls);
+  const url = urls[0];
   if (!url) return;
 
+  portraitUrlCandidates.value = urls;
+  portraitUrlCandidateIndex.value = 0;
   setPortraitFromUrl(url);
   portraitScale.value = DEFAULT_PORTRAIT_SCALE;
   portraitPos.value = getDefaultPortraitPosition(portraitScale.value);
+}
+
+function onPortraitError() {
+  if (portraitSrc.value) {
+    failedImageUrls.add(portraitSrc.value);
+  }
+
+  const nextIndex = portraitUrlCandidateIndex.value + 1;
+  const nextUrl = portraitUrlCandidates.value
+    .slice(nextIndex)
+    .find((url) => !failedImageUrls.has(url));
+
+  if (!nextUrl) return;
+
+  portraitUrlCandidateIndex.value = portraitUrlCandidates.value.indexOf(nextUrl);
+  setPortraitFromUrl(nextUrl);
 }
 
 function applySelectedPortrait() {
@@ -520,6 +579,7 @@ async function loadCharacterRecruitData(charId, options = {}) {
         ? pickRandomElitePortraitIndex(detail)
         : Math.max(0, (detail.portraits?.length || 1) - 1);
     applyPortraitFromDetail(detail, selectedPortraitIndex.value);
+    preloadPortraits(detail, selectedPortraitIndex.value);
     applySelectedCharacterFaction();
 
     const recruitText = detail.recruitVoiceText || detail.traitDescription || '';
@@ -593,6 +653,10 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  if (charSearchDebounceTimer) {
+    clearTimeout(charSearchDebounceTimer);
+    charSearchDebounceTimer = null;
+  }
   window.removeEventListener('resize', fitPreview);
   window.removeEventListener('mousemove', onPointerMove);
   window.removeEventListener('mouseup', endPortraitDrag);
@@ -606,6 +670,16 @@ onUnmounted(() => {
 
 watch(locale, () => {
   syncFactionI18nMessages(globalI18n);
+});
+
+watch(charSearch, (value) => {
+  if (charSearchDebounceTimer) {
+    clearTimeout(charSearchDebounceTimer);
+  }
+  charSearchDebounceTimer = setTimeout(() => {
+    debouncedCharSearch.value = value;
+    charSearchDebounceTimer = null;
+  }, 120);
 });
 </script>
 
