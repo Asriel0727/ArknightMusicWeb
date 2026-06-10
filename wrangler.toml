@@ -1,0 +1,10 @@
+name = "arknights-recruit-api"
+main = "worker/index.js"
+compatibility_date = "2026-06-10"
+
+[[kv_namespaces]]
+binding = "ARKNIGHTS_DATA"
+id = "1f16c51e50154624856b1feb4f67ea2e"
+
+[triggers]
+crons = ["0 */6 * * *"]
