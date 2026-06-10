@@ -29,18 +29,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { defineAsyncComponent, ref, onMounted, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ParticleBackground from './components/ParticleBackground.vue';
 import Navbar from './components/Navbar.vue';
 import TopBar from './components/TopBar.vue';
-import AlbumList from './components/AlbumList.vue';
 import Modal from './components/Modal.vue';
-import CharacterList from './components/CharacterList.vue';
-import RecruitCardMaker from './components/RecruitCardMaker.vue';
 import { initAudioPlayer, modalState, albumState } from './stores/player.js';
-import { fetchAlbumDetails } from './services/api.js';
 import { decodeText } from './utils/textGlitch.js';
+
+const AlbumList = defineAsyncComponent(() => import('./components/AlbumList.vue'));
+const CharacterList = defineAsyncComponent(() => import('./components/CharacterList.vue'));
+const RecruitCardMaker = defineAsyncComponent(() => import('./components/RecruitCardMaker.vue'));
 
 const { t, locale } = useI18n();
 
@@ -78,6 +78,7 @@ const handleSearch = (query) => {
 
 const handleViewAlbum = async (albumId) => {
   try {
+    const { fetchAlbumDetails } = await import('./services/api.js');
     albumState.currentAlbumDetails = await fetchAlbumDetails(albumId);
     modalState.currentView = 'album';
     modalState.isOpen = true;

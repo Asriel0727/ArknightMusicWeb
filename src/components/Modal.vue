@@ -24,13 +24,13 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, defineAsyncComponent, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import AlbumDetails from './AlbumDetails.vue';
-import PlayerView from './PlayerView.vue';
-import CharacterDetails from './CharacterDetails.vue';
 import { modalState, albumState, playerState, characterState } from '../stores/player.js';
-import { fetchAlbumDetails } from '../services/api.js';
+
+const AlbumDetails = defineAsyncComponent(() => import('./AlbumDetails.vue'));
+const PlayerView = defineAsyncComponent(() => import('./PlayerView.vue'));
+const CharacterDetails = defineAsyncComponent(() => import('./CharacterDetails.vue'));
 
 const { locale } = useI18n();
 
@@ -49,6 +49,7 @@ const handleClose = async () => {
       // 如果當前專輯詳情不是播放歌曲所屬的專輯，則獲取正確的專輯
       if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== currentSong.albumCid) {
         try {
+          const { fetchAlbumDetails } = await import('../services/api.js');
           albumState.currentAlbumDetails = await fetchAlbumDetails(currentSong.albumCid);
         } catch (error) {
           console.error('獲取專輯詳情失敗:', error);

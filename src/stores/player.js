@@ -1,7 +1,5 @@
 import { reactive } from 'vue';
-import { fetchSongDetails, fetchLyrics, fetchAlbumDetails } from '../services/api.js';
 import { i18n } from '../i18n/index.js';
-import { translateLyricLines } from '../services/lyricsTranslationPlugin.js';
 
 function unknownArtistLabel() {
   return i18n.global.t('common.unknownArtist');
@@ -14,6 +12,22 @@ function getCurrentLocale() {
 
 let lyricLoadToken = 0;
 let lyricTranslationToken = 0;
+let apiModulePromise = null;
+let lyricsTranslationPluginPromise = null;
+
+async function loadApiModule() {
+  if (!apiModulePromise) {
+    apiModulePromise = import('../services/api.js');
+  }
+  return apiModulePromise;
+}
+
+async function loadLyricsTranslationPlugin() {
+  if (!lyricsTranslationPluginPromise) {
+    lyricsTranslationPluginPromise = import('../services/lyricsTranslationPlugin.js');
+  }
+  return lyricsTranslationPluginPromise;
+}
 
 // 播放器狀態
 export const playerState = reactive({
@@ -102,6 +116,7 @@ export function initAudioPlayer(audioElement) {
 // 播放歌曲（音訊優先：不等待歌詞；已有 sourceUrl 時不重複請求詳情）
 export async function playSong(song, coverUrl, coverDeUrl) {
   try {
+    const { fetchSongDetails, fetchLyrics } = await loadApiModule();
     let songDetails = song;
     if (!song.sourceUrl) {
       songDetails = await fetchSongDetails(song.cid);
@@ -194,6 +209,7 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
   playerState.isTranslatingLyrics = true;
 
   try {
+    const { translateLyricLines } = await loadLyricsTranslationPlugin();
     const translatedLyrics = await translateLyricLines(playerState.lyrics, getCurrentLocale());
 
     if (
@@ -214,6 +230,7 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
 // 從專輯播放歌曲
 export async function playSongFromAlbum(index, albumId) {
   try {
+    const { fetchAlbumDetails } = await loadApiModule();
     if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== albumId) {
       albumState.currentAlbumDetails = await fetchAlbumDetails(albumId);
     }
@@ -240,6 +257,7 @@ export async function playSongFromAlbum(index, albumId) {
 // 從主列表播放歌曲
 export async function playSongFromMasterList(song) {
   try {
+    const { fetchSongDetails, fetchAlbumDetails } = await loadApiModule();
     const songDetails = await fetchSongDetails(song.cid);
     const albumCid = songDetails.albumCid;
     if (!albumCid) {

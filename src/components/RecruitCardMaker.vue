@@ -247,9 +247,6 @@ import {
   fetchCharacters,
   fetchCharacterDetails,
   getCharacterAvatarFallbackUrl,
-  getRecruitFactionLogoUrl,
-  getRecruitProfessionIconUrl,
-  RECRUIT_FACTION_LOGO_OPTIONS,
   syncFactionI18nMessages,
 } from '../services/api.js';
 import {
@@ -258,6 +255,9 @@ import {
   DEFAULT_RECRUIT_BACKGROUND,
   RECRUIT_DEFAULT_BACKGROUND_URL,
   RECRUIT_NEW_BADGE_URL,
+  RECRUIT_FACTION_LOGO_OPTIONS,
+  getRecruitFactionLogoUrl,
+  getRecruitProfessionIconUrl,
   rarityToStars,
   factionIdToLogoKey,
 } from '../utils/recruitCard.js';

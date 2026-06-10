@@ -5,7 +5,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { getRecruitFactionLogoUrl, RECRUIT_FACTION_LOGO_OPTIONS } from '../services/api.js';
+import { getRecruitFactionLogoUrl, RECRUIT_FACTION_LOGO_OPTIONS } from '../utils/recruitCard.js';
 
 const canvasRef = ref(null);
 const mouseCanvasRef = ref(null);
@@ -23,6 +23,10 @@ let circleAnimationId = null;
 // 檢測是否為觸摸設備（沒有精確指針）
 const isTouchDevice = () => {
   return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+};
+
+const prefersReducedMotion = () => {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 };
 
 // 粒子区域大小（右下角区域，调整为与按钮差不多大小）
@@ -154,7 +158,7 @@ const getPoints = () => {
   if (!ctx || !canvasRef.value) return [];
   const { width, height, data } = ctx.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height);
   const points = [];
-  const gap = 6;
+  const gap = isTouchDevice() ? 14 : 10;
   for (let i = 0; i < width; i += gap) {
     for (let j = 0; j < height; j += gap) {
       const index = (j * width + i) * 4;
@@ -336,6 +340,10 @@ const run = () => {
 };
 
 onMounted(() => {
+  if (prefersReducedMotion()) {
+    return;
+  }
+
   if (canvasRef.value) {
     ctx = canvasRef.value.getContext("2d", {
       willReadFrequently: true
@@ -418,6 +426,13 @@ onUnmounted(() => {
     height: 120px;
     bottom: 10px;
     right: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particle-canvas,
+  .mouse-canvas {
+    display: none;
   }
 }
 </style>
