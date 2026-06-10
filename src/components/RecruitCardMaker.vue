@@ -275,6 +275,15 @@ const activeTab = ref('appearance');
 const previewAreaRef = ref(null);
 const cardRef = ref(null);
 const previewScale = ref(0.12);
+const DEFAULT_PORTRAIT_WIDTH = 500;
+const DEFAULT_PORTRAIT_SCALE = 1.45;
+
+function getDefaultPortraitPosition(scale = DEFAULT_PORTRAIT_SCALE) {
+  return {
+    x: Math.round((RECRUIT_CARD_SIZE.width - DEFAULT_PORTRAIT_WIDTH * scale) / 2),
+    y: 70,
+  };
+}
 
 const nameZh = ref('中文名稱');
 const nameEn = ref('ENGLISH NAME');
@@ -288,8 +297,8 @@ const showVoucherDecor = ref(false);
 const showNewBadge = ref(true);
 
 const portraitSrc = ref('');
-const portraitScale = ref(1);
-const portraitPos = ref({ x: 342, y: 190 });
+const portraitScale = ref(DEFAULT_PORTRAIT_SCALE);
+const portraitPos = ref(getDefaultPortraitPosition());
 const customBgUrl = ref('');
 const portraitObjectUrl = ref('');
 
@@ -343,7 +352,7 @@ const cardBackgroundStyle = computed(() => {
 const portraitStyle = computed(() => ({
   left: `${portraitPos.value.x}px`,
   top: `${portraitPos.value.y}px`,
-  width: `${500 * portraitScale.value}px`,
+  width: `${DEFAULT_PORTRAIT_WIDTH * portraitScale.value}px`,
 }));
 
 const previewScalerStyle = computed(() => ({
@@ -424,8 +433,8 @@ function applyPortraitFromDetail(detail, portraitIndex) {
   if (!url) return;
 
   setPortraitFromUrl(url);
-  portraitPos.value = { x: 320, y: 120 };
-  portraitScale.value = 1;
+  portraitScale.value = DEFAULT_PORTRAIT_SCALE;
+  portraitPos.value = getDefaultPortraitPosition(portraitScale.value);
 }
 
 function applySelectedPortrait() {
@@ -436,6 +445,20 @@ function applySelectedPortrait() {
 function applySelectedCharacterFaction() {
   if (!useSelectedCharacterFaction.value || !selectedCharacterDetails.value?.factionId) return;
   factionLogoKey.value = factionIdToLogoKey(selectedCharacterDetails.value.factionId);
+}
+
+function pickRandomElitePortraitIndex(detail) {
+  const portraits = detail?.portraits || [];
+  const eliteIndexes = portraits
+    .map((portrait, index) => ({ portrait, index }))
+    .filter(({ portrait }) => portrait?.skinId == null)
+    .map(({ index }) => index);
+
+  if (eliteIndexes.length > 0) {
+    return eliteIndexes[Math.floor(Math.random() * eliteIndexes.length)];
+  }
+
+  return Math.max(0, portraits.length - 1);
 }
 
 function onPortraitUpload(e) {
@@ -488,11 +511,14 @@ function endPortraitDrag() {
   dragState = null;
 }
 
-async function loadCharacterRecruitData(charId) {
+async function loadCharacterRecruitData(charId, options = {}) {
   try {
     const detail = await fetchCharacterDetails(charId);
     selectedCharacterDetails.value = detail;
-    selectedPortraitIndex.value = Math.max(0, (detail.portraits?.length || 1) - 1);
+    selectedPortraitIndex.value =
+      options.portraitMode === 'eliteOnly'
+        ? pickRandomElitePortraitIndex(detail)
+        : Math.max(0, (detail.portraits?.length || 1) - 1);
     applyPortraitFromDetail(detail, selectedPortraitIndex.value);
     applySelectedCharacterFaction();
 
@@ -505,7 +531,7 @@ async function loadCharacterRecruitData(charId) {
   }
 }
 
-async function applyCharacter(char) {
+async function applyCharacter(char, options = {}) {
   selectedCharId.value = char.id;
   nameZh.value = char.name || '';
   nameEn.value = (char.appellation || char.id || '').toUpperCase();
@@ -514,13 +540,13 @@ async function applyCharacter(char) {
   if (useSelectedCharacterFaction.value) {
     factionLogoKey.value = factionIdToLogoKey(char.factionId);
   }
-  await loadCharacterRecruitData(char.id);
+  await loadCharacterRecruitData(char.id, options);
 }
 
 async function pickRandomOperator() {
   if (!characters.value.length) return;
   const char = characters.value[Math.floor(Math.random() * characters.value.length)];
-  await applyCharacter(char);
+  await applyCharacter(char, { portraitMode: 'eliteOnly' });
 }
 
 async function exportCard() {
