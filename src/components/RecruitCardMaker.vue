@@ -245,7 +245,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { i18n as globalI18n } from '../i18n/index.js';
 import {
-  fetchCharacters,
+  fetchRecruitCharacters,
   fetchRecruitCharacterDetails,
   getCharacterAvatarFallbackUrl,
   getCharacterAvatarUrls,
@@ -644,7 +644,7 @@ onMounted(async () => {
 
   try {
     await syncFactionI18nMessages(globalI18n);
-    characters.value = await fetchCharacters();
+    characters.value = await fetchRecruitCharacters();
   } catch (err) {
     console.error(err);
   } finally {

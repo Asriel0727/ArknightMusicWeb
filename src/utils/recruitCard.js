@@ -119,6 +119,9 @@ export function rarityToStars(rarity) {
 
 export function factionIdToLogoKey(factionId) {
   if (!factionId) return 'logo_rhodes';
+  if (typeof factionId === 'object') {
+    return factionIdToLogoKey(factionId.teamId || factionId.groupId || factionId.nationId);
+  }
   const raw = String(factionId);
   if (FACTION_ID_TO_LOGO[raw]) return FACTION_ID_TO_LOGO[raw];
   const lower = raw.toLowerCase();

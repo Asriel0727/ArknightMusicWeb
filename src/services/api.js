@@ -22,6 +22,10 @@ import {
 const API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 /** 專輯／歌曲等 JSON API（Express 掛在 /api） */
 const API_BASE = `${API_ORIGIN}/api`;
+const DEFAULT_RECRUIT_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
+const RECRUIT_API_BASE = (
+  import.meta.env.VITE_RECRUIT_API_BASE || DEFAULT_RECRUIT_API_BASE
+).replace(/\/$/, '');
 /** 圖片／歌詞 proxy 在網站根路徑（/api/proxy-* 會 404） */
 
 /** 歌曲詳情記憶體快取（切歌／重播會重複請求同一 cid） */
@@ -332,6 +336,92 @@ function resolveCharacterTableDisplayName(char) {
   if (n) return n;
   const a = char?.appellation != null ? String(char.appellation).trim() : '';
   return a;
+}
+
+async function fetchRecruitApiJson(path) {
+  const response = await fetch(`${RECRUIT_API_BASE}${path}`);
+  if (!response.ok) {
+    throw new Error(`Recruit API failed: ${response.status}`);
+  }
+  const data = await response.json();
+  if (data?.ok === false) {
+    throw new Error(data.error || 'Recruit API returned an error');
+  }
+  return data;
+}
+
+function normalizeWorkerOperator(operator) {
+  const factionId = normalizeWorkerFactionId(operator.factionId);
+  const factionName = normalizeWorkerFactionName(operator.factionName || operator.nationName, factionId);
+  return {
+    id: operator.id,
+    name: toTraditionalGameDataText(operator.name || ''),
+    appellation: operator.appellation || '',
+    profession: operator.profession || 'PIONEER',
+    rarity: operator.rarity ?? 0,
+    position: operator.position || '',
+    tagList: (operator.tagList || []).map((tag) => toTraditionalGameDataText(tag)),
+    nation: operator.nation || factionId,
+    factionId,
+    factionOrder: operator.factionOrder ?? 9999,
+    nationName: toTraditionalGameDataText(factionName),
+    avatarUrl: operator.avatarUrl || AVATAR_SOURCES[0](operator.id),
+  };
+}
+
+function normalizeWorkerRecruitDetail(operator) {
+  const factionId = normalizeWorkerFactionId(operator.factionId);
+  const factionName = normalizeWorkerFactionName(operator.factionName || operator.nationName, factionId);
+  return {
+    id: operator.id,
+    name: toTraditionalGameDataText(operator.name || ''),
+    appellation: operator.appellation || '',
+    profession: operator.profession || 'PIONEER',
+    rarity: operator.rarity ?? 0,
+    factionId,
+    nationName: toTraditionalGameDataText(factionName),
+    portraits: (operator.portraits || []).map((portrait) => ({
+      ...portrait,
+      name: toTraditionalGameDataText(portrait.name || portrait.portraitId || ''),
+      urls: portrait.urls || [],
+    })),
+    traitDescription: toTraditionalGameDataText(
+      normalizeEscapedNewlines(operator.traitDescription || '')
+    ),
+    recruitVoiceText: toTraditionalGameDataText(
+      normalizeEscapedNewlines(operator.recruitVoiceText || '')
+    ),
+    avatarUrl: operator.avatarUrl || AVATAR_SOURCES[0](operator.id),
+  };
+}
+
+function normalizeWorkerFactionId(rawFactionId) {
+  if (!rawFactionId) return '';
+  if (typeof rawFactionId === 'object') {
+    return rawFactionId.teamId || rawFactionId.groupId || rawFactionId.nationId || '';
+  }
+  return String(rawFactionId);
+}
+
+function normalizeWorkerFactionName(rawFactionName, fallback) {
+  if (!rawFactionName) return fallback || '';
+  if (typeof rawFactionName === 'object') {
+    return rawFactionName.powerName || rawFactionName.teamId || rawFactionName.groupId || rawFactionName.nationId || fallback || '';
+  }
+  return String(rawFactionName);
+}
+
+export async function fetchRecruitCharacters() {
+  try {
+    const data = await fetchRecruitApiJson('/api/recruit/operators');
+    if (!Array.isArray(data.operators)) {
+      throw new Error('Recruit API operators payload is invalid');
+    }
+    return data.operators.map(normalizeWorkerOperator);
+  } catch (error) {
+    console.warn('Recruit API operators fallback to local source:', error);
+    return fetchCharacters();
+  }
 }
 
 /**
@@ -654,7 +744,7 @@ function resolveCharacterPortraits(charId, charData, skinTable) {
   return portraits;
 }
 
-export async function fetchRecruitCharacterDetails(charId) {
+async function fetchRecruitCharacterDetailsFromGameData(charId) {
   try {
     const excel = getGameDataExcelBase();
     const [charTableRes, skinTable, teamTable, charwordTable] = await Promise.all([
@@ -694,6 +784,21 @@ export async function fetchRecruitCharacterDetails(charId) {
   } catch (error) {
     console.error('獲取招募卡角色資料失敗:', error);
     throw error;
+  }
+}
+
+export async function fetchRecruitCharacterDetails(charId) {
+  try {
+    const data = await fetchRecruitApiJson(
+      `/api/recruit/operators/${encodeURIComponent(charId)}`
+    );
+    if (!data.operator) {
+      throw new Error('Recruit API operator payload is invalid');
+    }
+    return normalizeWorkerRecruitDetail(data.operator);
+  } catch (error) {
+    console.warn('Recruit API detail fallback to local source:', error);
+    return fetchRecruitCharacterDetailsFromGameData(charId);
   }
 }
 
