@@ -19,6 +19,7 @@ let timer = null;
 let nowImg = 0;
 let animationFrameId = null;
 let circleAnimationId = null;
+let lastDrawTime = 0;
 
 // 檢測是否為觸摸設備（沒有精確指針）
 const isTouchDevice = () => {
@@ -100,6 +101,31 @@ class Particle {
     ctx.fill();
   }
 
+  tick(deltaTime) {
+    const k = 0.15;
+    let xSpeed = (this.tx - this.x) / duration;
+    let ySpeed = (this.ty - this.y) / duration;
+
+    if (mouseX !== null && mouseY !== null) {
+      const r = Math.sqrt((this.x - mouseX) ** 2 + (this.y - mouseY) ** 2);
+      let a = 0;
+      if (r < maxDis) {
+        a = Math.sqrt(maxDis / (r + 1)) - 1;
+      }
+
+      if (r !== 0) {
+        xSpeed += (this.x - mouseX) / r * a * k;
+        ySpeed += (this.y - mouseY) / r * a * k;
+      } else {
+        xSpeed += (Math.random() * 2 * Math.PI - Math.PI) * a * k;
+        ySpeed += (Math.random() * 2 * Math.PI - Math.PI) * a * k;
+      }
+    }
+
+    this.x += xSpeed * deltaTime;
+    this.y += ySpeed * deltaTime;
+  }
+
   // 一帧动画
   move() {
     const startTime = Date.now();
@@ -146,8 +172,12 @@ class Particle {
 
 // 绘制
 const draw = () => {
+  const now = performance.now();
+  const deltaTime = lastDrawTime ? Math.min(now - lastDrawTime, 64) : 16;
+  lastDrawTime = now;
   clear();
   for (let i = 0; i < particles.length; i++) {
+    particles[i].tick(deltaTime);
     particles[i].draw();
   }
   animationFrameId = requestAnimationFrame(draw);
@@ -235,7 +265,6 @@ const update = (failedAttempts = 0) => {
 
       if (!point) {
         point = new Particle(x, y, average_x, average_y);
-        point.move();
         particles.push(point);
       } else {
         point.tx = x;
@@ -312,11 +341,21 @@ const handleMouseMove = (e) => {
 const handleVisibilityChange = () => {
   if (!document.hidden) {
     // 定时器
-    timer = setInterval(update, 5000);
+    if (!timer) {
+      timer = setInterval(update, 5000);
+    }
+    if (!animationFrameId) {
+      lastDrawTime = 0;
+      draw();
+    }
   } else {
     if (timer) {
       clearInterval(timer);
       timer = null;
+    }
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
     }
   }
 };
@@ -330,6 +369,7 @@ const run = () => {
   if (!canvasRef.value) return;
   
   initCanvasSize();
+  update();
   timer = setInterval(update, 5000);
   draw();
   

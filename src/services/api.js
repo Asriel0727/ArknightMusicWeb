@@ -529,6 +529,174 @@ function formatPotentialBuff(buff) {
   }).join(', ');
 }
 
+function parseCharacterRarity(rarity) {
+  if (typeof rarity === 'number') return rarity;
+  if (typeof rarity === 'string') {
+    const match = rarity.match(/TIER_(\d+)/);
+    if (match) return parseInt(match[1]) - 1;
+    const num = parseInt(rarity);
+    if (!isNaN(num)) return num;
+  }
+  return 0;
+}
+
+function getPortraitUrls(portraitId, alternativeIds = []) {
+  if (!portraitId) return [];
+
+  const allIds = [portraitId, ...alternativeIds].filter(Boolean);
+  const urls = [];
+
+  allIds.forEach(id => {
+    const enc = encodeURIComponent(id);
+    urls.push(
+      `${ARKNIGHT_IMAGES_BASE}/characters/${enc}.png`,
+      `https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/${enc}.png`,
+      `${ARKNIGHT_IMAGES_MIRROR_ACESHIP}/characters/${enc}.png`,
+      `https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/${enc}.png`,
+      `https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/${enc}.png`
+    );
+  });
+
+  return urls;
+}
+
+function resolveCharacterPortraits(charId, charData, skinTable) {
+  const portraits = [];
+  const displaySkins = charData.displaySkins || [];
+  const eliteLabels = getApiBuiltLabels();
+
+  if (charData.phases && charData.phases.length > 1) {
+    const phase1 = charData.phases[1];
+    const elite1Skin = displaySkins.find(skin =>
+      skin.portraitId && (skin.portraitId.includes('_1') || skin.portraitId.includes('#1'))
+    ) || displaySkins[0];
+    const displayId1 = elite1Skin?.portraitId || phase1.displayId || `${charId}_1`;
+    const alternativeIds1 = [
+      `${charId}_1+`,
+      `${charId}_1`,
+      `${charId}#1`,
+      phase1.displayId
+    ].filter(id => id && id !== displayId1);
+
+    portraits.push({
+      name: eliteLabels.elite1,
+      portraitId: displayId1,
+      urls: getPortraitUrls(displayId1, alternativeIds1),
+      skinId: null
+    });
+  }
+
+  if (charData.phases && charData.phases.length > 2) {
+    const phase2 = charData.phases[2];
+    const elite2Skin = displaySkins.find(skin =>
+      skin.portraitId && (skin.portraitId.includes('_2') || skin.portraitId.includes('#2'))
+    ) || displaySkins[1];
+    const displayId2 = elite2Skin?.portraitId || phase2.displayId || `${charId}_2`;
+
+    portraits.push({
+      name: eliteLabels.elite2,
+      portraitId: displayId2,
+      urls: getPortraitUrls(displayId2),
+      skinId: null
+    });
+  }
+
+  const elitePortraitIds = new Set(portraits.map(p => p.portraitId).filter(Boolean));
+  const charSkinsMap = skinTable?.charSkins;
+  if (charSkinsMap && typeof charSkinsMap === 'object') {
+    const costumeRows = [];
+
+    for (const skin of Object.values(charSkinsMap)) {
+      if (!skin || skin.charId !== charId) continue;
+      const gid = skin.displaySkin?.skinGroupId;
+      if (typeof gid === 'string' && gid.startsWith('ILLUST_')) continue;
+
+      const portraitId = skin.portraitId;
+      if (!portraitId || elitePortraitIds.has(portraitId)) continue;
+
+      const ds = skin.displaySkin || {};
+      const rawLabel = [ds.skinName, ds.skinGroupName].find(Boolean) || skin.skinId || portraitId;
+      let labelStr = String(rawLabel);
+      if (shouldApplyS2tGameData()) {
+        labelStr = toTraditionalGameDataText(labelStr);
+      }
+      const lb = getApiBuiltLabels();
+      const tabName =
+        getGameDataFolder() === 'zh_CN'
+          ? labelStr.startsWith('時裝')
+            ? labelStr
+            : `時裝 - ${labelStr}`
+          : `${lb.costumePrefix}${labelStr}`;
+
+      costumeRows.push({
+        skinId: skin.skinId,
+        portraitId,
+        tabName,
+        sortId: typeof ds.sortId === 'number' ? ds.sortId : 0
+      });
+    }
+
+    costumeRows.sort((a, b) => a.sortId - b.sortId || String(a.skinId).localeCompare(String(b.skinId)));
+
+    const seenPortrait = new Set();
+    for (const row of costumeRows) {
+      if (seenPortrait.has(row.portraitId)) continue;
+      seenPortrait.add(row.portraitId);
+      portraits.push({
+        name: row.tabName,
+        portraitId: row.portraitId,
+        urls: getPortraitUrls(row.portraitId),
+        skinId: row.skinId
+      });
+    }
+  }
+
+  return portraits;
+}
+
+export async function fetchRecruitCharacterDetails(charId) {
+  try {
+    const excel = getGameDataExcelBase();
+    const [charTableRes, skinTable, teamTable, charwordTable] = await Promise.all([
+      fetch(`${excel}/character_table.json`),
+      getSkinTableShared(),
+      getHandbookTeamTable(),
+      getCharwordTableShared(),
+    ]);
+
+    if (!charTableRes.ok) throw new Error('無法獲取角色資料');
+    const charTable = await charTableRes.json();
+    const charData = charTable[charId];
+    if (!charData) throw new Error('角色不存在');
+
+    let traitDescription = '';
+    if (charData.trait && charData.trait.candidates && charData.trait.candidates.length > 0) {
+      const lastCandidate = charData.trait.candidates[charData.trait.candidates.length - 1];
+      traitDescription = cleanDescription(lastCandidate.overrideDescripton || lastCandidate.additionalDescription || '', lastCandidate.blackboard || []);
+    }
+    if (!traitDescription && charData.description) {
+      traitDescription = cleanDescription(charData.description);
+    }
+
+    return {
+      id: charId,
+      name: toTraditionalGameDataText(resolveCharacterTableDisplayName(charData)),
+      appellation: charData.appellation,
+      profession: charData.profession,
+      rarity: parseCharacterRarity(charData.rarity),
+      factionId: resolveFactionId(charData),
+      nationName: factionIdToDisplayName(resolveFactionId(charData), teamTable),
+      portraits: resolveCharacterPortraits(charId, charData, skinTable),
+      traitDescription: traitDescription,
+      recruitVoiceText: resolveRecruitVoiceText(charId, charwordTable),
+      avatarUrl: AVATAR_SOURCES[0](charId)
+    };
+  } catch (error) {
+    console.error('獲取招募卡角色資料失敗:', error);
+    throw error;
+  }
+}
+
 /**
  * 獲取角色詳細資料
  * @param {string} charId - 角色ID

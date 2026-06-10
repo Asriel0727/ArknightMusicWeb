@@ -245,7 +245,7 @@ import { useI18n } from 'vue-i18n';
 import { i18n as globalI18n } from '../i18n/index.js';
 import {
   fetchCharacters,
-  fetchCharacterDetails,
+  fetchRecruitCharacterDetails,
   getCharacterAvatarFallbackUrl,
   syncFactionI18nMessages,
 } from '../services/api.js';
@@ -513,7 +513,7 @@ function endPortraitDrag() {
 
 async function loadCharacterRecruitData(charId, options = {}) {
   try {
-    const detail = await fetchCharacterDetails(charId);
+    const detail = await fetchRecruitCharacterDetails(charId);
     selectedCharacterDetails.value = detail;
     selectedPortraitIndex.value =
       options.portraitMode === 'eliteOnly'
