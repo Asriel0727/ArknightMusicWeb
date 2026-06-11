@@ -139,7 +139,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { fetchCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls, fetchCharacterDetails, syncFactionI18nMessages } from '../services/api.js';
+import { fetchRecruitCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls, fetchCharacterDetails, syncFactionI18nMessages } from '../services/api.js';
 import { modalState, characterState } from '../stores/player.js';
 import { i18n } from '../i18n/index.js';
 
@@ -320,7 +320,7 @@ const loadCharacters = async () => {
   error.value = null;
   
   try {
-    const loadedChars = await fetchCharacters();
+    const loadedChars = await fetchRecruitCharacters();
     characters.value = loadedChars;
     // 重置所有角色的圖片索引
     avatarIndexMap.value.clear();
@@ -335,7 +335,8 @@ const loadCharacters = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await syncFactionI18nMessages(i18n);
   loadCharacters();
 });
 
@@ -683,4 +684,3 @@ watch(locale, async () => {
   }
 }
 </style>
-

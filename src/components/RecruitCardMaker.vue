@@ -146,15 +146,15 @@
           <div v-show="activeTab === 'text'" class="tab-pane">
             <label class="field">
               <span>{{ t('recruit.nameZh') }}</span>
-              <input v-model="nameZh" type="text" />
+              <input :value="nameZh" type="text" @input="onNameZhInput" />
             </label>
             <label class="field">
               <span>{{ t('recruit.nameEn') }}</span>
-              <input v-model="nameEn" type="text" />
+              <input :value="nameEn" type="text" @input="onNameEnInput" />
             </label>
             <label class="field">
               <span>{{ t('recruit.tagline') }}</span>
-              <textarea v-model="tagline" rows="4" />
+              <textarea :value="tagline" rows="4" @input="onTaglineInput" />
             </label>
           </div>
         </div>
@@ -287,11 +287,45 @@ function getDefaultPortraitPosition(scale = DEFAULT_PORTRAIT_SCALE) {
   };
 }
 
-const nameZh = ref('中文名稱');
-const nameEn = ref('ENGLISH NAME');
-const tagline = ref(
-  '博士，好久不見。我知道羅德島當前狀況不容樂觀，我會回來提供一份助力。也\n以防你忘記，我依然是羅德島的一員。'
-);
+const DEFAULT_RECRUIT_TEXT = {
+  'zh-TW': {
+    nameZh: '中文名稱',
+    nameEn: 'ENGLISH NAME',
+    tagline: '請在此輸入幹員報到語音或介紹文字。\n選擇角色後會自動套用資料。',
+  },
+  'zh-CN': {
+    nameZh: '中文名称',
+    nameEn: 'ENGLISH NAME',
+    tagline: '请在此输入干员报到语音或介绍文字。\n选择角色后会自动套用资料。',
+  },
+  en: {
+    nameZh: 'Operator name',
+    nameEn: 'ENGLISH NAME',
+    tagline: 'Enter the operator onboarding line or profile text here.\nSelecting an operator will fill this automatically.',
+  },
+  ja: {
+    nameZh: 'オペレーター名',
+    nameEn: 'ENGLISH NAME',
+    tagline: 'オペレーターの着任ボイスや紹介文を入力してください。\nオペレーターを選択すると自動入力されます。',
+  },
+  ko: {
+    nameZh: '오퍼레이터 이름',
+    nameEn: 'ENGLISH NAME',
+    tagline: '오퍼레이터 합류 대사나 소개 문구를 입력하세요.\n오퍼레이터를 선택하면 자동으로 입력됩니다.',
+  },
+};
+
+function getDefaultRecruitText(localeCode) {
+  return DEFAULT_RECRUIT_TEXT[localeCode] || DEFAULT_RECRUIT_TEXT['zh-TW'];
+}
+
+const initialRecruitText = getDefaultRecruitText(locale.value);
+const nameZh = ref(initialRecruitText.nameZh);
+const nameEn = ref(initialRecruitText.nameEn);
+const tagline = ref(initialRecruitText.tagline);
+const nameZhEditedByUser = ref(false);
+const nameEnEditedByUser = ref(false);
+const taglineEditedByUser = ref(false);
 const starCount = ref(6);
 const profession = ref('PIONEER');
 const factionLogoKey = ref('logo_rhodes');
@@ -318,6 +352,8 @@ const portraitUrlCandidateIndex = ref(0);
 
 let dragState = null;
 let charSearchDebounceTimer = null;
+let recruitCharactersLoadToken = 0;
+let recruitCharacterDetailToken = 0;
 const failedImageUrls = new Set();
 
 const professionOptions = computed(() => [
@@ -404,6 +440,39 @@ function fitPreview() {
     1
   );
   previewScale.value = Math.max(0.08, scale);
+}
+
+function onNameZhInput(event) {
+  nameZhEditedByUser.value = true;
+  nameZh.value = event.target.value;
+}
+
+function onNameEnInput(event) {
+  nameEnEditedByUser.value = true;
+  nameEn.value = event.target.value;
+}
+
+function onTaglineInput(event) {
+  taglineEditedByUser.value = true;
+  tagline.value = event.target.value;
+}
+
+function applyLocalizedDefaultText() {
+  if (selectedCharId.value) return;
+
+  const defaultText = getDefaultRecruitText(locale.value);
+
+  if (!nameZhEditedByUser.value) {
+    nameZh.value = defaultText.nameZh;
+  }
+
+  if (!nameEnEditedByUser.value) {
+    nameEn.value = defaultText.nameEn;
+  }
+
+  if (!taglineEditedByUser.value) {
+    tagline.value = defaultText.tagline;
+  }
 }
 
 function onAvatarError(event, charId) {
@@ -506,18 +575,10 @@ function applySelectedCharacterFaction() {
   factionLogoKey.value = factionIdToLogoKey(selectedCharacterDetails.value.factionId);
 }
 
-function pickRandomElitePortraitIndex(detail) {
+function pickEliteOnePortraitIndex(detail) {
   const portraits = detail?.portraits || [];
-  const eliteIndexes = portraits
-    .map((portrait, index) => ({ portrait, index }))
-    .filter(({ portrait }) => portrait?.skinId == null)
-    .map(({ index }) => index);
-
-  if (eliteIndexes.length > 0) {
-    return eliteIndexes[Math.floor(Math.random() * eliteIndexes.length)];
-  }
-
-  return Math.max(0, portraits.length - 1);
+  const eliteOneIndex = portraits.findIndex((portrait) => portrait?.skinId == null);
+  return eliteOneIndex >= 0 ? eliteOneIndex : 0;
 }
 
 function onPortraitUpload(e) {
@@ -571,19 +632,19 @@ function endPortraitDrag() {
 }
 
 async function loadCharacterRecruitData(charId, options = {}) {
+  const detailToken = ++recruitCharacterDetailToken;
   try {
     const detail = await fetchRecruitCharacterDetails(charId);
+    if (detailToken !== recruitCharacterDetailToken) return;
+
     selectedCharacterDetails.value = detail;
-    selectedPortraitIndex.value =
-      options.portraitMode === 'eliteOnly'
-        ? pickRandomElitePortraitIndex(detail)
-        : Math.max(0, (detail.portraits?.length || 1) - 1);
+    selectedPortraitIndex.value = pickEliteOnePortraitIndex(detail);
     applyPortraitFromDetail(detail, selectedPortraitIndex.value);
     preloadPortraits(detail, selectedPortraitIndex.value);
     applySelectedCharacterFaction();
 
     const recruitText = detail.recruitVoiceText || detail.traitDescription || '';
-    if (recruitText) {
+    if (recruitText && (!options.preserveUserText || !taglineEditedByUser.value)) {
       tagline.value = recruitText.replace(/\\n/g, '\n').slice(0, 200);
     }
   } catch (err) {
@@ -592,21 +653,65 @@ async function loadCharacterRecruitData(charId, options = {}) {
 }
 
 async function applyCharacter(char, options = {}) {
+  const preserveUserText = options.preserveUserText === true;
+
   selectedCharId.value = char.id;
-  nameZh.value = char.name || '';
-  nameEn.value = (char.appellation || char.id || '').toUpperCase();
+
+  if (!preserveUserText) {
+    nameZhEditedByUser.value = false;
+    nameEnEditedByUser.value = false;
+    taglineEditedByUser.value = false;
+  }
+
+  if (!preserveUserText || !nameZhEditedByUser.value) {
+    nameZh.value = char.name || '';
+  }
+
+  if (!preserveUserText || !nameEnEditedByUser.value) {
+    nameEn.value = (char.appellation || char.id || '').toUpperCase();
+  }
+
   starCount.value = getRarityStars(char.rarity);
   profession.value = char.profession || 'PIONEER';
   if (useSelectedCharacterFaction.value) {
     factionLogoKey.value = factionIdToLogoKey(char.factionId);
   }
-  await loadCharacterRecruitData(char.id, options);
+  await loadCharacterRecruitData(char.id, { preserveUserText });
 }
 
 async function pickRandomOperator() {
   if (!characters.value.length) return;
   const char = characters.value[Math.floor(Math.random() * characters.value.length)];
-  await applyCharacter(char, { portraitMode: 'eliteOnly' });
+  await applyCharacter(char);
+}
+
+async function loadRecruitCharacters() {
+  const loadToken = ++recruitCharactersLoadToken;
+  await syncFactionI18nMessages(globalI18n);
+  const loadedCharacters = await fetchRecruitCharacters();
+  if (loadToken !== recruitCharactersLoadToken) return;
+
+  characters.value = loadedCharacters;
+
+  if (selectedCharId.value) {
+    const selectedCharacter = loadedCharacters.find((char) => char.id === selectedCharId.value);
+    if (selectedCharacter) {
+      await applyCharacter(selectedCharacter, { preserveUserText: true });
+    }
+  } else {
+    applyLocalizedDefaultText();
+  }
+}
+
+async function handleAppLocaleChanged() {
+  try {
+    isLoadingChars.value = true;
+    await loadRecruitCharacters();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    isLoadingChars.value = false;
+  }
 }
 
 async function exportCard() {
@@ -641,10 +746,10 @@ onMounted(async () => {
   window.addEventListener('mouseup', endPortraitDrag);
   window.addEventListener('touchmove', onPointerMove, { passive: false });
   window.addEventListener('touchend', endPortraitDrag);
+  window.addEventListener('app-locale-changed', handleAppLocaleChanged);
 
   try {
-    await syncFactionI18nMessages(globalI18n);
-    characters.value = await fetchRecruitCharacters();
+    await loadRecruitCharacters();
   } catch (err) {
     console.error(err);
   } finally {
@@ -662,14 +767,11 @@ onUnmounted(() => {
   window.removeEventListener('mouseup', endPortraitDrag);
   window.removeEventListener('touchmove', onPointerMove);
   window.removeEventListener('touchend', endPortraitDrag);
+  window.removeEventListener('app-locale-changed', handleAppLocaleChanged);
   revokePortraitObjectUrl();
   if (customBgUrl.value?.startsWith('blob:')) {
     URL.revokeObjectURL(customBgUrl.value);
   }
-});
-
-watch(locale, () => {
-  syncFactionI18nMessages(globalI18n);
 });
 
 watch(charSearch, (value) => {

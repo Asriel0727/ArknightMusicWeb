@@ -9,6 +9,7 @@ import {
   getGameDataExcelBase,
   getGameDataFolder,
   getApiBuiltLabels,
+  getCurrentUiLocale,
   setGameDataFolderFromUiLocale,
   shouldApplyS2tGameData,
 } from './gameDataSource.js';
@@ -411,7 +412,16 @@ function normalizeWorkerFactionName(rawFactionName, fallback) {
   return String(rawFactionName);
 }
 
+function shouldUseRecruitWorkerApi() {
+  const locale = getCurrentUiLocale();
+  return locale === 'zh-TW' || locale === 'zh-CN';
+}
+
 export async function fetchRecruitCharacters() {
+  if (!shouldUseRecruitWorkerApi()) {
+    return fetchCharacters();
+  }
+
   try {
     const data = await fetchRecruitApiJson('/api/recruit/operators');
     if (!Array.isArray(data.operators)) {
@@ -788,6 +798,10 @@ async function fetchRecruitCharacterDetailsFromGameData(charId) {
 }
 
 export async function fetchRecruitCharacterDetails(charId) {
+  if (!shouldUseRecruitWorkerApi()) {
+    return fetchRecruitCharacterDetailsFromGameData(charId);
+  }
+
   try {
     const data = await fetchRecruitApiJson(
       `/api/recruit/operators/${encodeURIComponent(charId)}`
