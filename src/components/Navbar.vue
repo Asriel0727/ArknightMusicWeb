@@ -157,6 +157,11 @@ const changePage = (page) => {
   font-size: 0.86rem;
   font-weight: 700;
   cursor: pointer;
+<<<<<<< Updated upstream
+=======
+  letter-spacing: 0;
+  text-transform: uppercase;
+>>>>>>> Stashed changes
   transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
   position: relative;
 }

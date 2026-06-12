@@ -245,6 +245,39 @@ main .page-title {
   font-size: 1.45rem;
   font-weight: 800;
   color: var(--text-color);
+  letter-spacing: 0;
+}
+
+.archive-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid rgba(111, 122, 132, 0.35);
+}
+
+.archive-kicker {
+  color: var(--accent-orange);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.archive-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  padding: 6px 9px;
+}
+
+.archive-status strong {
+  color: var(--accent-cyan);
 }
 
 .archive-header {
@@ -516,4 +549,3 @@ main .page-title {
   }
 }
 </style>
-

@@ -342,6 +342,9 @@ onUnmounted(() => {
     right: 0;
     font-size: 0.95rem;
   }
+  .signal-label {
+    display: none;
+  }
   #audio-visualizer {
     height: 20px;
     width: 32px;

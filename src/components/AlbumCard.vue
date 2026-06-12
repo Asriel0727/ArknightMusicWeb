@@ -198,7 +198,11 @@ onMounted(() => {
   font-weight: 800;
   font-size: 0.82rem;
   line-height: 1.5;
+<<<<<<< Updated upstream
   height: 40px;
+=======
+  height: 38px;
+>>>>>>> Stashed changes
   box-sizing: border-box;
   white-space: nowrap;
   margin-top: 0;
@@ -249,6 +253,7 @@ onMounted(() => {
     transform: translateX(-100%);
   }
 }
+<<<<<<< Updated upstream
 
 @media (max-width: 720px) {
   .album {
@@ -266,4 +271,22 @@ onMounted(() => {
   }
 }
 </style>
+=======
+>>>>>>> Stashed changes
 
+@media (max-width: 720px) {
+  .album {
+    grid-template-columns: 48px 64px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .album-cover-frame {
+    width: 60px;
+    height: 60px;
+  }
+
+  .album button {
+    grid-column: 1 / -1;
+  }
+}
+</style>

@@ -376,7 +376,7 @@ onUnmounted(() => {
 }
 
 .player-info h4 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-bottom: 5px;
   color: var(--text-color);
   font-weight: 900;
