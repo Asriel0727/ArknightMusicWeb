@@ -18,6 +18,10 @@
           <div class="player-info">
             <h4>{{ playerState.currentSong?.name || t('common.unknownSong') }}</h4>
             <p>{{ playerState.currentSong?.artistes?.join(', ') || t('common.unknownArtist') }}</p>
+            <div class="signal-meta">
+              <span>{{ playerState.isPlaying ? 'PLAYING' : 'STANDBY' }}</span>
+              <span>{{ formatTime(playerState.duration) }}</span>
+            </div>
           </div>
         </div>
         <div class="player-controls">
@@ -300,6 +304,9 @@ onUnmounted(() => {
   grid-template-columns: repeat(2, 1fr);
   gap: 22px;
   align-items: stretch;
+  height: min(calc(100vh - 150px), 720px);
+  min-height: 520px;
+  overflow: hidden;
 }
 
 .player-view-left,
@@ -307,6 +314,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .player-view-left .player-container {
@@ -357,7 +365,8 @@ onUnmounted(() => {
 .player-cover img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: rgba(5, 6, 7, 0.82);
 }
 
 .player-cover .no-cover {
@@ -385,6 +394,23 @@ onUnmounted(() => {
 .player-info p {
   color: var(--text-secondary);
   font-size: 0.9rem;
+}
+
+.signal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.signal-meta span {
+  padding: 4px 8px;
+  background: rgba(13, 16, 19, 0.84);
+  border: 1px solid rgba(111, 122, 132, 0.28);
+  color: var(--accent-cyan);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
 }
 
 .player-controls {
@@ -421,6 +447,30 @@ onUnmounted(() => {
   flex-shrink: 0;
   flex-grow: 0;
   padding: 0;
+  line-height: 1;
+  overflow: visible;
+}
+
+.control-btn i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  line-height: normal;
+  font-size: inherit;
+  text-align: center;
+  overflow: visible;
+}
+
+.control-btn i::before {
+  display: block;
+  line-height: 1;
+  overflow: visible;
+}
+
+.control-btn .fa-play {
+  transform: translateX(1px);
 }
 
 .control-btn:hover {
@@ -433,7 +483,7 @@ onUnmounted(() => {
   background: rgba(45, 212, 191, 0.14);
   border-color: var(--accent-cyan);
   color: var(--accent-cyan);
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   min-width: 56px;
   max-width: 56px;
   width: 56px;
@@ -549,18 +599,23 @@ onUnmounted(() => {
 }
 
 .album-grid-visual-small {
-  width: 80%;
-  max-width: 400px;
-  height: auto;
+  width: 100%;
+  max-width: none;
+  height: 240px;
+  object-fit: contain;
+  background: rgba(5, 6, 7, 0.72);
   border-radius: 2px;
   border: 1px solid rgba(111, 122, 132, 0.28);
   display: block;
-  margin: 0 auto 15px auto;
+  margin: 0 0 14px 0;
+  flex: 0 0 auto;
 }
 
 .lyrics-container {
   margin-top: 0;
-  max-height: 250px;
+  max-height: none;
+  min-height: 0;
+  flex: 1;
   overflow-y: auto;
   background: rgba(5, 6, 7, 0.72);
   padding: 16px;
@@ -624,6 +679,9 @@ onUnmounted(() => {
 @media (max-width: 900px) {
   .player-view-grid {
     grid-template-columns: 1fr;
+    height: auto;
+    max-height: none;
+    overflow: visible;
   }
   
   .player-header {
@@ -634,6 +692,14 @@ onUnmounted(() => {
   .player-cover {
     margin-right: 0;
     margin-bottom: 15px;
+  }
+
+  .album-grid-visual-small {
+    height: 180px;
+  }
+
+  .lyrics-container {
+    max-height: 420px;
   }
 }
 </style>

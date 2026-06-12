@@ -188,11 +188,11 @@ onUnmounted(() => {
   background: rgba(13, 16, 19, 0.9);
   border: 1px solid rgba(111, 122, 132, 0.35);
   border-radius: 2px;
-  padding: 7px 10px;
+  padding: 5px 9px;
   width: 100%;
   max-width: 720px;
   position: relative;
-  min-height: 44px;
+  min-height: 38px;
 }
 
 .signal-label {
@@ -237,8 +237,8 @@ onUnmounted(() => {
   color: var(--primary-color);
   border: 1px solid rgba(79, 182, 255, 0.4);
   border-radius: 2px;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -297,8 +297,8 @@ onUnmounted(() => {
 #audio-visualizer {
   display: flex;
   align-items: flex-end;
-  height: 32px;
-  width: 48px;
+  height: 26px;
+  width: 42px;
   gap: 3px;
   margin-left: 8px;
 }

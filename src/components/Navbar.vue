@@ -83,8 +83,8 @@ const changePage = (page) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 40px;
-  margin-bottom: 14px;
+  padding: 8px 40px;
+  margin-bottom: 8px;
   flex-wrap: nowrap;
   min-width: 0;
   overflow-x: auto;
@@ -149,19 +149,16 @@ const changePage = (page) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 16px;
+  padding: 7px 14px;
   background: rgba(13, 16, 19, 0.78);
   border: 1px solid rgba(111, 122, 132, 0.28);
   border-radius: 2px;
   color: var(--text-secondary);
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
-<<<<<<< Updated upstream
-=======
   letter-spacing: 0;
   text-transform: uppercase;
->>>>>>> Stashed changes
   transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
   position: relative;
 }
@@ -193,7 +190,7 @@ const changePage = (page) => {
 }
 
 .logo-img {
-  height: 34px;
+  height: 30px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -202,13 +199,13 @@ const changePage = (page) => {
 
 @media (max-width: 900px) {
   .main-navbar {
-    padding: 12px 15px;
+    padding: 8px 15px;
     gap: 8px;
   }
   
   .nav-tab {
-    padding: 8px 14px;
-    font-size: 0.9rem;
+    padding: 7px 12px;
+    font-size: 0.82rem;
   }
   
   .nav-tab i {
@@ -216,7 +213,7 @@ const changePage = (page) => {
   }
   
   .logo-img {
-    height: 35px;
+    height: 30px;
   }
 }
 

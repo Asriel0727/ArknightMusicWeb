@@ -91,7 +91,7 @@ watch(() => playerState.currentSong, (newSong) => {
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   z-index: 1000;
   opacity: 0;
@@ -107,37 +107,37 @@ watch(() => playerState.currentSong, (newSong) => {
 
 .modal-content {
   background: rgba(9, 12, 16, 0.98);
-  border-left: 1px solid rgba(111, 122, 132, 0.45);
-  border-radius: 0;
-  padding: 25px;
-  width: min(960px, 92vw);
-  max-width: none;
-  height: 100vh;
-  max-height: none;
+  border: 1px solid rgba(111, 122, 132, 0.45);
+  border-radius: 2px;
+  padding: 54px 24px 24px;
+  width: min(1080px, 94vw);
+  max-width: 1080px;
+  height: auto;
+  max-height: 88vh;
   color: var(--text-color);
   position: relative;
-  box-shadow: -24px 0 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.62);
   overflow-y: auto;
-  transform: translateX(18px);
+  transform: translateY(12px) scale(0.985);
   transition: transform 0.22s ease;
 }
 
 .modal.show .modal-content {
-  transform: translateX(0);
+  transform: translateY(0) scale(1);
 }
 
 .modal-close {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
+  top: 12px;
+  right: 14px;
+  z-index: 3;
+  background: rgba(5, 6, 7, 0.9);
   color: var(--text-color);
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
   transition: color 0.3s;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,8 +153,9 @@ watch(() => playerState.currentSong, (newSong) => {
 
 @media (max-width: 480px) {
   .modal-content {
-    padding: 15px;
-    width: 100%;
+    padding: 50px 12px 14px;
+    width: 96vw;
+    max-height: 92vh;
   }
 }
 </style>

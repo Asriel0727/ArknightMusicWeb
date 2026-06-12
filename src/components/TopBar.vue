@@ -24,11 +24,11 @@ const handleSearch = (query) => {
 .topbar-section {
   width: 100%;
   max-width: 1400px;
-  margin: 0 auto 18px auto;
+  margin: 0 auto 8px auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 12px;
   padding: 0 40px;
 }
 
@@ -45,10 +45,9 @@ const handleSearch = (query) => {
   .topbar-section {
     padding-left: 15px;
     padding-right: 15px;
-    gap: 8px;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 6px;
   }
   
   .topbar-right {

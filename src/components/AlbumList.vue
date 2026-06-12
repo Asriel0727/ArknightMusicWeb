@@ -84,33 +84,14 @@ const windowWidth = ref(window.innerWidth);
 
 // 響應式計算每頁顯示的專輯數量
 const albumsPerPage = computed(() => {
-  const width = windowWidth.value;
-  
-  // 根據屏幕寬度計算每行可以顯示多少個專輯
-  // 專輯卡片最小寬度：250px (桌面) 或 200px (移動端)
-  // 加上間距：25px (桌面) 或 15px (移動端)
-  const cardMinWidth = width <= 900 ? 200 : 250;
-  const gap = width <= 900 ? 15 : 25;
-  const containerPadding = 40; // 左右padding
-  const availableWidth = width - containerPadding;
-  
-  // 計算每行可以放多少個
-  const cardsPerRow = Math.floor((availableWidth + gap) / (cardMinWidth + gap));
-  
-  // 根據屏幕高度計算可以顯示多少行
-  // 專輯卡片高度約：350px (包含圖片、文字、按鈕)
-  const cardHeight = 350;
-  const viewportHeight = window.innerHeight;
-  const headerHeight = 200; // 導航欄和頂部工具欄的高度
-  const paginationHeight = 100; // 分頁控件的高度
-  const availableHeight = viewportHeight - headerHeight - paginationHeight;
-  const rowsPerPage = Math.max(2, Math.floor(availableHeight / (cardHeight + gap))); // 至少顯示2行
-  
-  // 每頁顯示的數量 = 每行數量 × 每頁行數
-  const perPage = cardsPerRow * rowsPerPage;
-  
-  // 設置最小和最大值
-  return Math.max(5, Math.min(perPage, 25)); // 最少4個，最多24個
+  const currentWidth = windowWidth.value;
+  const currentViewportHeight = window.innerHeight;
+  const rowHeight = currentWidth <= 720 ? 76 : 84;
+  const reservedHeight = currentWidth <= 600 ? 292 : currentWidth <= 900 ? 268 : 238;
+  const availableHeightForRows = Math.max(0, currentViewportHeight - reservedHeight);
+  const visibleRows = Math.floor(availableHeightForRows / rowHeight);
+
+  return Math.max(4, Math.min(visibleRows, 14));
 });
 
 // 計算總頁數
@@ -234,7 +215,7 @@ defineExpose({
 <style scoped>
 main {
   flex: 1;
-  padding: 18px 40px 24px;
+  padding: 10px 40px 14px;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -242,7 +223,7 @@ main {
 
 main .page-title {
   margin: 2px 0 0;
-  font-size: 1.45rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: var(--text-color);
   letter-spacing: 0;
@@ -253,14 +234,14 @@ main .page-title {
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 14px;
-  padding: 14px 0 12px;
+  margin-bottom: 8px;
+  padding: 8px 0;
   border-bottom: 1px solid rgba(111, 122, 132, 0.35);
 }
 
 .archive-kicker {
   color: var(--accent-orange);
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 900;
   letter-spacing: 0.06em;
 }
@@ -270,42 +251,10 @@ main .page-title {
   align-items: center;
   gap: 8px;
   color: var(--text-secondary);
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 800;
   border: 1px solid rgba(45, 212, 191, 0.32);
-  padding: 6px 9px;
-}
-
-.archive-status strong {
-  color: var(--accent-cyan);
-}
-
-.archive-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
-  padding: 14px 0 12px;
-  border-bottom: 1px solid rgba(111, 122, 132, 0.35);
-}
-
-.archive-kicker {
-  color: var(--accent-orange);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-}
-
-.archive-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-secondary);
-  font-size: 0.72rem;
-  font-weight: 800;
-  border: 1px solid rgba(45, 212, 191, 0.32);
-  padding: 6px 9px;
+  padding: 4px 8px;
 }
 
 .archive-status strong {
@@ -315,8 +264,8 @@ main .page-title {
 .albums-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px 0 0;
+  gap: 6px;
+  padding: 4px 0 0;
 }
 
 .loading-spinner {
@@ -350,19 +299,19 @@ main .page-title {
 }
 
 .pagination-wrapper {
-  margin-top: 24px;
-  padding: 16px 0;
+  margin-top: 8px;
+  padding: 8px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
 }
 
 .pagination-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -371,15 +320,15 @@ main .page-title {
   background-image: none;
   color: var(--primary-color);
   border: 1px solid rgba(79, 182, 255, 0.35);
-  padding: 12px 24px;
+  padding: 0 14px;
   border-radius: 2px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.82rem;
   font-weight: 500;
   line-height: 1.4;
-  min-height: 44px;
-  max-height: 44px;
-  height: 44px;
+  min-height: 34px;
+  max-height: 34px;
+  height: 34px;
   box-sizing: border-box;
   white-space: nowrap;
   transition: background-color 0.16s, border-color 0.16s, color 0.16s;
@@ -418,12 +367,12 @@ main .page-title {
   align-items: center;
   gap: 4px;
   color: var(--text-color);
-  font-size: 1rem;
-  min-width: 150px;
+  font-size: 0.82rem;
+  min-width: 128px;
 }
 
 .pagination-count {
-  font-size: 0.85rem;
+  font-size: 0.74rem;
   color: var(--text-secondary);
 }
 
@@ -438,15 +387,15 @@ main .page-title {
   background: rgba(13, 16, 19, 0.86);
   color: var(--text-color);
   border: 1px solid var(--border-color);
-  min-width: 44px;
-  max-width: 44px;
-  width: 44px;
-  min-height: 44px;
-  max-height: 44px;
-  height: 44px;
+  min-width: 30px;
+  max-width: 30px;
+  width: 30px;
+  min-height: 30px;
+  max-height: 30px;
+  height: 30px;
   border-radius: 2px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.82rem;
   font-weight: 500;
   line-height: 1;
   box-sizing: border-box;
@@ -473,64 +422,67 @@ main .page-title {
 
 @media (max-width: 900px) {
   .albums-container {
-    gap: 8px;
+    gap: 6px;
   }
   
   .pagination-controls {
-    gap: 15px;
+    gap: 8px;
   }
   
   .pagination-btn {
-    padding: 10px 20px;
-    font-size: 0.95rem;
-    min-height: 40px;
-    max-height: 40px;
-    height: 40px;
+    padding: 0 12px;
+    font-size: 0.78rem;
+    min-height: 32px;
+    max-height: 32px;
+    height: 32px;
     gap: 6px;
   }
   
   .pagination-info {
-    font-size: 0.9rem;
-    min-width: 120px;
+    font-size: 0.78rem;
+    min-width: 110px;
   }
   
   .page-number {
-    min-width: 40px;
-    max-width: 40px;
-    width: 40px;
-    min-height: 40px;
-    max-height: 40px;
-    height: 40px;
-    font-size: 0.95rem;
+    min-width: 28px;
+    max-width: 28px;
+    width: 28px;
+    min-height: 28px;
+    max-height: 28px;
+    height: 28px;
+    font-size: 0.78rem;
   }
 }
 
 @media (max-width: 600px) {
   main {
-    padding: 12px 10px 20px;
+    padding: 8px 10px 12px;
   }
 
   .archive-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+  }
+
+  main .page-title {
+    font-size: 1.05rem;
   }
 
   .pagination-controls {
-    flex-direction: column;
-    gap: 10px;
+    gap: 6px;
   }
   
   .pagination-btn {
-    width: 100%;
-    max-width: 200px;
-    min-width: 140px;
+    width: auto;
+    max-width: none;
+    min-width: 104px;
     justify-content: center;
-    padding: 10px 16px;
-    min-height: 40px;
-    max-height: 40px;
-    height: 40px;
-    font-size: 0.9rem;
+    padding: 0 10px;
+    min-height: 30px;
+    max-height: 30px;
+    height: 30px;
+    font-size: 0.74rem;
     gap: 6px;
   }
   
@@ -539,13 +491,13 @@ main .page-title {
   }
   
   .page-number {
-    min-width: 36px;
-    max-width: 36px;
-    width: 36px;
-    min-height: 36px;
-    max-height: 36px;
-    height: 36px;
-    font-size: 0.9rem;
+    min-width: 26px;
+    max-width: 26px;
+    width: 26px;
+    min-height: 26px;
+    max-height: 26px;
+    height: 26px;
+    font-size: 0.72rem;
   }
 }
 </style>

@@ -922,10 +922,11 @@ main {
 
 footer {
     text-align: center;
-    padding: 15px;
+    padding: 6px 12px;
     background: rgba(13, 17, 23, 0.8);
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.72rem;
+    border-top: 1px solid rgba(111, 122, 132, 0.22);
 }
 
 .all-songs-bar {
