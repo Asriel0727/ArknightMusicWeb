@@ -70,6 +70,69 @@
             </label>
           </div>
         </div>
+
+        <div class="signal-dashboard">
+          <section class="signal-module signal-analysis">
+            <div class="module-header">
+              <span>SIGNAL ANALYSIS</span>
+              <strong>{{ Math.round(progressPercent) }}%</strong>
+            </div>
+            <div class="waveform-strip" :class="{ active: playerState.isPlaying }" aria-hidden="true">
+              <span
+                v-for="(height, index) in waveformBars"
+                :key="index"
+                class="waveform-bar"
+                :style="{ '--bar-height': `${height}%`, '--bar-delay': `${index * 70}ms` }"
+              ></span>
+            </div>
+            <div class="analysis-grid">
+              <div>
+                <span>LYRICS</span>
+                <strong>{{ lyricsStatus }}</strong>
+              </div>
+              <div>
+                <span>TRANSLATION</span>
+                <strong>{{ translationStatus }}</strong>
+              </div>
+              <div>
+                <span>VOLUME</span>
+                <strong>{{ Math.round(playerState.volume * 100) }}%</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="signal-module track-dossier">
+            <div class="module-header">
+              <span>TRACK DOSSIER</span>
+              <strong>{{ trackPositionLabel }}</strong>
+            </div>
+            <dl>
+              <div>
+                <dt>TRACK ID</dt>
+                <dd>{{ playerState.currentSong?.cid || '--' }}</dd>
+              </div>
+              <div>
+                <dt>ALBUM ID</dt>
+                <dd>{{ playerState.currentSong?.albumCid || '--' }}</dd>
+              </div>
+              <div>
+                <dt>SOURCE</dt>
+                <dd>{{ playerState.currentSong?.artistes?.join(', ') || t('common.unknownArtist') }}</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="signal-module queue-link">
+            <div class="queue-row">
+              <span>PREV</span>
+              <strong>{{ previousSong?.name || '--' }}</strong>
+            </div>
+            <div class="queue-row">
+              <span>NEXT</span>
+              <strong>{{ nextSong?.name || '--' }}</strong>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
     <div class="player-view-right">
@@ -142,6 +205,63 @@ const volumeIcon = computed(() => {
   } else {
     return 'fas fa-volume-down';
   }
+});
+
+const waveformBars = [42, 68, 36, 74, 54, 82, 46, 64, 34, 78, 52, 70, 40, 86, 58, 66, 44, 72];
+
+const trackPositionLabel = computed(() => {
+  const totalTracks = playerState.currentPlaylist.length;
+  if (!totalTracks) {
+    return '00/00';
+  }
+
+  return `${String(playerState.currentSongIndex + 1).padStart(2, '0')}/${String(totalTracks).padStart(2, '0')}`;
+});
+
+const previousSong = computed(() => {
+  const playlist = playerState.currentPlaylist;
+  if (!playlist.length) {
+    return null;
+  }
+
+  const previousIndex = playerState.currentSongIndex <= 0
+    ? playlist.length - 1
+    : playerState.currentSongIndex - 1;
+  return playlist[previousIndex] || null;
+});
+
+const nextSong = computed(() => {
+  const playlist = playerState.currentPlaylist;
+  if (!playlist.length) {
+    return null;
+  }
+
+  const nextIndex = (playerState.currentSongIndex + 1) % playlist.length;
+  return playlist[nextIndex] || null;
+});
+
+const lyricsStatus = computed(() => {
+  if (!playerState.lyrics || playerState.lyrics.length === 0) {
+    return 'NO DATA';
+  }
+
+  if (activeLyricIndex.value < 0) {
+    return 'STANDBY';
+  }
+
+  return `${String(activeLyricIndex.value + 1).padStart(2, '0')}/${String(playerState.lyrics.length).padStart(2, '0')}`;
+});
+
+const translationStatus = computed(() => {
+  if (!playerState.showLyricTranslation) {
+    return 'OFF';
+  }
+
+  if (playerState.isTranslatingLyrics) {
+    return 'SYNCING';
+  }
+
+  return 'ONLINE';
 });
 
 const proxyImageUrl = (url) => {
@@ -330,6 +450,10 @@ onUnmounted(() => {
   border: 1px solid rgba(111, 122, 132, 0.3);
   border-radius: 2px;
   position: relative;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .player-container::before {
@@ -417,6 +541,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  flex: 0 0 auto;
 }
 
 .controls-top {
@@ -598,6 +723,156 @@ onUnmounted(() => {
   line-height: 1;
 }
 
+.signal-dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 16px;
+  min-height: 0;
+  flex: 1;
+}
+
+.signal-module {
+  background:
+    linear-gradient(90deg, rgba(45, 212, 191, 0.06), transparent 42%),
+    rgba(5, 6, 7, 0.46);
+  border: 1px solid rgba(111, 122, 132, 0.26);
+  border-left: 2px solid rgba(45, 212, 191, 0.62);
+  padding: 12px;
+  min-width: 0;
+}
+
+.module-header,
+.queue-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.module-header span,
+.queue-row span,
+.analysis-grid span,
+.track-dossier dt {
+  color: var(--text-dim);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.module-header strong,
+.queue-row strong {
+  color: var(--accent-cyan);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+
+.waveform-strip {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  align-items: center;
+  gap: 4px;
+  height: 68px;
+  margin: 12px 0;
+  padding: 8px 10px;
+  background:
+    linear-gradient(rgba(111, 122, 132, 0.12) 1px, transparent 1px),
+    rgba(13, 16, 19, 0.58);
+  background-size: 100% 17px;
+  border: 1px solid rgba(111, 122, 132, 0.18);
+}
+
+.waveform-bar {
+  height: var(--bar-height);
+  min-height: 8px;
+  background: linear-gradient(180deg, var(--accent-cyan), rgba(79, 182, 255, 0.26));
+  transform-origin: center;
+  opacity: 0.58;
+}
+
+.waveform-strip.active .waveform-bar {
+  animation: signalPulse 920ms ease-in-out infinite alternate;
+  animation-delay: var(--bar-delay);
+  opacity: 0.9;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.analysis-grid div {
+  padding: 8px;
+  background: rgba(13, 16, 19, 0.62);
+  border: 1px solid rgba(111, 122, 132, 0.18);
+  min-width: 0;
+}
+
+.analysis-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-dossier dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.track-dossier dl div {
+  min-width: 0;
+  padding: 8px;
+  background: rgba(13, 16, 19, 0.62);
+  border: 1px solid rgba(111, 122, 132, 0.18);
+}
+
+.track-dossier dl div:last-child {
+  grid-column: 1 / -1;
+}
+
+.track-dossier dd {
+  margin: 4px 0 0;
+  color: var(--text-color);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-link {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.queue-row {
+  min-width: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(111, 122, 132, 0.16);
+}
+
+.queue-row:last-child {
+  border-bottom: none;
+}
+
+.queue-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .album-grid-visual-small {
   width: 100%;
   max-width: none;
@@ -676,6 +951,17 @@ onUnmounted(() => {
   }
 }
 
+@keyframes signalPulse {
+  from {
+    transform: scaleY(0.62);
+    opacity: 0.5;
+  }
+  to {
+    transform: scaleY(1.08);
+    opacity: 0.95;
+  }
+}
+
 @media (max-width: 900px) {
   .player-view-grid {
     grid-template-columns: 1fr;
@@ -700,6 +986,25 @@ onUnmounted(() => {
 
   .lyrics-container {
     max-height: 420px;
+  }
+
+  .signal-dashboard {
+    flex: none;
+  }
+
+  .analysis-grid,
+  .track-dossier dl {
+    grid-template-columns: 1fr;
+  }
+
+  .track-dossier dl div:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waveform-strip.active .waveform-bar {
+    animation: none;
   }
 }
 </style>

@@ -119,7 +119,7 @@ import { useI18n } from 'vue-i18n';
 import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
 import { playSongFromAlbum, playerState } from '../stores/player.js';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const props = defineProps({
   album: {
@@ -128,10 +128,18 @@ const props = defineProps({
   }
 });
 
-const introForDisplay = computed(() => {
+const introSourceText = computed(() => {
   const raw = props.album?.intro;
   if (raw == null || !String(raw).trim()) return t('common.noIntro');
   return normalizeEscapedNewlines(raw);
+});
+
+const translatedIntro = ref('');
+const isIntroTranslating = ref(false);
+let introTranslationToken = 0;
+
+const introForDisplay = computed(() => {
+  return translatedIntro.value || introSourceText.value;
 });
 
 const emit = defineEmits(['play-song']);
@@ -223,6 +231,42 @@ const isCurrentSong = (song) => {
   return playerState.currentSong?.cid === song.cid;
 };
 
+const refreshIntroTranslation = async () => {
+  const sourceText = introSourceText.value;
+  const targetLocale = locale.value;
+  const token = ++introTranslationToken;
+
+  translatedIntro.value = '';
+  isIntroTranslating.value = false;
+
+  if (!sourceText || sourceText === t('common.noIntro')) {
+    return;
+  }
+
+  if (targetLocale === 'zh-TW') {
+    return;
+  }
+
+  isIntroTranslating.value = true;
+
+  try {
+    const { translateTextBlock } = await import('../services/lyricsTranslationPlugin.js');
+    const result = await translateTextBlock(sourceText, targetLocale);
+
+    if (token !== introTranslationToken) {
+      return;
+    }
+
+    translatedIntro.value = result || sourceText;
+  } catch (error) {
+    console.warn('Album intro translation failed:', error.message);
+  } finally {
+    if (token === introTranslationToken) {
+      isIntroTranslating.value = false;
+    }
+  }
+};
+
 // 設置標題引用（優化：使用 Map 提高性能）
 const setTitleRef = (el, index) => {
   // 確保 Map 已初始化
@@ -276,9 +320,36 @@ watch(() => props.album.cid, () => {
   });
 });
 
+watch(() => props.album.cid, () => {
+  currentPage.value = 1;
+  imageLoaded.value = false;
+  if (songTitleRefs.value) {
+    songTitleRefs.value.clear();
+  } else {
+    songTitleRefs.value = new Map();
+  }
+  nextTick(() => {
+    applyMarquee();
+  });
+  refreshIntroTranslation();
+});
+
+watch(locale, () => {
+  refreshIntroTranslation();
+});
+
+watch(introSourceText, () => {
+  refreshIntroTranslation();
+});
+
 watch(currentPage, () => {
   // 換頁時立即應用跑馬燈
   applyMarquee();
+});
+
+onMounted(() => {
+  applyMarquee();
+  refreshIntroTranslation();
 });
 
 onMounted(() => {
