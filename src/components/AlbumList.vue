@@ -1,6 +1,15 @@
 <template>
   <main class="album-list-main" :key="locale">
-    <h1 class="page-title">{{ t('album.pageTitle') }}</h1>
+    <div class="archive-header">
+      <div>
+        <span class="archive-kicker">RHODES AUDIO ARCHIVE</span>
+        <h1 class="page-title">{{ t('album.pageTitle') }}</h1>
+      </div>
+      <div class="archive-status">
+        <span>STATUS</span>
+        <strong>ONLINE</strong>
+      </div>
+    </div>
     <div v-if="albumState.isLoading && !albumState.isInitialFetchDone" class="loading-spinner">
       <div class="spinner"></div>
       <p>{{ t('common.loading') }}</p>
@@ -225,25 +234,56 @@ defineExpose({
 <style scoped>
 main {
   flex: 1;
-  padding: 20px;
+  padding: 18px 40px 24px;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 main .page-title {
-  margin: 0 0 16px 0;
-  font-size: 1.35rem;
-  font-weight: 600;
+  margin: 2px 0 0;
+  font-size: 1.45rem;
+  font-weight: 800;
   color: var(--text-color);
 }
 
+.archive-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid rgba(111, 122, 132, 0.35);
+}
+
+.archive-kicker {
+  color: var(--accent-orange);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.archive-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  padding: 6px 9px;
+}
+
+.archive-status strong {
+  color: var(--accent-cyan);
+}
+
 .albums-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 25px;
-  padding: 20px 0;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0 0;
 }
 
 .loading-spinner {
@@ -277,8 +317,8 @@ main .page-title {
 }
 
 .pagination-wrapper {
-  margin-top: 40px;
-  padding: 20px 0;
+  margin-top: 24px;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -294,12 +334,12 @@ main .page-title {
 }
 
 .pagination-btn {
-  background-color: var(--primary-color);
+  background-color: rgba(79, 182, 255, 0.12);
   background-image: none;
-  color: white;
-  border: none;
+  color: var(--primary-color);
+  border: 1px solid rgba(79, 182, 255, 0.35);
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
@@ -309,7 +349,7 @@ main .page-title {
   height: 44px;
   box-sizing: border-box;
   white-space: nowrap;
-  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -325,9 +365,10 @@ main .page-title {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background-color: #3d8eff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(88, 166, 255, 0.3);
+  background-color: rgba(255, 138, 42, 0.14);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+  box-shadow: none;
 }
 
 .pagination-btn:disabled {
@@ -361,16 +402,16 @@ main .page-title {
 }
 
 .page-number {
-  background: var(--card-bg);
+  background: rgba(13, 16, 19, 0.86);
   color: var(--text-color);
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   min-width: 44px;
   max-width: 44px;
   width: 44px;
   min-height: 44px;
   max-height: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
@@ -392,15 +433,14 @@ main .page-title {
 }
 
 .page-number.active {
-  background: var(--primary-color);
-  color: white;
+  background: rgba(79, 182, 255, 0.16);
+  color: var(--text-color);
   border-color: var(--primary-color);
 }
 
 @media (max-width: 900px) {
   .albums-container {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    gap: 8px;
   }
   
   .pagination-controls {
@@ -433,6 +473,16 @@ main .page-title {
 }
 
 @media (max-width: 600px) {
+  main {
+    padding: 12px 10px 20px;
+  }
+
+  .archive-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .pagination-controls {
     flex-direction: column;
     gap: 10px;

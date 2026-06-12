@@ -77,17 +77,18 @@ const changePage = (page) => {
 <style scoped>
 .main-navbar {
   width: 100%;
-  background: var(--card-bg);
-  border-radius: 0 0 32px 32px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  background: rgba(5, 6, 7, 0.92);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: inset 0 -1px 0 rgba(231, 236, 239, 0.04);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 40px;
-  margin-bottom: 18px;
+  padding: 12px 40px;
+  margin-bottom: 14px;
   flex-wrap: nowrap;
   min-width: 0;
   overflow-x: auto;
+  backdrop-filter: blur(10px);
 }
 
 .navbar-left {
@@ -99,9 +100,9 @@ const changePage = (page) => {
 
 .navbar-right {
   display: flex;
-  flex-direction: column;
+  flex-direction: row-reverse;
   align-items: center;
-  gap: 6px;
+  gap: 14px;
   flex-shrink: 0;
 }
 
@@ -123,12 +124,12 @@ const changePage = (page) => {
 
 .nav-locale {
   appearance: auto;
-  background: var(--card-bg);
+  background: #090c10;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 2px;
   color: var(--text-color);
   font-size: 0.72rem;
-  padding: 3px 6px;
+  padding: 5px 8px;
   cursor: pointer;
   max-width: 118px;
   line-height: 1.3;
@@ -141,33 +142,45 @@ const changePage = (page) => {
 
 .nav-tabs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .nav-tab {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 12px;
+  padding: 9px 16px;
+  background: rgba(13, 16, 19, 0.78);
+  border: 1px solid rgba(111, 122, 132, 0.28);
+  border-radius: 2px;
   color: var(--text-secondary);
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.86rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  position: relative;
 }
 
 .nav-tab:hover {
   color: var(--text-color);
-  background: rgba(88, 166, 255, 0.1);
+  background: rgba(45, 212, 191, 0.08);
+  border-color: rgba(45, 212, 191, 0.45);
 }
 
 .nav-tab.active {
-  color: var(--primary-color);
-  background: rgba(88, 166, 255, 0.15);
+  color: var(--text-color);
+  background: rgba(79, 182, 255, 0.12);
   border-color: var(--primary-color);
+}
+
+.nav-tab.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--accent-orange);
 }
 
 .nav-tab i {
@@ -175,10 +188,11 @@ const changePage = (page) => {
 }
 
 .logo-img {
-  height: 40px;
+  height: 34px;
   width: auto;
   object-fit: contain;
   display: block;
+  filter: grayscale(0.2) contrast(1.1);
 }
 
 @media (max-width: 900px) {
@@ -204,7 +218,6 @@ const changePage = (page) => {
 @media (max-width: 600px) {
   .main-navbar {
     padding: 10px 10px;
-    border-radius: 0 0 20px 20px;
   }
   
   .nav-tab {

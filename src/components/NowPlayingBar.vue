@@ -1,5 +1,6 @@
 <template>
   <div class="now-playing-bar" ref="barRef">
+    <span class="signal-label">CURRENT SIGNAL</span>
     <div id="audio-visualizer" :class="{ paused: !playerState.isPlaying }">
       <div 
         v-for="(bar, index) in visualizerBars" 
@@ -183,21 +184,34 @@ onUnmounted(() => {
 .now-playing-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: var(--card-bg);
-  border-radius: 8px;
-  padding: 10px 15px;
+  gap: 10px;
+  background: rgba(13, 16, 19, 0.9);
+  border: 1px solid rgba(111, 122, 132, 0.35);
+  border-radius: 2px;
+  padding: 7px 10px;
   width: 100%;
-  max-width: 600px;
+  max-width: 720px;
   position: relative;
+  min-height: 44px;
+}
+
+.signal-label {
+  flex-shrink: 0;
+  color: var(--accent-orange);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border-right: 1px solid rgba(111, 122, 132, 0.35);
+  padding-right: 10px;
 }
 
 .now-playing-marquee-container {
   flex: 1;
   overflow: hidden;
   white-space: nowrap;
-  color: var(--primary-color);
-  font-weight: 500;
+  color: var(--text-color);
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 .now-playing-marquee-container.clickable {
@@ -219,10 +233,10 @@ onUnmounted(() => {
 }
 
 .now-playing-dropdown {
-  background: var(--primary-color);
-  color: #222;
-  border: none;
-  border-radius: 50%;
+  background: rgba(79, 182, 255, 0.12);
+  color: var(--primary-color);
+  border: 1px solid rgba(79, 182, 255, 0.4);
+  border-radius: 2px;
   width: 32px;
   height: 32px;
   display: flex;
@@ -235,8 +249,9 @@ onUnmounted(() => {
 }
 
 .now-playing-dropdown:hover {
-  background: #3d8eff;
-  color: #fff;
+  background: rgba(255, 138, 42, 0.16);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
 }
 
 .now-playing-dropdown-list {
@@ -249,10 +264,10 @@ onUnmounted(() => {
   transition: opacity 0.2s ease, visibility 0.2s ease;
   max-height: 60vh;
   overflow-y: auto;
-  background: var(--card-bg);
+  background: #090c10;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
   z-index: 2000;
   padding: 6px 0;
 }
@@ -275,8 +290,8 @@ onUnmounted(() => {
 
 .dropdown-song-item:hover,
 .dropdown-song-item.active {
-  background: var(--primary-color);
-  color: #fff;
+  background: rgba(79, 182, 255, 0.14);
+  color: var(--text-color);
 }
 
 #audio-visualizer {
@@ -289,10 +304,10 @@ onUnmounted(() => {
 }
 
 .audio-bar {
-  width: 5px;
+  width: 3px;
   height: 100%;
-  background: var(--primary-color);
-  border-radius: 3px;
+  background: var(--accent-cyan);
+  border-radius: 0;
   transition: height 0.15s cubic-bezier(.4,2,.6,1), background 0.2s;
   opacity: 0.85;
 }
@@ -312,6 +327,9 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
+  .signal-label {
+    display: none;
+  }
   #now-playing-title {
     max-width: 90px;
     font-size: 0.95rem;

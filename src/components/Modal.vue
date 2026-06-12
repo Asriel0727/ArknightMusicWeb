@@ -91,13 +91,13 @@ watch(() => playerState.currentSong, (newSong) => {
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   z-index: 1000;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
-  backdrop-filter: blur(5px);
+  transition: opacity 0.22s ease;
+  backdrop-filter: none;
 }
 
 .modal.show {
@@ -106,16 +106,24 @@ watch(() => playerState.currentSong, (newSong) => {
 }
 
 .modal-content {
-  background: var(--card-bg);
-  border-radius: 10px;
+  background: rgba(9, 12, 16, 0.98);
+  border-left: 1px solid rgba(111, 122, 132, 0.45);
+  border-radius: 0;
   padding: 25px;
-  width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
+  width: min(960px, 92vw);
+  max-width: none;
+  height: 100vh;
+  max-height: none;
   color: var(--text-color);
   position: relative;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, 0.55);
   overflow-y: auto;
+  transform: translateX(18px);
+  transition: transform 0.22s ease;
+}
+
+.modal.show .modal-content {
+  transform: translateX(0);
 }
 
 .modal-close {
@@ -133,18 +141,20 @@ watch(() => playerState.currentSong, (newSong) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border: 1px solid rgba(111, 122, 132, 0.35);
+  border-radius: 2px;
 }
 
 .modal-close:hover {
-  color: var(--primary-color);
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent-orange);
+  background: rgba(255, 138, 42, 0.12);
+  border-color: var(--accent-orange);
 }
 
 @media (max-width: 480px) {
   .modal-content {
     padding: 15px;
-    width: 95%;
+    width: 100%;
   }
 }
 </style>

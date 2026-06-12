@@ -36,12 +36,13 @@ const handleSearch = () => {
 }
 
 .search-topbar {
-  background: var(--card-bg);
-  border-radius: 8px;
-  padding: 7px;
-  box-shadow: 0 2px 8px rgba(88,166,255,0.08);
-  width: 250px;
-  height: 50px;
+  background: rgba(13, 16, 19, 0.88);
+  border: 1px solid rgba(111, 122, 132, 0.35);
+  border-radius: 2px;
+  padding: 6px;
+  box-shadow: none;
+  width: 300px;
+  height: 44px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -54,7 +55,7 @@ const handleSearch = () => {
   border: none;
   border-radius: 0;
   color: var(--text-color);
-  font-size: 1rem;
+  font-size: 0.9rem;
   padding: 0 12px;
   box-shadow: none;
   min-width: 0;
@@ -62,13 +63,13 @@ const handleSearch = () => {
 
 .search-topbar input:focus {
   outline: none;
-  background: rgba(88,166,255,0.07);
+  background: rgba(45, 212, 191, 0.06);
 }
 
 .search-topbar button {
-  background-color: var(--primary-color);
-  color: #222;
-  border-radius: 50%;
+  background-color: rgba(79, 182, 255, 0.14);
+  color: var(--primary-color);
+  border-radius: 2px;
   min-width: 36px;
   max-width: 36px;
   width: 36px;
@@ -80,7 +81,7 @@ const handleSearch = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid rgba(79, 182, 255, 0.35);
   padding: 0;
   box-sizing: border-box;
   transition: background-color 0.2s, color 0.2s;
@@ -92,8 +93,9 @@ const handleSearch = () => {
 }
 
 .search-topbar button:hover {
-  background-color: #3d8eff;
-  color: #fff;
+  background-color: rgba(255, 138, 42, 0.16);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
 }
 
 @media (max-width: 900px) {
