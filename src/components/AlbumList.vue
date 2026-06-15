@@ -77,6 +77,7 @@ let lastWheelPageAt = 0;
 
 const WHEEL_PAGE_THRESHOLD = 90;
 const WHEEL_PAGE_COOLDOWN_MS = 520;
+const SCROLL_EDGE_THRESHOLD = 24;
 
 // 響應式計算每頁顯示的專輯數量
 const albumsPerPage = computed(() => {
@@ -177,9 +178,36 @@ const goToPage = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+const getScrollEdges = () => {
+  const root = document.documentElement;
+  const scrollTop = window.scrollY || root.scrollTop || 0;
+  const viewportHeight = window.innerHeight || root.clientHeight || 0;
+  const scrollHeight = root.scrollHeight || 0;
+
+  return {
+    isNearTop: scrollTop <= SCROLL_EDGE_THRESHOLD,
+    isNearBottom: scrollTop + viewportHeight >= scrollHeight - SCROLL_EDGE_THRESHOLD,
+  };
+};
+
 const handleWheelPageTurn = (event) => {
   if (modalState.isOpen || totalPages.value <= 1) return;
   if (event.ctrlKey || event.shiftKey || Math.abs(event.deltaY) < 1) return;
+
+  const direction = event.deltaY > 0 ? 1 : -1;
+  const { isNearTop, isNearBottom } = getScrollEdges();
+  const canTurnPage = direction > 0 ? isNearBottom : isNearTop;
+
+  if (!canTurnPage) {
+    wheelDeltaAccumulator = 0;
+    return;
+  }
+
+  const nextPage = albumState.currentPage + direction;
+  if (nextPage < 1 || nextPage > totalPages.value) {
+    wheelDeltaAccumulator = 0;
+    return;
+  }
 
   const now = Date.now();
 
@@ -195,13 +223,7 @@ const handleWheelPageTurn = (event) => {
     return;
   }
 
-  const direction = wheelDeltaAccumulator > 0 ? 1 : -1;
-  const nextPage = albumState.currentPage + direction;
   wheelDeltaAccumulator = 0;
-
-  if (nextPage < 1 || nextPage > totalPages.value) {
-    return;
-  }
 
   lastWheelPageAt = now;
   goToPage(nextPage);
