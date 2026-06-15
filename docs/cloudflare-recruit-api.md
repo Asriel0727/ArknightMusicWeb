@@ -87,6 +87,8 @@ Authorization: <SYNC_TOKEN>
 - Operator detail JSON is stored in KV under `recruit:operator:v2:{charId}`.
 - Music API JSON can be mirrored into Supabase table `music_cache`.
 - Music cache keys use the prefix `music:api:v1:`.
+- Music song details are prewarmed in batches into `music:api:v1:song:{songId}`.
+- Song detail prewarm progress is stored in `music:api:v1:prewarm:song-detail-cursor`.
 - All 418 operator detail entries were prewarmed into remote KV during setup.
 - Image URLs returned by the API go through `/api/recruit/image`.
 - The image proxy only allows `https://raw.githubusercontent.com/...` image URLs.
@@ -124,6 +126,17 @@ Invoke-RestMethod `
   -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/sync-music" `
   -Headers @{ Authorization = "ark-sync-2026" }
 ```
+
+Manual music sync with a larger song detail prewarm batch:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/sync-music?songDetailLimit=10" `
+  -Headers @{ Authorization = "ark-sync-2026" }
+```
+
+Use `songDetailLimit=0` to refresh only the album/song lists without prewarming song details.
+The Worker caps this value at 10 to avoid request timeouts. The cron sync prewarms 10 song details automatically every run.
 
 The frontend can opt into the Worker-backed music mirror with:
 

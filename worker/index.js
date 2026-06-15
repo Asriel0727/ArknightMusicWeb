@@ -9,7 +9,10 @@ const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.work
 const RECRUIT_OPERATORS_KEY = 'recruit:operators:v2';
 const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v2:';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
+const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
+const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
+const MAX_SONG_DETAIL_PREWARM_LIMIT = 10;
 
 export default {
   async fetch(request, env, ctx) {
@@ -44,7 +47,10 @@ export default {
         return unauthorized;
       }
 
-      const result = await syncMusicCache(env);
+      const detailLimit = parseMusicPrewarmLimit(url.searchParams.get('songDetailLimit'));
+      const result = await syncMusicCache(env, {
+        songDetailLimit: detailLimit,
+      });
       return json({
         ok: true,
         ...result,
@@ -132,7 +138,9 @@ export default {
     await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
     if (hasSupabaseConfig(env)) {
       ctx.waitUntil(
-        syncMusicCache(env).catch((error) => {
+        syncMusicCache(env, {
+          songDetailLimit: 10,
+        }).catch((error) => {
           console.warn('Music cache sync failed:', error.message);
         })
       );
@@ -167,6 +175,22 @@ function getSupabaseUrl(env) {
 
 function hasSupabaseConfig(env) {
   return Boolean(getSupabaseUrl(env) && env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function parseMusicPrewarmLimit(rawLimit) {
+  if (rawLimit == null || rawLimit === '') {
+    return DEFAULT_SONG_DETAIL_PREWARM_LIMIT;
+  }
+
+  const limit = Number(rawLimit);
+  if (!Number.isFinite(limit)) {
+    return DEFAULT_SONG_DETAIL_PREWARM_LIMIT;
+  }
+
+  return Math.min(
+    MAX_SONG_DETAIL_PREWARM_LIMIT,
+    Math.max(0, Math.floor(limit))
+  );
 }
 
 function supabaseHeaders(env, extraHeaders = {}) {
@@ -324,7 +348,7 @@ async function handleMusicApiRequest(request, env, url) {
   return null;
 }
 
-async function syncMusicCache(env) {
+async function syncMusicCache(env, options = {}) {
   if (!hasSupabaseConfig(env)) {
     return {
       synced: [],
@@ -334,6 +358,8 @@ async function syncMusicCache(env) {
   }
 
   const synced = [];
+  const songDetailLimit =
+    options.songDetailLimit ?? DEFAULT_SONG_DETAIL_PREWARM_LIMIT;
   const albums = await fetchMusicJson('/api/albums');
   await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
   synced.push({
@@ -348,10 +374,118 @@ async function syncMusicCache(env) {
     count: Array.isArray(songs.data?.data?.list) ? songs.data.data.list.length : null,
   });
 
+  const songDetails = await prewarmMusicSongDetails(env, songs.data, {
+    limit: songDetailLimit,
+  });
+  synced.push({
+    key: `${MUSIC_CACHE_PREFIX}song:{songId}`,
+    ...songDetails,
+  });
+
   return {
     synced,
     supabaseConfigured: true,
   };
+}
+
+async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
+  const songs = Array.isArray(songsPayload?.data?.list)
+    ? songsPayload.data.list
+    : [];
+  const limit = Math.max(0, Math.floor(options.limit ?? DEFAULT_SONG_DETAIL_PREWARM_LIMIT));
+
+  if (songs.length === 0 || limit === 0) {
+    return {
+      attempted: 0,
+      stored: 0,
+      errors: 0,
+      total: songs.length,
+      nextIndex: 0,
+      done: songs.length === 0,
+    };
+  }
+
+  const cursorRow = await readSupabaseCache(env, MUSIC_SONG_DETAIL_CURSOR_KEY);
+  const startIndex = normalizeCursorIndex(cursorRow?.data?.nextIndex, songs.length);
+  const candidates = buildCircularBatch(songs, startIndex, limit);
+  let stored = 0;
+  let errors = 0;
+
+  for (const item of candidates) {
+    const songId = item.song?.cid;
+    if (!songId) {
+      continue;
+    }
+
+    try {
+      const detail = await fetchMusicJson(`/api/song/${encodeURIComponent(songId)}`);
+      await writeSupabaseCache(
+        env,
+        `${MUSIC_CACHE_PREFIX}song:${songId}`,
+        detail.data,
+        detail.sourceUrl
+      );
+      stored += 1;
+    } catch (error) {
+      errors += 1;
+      console.warn('Music song detail prewarm failed:', songId, error.message);
+    }
+  }
+
+  const nextIndex = songs.length === 0
+    ? 0
+    : (startIndex + candidates.length) % songs.length;
+  await writeSupabaseCache(
+    env,
+    MUSIC_SONG_DETAIL_CURSOR_KEY,
+    {
+      nextIndex,
+      total: songs.length,
+      lastBatchSize: candidates.length,
+      lastStored: stored,
+      lastErrors: errors,
+      updatedAt: new Date().toISOString(),
+    },
+    'worker:sync-music'
+  );
+
+  return {
+    attempted: candidates.length,
+    stored,
+    errors,
+    total: songs.length,
+    startIndex,
+    nextIndex,
+    done: candidates.length >= songs.length || nextIndex === 0,
+  };
+}
+
+function normalizeCursorIndex(rawIndex, total) {
+  if (total <= 0) {
+    return 0;
+  }
+
+  const index = Number(rawIndex);
+  if (!Number.isFinite(index)) {
+    return 0;
+  }
+
+  return Math.min(total - 1, Math.max(0, Math.floor(index)));
+}
+
+function buildCircularBatch(items, startIndex, limit) {
+  const cappedLimit = Math.min(items.length, Math.max(0, limit));
+  const batch = [];
+
+  for (let offset = 0; offset < cappedLimit; offset += 1) {
+    const index = (startIndex + offset) % items.length;
+    batch.push({
+      index,
+      song: items[index],
+    });
+  }
+
+  return batch;
 }
 
 async function buildRecruitOperators(publicApiBase) {

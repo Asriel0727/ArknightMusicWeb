@@ -32,11 +32,18 @@
       :class="{ show: dropdownState.isOpen }"
       ref="dropdownRef"
     >
+      <div v-if="dropdownState.isLoading && dropdownState.allSongs.length === 0" class="dropdown-song-item muted">
+        Loading signal index...
+      </div>
+      <div v-else-if="dropdownState.loadError" class="dropdown-song-item muted">
+        {{ dropdownState.loadError }}
+      </div>
       <div 
         v-for="(song, idx) in dropdownState.allSongs" 
         :key="song.cid"
         class="dropdown-song-item"
         :class="{ active: idx === playerState.currentSongIndex && isCurrentSong(song) }"
+        @pointerenter="preloadSong(song)"
         @click="handleSongClick(song)"
       >
         <span>{{ song.name }}</span>
@@ -50,7 +57,7 @@
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { playerState, dropdownState, modalState } from '../stores/player.js';
-import { playSongFromMasterList } from '../stores/player.js';
+import { playSongFromMasterList, prefetchSongFromMasterList } from '../stores/player.js';
 
 const { t } = useI18n();
 
@@ -66,12 +73,27 @@ const visualizerBars = ref([
   { height: 50 }
 ]);
 
+const SONG_DROPDOWN_CACHE_KEY = 'arknights:now-playing:songs:v1';
+const SONG_DROPDOWN_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
+
+let songLoadPromise = null;
+
 const currentTitle = computed(() => {
   return playerState.currentSong?.name || t('common.noNowPlaying');
 });
 
 const isCurrentSong = (song) => {
   return playerState.currentSong?.cid === song.cid;
+};
+
+const preloadSong = (song) => {
+  prefetchSongFromMasterList(song);
+};
+
+const preloadInitialSongs = (songs) => {
+  songs.slice(0, 6).forEach((song, index) => {
+    window.setTimeout(() => preloadSong(song), 180 * index);
+  });
 };
 
 // 更新跑馬燈效果
@@ -113,10 +135,11 @@ const toggleDropdown = async () => {
   if (dropdownState.isOpen) {
     dropdownState.isOpen = false;
   } else {
-    if (!dropdownState.isLoaded) {
-      await loadAllSongs();
-    }
+    restoreCachedSongs();
     dropdownState.isOpen = true;
+    if (!dropdownState.isLoaded) {
+      loadSongDropdown().catch(() => {});
+    }
   }
 };
 
@@ -139,6 +162,89 @@ const loadAllSongs = async () => {
 };
 
 // 處理歌曲點擊
+const normalizeSongsForDropdown = (songs) => {
+  return songs.map(song => ({
+    cid: song.cid,
+    name: song.name,
+    artistes: song.artists || song.artistes || [t('common.unknownArtist')]
+  }));
+};
+
+const restoreCachedSongs = () => {
+  if (dropdownState.isLoaded || dropdownState.allSongs.length > 0) return false;
+
+  try {
+    const raw = localStorage.getItem(SONG_DROPDOWN_CACHE_KEY);
+    if (!raw) return false;
+
+    const cached = JSON.parse(raw);
+    if (!cached?.songs || Date.now() - cached.cachedAt > SONG_DROPDOWN_CACHE_TTL_MS) {
+      return false;
+    }
+
+    dropdownState.allSongs = cached.songs;
+    dropdownState.isLoaded = true;
+    dropdownState.loadError = '';
+    preloadInitialSongs(cached.songs);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const saveCachedSongs = (songs) => {
+  try {
+    localStorage.setItem(
+      SONG_DROPDOWN_CACHE_KEY,
+      JSON.stringify({
+        cachedAt: Date.now(),
+        songs
+      })
+    );
+  } catch {
+    // Storage quota/private mode should not break playback controls.
+  }
+};
+
+const loadSongDropdown = async ({ force = false } = {}) => {
+  if (!force && dropdownState.isLoaded) return;
+  if (songLoadPromise) return songLoadPromise;
+
+  dropdownState.isLoading = true;
+  dropdownState.loadError = '';
+
+  songLoadPromise = import('../services/api.js')
+    .then(({ fetchSongs }) => fetchSongs())
+    .then((songs) => {
+      const normalizedSongs = normalizeSongsForDropdown(songs);
+      dropdownState.allSongs = normalizedSongs;
+      dropdownState.isLoaded = true;
+      saveCachedSongs(normalizedSongs);
+      preloadInitialSongs(normalizedSongs);
+    })
+    .catch((error) => {
+      dropdownState.loadError = 'Unable to load signal index';
+      console.error('頛????脣?銵冽??粹:', error);
+    })
+    .finally(() => {
+      dropdownState.isLoading = false;
+      songLoadPromise = null;
+    });
+
+  return songLoadPromise;
+};
+
+const warmupSongDropdown = () => {
+  if (restoreCachedSongs()) return;
+
+  const run = () => loadSongDropdown().catch(() => {});
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(run, { timeout: 3000 });
+  } else {
+    window.setTimeout(run, 1200);
+  }
+};
+
 const handleSongClick = (song) => {
   playSongFromMasterList(song);
   dropdownState.isOpen = false;
@@ -168,6 +274,7 @@ watch(currentTitle, () => {
 onMounted(() => {
   updateMarquee();
   animateVisualizer();
+  warmupSongDropdown();
   document.body.addEventListener('click', handleClickOutside);
 });
 
@@ -271,6 +378,16 @@ onUnmounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.dropdown-song-item.muted {
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.dropdown-song-item.muted:hover {
+  background: transparent;
+  color: var(--text-secondary);
 }
 
 .dropdown-song-item:hover,
