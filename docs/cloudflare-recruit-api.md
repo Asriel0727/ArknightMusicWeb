@@ -15,9 +15,12 @@ This file records the current backend state so the project can be resumed from a
 - KV binding: `ARKNIGHTS_DATA`
 - KV namespace id: `1f16c51e50154624856b1feb4f67ea2e`
 - Secret required: `SYNC_TOKEN`
+- Secret required for Supabase music mirror: `SUPABASE_SERVICE_ROLE_KEY`
+- Variable: `SUPABASE_URL=https://rdneemerltoxlfosazcz.supabase.co`
 - Setup token used during local testing: `ark-sync-2026`
 
 Do not commit real production secrets if the token is changed later.
+Never commit the Supabase service role key. Store it only as a Cloudflare Worker secret.
 
 ## Scheduled Sync
 
@@ -51,6 +54,12 @@ Public:
 
 ```txt
 GET /api/health
+GET /api/albums
+GET /api/album/:albumId/detail
+GET /api/songs
+GET /api/song/:songId
+GET /proxy-image?url=...
+GET /proxy-lyrics?url=...
 GET /api/recruit/operators
 GET /api/recruit/operators/:charId
 GET /api/recruit/image?url=...
@@ -60,6 +69,7 @@ Admin:
 
 ```txt
 GET /api/admin/sync
+GET /api/admin/sync-music
 GET /api/admin/prewarm-details?offset=0&limit=40
 ```
 
@@ -75,6 +85,8 @@ Authorization: <SYNC_TOKEN>
 
 - Operator list is stored in KV under `recruit:operators:v2`.
 - Operator detail JSON is stored in KV under `recruit:operator:v2:{charId}`.
+- Music API JSON can be mirrored into Supabase table `music_cache`.
+- Music cache keys use the prefix `music:api:v1:`.
 - All 418 operator detail entries were prewarmed into remote KV during setup.
 - Image URLs returned by the API go through `/api/recruit/image`.
 - The image proxy only allows `https://raw.githubusercontent.com/...` image URLs.
@@ -85,6 +97,41 @@ public, max-age=2592000, immutable
 ```
 
 Images are cached by Cloudflare after first fetch. They are not permanently stored in KV.
+
+## Supabase Music Mirror
+
+Create this table in Supabase SQL editor:
+
+```sql
+create table if not exists public.music_cache (
+  key text primary key,
+  data jsonb not null,
+  source text,
+  updated_at timestamptz not null default now()
+);
+```
+
+Set the Worker secret:
+
+```powershell
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+```
+
+Manual music sync:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/sync-music" `
+  -Headers @{ Authorization = "ark-sync-2026" }
+```
+
+The frontend can opt into the Worker-backed music mirror with:
+
+```env
+VITE_MUSIC_API_ORIGIN=https://arknights-recruit-api.molly27molly.workers.dev
+```
+
+If this env var is not set, the frontend keeps using the original Monster Siren API.
 
 ## Useful Commands
 

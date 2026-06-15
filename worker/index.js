@@ -4,9 +4,12 @@ const EXCEL_BASE =
 const IMAGE_BASE =
   'https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main';
 
+const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const RECRUIT_OPERATORS_KEY = 'recruit:operators:v2';
 const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v2:';
+const MUSIC_CACHE_PREFIX = 'music:api:v1:';
+const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
 
 export default {
   async fetch(request, env, ctx) {
@@ -17,6 +20,34 @@ export default {
       return json({
         ok: true,
         service: 'arknights-recruit-api',
+        supabaseConfigured: hasSupabaseConfig(env),
+        time: new Date().toISOString(),
+      });
+    }
+
+    const musicResponse = await handleMusicApiRequest(request, env, url);
+    if (musicResponse) {
+      return musicResponse;
+    }
+
+    if (url.pathname === '/proxy-image') {
+      return proxyMusicAsset(request, 'image');
+    }
+
+    if (url.pathname === '/proxy-lyrics') {
+      return proxyMusicAsset(request, 'lyrics');
+    }
+
+    if (url.pathname === '/api/admin/sync-music') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) {
+        return unauthorized;
+      }
+
+      const result = await syncMusicCache(env);
+      return json({
+        ok: true,
+        ...result,
         time: new Date().toISOString(),
       });
     }
@@ -99,6 +130,13 @@ export default {
   async scheduled(event, env, ctx) {
     const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
     await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
+    if (hasSupabaseConfig(env)) {
+      ctx.waitUntil(
+        syncMusicCache(env).catch((error) => {
+          console.warn('Music cache sync failed:', error.message);
+        })
+      );
+    }
     console.info({
       message: 'Recruit operators synced by cron',
       count: data.operators.length,
@@ -121,6 +159,199 @@ function requireAdminToken(request, env) {
   }
 
   return null;
+}
+
+function getSupabaseUrl(env) {
+  return (env.SUPABASE_URL || DEFAULT_SUPABASE_URL).replace(/\/$/, '');
+}
+
+function hasSupabaseConfig(env) {
+  return Boolean(getSupabaseUrl(env) && env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function supabaseHeaders(env, extraHeaders = {}) {
+  return {
+    apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+    authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+    ...extraHeaders,
+  };
+}
+
+async function readSupabaseCache(env, key) {
+  if (!hasSupabaseConfig(env)) {
+    return null;
+  }
+
+  const endpoint = `${getSupabaseUrl(env)}/rest/v1/music_cache?key=eq.${encodeURIComponent(
+    key
+  )}&select=key,data,source,updated_at&limit=1`;
+  const response = await fetch(endpoint, {
+    headers: supabaseHeaders(env),
+  });
+
+  if (!response.ok) {
+    console.warn('Supabase cache read failed:', response.status, key);
+    return null;
+  }
+
+  const rows = await response.json();
+  return rows?.[0] || null;
+}
+
+async function writeSupabaseCache(env, key, data, source) {
+  if (!hasSupabaseConfig(env)) {
+    return false;
+  }
+
+  const endpoint = `${getSupabaseUrl(env)}/rest/v1/music_cache`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: supabaseHeaders(env, {
+      'content-type': 'application/json',
+      prefer: 'resolution=merge-duplicates',
+    }),
+    body: JSON.stringify({
+      key,
+      data,
+      source,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    console.warn('Supabase cache write failed:', response.status, key);
+    return false;
+  }
+
+  return true;
+}
+
+async function fetchMusicJson(sourcePath) {
+  const sourceUrl = `${MUSIC_API_ORIGIN}${sourcePath}`;
+  const response = await fetch(sourceUrl, {
+    cf: {
+      cacheTtl: 900,
+      cacheEverything: true,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Music API failed: ${response.status} ${sourceUrl}`);
+  }
+
+  return {
+    data: await response.json(),
+    sourceUrl,
+  };
+}
+
+async function getMusicJson(env, key, sourcePath) {
+  const cached = await readSupabaseCache(env, key);
+  if (cached?.data) {
+    return {
+      data: cached.data,
+      source: 'supabase',
+      updatedAt: cached.updated_at,
+    };
+  }
+
+  const fetched = await fetchMusicJson(sourcePath);
+  await writeSupabaseCache(env, key, fetched.data, fetched.sourceUrl);
+
+  return {
+    data: fetched.data,
+    source: 'origin',
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+async function handleMusicApiRequest(request, env, url) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return null;
+  }
+
+  const routes = [
+    {
+      pattern: /^\/api\/albums$/,
+      cacheKey: `${MUSIC_CACHE_PREFIX}albums`,
+      sourcePath: '/api/albums',
+    },
+    {
+      pattern: /^\/api\/songs$/,
+      cacheKey: `${MUSIC_CACHE_PREFIX}songs`,
+      sourcePath: '/api/songs',
+    },
+  ];
+
+  for (const route of routes) {
+    if (route.pattern.test(url.pathname)) {
+      const result = await getMusicJson(env, route.cacheKey, route.sourcePath);
+      return json(result.data, 200, 900, {
+        'x-data-source': result.source,
+        'x-cache-updated-at': result.updatedAt || '',
+      });
+    }
+  }
+
+  const albumMatch = url.pathname.match(/^\/api\/album\/([^/]+)\/detail$/);
+  if (albumMatch) {
+    const albumId = decodeURIComponent(albumMatch[1]);
+    const result = await getMusicJson(
+      env,
+      `${MUSIC_CACHE_PREFIX}album:${albumId}`,
+      `/api/album/${encodeURIComponent(albumId)}/detail`
+    );
+    return json(result.data, 200, 900, {
+      'x-data-source': result.source,
+      'x-cache-updated-at': result.updatedAt || '',
+    });
+  }
+
+  const songMatch = url.pathname.match(/^\/api\/song\/([^/]+)$/);
+  if (songMatch) {
+    const songId = decodeURIComponent(songMatch[1]);
+    const result = await getMusicJson(
+      env,
+      `${MUSIC_CACHE_PREFIX}song:${songId}`,
+      `/api/song/${encodeURIComponent(songId)}`
+    );
+    return json(result.data, 200, 900, {
+      'x-data-source': result.source,
+      'x-cache-updated-at': result.updatedAt || '',
+    });
+  }
+
+  return null;
+}
+
+async function syncMusicCache(env) {
+  if (!hasSupabaseConfig(env)) {
+    return {
+      synced: [],
+      supabaseConfigured: false,
+      warning: 'SUPABASE_SERVICE_ROLE_KEY is not configured.',
+    };
+  }
+
+  const synced = [];
+  const albums = await fetchMusicJson('/api/albums');
+  await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
+  synced.push({
+    key: `${MUSIC_CACHE_PREFIX}albums`,
+    count: Array.isArray(albums.data?.data) ? albums.data.data.length : null,
+  });
+
+  const songs = await fetchMusicJson('/api/songs');
+  await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}songs`, songs.data, songs.sourceUrl);
+  synced.push({
+    key: `${MUSIC_CACHE_PREFIX}songs`,
+    count: Array.isArray(songs.data?.data?.list) ? songs.data.data.list.length : null,
+  });
+
+  return {
+    synced,
+    supabaseConfigured: true,
+  };
 }
 
 async function buildRecruitOperators(publicApiBase) {
@@ -510,6 +741,82 @@ async function proxyRecruitImage(request) {
   return request.method === 'HEAD' ? new Response(null, response) : response;
 }
 
+function isAllowedMusicAssetUrl(rawUrl, type) {
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol !== 'https:') {
+      return false;
+    }
+
+    if (type === 'image') {
+      return /\.(png|jpg|jpeg|webp)$/i.test(url.pathname);
+    }
+
+    if (type === 'lyrics') {
+      return /\.(lrc|txt)$/i.test(url.pathname);
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+async function proxyMusicAsset(request, type) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new Response('Method not allowed', {
+      status: 405,
+      headers: {
+        allow: 'GET, HEAD',
+        'access-control-allow-origin': '*',
+      },
+    });
+  }
+
+  const requestUrl = new URL(request.url);
+  const rawUrl = requestUrl.searchParams.get('url') || '';
+
+  if (!isAllowedMusicAssetUrl(rawUrl, type)) {
+    return json({ ok: false, error: 'Invalid asset url' }, 400);
+  }
+
+  const cache = caches.default;
+  const cacheKey = new Request(request.url, { method: 'GET' });
+  const cached = await cache.match(cacheKey);
+  if (cached) {
+    return request.method === 'HEAD' ? new Response(null, cached) : cached;
+  }
+
+  const cacheTtl = type === 'image' ? 60 * 60 * 24 * 30 : 60 * 60 * 6;
+  const upstream = await fetch(rawUrl, {
+    cf: {
+      cacheTtl,
+      cacheEverything: true,
+    },
+  });
+
+  if (!upstream.ok) {
+    return new Response('Asset not found', {
+      status: upstream.status,
+      headers: {
+        'access-control-allow-origin': '*',
+        'cache-control': 'public, max-age=300',
+      },
+    });
+  }
+
+  const response = new Response(upstream.body, upstream);
+  response.headers.set('access-control-allow-origin', '*');
+  response.headers.set(
+    'cache-control',
+    type === 'image' ? 'public, max-age=2592000, immutable' : 'public, max-age=21600'
+  );
+  response.headers.delete('set-cookie');
+
+  await cache.put(cacheKey, response.clone());
+  return request.method === 'HEAD' ? new Response(null, response) : response;
+}
+
 function cleanText(text) {
   return String(text || '')
     .replace(/\\n/g, '\n')
@@ -541,13 +848,14 @@ function resolveFactionId(char) {
   return char.teamId || char.groupId || char.nationId || 'rhodes';
 }
 
-function json(data, status = 200, cacheSeconds = 0) {
+function json(data, status = 200, cacheSeconds = 0, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'access-control-allow-origin': '*',
       'cache-control': cacheSeconds ? `public, max-age=${cacheSeconds}` : 'no-store',
+      ...extraHeaders,
     },
   });
 }

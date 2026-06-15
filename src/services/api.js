@@ -20,7 +20,10 @@ import {
   RECRUIT_FACTION_LOGO_OPTIONS,
 } from '../utils/recruitCard.js';
 
-const API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
+const DEFAULT_MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
+const API_ORIGIN = (
+  import.meta.env.VITE_MUSIC_API_ORIGIN || DEFAULT_MUSIC_API_ORIGIN
+).replace(/\/$/, '');
 /** 專輯／歌曲等 JSON API（Express 掛在 /api） */
 const API_BASE = `${API_ORIGIN}/api`;
 const DEFAULT_RECRUIT_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
