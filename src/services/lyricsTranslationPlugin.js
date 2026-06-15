@@ -210,3 +210,40 @@ export async function translateLyricLines(lines, locale) {
 
   return result;
 }
+
+export async function translateTextBlock(text, locale) {
+  const trimmedText = String(text || '').trim();
+  if (!trimmedText) {
+    return '';
+  }
+
+  const targetLocale = normalizeTargetLocale(locale);
+  const pseudoLines = [{ text: trimmedText }];
+
+  if (shouldSkipTranslation(pseudoLines, targetLocale)) {
+    return trimmedText;
+  }
+
+  const cached = readCachedTranslation(trimmedText, targetLocale);
+  if (cached != null) {
+    return cached;
+  }
+
+  const params = new URLSearchParams({
+    client: 'gtx',
+    sl: 'auto',
+    tl: targetLocale,
+    dt: 't',
+    q: trimmedText,
+  });
+
+  const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`Translate request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const translation = readGoogleTranslateResponse(data);
+  writeCachedTranslation(trimmedText, targetLocale, translation);
+  return translation;
+}

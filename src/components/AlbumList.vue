@@ -1,5 +1,5 @@
 <template>
-  <main class="album-list-main" :key="locale">
+  <main class="album-list-main" :key="locale" @wheel="handleWheelPageTurn">
     <h1 class="page-title">{{ t('album.pageTitle') }}</h1>
     <div v-if="albumState.isLoading && !albumState.isInitialFetchDone" class="loading-spinner">
       <div class="spinner"></div>
@@ -66,12 +66,17 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AlbumCard from './AlbumCard.vue';
-import { albumState, searchState } from '../stores/player.js';
+import { albumState, modalState, searchState } from '../stores/player.js';
 import { fetchAlbums } from '../services/api.js';
 
 const { t, locale } = useI18n();
 const containerRef = ref(null);
 const windowWidth = ref(window.innerWidth);
+let wheelDeltaAccumulator = 0;
+let lastWheelPageAt = 0;
+
+const WHEEL_PAGE_THRESHOLD = 90;
+const WHEEL_PAGE_COOLDOWN_MS = 520;
 
 // 響應式計算每頁顯示的專輯數量
 const albumsPerPage = computed(() => {
@@ -170,6 +175,36 @@ const goToPage = (page) => {
   albumState.currentPage = page;
   // 滾動到頂部
   window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const handleWheelPageTurn = (event) => {
+  if (modalState.isOpen || totalPages.value <= 1) return;
+  if (event.ctrlKey || event.shiftKey || Math.abs(event.deltaY) < 1) return;
+
+  const now = Date.now();
+
+  event.preventDefault();
+
+  if (now - lastWheelPageAt < WHEEL_PAGE_COOLDOWN_MS) {
+    return;
+  }
+
+  wheelDeltaAccumulator += event.deltaY;
+
+  if (Math.abs(wheelDeltaAccumulator) < WHEEL_PAGE_THRESHOLD) {
+    return;
+  }
+
+  const direction = wheelDeltaAccumulator > 0 ? 1 : -1;
+  const nextPage = albumState.currentPage + direction;
+  wheelDeltaAccumulator = 0;
+
+  if (nextPage < 1 || nextPage > totalPages.value) {
+    return;
+  }
+
+  lastWheelPageAt = now;
+  goToPage(nextPage);
 };
 
 const emit = defineEmits(['view-album']);

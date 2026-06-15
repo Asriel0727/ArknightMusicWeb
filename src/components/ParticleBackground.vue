@@ -430,8 +430,7 @@ onUnmounted(() => {
   width: 200px;
   height: 200px;
   z-index: 1;
-  pointer-events: auto;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 .mouse-canvas {
