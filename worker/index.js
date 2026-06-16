@@ -13,6 +13,7 @@ const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-c
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
 const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
 const MAX_SONG_DETAIL_PREWARM_LIMIT = 10;
+const MUSIC_SONG_DETAIL_MAX_AGE_MS = 10 * 60 * 1000;
 
 export default {
   async fetch(request, env, ctx) {
@@ -39,6 +40,10 @@ export default {
 
     if (url.pathname === '/proxy-lyrics') {
       return proxyMusicAsset(request, 'lyrics');
+    }
+
+    if (url.pathname === '/proxy-audio') {
+      return proxyMusicAsset(request, 'audio');
     }
 
     if (url.pathname === '/api/admin/sync-music') {
@@ -289,6 +294,39 @@ async function getMusicJson(env, key, sourcePath) {
   };
 }
 
+async function getMusicSongJson(env, key, sourcePath) {
+  const cached = await readSupabaseCache(env, key);
+  if (cached?.data && isFreshSupabaseRow(cached, MUSIC_SONG_DETAIL_MAX_AGE_MS)) {
+    return {
+      data: cached.data,
+      source: 'supabase',
+      updatedAt: cached.updated_at,
+    };
+  }
+
+  const fetched = await fetchMusicJson(sourcePath);
+  await writeSupabaseCache(env, key, fetched.data, fetched.sourceUrl);
+
+  return {
+    data: fetched.data,
+    source: cached?.data ? 'origin-refresh' : 'origin',
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function isFreshSupabaseRow(row, maxAgeMs) {
+  if (!row?.updated_at) {
+    return false;
+  }
+
+  const updatedAt = Date.parse(row.updated_at);
+  if (!Number.isFinite(updatedAt)) {
+    return false;
+  }
+
+  return Date.now() - updatedAt <= maxAgeMs;
+}
+
 async function handleMusicApiRequest(request, env, url) {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return null;
@@ -334,7 +372,7 @@ async function handleMusicApiRequest(request, env, url) {
   const songMatch = url.pathname.match(/^\/api\/song\/([^/]+)$/);
   if (songMatch) {
     const songId = decodeURIComponent(songMatch[1]);
-    const result = await getMusicJson(
+    const result = await getMusicSongJson(
       env,
       `${MUSIC_CACHE_PREFIX}song:${songId}`,
       `/api/song/${encodeURIComponent(songId)}`
@@ -890,6 +928,11 @@ function isAllowedMusicAssetUrl(rawUrl, type) {
       return /\.(lrc|txt)$/i.test(url.pathname);
     }
 
+    if (type === 'audio') {
+      return /^res\d*\.hycdn\.cn$/i.test(url.hostname) &&
+        /\.(mp3|wav|flac|m4a|ogg)$/i.test(url.pathname);
+    }
+
     return false;
   } catch {
     return false;
@@ -916,13 +959,21 @@ async function proxyMusicAsset(request, type) {
 
   const cache = caches.default;
   const cacheKey = new Request(request.url, { method: 'GET' });
-  const cached = await cache.match(cacheKey);
+  const shouldUseManualCache = type !== 'audio' && !request.headers.get('range');
+  const cached = shouldUseManualCache ? await cache.match(cacheKey) : null;
   if (cached) {
     return request.method === 'HEAD' ? new Response(null, cached) : cached;
   }
 
   const cacheTtl = type === 'image' ? 60 * 60 * 24 * 30 : 60 * 60 * 6;
+  const upstreamHeaders = new Headers();
+  const range = request.headers.get('range');
+  if (range) {
+    upstreamHeaders.set('range', range);
+  }
+
   const upstream = await fetch(rawUrl, {
+    headers: upstreamHeaders,
     cf: {
       cacheTtl,
       cacheEverything: true,
@@ -941,13 +992,17 @@ async function proxyMusicAsset(request, type) {
 
   const response = new Response(upstream.body, upstream);
   response.headers.set('access-control-allow-origin', '*');
+  response.headers.set('accept-ranges', response.headers.get('accept-ranges') || 'bytes');
   response.headers.set(
     'cache-control',
     type === 'image' ? 'public, max-age=2592000, immutable' : 'public, max-age=21600'
   );
   response.headers.delete('set-cookie');
 
-  await cache.put(cacheKey, response.clone());
+  if (shouldUseManualCache) {
+    await cache.put(cacheKey, response.clone());
+  }
+
   return request.method === 'HEAD' ? new Response(null, response) : response;
 }
 

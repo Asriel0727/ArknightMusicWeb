@@ -185,6 +185,11 @@ export function getProxyImageUrl(imageUrl) {
   return `${API_ORIGIN}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
 }
 
+export function getProxyAudioUrl(audioUrl) {
+  if (!audioUrl) return '';
+  return `${API_ORIGIN}/proxy-audio?url=${encodeURIComponent(audioUrl)}`;
+}
+
 // ========== 明日方舟角色相關 API ==========
 
 /** 角色頭像／立繪／道具圖等主要圖床（較完整，優先使用） */

@@ -132,7 +132,7 @@ export function initAudioPlayer(audioElement) {
 // 播放歌曲（音訊優先：不等待歌詞；已有 sourceUrl 時不重複請求詳情）
 export async function playSong(song, coverUrl, coverDeUrl) {
   try {
-    const { fetchSongDetails, fetchLyrics } = await loadApiModule();
+    const { fetchSongDetails, fetchLyrics, getProxyAudioUrl } = await loadApiModule();
     let songDetails = song;
     if (!song.sourceUrl) {
       songDetails = await fetchSongDetails(song.cid);
@@ -143,7 +143,7 @@ export async function playSong(song, coverUrl, coverDeUrl) {
       artistes: song.artistes || songDetails.artistes || [unknownArtistLabel()],
       coverUrl: coverUrl || song.coverUrl || songDetails.coverUrl,
       coverDeUrl: coverDeUrl || song.coverDeUrl || songDetails.coverDeUrl,
-      audioUrl: songDetails.sourceUrl || '',
+      audioUrl: getProxyAudioUrl(songDetails.sourceUrl || ''),
       albumCid: song.albumCid || songDetails.albumCid
     };
 
