@@ -10,9 +10,12 @@ const RECRUIT_OPERATORS_KEY = 'recruit:operators:v2';
 const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v2:';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
+const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
 const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
 const MAX_SONG_DETAIL_PREWARM_LIMIT = 10;
+const DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT = 5;
+const MAX_ALBUM_DETAIL_PREWARM_LIMIT = 5;
 const MUSIC_SONG_DETAIL_MAX_AGE_MS = 10 * 60 * 1000;
 
 export default {
@@ -53,8 +56,10 @@ export default {
       }
 
       const detailLimit = parseMusicPrewarmLimit(url.searchParams.get('songDetailLimit'));
+      const albumDetailLimit = parseAlbumPrewarmLimit(url.searchParams.get('albumDetailLimit'));
       const result = await syncMusicCache(env, {
         songDetailLimit: detailLimit,
+        albumDetailLimit,
       });
       return json({
         ok: true,
@@ -76,6 +81,25 @@ export default {
         ok: true,
         synced: RECRUIT_OPERATORS_KEY,
         count: data.operators.length,
+        time: new Date().toISOString(),
+      });
+    }
+
+    if (url.pathname === '/api/admin/prewarm-music-albums') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) {
+        return unauthorized;
+      }
+
+      const limit = parseAlbumPrewarmLimit(url.searchParams.get('limit'));
+      const albums = await fetchMusicJson('/api/albums');
+      await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
+      await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumRows(albums.data));
+      const result = await prewarmMusicAlbumDetails(env, albums.data, { limit });
+
+      return json({
+        ok: true,
+        ...result,
         time: new Date().toISOString(),
       });
     }
@@ -145,6 +169,7 @@ export default {
       ctx.waitUntil(
         syncMusicCache(env, {
           songDetailLimit: 10,
+          albumDetailLimit: 5,
         }).catch((error) => {
           console.warn('Music cache sync failed:', error.message);
         })
@@ -194,6 +219,22 @@ function parseMusicPrewarmLimit(rawLimit) {
 
   return Math.min(
     MAX_SONG_DETAIL_PREWARM_LIMIT,
+    Math.max(0, Math.floor(limit))
+  );
+}
+
+function parseAlbumPrewarmLimit(rawLimit) {
+  if (rawLimit == null || rawLimit === '') {
+    return DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT;
+  }
+
+  const limit = Number(rawLimit);
+  if (!Number.isFinite(limit)) {
+    return DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT;
+  }
+
+  return Math.min(
+    MAX_ALBUM_DETAIL_PREWARM_LIMIT,
     Math.max(0, Math.floor(limit))
   );
 }
@@ -255,6 +296,40 @@ async function writeSupabaseCache(env, key, data, source) {
   return true;
 }
 
+async function upsertSupabaseRows(env, tableName, rows) {
+  if (!hasSupabaseConfig(env) || !Array.isArray(rows) || rows.length === 0) {
+    return {
+      ok: false,
+      count: 0,
+      skipped: true,
+    };
+  }
+
+  const endpoint = `${getSupabaseUrl(env)}/rest/v1/${tableName}`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: supabaseHeaders(env, {
+      'content-type': 'application/json',
+      prefer: 'resolution=merge-duplicates',
+    }),
+    body: JSON.stringify(rows),
+  });
+
+  if (!response.ok) {
+    console.warn('Supabase normalized upsert failed:', tableName, response.status);
+    return {
+      ok: false,
+      count: rows.length,
+      status: response.status,
+    };
+  }
+
+  return {
+    ok: true,
+    count: rows.length,
+  };
+}
+
 async function fetchMusicJson(sourcePath) {
   const sourceUrl = `${MUSIC_API_ORIGIN}${sourcePath}`;
   const response = await fetch(sourceUrl, {
@@ -274,6 +349,91 @@ async function fetchMusicJson(sourcePath) {
   };
 }
 
+function getMusicAlbumList(payload) {
+  return Array.isArray(payload?.data) ? payload.data : [];
+}
+
+function getMusicSongList(payload) {
+  return Array.isArray(payload?.data?.list) ? payload.data.list : [];
+}
+
+function normalizeMusicAlbumRows(payload) {
+  return getMusicAlbumList(payload)
+    .filter((album) => album?.cid)
+    .map((album) => ({
+      id: String(album.cid),
+      name: String(album.name || ''),
+      artists: album.artistes || album.artists || [],
+      intro: album.intro || null,
+      belong: album.belong || null,
+      cover_url: album.coverUrl || null,
+      cover_de_url: album.coverDeUrl || null,
+      raw: album,
+      updated_at: new Date().toISOString(),
+    }));
+}
+
+function normalizeMusicAlbumDetailRow(payload) {
+  const album = payload?.data;
+  if (!album?.cid) {
+    return [];
+  }
+
+  return normalizeMusicAlbumRows({
+    data: [album],
+  });
+}
+
+function normalizeMusicSongListRows(payload) {
+  return getMusicSongList(payload)
+    .filter((song) => song?.cid)
+    .map((song) => ({
+      id: String(song.cid),
+      name: String(song.name || ''),
+      artists: song.artistes || song.artists || [],
+      raw: song,
+      updated_at: new Date().toISOString(),
+    }));
+}
+
+function normalizeMusicAlbumSongRows(payload) {
+  const album = payload?.data;
+  const songs = Array.isArray(album?.songs) ? album.songs : [];
+
+  return songs
+    .filter((song) => song?.cid)
+    .map((song) => ({
+      id: String(song.cid),
+      album_id: album.cid ? String(album.cid) : null,
+      name: String(song.name || ''),
+      artists: song.artistes || song.artists || album.artistes || album.artists || [],
+      raw: song,
+      updated_at: new Date().toISOString(),
+    }));
+}
+
+function normalizeMusicSongDetailRow(payload) {
+  const song = payload?.data;
+  if (!song?.cid) {
+    return [];
+  }
+
+  return [
+    {
+      id: String(song.cid),
+      album_id: song.albumCid ? String(song.albumCid) : null,
+      name: String(song.name || ''),
+      artists: song.artistes || song.artists || [],
+      source_url: song.sourceUrl || null,
+      lyric_url: song.lyricUrl || null,
+      mv_url: song.mvUrl || null,
+      mv_cover_url: song.mvCoverUrl || null,
+      raw: song,
+      updated_at: new Date().toISOString(),
+    },
+  ];
+}
+
 async function getMusicJson(env, key, sourcePath) {
   const cached = await readSupabaseCache(env, key);
   if (cached?.data) {
@@ -286,6 +446,7 @@ async function getMusicJson(env, key, sourcePath) {
 
   const fetched = await fetchMusicJson(sourcePath);
   await writeSupabaseCache(env, key, fetched.data, fetched.sourceUrl);
+  await upsertSupabaseRows(env, 'music_songs', normalizeMusicSongDetailRow(fetched.data));
 
   return {
     data: fetched.data,
@@ -363,6 +524,8 @@ async function handleMusicApiRequest(request, env, url) {
       `${MUSIC_CACHE_PREFIX}album:${albumId}`,
       `/api/album/${encodeURIComponent(albumId)}/detail`
     );
+    await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumDetailRow(result.data));
+    await upsertSupabaseRows(env, 'music_songs', normalizeMusicAlbumSongRows(result.data));
     return json(result.data, 200, 900, {
       'x-data-source': result.source,
       'x-cache-updated-at': result.updatedAt || '',
@@ -398,18 +561,39 @@ async function syncMusicCache(env, options = {}) {
   const synced = [];
   const songDetailLimit =
     options.songDetailLimit ?? DEFAULT_SONG_DETAIL_PREWARM_LIMIT;
+  const albumDetailLimit =
+    options.albumDetailLimit ?? DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT;
   const albums = await fetchMusicJson('/api/albums');
   await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
+  const normalizedAlbums = normalizeMusicAlbumRows(albums.data);
+  const albumTableResult = await upsertSupabaseRows(env, 'music_albums', normalizedAlbums);
   synced.push({
     key: `${MUSIC_CACHE_PREFIX}albums`,
     count: Array.isArray(albums.data?.data) ? albums.data.data.length : null,
   });
+  synced.push({
+    table: 'music_albums',
+    ...albumTableResult,
+  });
+  const albumDetails = await prewarmMusicAlbumDetails(env, albums.data, {
+    limit: albumDetailLimit,
+  });
+  synced.push({
+    key: `${MUSIC_CACHE_PREFIX}album:{albumId}`,
+    ...albumDetails,
+  });
 
   const songs = await fetchMusicJson('/api/songs');
   await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}songs`, songs.data, songs.sourceUrl);
+  const normalizedSongs = normalizeMusicSongListRows(songs.data);
+  const songTableResult = await upsertSupabaseRows(env, 'music_songs', normalizedSongs);
   synced.push({
     key: `${MUSIC_CACHE_PREFIX}songs`,
     count: Array.isArray(songs.data?.data?.list) ? songs.data.data.list.length : null,
+  });
+  synced.push({
+    table: 'music_songs',
+    ...songTableResult,
   });
 
   const songDetails = await prewarmMusicSongDetails(env, songs.data, {
@@ -450,7 +634,7 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
   let errors = 0;
 
   for (const item of candidates) {
-    const songId = item.song?.cid;
+    const songId = item.item?.cid;
     if (!songId) {
       continue;
     }
@@ -463,6 +647,11 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
         detail.data,
         detail.sourceUrl
       );
+      await upsertSupabaseRows(
+        env,
+        'music_songs',
+        normalizeMusicSongDetailRow(detail.data)
+      );
       stored += 1;
     } catch (error) {
       errors += 1;
@@ -473,6 +662,7 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
   const nextIndex = songs.length === 0
     ? 0
     : (startIndex + candidates.length) % songs.length;
+  const wrapped = didCircularBatchWrap(startIndex, candidates.length, songs.length);
   await writeSupabaseCache(
     env,
     MUSIC_SONG_DETAIL_CURSOR_KEY,
@@ -482,6 +672,7 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
       lastBatchSize: candidates.length,
       lastStored: stored,
       lastErrors: errors,
+      lastWrapped: wrapped,
       updatedAt: new Date().toISOString(),
     },
     'worker:sync-music'
@@ -494,7 +685,84 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
     total: songs.length,
     startIndex,
     nextIndex,
-    done: candidates.length >= songs.length || nextIndex === 0,
+    wrapped,
+    done: wrapped,
+  };
+}
+
+async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
+  const albums = getMusicAlbumList(albumsPayload);
+  const limit = Math.max(0, Math.floor(options.limit ?? DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT));
+
+  if (albums.length === 0 || limit === 0) {
+    return {
+      attempted: 0,
+      stored: 0,
+      errors: 0,
+      total: albums.length,
+      nextIndex: 0,
+      done: albums.length === 0,
+    };
+  }
+
+  const cursorRow = await readSupabaseCache(env, MUSIC_ALBUM_DETAIL_CURSOR_KEY);
+  const startIndex = normalizeCursorIndex(cursorRow?.data?.nextIndex, albums.length);
+  const candidates = buildCircularBatch(albums, startIndex, limit);
+  let stored = 0;
+  let errors = 0;
+
+  for (const item of candidates) {
+    const cid = item.item?.cid;
+    if (!cid) {
+      continue;
+    }
+
+    try {
+      const detail = await fetchMusicJson(`/api/album/${encodeURIComponent(cid)}/detail`);
+      await writeSupabaseCache(
+        env,
+        `${MUSIC_CACHE_PREFIX}album:${cid}`,
+        detail.data,
+        detail.sourceUrl
+      );
+      await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumDetailRow(detail.data));
+      await upsertSupabaseRows(env, 'music_songs', normalizeMusicAlbumSongRows(detail.data));
+      stored += 1;
+    } catch (error) {
+      errors += 1;
+      console.warn('Music album detail prewarm failed:', cid, error.message);
+    }
+  }
+
+  const nextIndex = albums.length === 0
+    ? 0
+    : (startIndex + candidates.length) % albums.length;
+  const wrapped = didCircularBatchWrap(startIndex, candidates.length, albums.length);
+  await writeSupabaseCache(
+    env,
+    MUSIC_ALBUM_DETAIL_CURSOR_KEY,
+    {
+      nextIndex,
+      total: albums.length,
+      lastBatchSize: candidates.length,
+      lastStored: stored,
+      lastErrors: errors,
+      lastWrapped: wrapped,
+      updatedAt: new Date().toISOString(),
+    },
+    'worker:prewarm-music-albums'
+  );
+
+  return {
+    synced: 'music:album-details',
+    attempted: candidates.length,
+    stored,
+    errors,
+    total: albums.length,
+    startIndex,
+    nextIndex,
+    wrapped,
+    done: wrapped,
   };
 }
 
@@ -519,11 +787,19 @@ function buildCircularBatch(items, startIndex, limit) {
     const index = (startIndex + offset) % items.length;
     batch.push({
       index,
-      song: items[index],
+      item: items[index],
     });
   }
 
   return batch;
+}
+
+function didCircularBatchWrap(startIndex, batchSize, total) {
+  if (total <= 0 || batchSize <= 0) {
+    return total === 0;
+  }
+
+  return startIndex + batchSize >= total;
 }
 
 async function buildRecruitOperators(publicApiBase) {

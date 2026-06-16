@@ -30,7 +30,9 @@ The Worker has a cron trigger:
 0 */6 * * *
 ```
 
-This syncs the recruit operator list every 6 hours.
+This syncs the recruit operator list every 6 hours. When Supabase is configured,
+the same cron also refreshes the music album/song lists and prewarms a small batch
+of song details and album details.
 
 ## KV Keys In Use
 
@@ -71,6 +73,7 @@ Admin:
 ```txt
 GET /api/admin/sync
 GET /api/admin/sync-music
+GET /api/admin/prewarm-music-albums?limit=5
 GET /api/admin/prewarm-details?offset=0&limit=40
 ```
 
@@ -89,7 +92,9 @@ Authorization: <SYNC_TOKEN>
 - Music API JSON can be mirrored into Supabase table `music_cache`.
 - Music cache keys use the prefix `music:api:v1:`.
 - Music song details are prewarmed in batches into `music:api:v1:song:{songId}`.
+- Music album details are prewarmed in batches into `music:api:v1:album:{albumId}`.
 - Song detail prewarm progress is stored in `music:api:v1:prewarm:song-detail-cursor`.
+- Album detail prewarm progress is stored in `music:api:v1:prewarm:album-detail-cursor`.
 - All 418 operator detail entries were prewarmed into remote KV during setup.
 - Image URLs returned by the API go through `/api/recruit/image`.
 - The image proxy only allows `https://raw.githubusercontent.com/...` image URLs.
@@ -114,6 +119,41 @@ create table if not exists public.music_cache (
 );
 ```
 
+Optional normalized music tables:
+
+```sql
+create table if not exists public.music_albums (
+  id text primary key,
+  name text not null,
+  artists jsonb not null default '[]'::jsonb,
+  intro text,
+  belong text,
+  cover_url text,
+  cover_de_url text,
+  raw jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.music_songs (
+  id text primary key,
+  album_id text references public.music_albums(id) on delete set null,
+  name text not null,
+  artists jsonb not null default '[]'::jsonb,
+  source_url text,
+  lyric_url text,
+  mv_url text,
+  mv_cover_url text,
+  raw jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists music_songs_album_id_idx
+  on public.music_songs(album_id);
+```
+
+`music_cache` keeps the original API payload for fallback. `music_albums` and `music_songs`
+store queryable, normalized data for your own database.
+
 Set the Worker secret:
 
 ```powershell
@@ -128,16 +168,29 @@ Invoke-RestMethod `
   -Headers @{ Authorization = "ark-sync-2026" }
 ```
 
-Manual music sync with a larger song detail prewarm batch:
+Manual music sync with detail prewarm batches:
 
 ```powershell
 Invoke-RestMethod `
-  -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/sync-music?songDetailLimit=10" `
+  -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/sync-music?songDetailLimit=10&albumDetailLimit=5" `
   -Headers @{ Authorization = "ark-sync-2026" }
 ```
 
-Use `songDetailLimit=0` to refresh only the album/song lists without prewarming song details.
-The Worker caps this value at 10 to avoid request timeouts. The cron sync prewarms 10 song details automatically every run.
+Use `songDetailLimit=0&albumDetailLimit=0` to refresh only the album/song lists without prewarming details.
+The Worker caps song details at 10 and album details at 5 to avoid request timeouts. The cron sync
+prewarms 10 song details and 5 album details automatically every run.
+
+Prewarm normalized album details in batches. This fills `music_albums` detail fields and
+`music_songs.album_id` from album track lists:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/prewarm-music-albums?limit=5" `
+  -Headers @{ Authorization = "ark-sync-2026" }
+```
+
+Run this repeatedly until `done` is `true`. `wrapped=true` means the cursor reached the end of the
+current list and wrapped back to the beginning.
 
 The frontend can opt into the Worker-backed music mirror with:
 
@@ -152,7 +205,19 @@ If this env var is not set, the frontend keeps using the original Monster Siren 
 Deploy Worker:
 
 ```powershell
-npx wrangler deploy
+npx.cmd wrangler deploy
+```
+
+Build frontend:
+
+```powershell
+npm.cmd run build
+```
+
+Check Worker syntax without deploying:
+
+```powershell
+node --check worker\index.js
 ```
 
 Manual list sync:
