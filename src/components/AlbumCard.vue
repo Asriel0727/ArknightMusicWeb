@@ -21,6 +21,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { getProxyImageUrl } from '../services/api.js';
 
 const { t } = useI18n();
 
@@ -39,7 +40,7 @@ const marqueeContent = ref(null);
 const proxyImageUrl = (url) => {
   if (!url) return '';
   // 使用和原本一樣的方法構建URL
-  return `https://monstersiren-web-api.vercel.app/proxy-image?url=${encodeURIComponent(url)}`;
+  return getProxyImageUrl(url);
 };
 
 const handleImageLoad = (event) => {

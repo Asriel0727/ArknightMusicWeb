@@ -68,6 +68,7 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
+import { getProxyImageUrl } from '../services/api.js';
 import { playSongFromAlbum } from '../stores/player.js';
 
 const { t, locale } = useI18n();
@@ -125,7 +126,7 @@ const getSongIndex = (index) => {
 const proxyImageUrl = (url) => {
   if (!url) return '';
   // 使用和原本一樣的方法構建URL
-  return `https://monstersiren-web-api.vercel.app/proxy-image?url=${encodeURIComponent(url)}`;
+  return getProxyImageUrl(url);
 };
 
 // 預加載圖片

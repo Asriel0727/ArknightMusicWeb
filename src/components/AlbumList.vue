@@ -67,7 +67,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AlbumCard from './AlbumCard.vue';
 import { albumState, modalState, searchState } from '../stores/player.js';
-import { fetchAlbums } from '../services/api.js';
+import { fetchAlbums, getProxyImageUrl } from '../services/api.js';
 
 const { t, locale } = useI18n();
 const containerRef = ref(null);
@@ -124,6 +124,33 @@ const displayAlbums = computed(() => {
   return albumsToShow.slice(startIndex, endIndex);
 });
 
+const preloadImage = (url) => {
+  if (!url) return;
+  const img = new Image();
+  img.decoding = 'async';
+  img.src = getProxyImageUrl(url);
+};
+
+const preloadAlbumImages = (albums, includeVisual = false) => {
+  albums.forEach((album) => {
+    preloadImage(album.coverUrl);
+    if (includeVisual) {
+      preloadImage(album.coverDeUrl);
+    }
+  });
+};
+
+const preloadCurrentAndNextPageImages = () => {
+  const albumsToShow = searchState.query ? searchState.filteredAlbums : albumState.allAlbums;
+  const startIndex = (albumState.currentPage - 1) * albumsPerPage.value;
+  const endIndex = startIndex + albumsPerPage.value;
+  const currentPageAlbums = albumsToShow.slice(startIndex, endIndex);
+  const nextPageAlbums = albumsToShow.slice(endIndex, endIndex + Math.min(6, albumsPerPage.value));
+
+  preloadAlbumImages(currentPageAlbums, false);
+  preloadAlbumImages(nextPageAlbums, false);
+};
+
 // 監聽窗口大小變化
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
@@ -144,6 +171,7 @@ const initializeAlbums = async () => {
     albumState.allAlbums = albums;
     albumState.isInitialFetchDone = true;
     albumState.currentPage = 1;
+    preloadCurrentAndNextPageImages();
   } catch (error) {
     console.error('Error initializing albums:', error);
   } finally {
@@ -174,6 +202,7 @@ const handleSearch = (query) => {
 const goToPage = (page) => {
   if (page < 1 || page > totalPages.value) return;
   albumState.currentPage = page;
+  preloadCurrentAndNextPageImages();
   // 滾動到頂部
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -245,6 +274,10 @@ watch(albumsPerPage, (newValue, oldValue) => {
     albumState.currentPage = Math.min(newPage, totalPages.value);
   }
 });
+
+watch(displayAlbums, () => {
+  preloadCurrentAndNextPageImages();
+}, { flush: 'post' });
 
 onMounted(() => {
   initializeAlbums();
