@@ -68,6 +68,20 @@ export default {
       });
     }
 
+    if (url.pathname === '/api/admin/music-cache-status') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) {
+        return unauthorized;
+      }
+
+      const status = await getMusicCacheStatus(env);
+      return json({
+        ok: true,
+        ...status,
+        time: new Date().toISOString(),
+      });
+    }
+
     if (url.pathname === '/api/admin/sync') {
       const unauthorized = requireAdminToken(request, env);
       if (unauthorized) {
@@ -330,6 +344,67 @@ async function upsertSupabaseRows(env, tableName, rows) {
   };
 }
 
+async function countSupabaseRows(env, tableName, filters = {}, selectColumn = 'id') {
+  if (!hasSupabaseConfig(env)) {
+    return null;
+  }
+
+  const params = new URLSearchParams({
+    select: selectColumn,
+    limit: '1',
+  });
+
+  Object.entries(filters).forEach(([key, value]) => {
+    params.set(key, value);
+  });
+
+  const endpoint = `${getSupabaseUrl(env)}/rest/v1/${tableName}?${params.toString()}`;
+  const response = await fetch(endpoint, {
+    method: 'HEAD',
+    headers: supabaseHeaders(env, {
+      prefer: 'count=exact',
+    }),
+  });
+
+  if (!response.ok) {
+    console.warn('Supabase count failed:', tableName, response.status);
+    return null;
+  }
+
+  return parseContentRangeTotal(response.headers.get('content-range'));
+}
+
+async function readLatestSupabaseRow(env, tableName, selectColumns) {
+  if (!hasSupabaseConfig(env)) {
+    return null;
+  }
+
+  const params = new URLSearchParams({
+    select: selectColumns,
+    order: 'updated_at.desc',
+    limit: '1',
+  });
+  const endpoint = `${getSupabaseUrl(env)}/rest/v1/${tableName}?${params.toString()}`;
+  const response = await fetch(endpoint, {
+    headers: supabaseHeaders(env),
+  });
+
+  if (!response.ok) {
+    console.warn('Supabase latest row read failed:', tableName, response.status);
+    return null;
+  }
+
+  const rows = await response.json();
+  return rows?.[0] || null;
+}
+
+function parseContentRangeTotal(contentRange) {
+  const total = String(contentRange || '').split('/').pop();
+  const count = Number(total);
+
+  return Number.isFinite(count) ? count : null;
+}
+
 async function fetchMusicJson(sourcePath) {
   const sourceUrl = `${MUSIC_API_ORIGIN}${sourcePath}`;
   const response = await fetch(sourceUrl, {
@@ -357,20 +432,29 @@ function getMusicSongList(payload) {
   return Array.isArray(payload?.data?.list) ? payload.data.list : [];
 }
 
-function normalizeMusicAlbumRows(payload) {
+function normalizeMusicAlbumRows(payload, options = {}) {
+  const includeDetailFields = options.includeDetailFields === true;
+
   return getMusicAlbumList(payload)
     .filter((album) => album?.cid)
-    .map((album) => ({
-      id: String(album.cid),
-      name: String(album.name || ''),
-      artists: album.artistes || album.artists || [],
-      intro: album.intro || null,
-      belong: album.belong || null,
-      cover_url: album.coverUrl || null,
-      cover_de_url: album.coverDeUrl || null,
-      raw: album,
-      updated_at: new Date().toISOString(),
-    }));
+    .map((album) => {
+      const row = {
+        id: String(album.cid),
+        name: String(album.name || ''),
+        artists: album.artistes || album.artists || [],
+        cover_url: album.coverUrl || null,
+        cover_de_url: album.coverDeUrl || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (includeDetailFields) {
+        row.intro = album.intro || null;
+        row.belong = album.belong || null;
+        row.raw = album;
+      }
+
+      return row;
+    });
 }
 
 function normalizeMusicAlbumDetailRow(payload) {
@@ -381,6 +465,8 @@ function normalizeMusicAlbumDetailRow(payload) {
 
   return normalizeMusicAlbumRows({
     data: [album],
+  }, {
+    includeDetailFields: true,
   });
 }
 
@@ -607,6 +693,84 @@ async function syncMusicCache(env, options = {}) {
   return {
     synced,
     supabaseConfigured: true,
+  };
+}
+
+async function getMusicCacheStatus(env) {
+  if (!hasSupabaseConfig(env)) {
+    return {
+      supabaseConfigured: false,
+      warning: 'SUPABASE_SERVICE_ROLE_KEY is not configured.',
+    };
+  }
+
+  const [
+    albumCount,
+    albumWithIntroCount,
+    albumWithCoverCount,
+    songCount,
+    songWithAlbumCount,
+    songWithoutAlbumCount,
+    songWithSourceCount,
+    songWithoutSourceCount,
+    songWithLyricCount,
+    songWithMvCount,
+    cacheEntryCount,
+    latestAlbum,
+    latestSong,
+    latestCacheEntry,
+    songCursor,
+    albumCursor,
+  ] = await Promise.all([
+    countSupabaseRows(env, 'music_albums'),
+    countSupabaseRows(env, 'music_albums', { intro: 'not.is.null' }),
+    countSupabaseRows(env, 'music_albums', { cover_url: 'not.is.null' }),
+    countSupabaseRows(env, 'music_songs'),
+    countSupabaseRows(env, 'music_songs', { album_id: 'not.is.null' }),
+    countSupabaseRows(env, 'music_songs', { album_id: 'is.null' }),
+    countSupabaseRows(env, 'music_songs', { source_url: 'not.is.null' }),
+    countSupabaseRows(env, 'music_songs', { source_url: 'is.null' }),
+    countSupabaseRows(env, 'music_songs', { lyric_url: 'not.is.null' }),
+    countSupabaseRows(env, 'music_songs', { mv_url: 'not.is.null' }),
+    countSupabaseRows(env, 'music_cache', { key: `like.${MUSIC_CACHE_PREFIX}*` }, 'key'),
+    readLatestSupabaseRow(env, 'music_albums', 'id,name,updated_at'),
+    readLatestSupabaseRow(env, 'music_songs', 'id,name,updated_at'),
+    readLatestSupabaseRow(env, 'music_cache', 'key,updated_at'),
+    readSupabaseCache(env, MUSIC_SONG_DETAIL_CURSOR_KEY),
+    readSupabaseCache(env, MUSIC_ALBUM_DETAIL_CURSOR_KEY),
+  ]);
+
+  return {
+    supabaseConfigured: true,
+    albums: {
+      total: albumCount,
+      withIntro: albumWithIntroCount,
+      withCover: albumWithCoverCount,
+      latestUpdatedAt: latestAlbum?.updated_at || null,
+      latestUpdatedId: latestAlbum?.id || null,
+      latestUpdatedName: latestAlbum?.name || null,
+    },
+    songs: {
+      total: songCount,
+      withAlbumId: songWithAlbumCount,
+      withoutAlbumId: songWithoutAlbumCount,
+      withSourceUrl: songWithSourceCount,
+      withoutSourceUrl: songWithoutSourceCount,
+      withLyricUrl: songWithLyricCount,
+      withMvUrl: songWithMvCount,
+      latestUpdatedAt: latestSong?.updated_at || null,
+      latestUpdatedId: latestSong?.id || null,
+      latestUpdatedName: latestSong?.name || null,
+    },
+    cache: {
+      musicEntryCount: cacheEntryCount,
+      latestUpdatedAt: latestCacheEntry?.updated_at || null,
+      latestUpdatedKey: latestCacheEntry?.key || null,
+    },
+    cursors: {
+      songDetails: songCursor?.data || null,
+      albumDetails: albumCursor?.data || null,
+    },
   };
 }
 

@@ -73,6 +73,7 @@ Admin:
 ```txt
 GET /api/admin/sync
 GET /api/admin/sync-music
+GET /api/admin/music-cache-status
 GET /api/admin/prewarm-music-albums?limit=5
 GET /api/admin/prewarm-details?offset=0&limit=40
 ```
@@ -191,6 +192,21 @@ Invoke-RestMethod `
 
 Run this repeatedly until `done` is `true`. `wrapped=true` means the cursor reached the end of the
 current list and wrapped back to the beginning.
+
+Check music database completeness:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/music-cache-status" `
+  -Headers @{ Authorization = "ark-sync-2026" }
+```
+
+The status endpoint returns album/song counts, missing `source_url` / `album_id` counts,
+latest updated rows, and the current prewarm cursors.
+
+If `albums.withIntro` is `0` after a previous sync, deploy the latest Worker and rerun the
+album detail prewarm. Older sync code could overwrite album detail fields with empty values
+from the basic album list response.
 
 The frontend can opt into the Worker-backed music mirror with:
 
