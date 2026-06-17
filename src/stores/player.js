@@ -360,10 +360,24 @@ export function seek(position) {
   syncLyrics(playerState.audioPlayer.currentTime);
 }
 
+export function clampVolume(volume) {
+  const parsedVolume = Number.parseFloat(volume);
+
+  if (Number.isNaN(parsedVolume)) {
+    return playerState.volume;
+  }
+
+  return Math.min(1, Math.max(0, parsedVolume));
+}
+
 export function setVolume(volume) {
   if (!playerState.audioPlayer) return;
-  playerState.audioPlayer.muted = false;
-  playerState.audioPlayer.volume = parseFloat(volume);
+
+  const nextVolume = clampVolume(volume);
+  playerState.audioPlayer.muted = nextVolume === 0;
+  playerState.audioPlayer.volume = nextVolume;
+  playerState.volume = nextVolume;
+  playerState.isMuted = nextVolume === 0;
 }
 
 export function toggleMute() {

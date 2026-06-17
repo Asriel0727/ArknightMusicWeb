@@ -46,7 +46,7 @@
               </button>
               <input 
                 type="range" 
-                :value="playerState.volume" 
+                v-model.number="playerState.volume" 
                 min="0" 
                 max="1" 
                 step="0.05"
@@ -123,7 +123,6 @@ let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
 
-// 歌詞時間偏移量（秒），正值表示提前顯示歌詞
 const LYRICS_TIME_OFFSET = 0.5;
 
 const progressPercent = computed(() => {
@@ -145,7 +144,6 @@ const proxyImageUrl = (url) => {
   if (!url) {
     return '';
   }
-  // 使用和原本一樣的方法構建URL
   return getProxyImageUrl(url);
 };
 
@@ -155,7 +153,6 @@ const handleImageLoad = (event) => {
 
 const handleImageError = (event) => {
   console.error('圖片加載失敗:', event.target.src);
-  // 不隱藏圖片，讓它顯示錯誤狀態
 };
 
 const handleSeek = (event) => {
@@ -180,7 +177,6 @@ const syncLyricsHighlight = (currentTime) => {
   if (!playerState.lyrics || playerState.lyrics.length === 0) return;
   if (!lyricsContainerRef.value) return;
 
-  // 添加時間偏移量，讓歌詞提前顯示
   const adjustedTime = currentTime + LYRICS_TIME_OFFSET;
 
   let newActiveIndex = -1;
@@ -192,11 +188,9 @@ const syncLyricsHighlight = (currentTime) => {
     }
   }
 
-  // 始終更新高亮狀態（不管用戶是否在滾動）
   if (newActiveIndex !== activeLyricIndex.value && newActiveIndex !== -1) {
     activeLyricIndex.value = newActiveIndex;
     
-    // 只有在用戶沒有主動滾動時才自動滾動
     if (!isUserScrolling) {
       const activeElement = lyricsContainerRef.value.querySelector(
         `.lyrics-line[data-time="${playerState.lyrics[newActiveIndex].time}"]`
