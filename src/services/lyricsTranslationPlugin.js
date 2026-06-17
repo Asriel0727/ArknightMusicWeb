@@ -71,8 +71,11 @@ function shouldSkipTranslation(lines, targetLocale) {
   if (targetLocale === 'zh-TW' || targetLocale === 'zh-CN') {
     return sourceLocale === targetLocale;
   }
-
   return sourceLocale === targetLocale;
+}
+
+function shouldSkipLineTranslation(text, targetLocale) {
+  return shouldSkipTranslation([{ text }], targetLocale);
 }
 
 function getCacheKey(text, targetLocale) {
@@ -187,16 +190,19 @@ export async function translateLyricLines(lines, locale) {
   }
 
   const targetLocale = normalizeTargetLocale(locale);
+  
   const result = lines.map((line) => ({
     ...line,
     translation: '',
   }));
 
-  if (shouldSkipTranslation(result, targetLocale)) {
-    return result;
-  }
+  const translatableLines = result.filter((line) => {
+    const text = String(line.text || '').trim();
+    return text && !shouldSkipLineTranslation(text, targetLocale);
+  });
 
-  const batches = createLyricBatches(result);
+  const batches = createLyricBatches(translatableLines);
+
   for (const batch of batches) {
     try {
       const translations = await translateBatch(batch, targetLocale);
