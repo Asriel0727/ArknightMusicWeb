@@ -1,5 +1,5 @@
 <template>
-  <div class="album-details-grid">
+  <div class="album-details-grid" :class="{ 'single-panel': !hasRightPanel }">
     <div class="album-details-left">
       <img 
         :key="album.cid + '-cover'"
@@ -11,12 +11,16 @@
         @load="handleImageLoad"
         @error="handleImageError"
       >
-      <h2>{{ album.name }}</h2>
+      <h2>{{ displayAlbumName }}</h2>
       <h3>{{ album.belong }}</h3>
-      <p class="album-intro api-pre-line">{{ introForDisplay }}</p>
+      <p class="album-intro api-pre-line">{{ displayIntro }}</p>
     </div>
-    <div class="album-details-right">
+    <div v-if="hasRightPanel" class="album-details-right" :class="{ loading: album.coverDeUrl && !imageLoaded }">
+      <div v-if="album.coverDeUrl && !imageLoaded" class="album-visual-placeholder">
+        {{ t('common.loading') }}
+      </div>
       <img 
+        v-if="album.coverDeUrl"
         :key="album.cid + '-visual'"
         :src="proxyImageUrl(album.coverDeUrl)" 
         :alt="album.name" 
@@ -65,11 +69,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
 import { getProxyImageUrl } from '../services/api.js';
 import { playSongFromAlbum } from '../stores/player.js';
+import { decodeTextLeftToRight } from '../utils/textGlitch.js';
 
 const { t, locale } = useI18n();
 
@@ -88,11 +93,71 @@ const introSourceText = computed(() => {
 
 const translatedIntro = ref('');
 const isIntroTranslating = ref(false);
+const displayAlbumName = ref('');
+const displayIntro = ref('');
+const isAlbumTextGlitching = ref(false);
 let introTranslationToken = 0;
+let albumTextGlitchFrame = null;
+
+const glitchedAlbumIds = globalThis.__albumDetailsGlitchedIds ?? new Set();
+globalThis.__albumDetailsGlitchedIds = glitchedAlbumIds;
 
 const introForDisplay = computed(() => {
   return translatedIntro.value || introSourceText.value;
 });
+
+displayAlbumName.value = props.album?.name || '';
+displayIntro.value = introForDisplay.value;
+
+const updateDisplayTexts = () => {
+  displayAlbumName.value = props.album?.name || '';
+  displayIntro.value = introForDisplay.value;
+};
+
+const cancelAlbumTextGlitch = () => {
+  if (albumTextGlitchFrame) {
+    cancelAnimationFrame(albumTextGlitchFrame);
+    albumTextGlitchFrame = null;
+  }
+};
+
+const startAlbumTextGlitch = () => {
+  const albumId = props.album?.cid;
+  if (!albumId || glitchedAlbumIds.has(albumId)) {
+    updateDisplayTexts();
+    return;
+  }
+
+  glitchedAlbumIds.add(albumId);
+  cancelAlbumTextGlitch();
+
+  const albumName = props.album?.name || '';
+  const intro = introForDisplay.value;
+  const duration = 1600;
+  const startTime = performance.now();
+
+  isAlbumTextGlitching.value = true;
+
+  const animate = (timestamp) => {
+    const elapsed = timestamp - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    displayAlbumName.value = decodeTextLeftToRight(albumName, progress);
+    displayIntro.value = decodeTextLeftToRight(intro, progress);
+
+    if (progress < 1) {
+      albumTextGlitchFrame = requestAnimationFrame(animate);
+      return;
+    }
+
+    displayAlbumName.value = props.album?.name || albumName;
+    displayIntro.value = introForDisplay.value || intro;
+    isAlbumTextGlitching.value = false;
+    albumTextGlitchFrame = null;
+  };
+
+  albumTextGlitchFrame = requestAnimationFrame(animate);
+};
 
 const emit = defineEmits(['play-song']);
 
@@ -100,6 +165,10 @@ const currentPage = ref(1);
 const songsPerPage = 4;
 const songTitleRefs = ref(new Map());
 const imageLoaded = ref(false);
+
+const hasRightPanel = computed(() => {
+  return Boolean(props.album?.coverDeUrl || props.album?.songs?.length);
+});
 
 // 確保 Map 始終存在
 if (!songTitleRefs.value) {
@@ -255,6 +324,7 @@ watch(() => props.album.cid, () => {
   // 使用 nextTick 確保 DOM 更新後再應用跑馬燈
   nextTick(() => {
     applyMarquee();
+    startAlbumTextGlitch();
   });
   refreshIntroTranslation();
 });
@@ -267,18 +337,31 @@ watch(introSourceText, () => {
   refreshIntroTranslation();
 });
 
+watch(introForDisplay, () => {
+  if (!isAlbumTextGlitching.value) {
+    displayIntro.value = introForDisplay.value;
+  }
+});
+
 watch(currentPage, () => {
   // 換頁時立即應用跑馬燈
   applyMarquee();
 });
 
 onMounted(() => {
+  updateDisplayTexts();
+  nextTick(() => {
+    startAlbumTextGlitch();
+  });
   refreshIntroTranslation();
 });
 
 onMounted(() => {
   // 初始載入時延遲應用跑馬燈，讓內容先顯示
   applyMarquee();
+});
+onUnmounted(() => {
+  cancelAlbumTextGlitch();
 });
 </script>
 
@@ -290,13 +373,41 @@ onMounted(() => {
   align-items: center;
 }
 
-.album-details-left,
-.album-details-right {
+.album-details-grid.single-panel {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.album-details-grid.single-panel .album-details-left {
+  max-width: 640px;
+  width: 100%;
+  justify-self: center;
+}
+
+.album-details-left {
   display: flex;
   flex-direction: column;
   gap: 15px;
   align-items: center;
   min-width: 0;
+}
+
+.album-details-right {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  min-height: 360px;
+}
+
+.album-visual-placeholder {
+  width: 100%;
+  min-height: 220px;
+  border-radius: 8px;
+  background: linear-gradient(45deg, #30363d, #484f58);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
 }
 
 .album-grid-cover {

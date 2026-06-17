@@ -1,5 +1,5 @@
 <template>
-  <div class="album">
+  <div class="album" @pointerenter="handlePreload" @focusin="handlePreload">
     <img 
       :src="proxyImageUrl(album.coverUrl)" 
       :alt="album.name"
@@ -32,7 +32,7 @@ const props = defineProps({
   }
 });
 
-defineEmits(['view-album']);
+const emit = defineEmits(['view-album', 'preload-album']);
 
 const marqueeContainer = ref(null);
 const marqueeContent = ref(null);
@@ -41,6 +41,10 @@ const proxyImageUrl = (url) => {
   if (!url) return '';
   // 使用和原本一樣的方法構建URL
   return getProxyImageUrl(url);
+};
+
+const handlePreload = () => {
+  emit('preload-album', props.album);
 };
 
 const handleImageLoad = (event) => {

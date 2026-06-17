@@ -1,5 +1,5 @@
 <template>
-  <div class="player-view-grid">
+  <div class="player-view-grid" :class="{ 'single-panel': !hasRightPanel }">
     <div class="player-view-left">
       <div class="player-container">
         <div class="player-header">
@@ -30,6 +30,14 @@
             </button>
             <button class="control-btn" @click="playNextSong">
               <i class="fas fa-step-forward"></i>
+            </button>
+            <button
+              class="control-btn"
+              :disabled="!playerState.currentSong"
+              :title="shareButtonTitle"
+              @click="handleShareSong"
+            >
+              <i :class="shareIcon"></i>
             </button>
           </div>
           <div class="progress-container" @click="handleSeek">
@@ -119,9 +127,11 @@ const { t, locale } = useI18n();
 
 const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);
+const hasCopiedShareLink = ref(false);
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
+let shareStatusTimeout = null;
 
 const LYRICS_TIME_OFFSET = 0.5;
 
@@ -138,6 +148,18 @@ const volumeIcon = computed(() => {
   } else {
     return 'fas fa-volume-down';
   }
+});
+
+const hasRightPanel = computed(() => {
+  return Boolean(playerState.currentSong?.coverDeUrl || playerState.lyrics?.length);
+});
+
+const shareIcon = computed(() => {
+  return hasCopiedShareLink.value ? 'fas fa-check' : 'fas fa-share-alt';
+});
+
+const shareButtonTitle = computed(() => {
+  return hasCopiedShareLink.value ? '已複製歌曲連結' : '分享歌曲連結';
 });
 
 const proxyImageUrl = (url) => {
@@ -170,6 +192,52 @@ const handleLyricTranslationToggle = () => {
   if (playerState.showLyricTranslation) {
     refreshLyricTranslations();
   }
+};
+
+const createSongShareUrl = () => {
+  const songId = playerState.currentSong?.cid;
+  if (!songId) {
+    return '';
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('song', songId);
+  return url.toString();
+};
+
+const copyText = async (text) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+};
+
+const handleShareSong = async () => {
+  const shareUrl = createSongShareUrl();
+  if (!shareUrl) {
+    return;
+  }
+
+  await copyText(shareUrl);
+  hasCopiedShareLink.value = true;
+
+  if (shareStatusTimeout) {
+    clearTimeout(shareStatusTimeout);
+  }
+
+  shareStatusTimeout = setTimeout(() => {
+    hasCopiedShareLink.value = false;
+  }, 1600);
 };
 
 // 同步歌詞高亮和滾動
@@ -285,6 +353,9 @@ onUnmounted(() => {
   stopLyricsSync();
   if (userScrollTimeout) {
     clearTimeout(userScrollTimeout);
+  }
+  if (shareStatusTimeout) {
+    clearTimeout(shareStatusTimeout);
   }
 });
 </script>
@@ -413,6 +484,16 @@ onUnmounted(() => {
   color: var(--primary-color);
 }
 
+.control-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.control-btn:disabled:hover {
+  background: none;
+  color: var(--text-color);
+}
+
 .control-btn.play-pause {
   background: var(--primary-color);
   color: white;
@@ -536,6 +617,16 @@ onUnmounted(() => {
   border-radius: 8px;
   display: block;
   margin: 0 auto 15px auto;
+}
+
+.player-view-grid.single-panel {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.player-view-grid.single-panel .player-view-left {
+  max-width: 520px;
+  width: 100%;
+  justify-self: center;
 }
 
 .lyrics-container {

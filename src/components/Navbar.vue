@@ -31,13 +31,13 @@
     <div class="navbar-right">
       <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />
       <label class="nav-locale-wrap">
-        <span class="nav-locale-label">{{ $t('language.label') }}</span>
-        <select v-model="localeModel" class="nav-locale">
-          <option value="zh-TW">{{ $t('language.zhTW') }}</option>
-          <option value="zh-CN">{{ $t('language.zhCN') }}</option>
-          <option value="en">{{ $t('language.en') }}</option>
-          <option value="ja">{{ $t('language.ja') }}</option>
-          <option value="ko">{{ $t('language.ko') }}</option>
+        <span class="nav-locale-label" :title="$t('language.label')" aria-hidden="true">
+          <i class="fas fa-globe"></i>
+        </span>
+        <select v-model="localeModel" class="nav-locale" :aria-label="$t('language.label')">
+          <option v-for="option in localeOptions" :key="option.value" :value="option.value">
+            {{ $t(option.labelKey) }}
+          </option>
         </select>
       </label>
     </div>
@@ -56,6 +56,14 @@ const localeModel = computed({
   get: () => locale.value,
   set: (v) => setLocale(v),
 });
+
+const localeOptions = [
+  { value: 'zh-TW', labelKey: 'language.zhTW' },
+  { value: 'zh-CN', labelKey: 'language.zhCN' },
+  { value: 'en', labelKey: 'language.en' },
+  { value: 'ja', labelKey: 'language.ja' },
+  { value: 'ko', labelKey: 'language.ko' },
+];
 
 // 使用 Vite 的 BASE_URL 来支持 GitHub Pages 的 base 路径
 const baseUrl = import.meta.env.BASE_URL;
@@ -115,10 +123,18 @@ const changePage = (page) => {
 }
 
 .nav-locale-label {
-  font-size: 0.65rem;
+  width: 24px;
+  height: 24px;
   color: var(--text-secondary);
-  white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-locale-label i {
+  font-size: 1rem;
 }
 
 .nav-locale {
@@ -214,10 +230,6 @@ const changePage = (page) => {
   }
   
   .nav-tab span {
-    display: none;
-  }
-
-  .nav-locale-label {
     display: none;
   }
 

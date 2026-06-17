@@ -93,3 +93,16 @@ export function decodeText(originalText, progress) {
   return decodedChars.join('');
 }
 
+export function decodeTextLeftToRight(originalText, progress) {
+  if (progress >= 1) return originalText;
+
+  const chars = originalText.split('');
+  const decodedCount = Math.floor(progress * chars.length);
+
+  return chars.map((char, index) => {
+    if (char === ' ' || char === '\n') return char;
+    if (index < decodedCount) return char;
+    return getGlitchCharForChar(char);
+  }).join('');
+}
+

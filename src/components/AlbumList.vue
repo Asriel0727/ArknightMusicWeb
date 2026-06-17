@@ -15,6 +15,7 @@
           :key="album.cid"
           :album="album"
           @view-album="handleViewAlbum"
+          @preload-album="handlePreloadAlbum"
         />
       </div>
       
@@ -124,18 +125,19 @@ const displayAlbums = computed(() => {
   return albumsToShow.slice(startIndex, endIndex);
 });
 
-const preloadImage = (url) => {
+const preloadImage = (url, priority = 'low') => {
   if (!url) return;
   const img = new Image();
   img.decoding = 'async';
+  img.fetchPriority = priority;
   img.src = getProxyImageUrl(url);
 };
 
-const preloadAlbumImages = (albums, includeVisual = false) => {
+const preloadAlbumImages = (albums, includeVisual = true, priority = 'low') => {
   albums.forEach((album) => {
     preloadImage(album.coverUrl);
     if (includeVisual) {
-      preloadImage(album.coverDeUrl);
+      preloadImage(album.coverDeUrl, priority);
     }
   });
 };
@@ -147,7 +149,7 @@ const preloadCurrentAndNextPageImages = () => {
   const currentPageAlbums = albumsToShow.slice(startIndex, endIndex);
   const nextPageAlbums = albumsToShow.slice(endIndex, endIndex + Math.min(6, albumsPerPage.value));
 
-  preloadAlbumImages(currentPageAlbums, false);
+  preloadAlbumImages(currentPageAlbums, true);
   preloadAlbumImages(nextPageAlbums, false);
 };
 
@@ -265,6 +267,11 @@ const handleViewAlbum = (albumId) => {
   emit('view-album', albumId);
 };
 
+const handlePreloadAlbum = (album) => {
+  if (!album) return;
+  preloadImage(album.coverDeUrl, 'high');
+};
+
 // 監聽每頁數量變化，調整當前頁
 watch(albumsPerPage, (newValue, oldValue) => {
   if (oldValue && albumState.currentPage > 1) {
@@ -330,10 +337,10 @@ main .page-title {
 
 .albums-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 280px));
   gap: 25px;
   padding: 20px 0;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  justify-content: center;
 }
 
 .loading-spinner {
@@ -489,7 +496,7 @@ main .page-title {
 
 @media (max-width: 900px) {
   .albums-container {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 260px));
     gap: 15px;
   }
   

@@ -1,7 +1,7 @@
 import OpenCC from 'opencc-js';
 
 const GOOGLE_TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
-const TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:v1:';
+const TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:v2:';
 const LINE_SEPARATOR = '\n';
 const MAX_BATCH_TEXT_LENGTH = 4200;
 const SUPPORTED_LOCALES = new Set(['zh-TW', 'zh-CN', 'en', 'ja', 'ko']);
@@ -142,7 +142,7 @@ function createLyricBatches(lines) {
       currentLength = 0;
     }
 
-    currentBatch.push({ index, text });
+    currentBatch.push({ index: line.sourceIndex ?? index, text });
     currentLength += text.length + LINE_SEPARATOR.length;
   });
 
@@ -196,10 +196,15 @@ export async function translateLyricLines(lines, locale) {
     translation: '',
   }));
 
-  const translatableLines = result.filter((line) => {
-    const text = String(line.text || '').trim();
-    return text && !shouldSkipLineTranslation(text, targetLocale);
-  });
+  const translatableLines = result
+    .map((line, index) => ({
+      ...line,
+      sourceIndex: index,
+    }))
+    .filter((line) => {
+      const text = String(line.text || '').trim();
+      return text && !shouldSkipLineTranslation(text, targetLocale);
+    });
 
   const batches = createLyricBatches(translatableLines);
 
