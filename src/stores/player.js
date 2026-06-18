@@ -43,6 +43,22 @@ async function loadLyricsTranslationPlugin() {
   return lyricsTranslationPluginPromise;
 }
 
+function normalizePlaybackTime(value) {
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function resetPlaybackProgress() {
+  playerState.currentTime = 0;
+  playerState.duration = 0;
+
+  if (!playerState.audioPlayer) {
+    return;
+  }
+
+  playerState.audioPlayer.pause();
+  playerState.audioPlayer.currentTime = 0;
+}
+
 // 播放器狀態
 export const playerState = reactive({
   audioPlayer: null,
@@ -102,12 +118,17 @@ export function initAudioPlayer(audioElement) {
   
   if (audioElement) {
     audioElement.addEventListener('timeupdate', () => {
-      playerState.currentTime = audioElement.currentTime;
+      playerState.currentTime = normalizePlaybackTime(audioElement.currentTime);
       syncLyrics(audioElement.currentTime);
     });
     
+    audioElement.addEventListener('loadedmetadata', () => {
+      playerState.currentTime = normalizePlaybackTime(audioElement.currentTime);
+      playerState.duration = normalizePlaybackTime(audioElement.duration);
+    });
+    
     audioElement.addEventListener('durationchange', () => {
-      playerState.duration = audioElement.duration;
+      playerState.duration = normalizePlaybackTime(audioElement.duration);
     });
     
     audioElement.addEventListener('volumechange', () => {
@@ -132,6 +153,8 @@ export function initAudioPlayer(audioElement) {
 // 播放歌曲（音訊優先：不等待歌詞；已有 sourceUrl 時不重複請求詳情）
 export async function playSong(song, coverUrl, coverDeUrl) {
   try {
+    resetPlaybackProgress();
+
     const { fetchSongDetails, fetchLyrics, getProxyAudioUrl } = await loadApiModule();
     let songDetails = song;
     if (!song.sourceUrl) {
