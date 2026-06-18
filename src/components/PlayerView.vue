@@ -22,6 +22,9 @@
         </div>
         <div class="player-controls">
           <div class="controls-top">
+            <button class="control-btn" :title="playModeTitle" @click="togglePlayMode">
+              <i :class="playModeIcon"></i>
+            </button>
             <button class="control-btn" @click="playPreviousSong">
               <i class="fas fa-step-backward"></i>
             </button>
@@ -119,7 +122,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations } from '../stores/player.js';
+import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations, togglePlayMode } from '../stores/player.js';
 import { getProxyImageUrl } from '../services/api.js';
 import { formatTime } from '../utils/time.js';
 
@@ -160,6 +163,30 @@ const shareIcon = computed(() => {
 
 const shareButtonTitle = computed(() => {
   return hasCopiedShareLink.value ? '已複製歌曲連結' : '分享歌曲連結';
+});
+
+const playModeIcon = computed(() => {
+  if (playerState.playMode === 'repeat-one') {
+    return 'fas fa-redo-alt';
+  }
+
+  if (playerState.playMode === 'shuffle') {
+    return 'fas fa-random';
+  }
+
+  return 'fas fa-sync-alt';
+});
+
+const playModeTitle = computed(() => {
+  if (playerState.playMode === 'repeat-one') {
+    return '單首循環';
+  }
+
+  if (playerState.playMode === 'shuffle') {
+    return '隨機播放';
+  }
+
+  return '列表循環';
 });
 
 const proxyImageUrl = (url) => {

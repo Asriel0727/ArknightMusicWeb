@@ -15,6 +15,7 @@ let lyricTranslationToken = 0;
 let apiModulePromise = null;
 let lyricsTranslationPluginPromise = null;
 const masterSongDetailsPromises = new Map();
+const PLAY_MODES = ['repeat-all', 'repeat-one', 'shuffle'];
 
 async function loadApiModule() {
   if (!apiModulePromise) {
@@ -59,6 +60,32 @@ function resetPlaybackProgress() {
   playerState.audioPlayer.currentTime = 0;
 }
 
+function getRandomSongIndex() {
+  const playlistLength = playerState.currentPlaylist.length;
+  if (playlistLength <= 1) {
+    return 0;
+  }
+
+  let randomIndex = playerState.currentSongIndex;
+  while (randomIndex === playerState.currentSongIndex) {
+    randomIndex = Math.floor(Math.random() * playlistLength);
+  }
+
+  return randomIndex;
+}
+
+function getNextSongIndex() {
+  if (playerState.playMode === 'repeat-one') {
+    return playerState.currentSongIndex;
+  }
+
+  if (playerState.playMode === 'shuffle') {
+    return getRandomSongIndex();
+  }
+
+  return (playerState.currentSongIndex + 1) % playerState.currentPlaylist.length;
+}
+
 // 播放器狀態
 export const playerState = reactive({
   audioPlayer: null,
@@ -73,6 +100,7 @@ export const playerState = reactive({
   lyrics: [],
   showLyricTranslation: false,
   isTranslatingLyrics: false,
+  playMode: 'repeat-all',
 });
 
 // 專輯和歌曲狀態
@@ -371,10 +399,16 @@ export function playPreviousSong() {
 
 export function playNextSong() {
   if (playerState.currentPlaylist.length === 0) return;
-  const newIndex = (playerState.currentSongIndex + 1) % playerState.currentPlaylist.length;
+  const newIndex = getNextSongIndex();
   playerState.currentSongIndex = newIndex;
   const song = playerState.currentPlaylist[newIndex];
   playSong(song, song.coverUrl, song.coverDeUrl);
+}
+
+export function togglePlayMode() {
+  const currentIndex = PLAY_MODES.indexOf(playerState.playMode);
+  const nextIndex = (currentIndex + 1) % PLAY_MODES.length;
+  playerState.playMode = PLAY_MODES[nextIndex];
 }
 
 export function seek(position) {
