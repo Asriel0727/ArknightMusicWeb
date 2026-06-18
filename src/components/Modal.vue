@@ -1,19 +1,29 @@
 <template>
   <div class="modal" :class="{ show: modalState.isOpen }" @click="handleBackdropClick">
     <div class="modal-content" @click.stop>
-      <button class="modal-close" @click="handleClose">
-        <i v-if="modalState.currentView === 'player'" class="fas fa-arrow-left"></i>
-        <span v-else>×</span>
+      <button class="modal-nav modal-nav-left" title="回首頁" @click="handleClose">
+        <i class="fas fa-home"></i>
+      </button>
+      <button
+        v-if="modalState.currentView === 'player'"
+        class="modal-nav modal-nav-right"
+        title="回專輯頁面"
+        @click="handleViewAlbumFromPlayer"
+      >
+        <i class="fas fa-compact-disc"></i>
       </button>
       <div id="modal-body">
-        <AlbumDetails 
+        <AlbumDetails
           v-if="modalState.currentView === 'album' && albumState.currentAlbumDetails"
           :key="(albumState.currentAlbumDetails?.cid || 'album') + '-' + locale"
           :album="albumState.currentAlbumDetails"
           @play-song="handlePlaySong"
         />
-        <PlayerView v-else-if="modalState.currentView === 'player'" :key="'player-' + locale" />
-        <CharacterDetails 
+        <PlayerView
+          v-else-if="modalState.currentView === 'player'"
+          :key="'player-' + locale"
+        />
+        <CharacterDetails
           v-else-if="modalState.currentView === 'character' && characterState.currentCharacterDetails"
           :key="characterDetailsKey"
           :character="characterState.currentCharacterDetails"
@@ -41,27 +51,13 @@ const characterDetailsKey = computed(() => {
 
 const emit = defineEmits(['close']);
 
-const handleClose = async () => {
-  if (modalState.currentView === 'player') {
-    // 返回專輯詳情 - 確保返回的是當前播放歌曲的專輯
-    const currentSong = playerState.currentSong;
-    if (currentSong && currentSong.albumCid) {
-      // 如果當前專輯詳情不是播放歌曲所屬的專輯，則獲取正確的專輯
-      if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== currentSong.albumCid) {
-        try {
-          const { fetchAlbumDetails } = await import('../services/api.js');
-          albumState.currentAlbumDetails = await fetchAlbumDetails(currentSong.albumCid);
-        } catch (error) {
-          console.error('獲取專輯詳情失敗:', error);
-        }
-      }
-    }
-    modalState.currentView = 'album';
-  } else {
-    // 關閉Modal
-    modalState.isOpen = false;
-    emit('close');
-  }
+const closeModal = () => {
+  modalState.isOpen = false;
+  emit('close');
+};
+
+const handleClose = () => {
+  closeModal();
 };
 
 const handleBackdropClick = (event) => {
@@ -74,7 +70,25 @@ const handlePlaySong = () => {
   modalState.currentView = 'player';
 };
 
-// 當有歌曲播放時，自動切換到播放器視圖
+const handleViewAlbumFromPlayer = async () => {
+  const currentSong = playerState.currentSong;
+  if (!currentSong?.albumCid) {
+    return;
+  }
+
+  if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== currentSong.albumCid) {
+    try {
+      const { fetchAlbumDetails } = await import('../services/api.js');
+      albumState.currentAlbumDetails = await fetchAlbumDetails(currentSong.albumCid);
+    } catch (error) {
+      console.error('Error fetching album details from player:', error);
+      return;
+    }
+  }
+
+  modalState.currentView = 'album';
+};
+
 watch(() => playerState.currentSong, (newSong) => {
   if (newSong && modalState.isOpen) {
     modalState.currentView = 'player';
@@ -118,10 +132,9 @@ watch(() => playerState.currentSong, (newSong) => {
   overflow-y: auto;
 }
 
-.modal-close {
+.modal-nav {
   position: absolute;
   top: 15px;
-  right: 15px;
   background: none;
   border: none;
   color: var(--text-color);
@@ -136,7 +149,15 @@ watch(() => playerState.currentSong, (newSong) => {
   border-radius: 50%;
 }
 
-.modal-close:hover {
+.modal-nav-left {
+  left: 15px;
+}
+
+.modal-nav-right {
+  right: 15px;
+}
+
+.modal-nav:hover {
   color: var(--primary-color);
   background: rgba(255, 255, 255, 0.1);
 }
@@ -148,4 +169,3 @@ watch(() => playerState.currentSong, (newSong) => {
   }
 }
 </style>
-
