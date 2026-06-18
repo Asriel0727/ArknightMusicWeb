@@ -380,7 +380,7 @@ const run = () => {
 };
 
 onMounted(() => {
-  if (prefersReducedMotion()) {
+  if (prefersReducedMotion() || isTouchDevice()) {
     return;
   }
 

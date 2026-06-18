@@ -79,6 +79,7 @@ let lastWheelPageAt = 0;
 const WHEEL_PAGE_THRESHOLD = 90;
 const WHEEL_PAGE_COOLDOWN_MS = 520;
 const SCROLL_EDGE_THRESHOLD = 24;
+const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 // 響應式計算每頁顯示的專輯數量
 const albumsPerPage = computed(() => {
@@ -149,7 +150,7 @@ const preloadCurrentAndNextPageImages = () => {
   const currentPageAlbums = albumsToShow.slice(startIndex, endIndex);
   const nextPageAlbums = albumsToShow.slice(endIndex, endIndex + Math.min(6, albumsPerPage.value));
 
-  preloadAlbumImages(currentPageAlbums, true);
+  preloadAlbumImages(currentPageAlbums, !isTouchDevice);
   preloadAlbumImages(nextPageAlbums, false);
 };
 

@@ -18,7 +18,7 @@
       <RecruitCardMaker />
     </template>
 
-    <audio ref="audioPlayerRef" preload="auto" style="display:none;"></audio>
+    <audio ref="audioPlayerRef" :preload="audioPreloadMode" style="display:none;"></audio>
     <footer>
       <p>{{ $t('footer.credit') }}</p>
     </footer>
@@ -60,6 +60,9 @@ watch(
 const audioPlayerRef = ref(null);
 const albumListRef = ref(null);
 const currentPage = ref('albums');
+const audioPreloadMode = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+  ? 'metadata'
+  : 'auto';
 
 const handlePageChange = (page) => {
   currentPage.value = page;
