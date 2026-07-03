@@ -3,7 +3,11 @@
     <ParticleBackground />
     <Navbar :currentPage="currentPage" @change-page="handlePageChange" />
 
-    <template v-if="currentPage === 'albums'">
+    <template v-if="currentPage === 'auth'">
+      <AuthView />
+    </template>
+
+    <template v-else-if="currentPage === 'albums'">
       <TopBar @search="handleSearch" />
       <AlbumList ref="albumListRef" @view-album="handleViewAlbum" />
       <Modal @close="handleModalClose" />
@@ -16,6 +20,11 @@
 
     <template v-else-if="currentPage === 'recruit'">
       <RecruitCardMaker />
+    </template>
+
+    <template v-else-if="currentPage === 'library'">
+      <UserLibraryView />
+      <Modal @close="handleModalClose" />
     </template>
 
     <audio ref="audioPlayerRef" :preload="audioPreloadMode" style="display:none;"></audio>
@@ -32,11 +41,14 @@ import ParticleBackground from './components/ParticleBackground.vue';
 import Navbar from './components/Navbar.vue';
 import TopBar from './components/TopBar.vue';
 import Modal from './components/Modal.vue';
+import { fetchAlbumDetails } from './services/api.js';
 import { initAudioPlayer, modalState, albumState, playSongFromMasterList } from './stores/player.js';
 
 const AlbumList = defineAsyncComponent(() => import('./components/AlbumList.vue'));
 const CharacterList = defineAsyncComponent(() => import('./components/CharacterList.vue'));
 const RecruitCardMaker = defineAsyncComponent(() => import('./components/RecruitCardMaker.vue'));
+const UserLibraryView = defineAsyncComponent(() => import('./components/UserLibraryView.vue'));
+const AuthView = defineAsyncComponent(() => import('./components/AuthView.vue'));
 
 const { t, locale } = useI18n();
 
@@ -76,7 +88,6 @@ const handleSearch = (query) => {
 
 const handleViewAlbum = async (albumId) => {
   try {
-    const { fetchAlbumDetails } = await import('./services/api.js');
     albumState.currentAlbumDetails = await fetchAlbumDetails(albumId);
     modalState.currentView = 'album';
     modalState.isOpen = true;

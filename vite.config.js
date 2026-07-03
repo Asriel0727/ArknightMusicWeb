@@ -14,6 +14,31 @@ export default defineConfig({
     // 3000 被占用時自動改用下一個可用埠（終端機會印出實際網址）
     strictPort: false,
     open: true
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return undefined
+          }
+
+          if (id.includes('html2canvas')) {
+            return 'html2canvas'
+          }
+
+          if (id.includes('opencc-js')) {
+            return 'opencc'
+          }
+
+          if (id.includes('vue') || id.includes('vue-i18n')) {
+            return 'vue-vendor'
+          }
+
+          return 'vendor'
+        }
+      }
+    }
   }
 })
 

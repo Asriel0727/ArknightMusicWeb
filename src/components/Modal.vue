@@ -39,6 +39,7 @@
 <script setup>
 import { computed, defineAsyncComponent, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { fetchAlbumDetails } from '../services/api.js';
 import { modalState, albumState, playerState, characterState } from '../stores/player.js';
 
 const AlbumDetails = defineAsyncComponent(() => import('./AlbumDetails.vue'));
@@ -81,7 +82,6 @@ const handleViewAlbumFromPlayer = async () => {
 
   if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== currentSong.albumCid) {
     try {
-      const { fetchAlbumDetails } = await import('../services/api.js');
       albumState.currentAlbumDetails = await fetchAlbumDetails(currentSong.albumCid);
     } catch (error) {
       console.error('Error fetching album details from player:', error);

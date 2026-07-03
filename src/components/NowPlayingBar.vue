@@ -58,6 +58,7 @@ import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { playerState, dropdownState, modalState } from '../stores/player.js';
 import { playSongFromMasterList, prefetchSongFromMasterList } from '../stores/player.js';
+import { fetchSongs } from '../services/api.js';
 
 const { t } = useI18n();
 
@@ -148,7 +149,6 @@ const loadAllSongs = async () => {
   if (dropdownState.isLoaded) return;
   
   try {
-    const { fetchSongs } = await import('../services/api.js');
     const songs = await fetchSongs();
     dropdownState.allSongs = songs.map(song => ({
       cid: song.cid,
@@ -213,8 +213,7 @@ const loadSongDropdown = async ({ force = false } = {}) => {
   dropdownState.isLoading = true;
   dropdownState.loadError = '';
 
-  songLoadPromise = import('../services/api.js')
-    .then(({ fetchSongs }) => fetchSongs())
+  songLoadPromise = fetchSongs()
     .then((songs) => {
       const normalizedSongs = normalizeSongsForDropdown(songs);
       dropdownState.allSongs = normalizedSongs;

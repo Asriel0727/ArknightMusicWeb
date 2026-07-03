@@ -2,6 +2,7 @@ import { useI18n } from 'vue-i18n';
 import { setGameDataFolderFromUiLocale } from '../services/gameDataSource.js';
 import { i18n } from '../i18n/index.js';
 import { APP_LOCALE_STORAGE_KEY } from '../i18n/constants.js';
+import { invalidateArknightsCaches, syncFactionI18nMessages } from '../services/api.js';
 import { playerState, refreshLyricTranslations } from '../stores/player.js';
 
 export function useAppLocale() {
@@ -16,7 +17,6 @@ export function useAppLocale() {
       /* ignore */
     }
     setGameDataFolderFromUiLocale(code);
-    const { invalidateArknightsCaches, syncFactionI18nMessages } = await import('../services/api.js');
     invalidateArknightsCaches();
     await syncFactionI18nMessages(i18n);
     if (playerState.showLyricTranslation && playerState.lyrics.length > 0) {

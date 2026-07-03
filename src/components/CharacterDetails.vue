@@ -20,6 +20,17 @@
           <span class="tag position">{{ character.position === 'MELEE' ? t('character.melee') : t('character.ranged') }}</span>
           <span v-if="getFactionLabel(character.factionId)" class="tag nation">{{ getFactionLabel(character.factionId) }}</span>
         </div>
+        <div v-if="authState.user" class="character-list-actions">
+          <select v-model="selectedCharacterListId" class="character-list-select" @focus="loadUserCharacterLists">
+            <option value="">選擇角色清單</option>
+            <option v-for="list in userCharacterLists" :key="list.id" :value="list.id">
+              {{ list.name }}
+            </option>
+          </select>
+          <button class="character-list-btn" type="button" @click="addCurrentCharacterToList">
+            加入清單
+          </button>
+        </div>
       </div>
     </div>
 
@@ -289,9 +300,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getCharacterAvatarUrls } from '../services/api.js';
+import { authState } from '../services/auth.js';
+import {
+  addCharacterToList,
+  createCharacterList,
+  fetchCharacterLists,
+} from '../services/userLibrary.js';
 
 const { t } = useI18n();
 
@@ -304,6 +321,37 @@ const props = defineProps({
 
 const currentPortraitIndex = ref(0);
 const currentPortraitUrlIndex = ref(0);
+const userCharacterLists = ref([]);
+const selectedCharacterListId = ref('');
+
+const loadUserCharacterLists = async () => {
+  if (!authState.user) return;
+  userCharacterLists.value = await fetchCharacterLists();
+};
+
+const addCurrentCharacterToList = async () => {
+  if (!authState.user || !props.character?.id) return;
+
+  if (!selectedCharacterListId.value) {
+    const name = window.prompt('Character list name');
+    if (!name) return;
+    const list = await createCharacterList(name);
+    await loadUserCharacterLists();
+    selectedCharacterListId.value = list?.id || '';
+  }
+
+  if (selectedCharacterListId.value) {
+    await addCharacterToList(selectedCharacterListId.value, props.character.id);
+  }
+};
+
+watch(() => authState.user, () => {
+  loadUserCharacterLists().catch(() => {});
+});
+
+onMounted(() => {
+  loadUserCharacterLists().catch(() => {});
+});
 const expandedStories = ref([0]); // 預設展開第一個檔案
 
 // 詳細資料頭像多來源索引
@@ -1139,4 +1187,10 @@ const handleMaterialError = (event) => {
 .api-pre-line {
   white-space: pre-line;
 }
+</style>
+
+<style scoped>
+.character-list-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.character-list-select { border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color); padding: 7px 9px; }
+.character-list-btn { border: 1px solid var(--primary-color); border-radius: 6px; background: transparent; color: var(--primary-color); padding: 7px 10px; cursor: pointer; }
 </style>

@@ -12,6 +12,9 @@ const MUSIC_CACHE_PREFIX = 'music:api:v1:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
 const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
 const LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:server:v1:';
+const USER_ACCOUNT_KEY_PREFIX = 'userAccount:v1:';
+const USER_SESSION_KEY_PREFIX = 'userSession:v1:';
+const USER_SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 const GOOGLE_TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
 const TRANSLATION_LINE_SEPARATOR = '\n';
 const MAX_TRANSLATION_BATCH_TEXT_LENGTH = 4200;
@@ -40,6 +43,11 @@ export default {
         supabaseConfigured: hasSupabaseConfig(env),
         time: new Date().toISOString(),
       });
+    }
+
+    const userResponse = await handleUserApiRequest(request, env, url);
+    if (userResponse) {
+      return userResponse;
     }
 
     const shareResponse = await handleSongSharePage(request, env, url);
@@ -236,6 +244,10 @@ function hasSupabaseConfig(env) {
   return Boolean(getSupabaseUrl(env) && env.SUPABASE_SERVICE_ROLE_KEY);
 }
 
+function getSupabaseAuthKey(env) {
+  return env.SUPABASE_ANON_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
+}
+
 function parseMusicPrewarmLimit(rawLimit) {
   if (rawLimit == null || rawLimit === '') {
     return DEFAULT_SONG_DETAIL_PREWARM_LIMIT;
@@ -387,6 +399,30 @@ async function countSupabaseRows(env, tableName, filters = {}, selectColumn = 'i
   }
 
   return parseContentRangeTotal(response.headers.get('content-range'));
+}
+
+async function supabaseRestRequest(env, tableName, options = {}) {
+  const endpoint = `${getSupabaseUrl(env)}/rest/v1/${tableName}${options.query || ''}`;
+  const response = await fetch(endpoint, {
+    method: options.method || 'GET',
+    headers: supabaseHeaders(env, {
+      'content-type': 'application/json',
+      prefer: options.prefer || 'return=representation',
+      ...(options.headers || {}),
+    }),
+    body: options.body == null ? undefined : JSON.stringify(options.body),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`Supabase ${tableName} failed: ${response.status} ${text}`);
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json().catch(() => null);
 }
 
 async function readLatestSupabaseRow(env, tableName, selectColumns) {
@@ -694,6 +730,455 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+async function handleUserApiRequest(request, env, url) {
+  if (!url.pathname.startsWith('/api/auth') && !url.pathname.startsWith('/api/user')) {
+    return null;
+  }
+
+  if (!hasSupabaseConfig(env)) {
+    return json({ ok: false, error: 'Supabase is not configured' }, 503);
+  }
+
+  if (url.pathname === '/api/auth/sign-up') {
+    return handleKeySignUp(request, env);
+  }
+
+  if (url.pathname === '/api/auth/sign-in') {
+    return handleKeySignIn(request, env);
+  }
+
+  const auth = await getAuthenticatedUser(request, env);
+  if (!auth.ok) {
+    return json({ ok: false, error: auth.error }, auth.status || 401);
+  }
+
+  if (url.pathname === '/api/auth/user') {
+    return json({ ok: true, user: auth.user });
+  }
+
+  if (url.pathname === '/api/user/favorite-songs') {
+    return handleFavoriteSongsRequest(request, env, auth.user, url);
+  }
+
+  const playlistMatch = url.pathname.match(/^\/api\/user\/playlists(?:\/([^/]+))?(?:\/songs)?$/);
+  if (playlistMatch) {
+    const playlistId = playlistMatch[1] ? decodeURIComponent(playlistMatch[1]) : '';
+    const isSongsRoute = url.pathname.endsWith('/songs');
+    return handlePlaylistRequest(request, env, auth.user, playlistId, isSongsRoute);
+  }
+
+  const characterListMatch = url.pathname.match(/^\/api\/user\/character-lists(?:\/([^/]+))?(?:\/items)?$/);
+  if (characterListMatch) {
+    const listId = characterListMatch[1] ? decodeURIComponent(characterListMatch[1]) : '';
+    const isItemsRoute = url.pathname.endsWith('/items');
+    return handleCharacterListRequest(request, env, auth.user, listId, isItemsRoute);
+  }
+
+  return json({ ok: false, error: 'Not found' }, 404);
+}
+
+async function handleKeySignUp(request, env) {
+  if (request.method !== 'POST') {
+    return methodNotAllowed('POST');
+  }
+
+  const body = await readJsonBody(request);
+  const loginKey = normalizeLoginKey(body.loginKey || body.email);
+  const password = String(body.password || '');
+  const validation = validateLoginCredentials(loginKey, password);
+  if (validation) {
+    return json({ ok: false, error: validation }, 400);
+  }
+
+  const accountKey = getUserAccountKey(loginKey);
+  const existing = await env.ARKNIGHTS_DATA.get(accountKey, 'json');
+  if (existing) {
+    return json({ ok: false, error: 'Login key already exists' }, 409);
+  }
+
+  const salt = randomBase64Url(16);
+  const passwordHash = await hashPassword(password, salt);
+  const user = {
+    id: crypto.randomUUID(),
+    loginKey,
+    createdAt: new Date().toISOString(),
+  };
+  const account = {
+    ...user,
+    salt,
+    passwordHash,
+  };
+  await env.ARKNIGHTS_DATA.put(accountKey, JSON.stringify(account));
+
+  const session = await createUserSession(env, user);
+  return json({ ok: true, session });
+}
+
+async function handleKeySignIn(request, env) {
+  if (request.method !== 'POST') {
+    return methodNotAllowed('POST');
+  }
+
+  const body = await readJsonBody(request);
+  const loginKey = normalizeLoginKey(body.loginKey || body.email);
+  const password = String(body.password || '');
+  const validation = validateLoginCredentials(loginKey, password);
+  if (validation) {
+    return json({ ok: false, error: validation }, 400);
+  }
+
+  const account = await env.ARKNIGHTS_DATA.get(getUserAccountKey(loginKey), 'json');
+  if (!account) {
+    return json({ ok: false, error: 'Invalid login key or password' }, 401);
+  }
+
+  const passwordHash = await hashPassword(password, account.salt);
+  if (passwordHash !== account.passwordHash) {
+    return json({ ok: false, error: 'Invalid login key or password' }, 401);
+  }
+
+  const session = await createUserSession(env, {
+    id: account.id,
+    loginKey: account.loginKey,
+    createdAt: account.createdAt,
+  });
+  return json({ ok: true, session });
+}
+
+async function createUserSession(env, user) {
+  const token = randomBase64Url(32);
+  const session = {
+    access_token: token,
+    token_type: 'bearer',
+    expires_in: USER_SESSION_TTL_SECONDS,
+    expires_at: Math.floor(Date.now() / 1000) + USER_SESSION_TTL_SECONDS,
+    user,
+  };
+  const sessionKey = await getUserSessionKey(token);
+  await env.ARKNIGHTS_DATA.put(sessionKey, JSON.stringify(session), {
+    expirationTtl: USER_SESSION_TTL_SECONDS,
+  });
+  return session;
+}
+
+function normalizeLoginKey(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function validateLoginCredentials(loginKey, password) {
+  if (!/^[a-z0-9_-]{3,32}$/.test(loginKey)) {
+    return 'Login key must be 3-32 characters: a-z, 0-9, _ or -';
+  }
+
+  if (password.length < 6) {
+    return 'Password must be at least 6 characters';
+  }
+
+  return '';
+}
+
+function getUserAccountKey(loginKey) {
+  return `${USER_ACCOUNT_KEY_PREFIX}${loginKey}`;
+}
+
+async function getUserSessionKey(token) {
+  return `${USER_SESSION_KEY_PREFIX}${await sha256Hex(token)}`;
+}
+
+async function hashPassword(password, salt) {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      hash: 'SHA-256',
+      salt: new TextEncoder().encode(salt),
+      iterations: 100000,
+    },
+    keyMaterial,
+    256
+  );
+  return bytesToBase64Url(new Uint8Array(bits));
+}
+
+function randomBase64Url(size) {
+  const bytes = new Uint8Array(size);
+  crypto.getRandomValues(bytes);
+  return bytesToBase64Url(bytes);
+}
+
+function bytesToBase64Url(bytes) {
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+async function getAuthenticatedUser(request, env) {
+  const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token) {
+    return { ok: false, status: 401, error: 'Login required' };
+  }
+
+  const session = await env.ARKNIGHTS_DATA.get(await getUserSessionKey(token), 'json');
+  if (!session?.user) {
+    return { ok: false, status: 401, error: 'Invalid session' };
+  }
+
+  return { ok: true, user: session.user };
+}
+
+async function handleFavoriteSongsRequest(request, env, user, url) {
+  if (request.method === 'GET') {
+    const rows = await supabaseRestRequest(
+      env,
+      'user_favorite_songs',
+      { query: `?user_id=eq.${encodeURIComponent(user.id)}&select=*&order=created_at.desc` }
+    );
+    return json({ ok: true, favorites: rows || [] });
+  }
+
+  if (request.method === 'POST') {
+    const body = await readJsonBody(request);
+    const songCid = String(body.songCid || body.song_cid || '').trim();
+    if (!songCid) {
+      return json({ ok: false, error: 'songCid is required' }, 400);
+    }
+
+    const rows = await supabaseRestRequest(env, 'user_favorite_songs', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=representation',
+      body: { user_id: user.id, song_cid: songCid },
+    });
+    return json({ ok: true, favorite: rows?.[0] || null });
+  }
+
+  if (request.method === 'DELETE') {
+    const songCid = url.searchParams.get('songCid') || '';
+    if (!songCid) {
+      return json({ ok: false, error: 'songCid is required' }, 400);
+    }
+
+    await supabaseRestRequest(env, 'user_favorite_songs', {
+      method: 'DELETE',
+      query: `?user_id=eq.${encodeURIComponent(user.id)}&song_cid=eq.${encodeURIComponent(songCid)}`,
+      prefer: 'return=minimal',
+    });
+    return json({ ok: true });
+  }
+
+  return methodNotAllowed('GET, POST, DELETE');
+}
+
+async function handlePlaylistRequest(request, env, user, playlistId, isSongsRoute) {
+  if (isSongsRoute) {
+    const playlist = await getOwnedRow(env, 'user_playlists', playlistId, user.id);
+    if (!playlist) {
+      return json({ ok: false, error: 'Playlist not found' }, 404);
+    }
+
+    if (request.method === 'POST') {
+      const body = await readJsonBody(request);
+      const songCid = String(body.songCid || body.song_cid || '').trim();
+      if (!songCid) {
+        return json({ ok: false, error: 'songCid is required' }, 400);
+      }
+
+      const rows = await supabaseRestRequest(env, 'user_playlist_songs', {
+        method: 'POST',
+        prefer: 'resolution=merge-duplicates,return=representation',
+        body: {
+          playlist_id: playlistId,
+          song_cid: songCid,
+          sort_order: Number(body.sortOrder || body.sort_order || 0),
+          note: body.note || null,
+        },
+      });
+      return json({ ok: true, item: rows?.[0] || null });
+    }
+
+    if (request.method === 'DELETE') {
+      const songCid = new URL(request.url).searchParams.get('songCid') || '';
+      await supabaseRestRequest(env, 'user_playlist_songs', {
+        method: 'DELETE',
+        query: `?playlist_id=eq.${encodeURIComponent(playlistId)}&song_cid=eq.${encodeURIComponent(songCid)}`,
+        prefer: 'return=minimal',
+      });
+      return json({ ok: true });
+    }
+  }
+
+  if (request.method === 'GET' && !playlistId) {
+    const rows = await supabaseRestRequest(
+      env,
+      'user_playlists',
+      { query: `?user_id=eq.${encodeURIComponent(user.id)}&select=*,songs:user_playlist_songs(*)&order=updated_at.desc` }
+    );
+    return json({ ok: true, playlists: rows || [] });
+  }
+
+  if (request.method === 'POST' && !playlistId) {
+    const body = await readJsonBody(request);
+    const name = String(body.name || '').trim();
+    if (!name) {
+      return json({ ok: false, error: 'name is required' }, 400);
+    }
+
+    const rows = await supabaseRestRequest(env, 'user_playlists', {
+      method: 'POST',
+      body: {
+        user_id: user.id,
+        name,
+        description: body.description || null,
+        visibility: body.visibility || 'private',
+      },
+    });
+    return json({ ok: true, playlist: rows?.[0] || null });
+  }
+
+  if (playlistId && request.method === 'PATCH') {
+    const body = await readJsonBody(request);
+    const rows = await supabaseRestRequest(env, 'user_playlists', {
+      method: 'PATCH',
+      query: `?id=eq.${encodeURIComponent(playlistId)}&user_id=eq.${encodeURIComponent(user.id)}`,
+      body: {
+        name: body.name,
+        description: body.description,
+        visibility: body.visibility,
+        updated_at: new Date().toISOString(),
+      },
+    });
+    return json({ ok: true, playlist: rows?.[0] || null });
+  }
+
+  if (playlistId && request.method === 'DELETE') {
+    await supabaseRestRequest(env, 'user_playlists', {
+      method: 'DELETE',
+      query: `?id=eq.${encodeURIComponent(playlistId)}&user_id=eq.${encodeURIComponent(user.id)}`,
+      prefer: 'return=minimal',
+    });
+    return json({ ok: true });
+  }
+
+  return methodNotAllowed('GET, POST, PATCH, DELETE');
+}
+
+async function handleCharacterListRequest(request, env, user, listId, isItemsRoute) {
+  if (isItemsRoute) {
+    const list = await getOwnedRow(env, 'user_character_lists', listId, user.id);
+    if (!list) {
+      return json({ ok: false, error: 'Character list not found' }, 404);
+    }
+
+    if (request.method === 'POST') {
+      const body = await readJsonBody(request);
+      const characterId = String(body.characterId || body.character_id || '').trim();
+      if (!characterId) {
+        return json({ ok: false, error: 'characterId is required' }, 400);
+      }
+
+      const rows = await supabaseRestRequest(env, 'user_character_list_items', {
+        method: 'POST',
+        prefer: 'resolution=merge-duplicates,return=representation',
+        body: {
+          list_id: listId,
+          character_id: characterId,
+          sort_order: Number(body.sortOrder || body.sort_order || 0),
+          note: body.note || null,
+        },
+      });
+      return json({ ok: true, item: rows?.[0] || null });
+    }
+
+    if (request.method === 'DELETE') {
+      const characterId = new URL(request.url).searchParams.get('characterId') || '';
+      await supabaseRestRequest(env, 'user_character_list_items', {
+        method: 'DELETE',
+        query: `?list_id=eq.${encodeURIComponent(listId)}&character_id=eq.${encodeURIComponent(characterId)}`,
+        prefer: 'return=minimal',
+      });
+      return json({ ok: true });
+    }
+  }
+
+  if (request.method === 'GET' && !listId) {
+    const rows = await supabaseRestRequest(
+      env,
+      'user_character_lists',
+      { query: `?user_id=eq.${encodeURIComponent(user.id)}&select=*,items:user_character_list_items(*)&order=updated_at.desc` }
+    );
+    return json({ ok: true, lists: rows || [] });
+  }
+
+  if (request.method === 'POST' && !listId) {
+    const body = await readJsonBody(request);
+    const name = String(body.name || '').trim();
+    if (!name) {
+      return json({ ok: false, error: 'name is required' }, 400);
+    }
+
+    const rows = await supabaseRestRequest(env, 'user_character_lists', {
+      method: 'POST',
+      body: {
+        user_id: user.id,
+        name,
+        description: body.description || null,
+      },
+    });
+    return json({ ok: true, list: rows?.[0] || null });
+  }
+
+  if (listId && request.method === 'PATCH') {
+    const body = await readJsonBody(request);
+    const rows = await supabaseRestRequest(env, 'user_character_lists', {
+      method: 'PATCH',
+      query: `?id=eq.${encodeURIComponent(listId)}&user_id=eq.${encodeURIComponent(user.id)}`,
+      body: {
+        name: body.name,
+        description: body.description,
+        updated_at: new Date().toISOString(),
+      },
+    });
+    return json({ ok: true, list: rows?.[0] || null });
+  }
+
+  if (listId && request.method === 'DELETE') {
+    await supabaseRestRequest(env, 'user_character_lists', {
+      method: 'DELETE',
+      query: `?id=eq.${encodeURIComponent(listId)}&user_id=eq.${encodeURIComponent(user.id)}`,
+      prefer: 'return=minimal',
+    });
+    return json({ ok: true });
+  }
+
+  return methodNotAllowed('GET, POST, PATCH, DELETE');
+}
+
+async function getOwnedRow(env, tableName, id, userId) {
+  if (!id) {
+    return null;
+  }
+
+  const rows = await supabaseRestRequest(env, tableName, {
+    query: `?id=eq.${encodeURIComponent(id)}&user_id=eq.${encodeURIComponent(userId)}&select=*&limit=1`,
+  });
+  return rows?.[0] || null;
+}
+
+async function readJsonBody(request) {
+  try {
+    return await request.json();
+  } catch {
+    return {};
+  }
 }
 
 async function handleMusicApiRequest(request, env, url) {

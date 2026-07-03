@@ -76,6 +76,16 @@
               </span>
               <span class="toggle-label">ç¿»è­¯</span>
             </label>
+            <div v-if="authState.user && playerState.currentSong" class="library-actions">
+              <button class="library-btn" type="button" :title="isFavoriteSong ? 'Remove favorite' : 'Add favorite'" @click="toggleFavoriteSong">
+                <i :class="isFavoriteSong ? 'fas fa-heart' : 'far fa-heart'"></i>
+              </button>
+              <select v-model="selectedPlaylistId" class="playlist-select" @focus="loadUserPlaylists">
+                <option value="">????</option>
+                <option v-for="playlist in userPlaylists" :key="playlist.id" :value="playlist.id">{{ playlist.name }}</option>
+              </select>
+              <button class="library-btn" type="button" @click="addCurrentSongToPlaylist">??</button>
+            </div>
           </div>
         </div>
       </div>
@@ -125,6 +135,8 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations, togglePlayMode } from '../stores/player.js';
 import { createSongShareUrl as createSongSharePageUrl, getProxyImageUrl } from '../services/api.js';
+import { authState } from '../services/auth.js';
+import { addFavoriteSong, addSongToPlaylist, createPlaylist, fetchFavoriteSongs, fetchPlaylists, removeFavoriteSong } from '../services/userLibrary.js';
 import { formatTime } from '../utils/time.js';
 
 const { t, locale } = useI18n();
@@ -133,12 +145,61 @@ const emit = defineEmits(['view-album']);
 const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);
 const hasCopiedShareLink = ref(false);
+const isFavoriteSong = ref(false);
+const userPlaylists = ref([]);
+const selectedPlaylistId = ref('');
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
 let shareStatusTimeout = null;
 
 const LYRICS_TIME_OFFSET = 0.5;
+
+const loadUserPlaylists = async () => {
+  if (!authState.user) return;
+  userPlaylists.value = await fetchPlaylists();
+};
+
+const refreshFavoriteState = async () => {
+  if (!authState.user || !playerState.currentSong?.cid) {
+    isFavoriteSong.value = false;
+    return;
+  }
+
+  const favorites = await fetchFavoriteSongs();
+  isFavoriteSong.value = favorites.some((favorite) => favorite.song_cid === playerState.currentSong.cid);
+};
+
+const toggleFavoriteSong = async () => {
+  const songId = playerState.currentSong?.cid;
+  if (!authState.user || !songId) return;
+
+  if (isFavoriteSong.value) {
+    await removeFavoriteSong(songId);
+    isFavoriteSong.value = false;
+    return;
+  }
+
+  await addFavoriteSong(songId);
+  isFavoriteSong.value = true;
+};
+
+const addCurrentSongToPlaylist = async () => {
+  const songId = playerState.currentSong?.cid;
+  if (!authState.user || !songId) return;
+
+  if (!selectedPlaylistId.value) {
+    const name = window.prompt('????????');
+    if (!name) return;
+    const playlist = await createPlaylist(name);
+    await loadUserPlaylists();
+    selectedPlaylistId.value = playlist?.id || '';
+  }
+
+  if (selectedPlaylistId.value) {
+    await addSongToPlaylist(selectedPlaylistId.value, songId);
+  }
+};
 
 const progressPercent = computed(() => {
   if (!playerState.duration || playerState.duration === 0) return 0;
@@ -380,6 +441,8 @@ watch(locale, () => {
 
 // çµ„ä»¶?›è??‚ï?å¦‚æ?æ­?œ¨?­æ”¾?‡å??•å?æ­?
 onMounted(() => {
+  refreshFavoriteState().catch(() => {});
+  loadUserPlaylists().catch(() => {});
   if (playerState.isPlaying) {
     startLyricsSync();
   }
@@ -744,4 +807,10 @@ onUnmounted(() => {
     margin-bottom: 15px;
   }
 }
+</style>
+
+<style scoped>
+.library-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.library-btn { border: 1px solid var(--primary-color); border-radius: 6px; background: transparent; color: var(--primary-color); padding: 6px 9px; cursor: pointer; }
+.playlist-select { max-width: 150px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color); padding: 6px; }
 </style>

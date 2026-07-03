@@ -21,7 +21,7 @@ import {
 } from '../utils/recruitCard.js';
 
 const DEFAULT_MUSIC_API_ORIGIN = 'https://arknights-recruit-api.molly27molly.workers.dev';
-const API_ORIGIN = (
+export const API_ORIGIN = (
   import.meta.env.VITE_MUSIC_API_ORIGIN || DEFAULT_MUSIC_API_ORIGIN
 ).replace(/\/$/, '');
 /** 專輯／歌曲等 JSON API（Express 掛在 /api） */

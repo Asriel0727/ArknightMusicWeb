@@ -1,7 +1,16 @@
-<template>
+﻿<template>
   <nav class="main-navbar">
     <div class="navbar-left">
       <div class="nav-tabs">
+        <button
+          v-if="!authState.user"
+          class="nav-tab"
+          :class="{ active: currentPage === 'auth' }"
+          @click="changePage('auth')"
+        >
+          <i class="fas fa-user-circle"></i>
+          <span>?餃/閮餃?</span>
+        </button>
         <button 
           class="nav-tab" 
           :class="{ active: currentPage === 'albums' }"
@@ -26,9 +35,27 @@
           <i class="fas fa-id-card"></i>
           <span>{{ $t('nav.recruit') }}</span>
         </button>
+        <button
+          v-if="authState.user"
+          class="nav-tab"
+          :class="{ active: currentPage === 'library' }"
+          @click="changePage('library')"
+        >
+          <i class="fas fa-bookmark"></i>
+          <span>???嗉?</span>
+        </button>
       </div>
     </div>
     <div class="navbar-right">
+      <div class="auth-box">
+        <template v-if="authState.user">
+          <span class="auth-email">{{ authState.user.loginKey }}</span>
+          <button class="auth-btn ghost" type="button" @click="handleSignOut">?餃</button>
+        </template>
+        <template v-else>
+          <span class="auth-email">Guest</span>
+        </template>
+      </div>
       <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />
       <label class="nav-locale-wrap">
         <span class="nav-locale-label" :title="$t('language.label')" aria-hidden="true">
@@ -45,9 +72,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAppLocale } from '../composables/useAppLocale.js';
+import { authState, initAuth, signOut } from '../services/auth.js';
 
 const { locale } = useI18n();
 const { setLocale } = useAppLocale();
@@ -65,7 +93,7 @@ const localeOptions = [
   { value: 'ko', labelKey: 'language.ko' },
 ];
 
-// 使用 Vite 的 BASE_URL 来支持 GitHub Pages 的 base 路径
+// 雿輻 Vite ??BASE_URL ?交??GitHub Pages ??base 頝臬?
 const baseUrl = import.meta.env.BASE_URL;
 
 const props = defineProps({
@@ -80,6 +108,17 @@ const emit = defineEmits(['change-page']);
 const changePage = (page) => {
   emit('change-page', page);
 };
+
+const handleSignOut = () => {
+  signOut();
+  if (props.currentPage === 'library') {
+    changePage('albums');
+  }
+};
+
+onMounted(() => {
+  initAuth().catch(() => {});
+});
 </script>
 
 <style scoped>
@@ -111,6 +150,65 @@ const changePage = (page) => {
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+}
+
+.auth-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 360px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.auth-input {
+  width: 118px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 5px 7px;
+  font-size: 0.75rem;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.auth-btn {
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  background: var(--primary-color);
+  color: #111;
+  padding: 5px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.auth-btn.ghost {
+  background: transparent;
+  color: var(--primary-color);
+}
+
+.auth-btn:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.auth-email {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.auth-error {
+  color: #ff7b72;
+  font-size: 0.7rem;
+  width: 100%;
+  text-align: center;
 }
 
 .nav-locale-wrap {
@@ -248,3 +346,4 @@ const changePage = (page) => {
   }
 }
 </style>
+
