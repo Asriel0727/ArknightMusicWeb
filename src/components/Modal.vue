@@ -1,17 +1,20 @@
 <template>
   <div class="modal" :class="{ show: modalState.isOpen }" @click="handleBackdropClick">
     <div class="modal-content" @click.stop>
-      <button class="modal-nav modal-nav-left" title="回首頁" @click="handleClose">
-        <i class="fas fa-home"></i>
-      </button>
-      <button
-        v-if="modalState.currentView === 'player'"
-        class="modal-nav modal-nav-right"
-        title="回專輯頁面"
-        @click="handleViewAlbumFromPlayer"
-      >
-        <i class="fas fa-compact-disc"></i>
-      </button>
+      <div class="modal-actions" aria-label="頁面導覽">
+        <button class="modal-nav" title="回首頁" @click="handleClose">
+          <i class="fas fa-home"></i>
+        </button>
+        <button
+          v-if="modalState.currentView === 'player'"
+          class="modal-nav"
+          title="回專輯頁面"
+          @click="handleViewAlbumFromPlayer"
+        >
+          <i class="fas fa-compact-disc"></i>
+        </button>
+      </div>
+
       <div id="modal-body">
         <AlbumDetails
           v-if="modalState.currentView === 'album' && albumState.currentAlbumDetails"
@@ -132,40 +135,53 @@ watch(() => playerState.currentSong, (newSong) => {
   overflow-y: auto;
 }
 
-.modal-nav {
+.modal-actions {
   position: absolute;
   top: 15px;
-  background: none;
-  border: none;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+}
+
+.modal-nav {
+  background: rgba(13, 17, 23, 0.72);
+  border: 1px solid var(--border-color);
   color: var(--text-color);
-  font-size: 24px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: color 0.3s;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-}
-
-.modal-nav-left {
-  left: 15px;
-}
-
-.modal-nav-right {
-  right: 15px;
+  border-radius: 8px;
+  padding: 0;
 }
 
 .modal-nav:hover {
   color: var(--primary-color);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(88, 166, 255, 0.12);
+  border-color: var(--primary-color);
+}
+
+.modal-nav:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 @media (max-width: 480px) {
   .modal-content {
     padding: 15px;
     width: 95%;
+  }
+
+  .modal-actions {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
   }
 }
 </style>

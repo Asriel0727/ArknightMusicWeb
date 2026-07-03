@@ -20,7 +20,7 @@ import {
   RECRUIT_FACTION_LOGO_OPTIONS,
 } from '../utils/recruitCard.js';
 
-const DEFAULT_MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
+const DEFAULT_MUSIC_API_ORIGIN = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const API_ORIGIN = (
   import.meta.env.VITE_MUSIC_API_ORIGIN || DEFAULT_MUSIC_API_ORIGIN
 ).replace(/\/$/, '');
@@ -130,6 +130,84 @@ export async function fetchSongDetails(songId) {
   const { data } = await response.json();
   songDetailsCache.set(songId, { data, t: Date.now() });
   return transformMusicApiPayload(JSON.parse(JSON.stringify(data)));
+}
+
+export async function fetchFullSongDetails(songId) {
+  const response = await fetch(`${API_BASE}/song/${encodeURIComponent(songId)}/full`);
+  if (!response.ok) throw new Error('Network response was not ok');
+
+  const { data } = await response.json();
+  const normalized = transformMusicApiPayload(data);
+  const lyricsText = data?.lyricsText || '';
+
+  return {
+    song: normalized?.song || {},
+    album: normalized?.album || null,
+    lyrics: lyricsText ? parseLRC(lyricsText) : [],
+    assets: normalized?.assets || {},
+  };
+}
+
+export async function searchMusic(query) {
+  const normalizedQuery = String(query || '').trim();
+  if (!normalizedQuery) {
+    return { albums: [], songs: [], count: 0 };
+  }
+
+  const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(normalizedQuery)}`);
+  if (!response.ok) throw new Error('Network response was not ok');
+  const data = await response.json();
+
+  return {
+    ...data,
+    albums: transformMusicApiPayload(data.albums || []),
+    songs: transformMusicApiPayload(data.songs || []),
+  };
+}
+
+export async function translateLyricsOnServer(lines, locale) {
+  const response = await fetch(`${API_BASE}/lyrics/translate`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      locale,
+      lines: lines.map((line) => ({ text: line.text || '' })),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Translate request failed: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function translateTextOnServer(text, locale) {
+  const response = await fetch(`${API_BASE}/lyrics/translate`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      locale,
+      text,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Translate request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.translation || '';
+}
+
+export function createSongShareUrl(songId, appUrl = window.location.href) {
+  if (!songId) return '';
+
+  return `${API_ORIGIN}/share/song/${encodeURIComponent(songId)}?app=${encodeURIComponent(appUrl)}`;
 }
 
 /**

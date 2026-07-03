@@ -11,6 +11,12 @@ const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v2:';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
 const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
+const LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:server:v1:';
+const GOOGLE_TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
+const TRANSLATION_LINE_SEPARATOR = '\n';
+const MAX_TRANSLATION_BATCH_TEXT_LENGTH = 4200;
+const SUPPORTED_TRANSLATION_LOCALES = new Set(['zh-TW', 'zh-CN', 'en', 'ja', 'ko']);
+const DEFAULT_APP_ORIGIN = 'https://molly27molly.github.io/ArknightMusicWeb/';
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
 const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
 const MAX_SONG_DETAIL_PREWARM_LIMIT = 10;
@@ -23,6 +29,10 @@ export default {
     const url = new URL(request.url);
     const publicApiBase = getPublicApiBase(request, env);
 
+    if (request.method === 'OPTIONS') {
+      return corsResponse();
+    }
+
     if (url.pathname === '/api/health') {
       return json({
         ok: true,
@@ -30,6 +40,11 @@ export default {
         supabaseConfigured: hasSupabaseConfig(env),
         time: new Date().toISOString(),
       });
+    }
+
+    const shareResponse = await handleSongSharePage(request, env, url);
+    if (shareResponse) {
+      return shareResponse;
     }
 
     const musicResponse = await handleMusicApiRequest(request, env, url);
@@ -574,7 +589,122 @@ function isFreshSupabaseRow(row, maxAgeMs) {
   return Date.now() - updatedAt <= maxAgeMs;
 }
 
+async function handleSongSharePage(request, env, url) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return null;
+  }
+
+  const match = url.pathname.match(/^\/share\/song\/([^/]+)$/);
+  if (!match) {
+    return null;
+  }
+
+  const songId = decodeURIComponent(match[1]);
+  const appUrl = buildSharedSongAppUrl(request, url, songId);
+  let song = {};
+  let album = null;
+
+  try {
+    const fullSong = await getFullSongJson(request, env, songId);
+    song = fullSong.data?.data?.song || {};
+    album = fullSong.data?.data?.album || null;
+  } catch (error) {
+    console.warn('Share page song lookup failed:', songId, error.message);
+  }
+
+  const title = song.name
+    ? `${song.name} | Monster Siren Records`
+    : 'Monster Siren Records';
+  const description = album?.name
+    ? `Listen from ${album.name}`
+    : 'Listen to this Arknights music track.';
+  const image = album?.coverDeUrl || album?.coverUrl || song.coverDeUrl || song.coverUrl || '';
+  const publicApiBase = getPublicApiBase(request, env);
+  const imageUrl = image ? proxyMusicAssetUrl(image, publicApiBase, 'image') : '';
+  const html = renderSongShareHtml({
+    title,
+    description,
+    imageUrl,
+    shareUrl: url.toString(),
+    appUrl,
+  });
+
+  return new Response(request.method === 'HEAD' ? null : html, {
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'public, max-age=900',
+      'access-control-allow-origin': '*',
+    },
+  });
+}
+
+function buildSharedSongAppUrl(request, url, songId) {
+  const rawApp = url.searchParams.get('app') || DEFAULT_APP_ORIGIN;
+  let appUrl;
+
+  try {
+    appUrl = new URL(rawApp);
+    if (appUrl.protocol !== 'https:' && appUrl.protocol !== 'http:') {
+      throw new Error('Invalid app protocol');
+    }
+  } catch {
+    appUrl = new URL(DEFAULT_APP_ORIGIN);
+  }
+
+  appUrl.searchParams.set('song', songId);
+  return appUrl.toString();
+}
+
+function renderSongShareHtml({ title, description, imageUrl, shareUrl, appUrl }) {
+  const safeTitle = escapeHtml(title);
+  const safeDescription = escapeHtml(description);
+  const safeImageUrl = escapeHtml(imageUrl);
+  const safeShareUrl = escapeHtml(shareUrl);
+  const safeAppUrl = escapeHtml(appUrl);
+
+  return `<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${safeTitle}</title>
+  <meta name="description" content="${safeDescription}">
+  <meta property="og:type" content="music.song">
+  <meta property="og:title" content="${safeTitle}">
+  <meta property="og:description" content="${safeDescription}">
+  <meta property="og:url" content="${safeShareUrl}">
+  ${safeImageUrl ? `<meta property="og:image" content="${safeImageUrl}">` : ''}
+  <meta name="twitter:card" content="${safeImageUrl ? 'summary_large_image' : 'summary'}">
+  <meta name="twitter:title" content="${safeTitle}">
+  <meta name="twitter:description" content="${safeDescription}">
+  ${safeImageUrl ? `<meta name="twitter:image" content="${safeImageUrl}">` : ''}
+  <link rel="canonical" href="${safeAppUrl}">
+  <meta http-equiv="refresh" content="0;url=${safeAppUrl}">
+</head>
+<body>
+  <p><a href="${safeAppUrl}">Open song</a></p>
+</body>
+</html>`;
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 async function handleMusicApiRequest(request, env, url) {
+  if (url.pathname === '/api/lyrics/translate') {
+    if (request.method !== 'POST') {
+      return methodNotAllowed('POST');
+    }
+
+    return handleLyricsTranslateRequest(request, env);
+  }
+
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return null;
   }
@@ -600,6 +730,21 @@ async function handleMusicApiRequest(request, env, url) {
         'x-cache-updated-at': result.updatedAt || '',
       });
     }
+  }
+
+  const fullSongMatch = url.pathname.match(/^\/api\/song\/([^/]+)\/full$/);
+  if (fullSongMatch) {
+    const songId = decodeURIComponent(fullSongMatch[1]);
+    const result = await getFullSongJson(request, env, songId);
+    return json(result.data, 200, 900, {
+      'x-data-source': result.source,
+      'x-cache-updated-at': result.updatedAt || '',
+    });
+  }
+
+  if (url.pathname === '/api/search') {
+    const result = await searchMusicJson(env, url.searchParams.get('q') || '');
+    return json(result, 200, 300);
   }
 
   const albumMatch = url.pathname.match(/^\/api\/album\/([^/]+)\/detail$/);
@@ -633,6 +778,382 @@ async function handleMusicApiRequest(request, env, url) {
   }
 
   return null;
+}
+
+async function getFullSongJson(request, env, songId) {
+  const publicApiBase = getPublicApiBase(request, env);
+  const songResult = await getMusicSongJson(
+    env,
+    `${MUSIC_CACHE_PREFIX}song:${songId}`,
+    `/api/song/${encodeURIComponent(songId)}`
+  );
+  const song = songResult.data?.data || {};
+  let album = null;
+  let albumSource = '';
+
+  if (song.albumCid) {
+    try {
+      const albumResult = await getMusicJson(
+        env,
+        `${MUSIC_CACHE_PREFIX}album:${song.albumCid}`,
+        `/api/album/${encodeURIComponent(song.albumCid)}/detail`
+      );
+      album = albumResult.data?.data || null;
+      albumSource = albumResult.source;
+      await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumDetailRow(albumResult.data));
+      await upsertSupabaseRows(env, 'music_songs', normalizeMusicAlbumSongRows(albumResult.data));
+    } catch (error) {
+      console.warn('Full song album lookup failed:', song.albumCid, error.message);
+    }
+  }
+
+  const lyricsText = song.lyricUrl
+    ? await fetchLyricsText(song.lyricUrl).catch((error) => {
+        console.warn('Full song lyrics lookup failed:', songId, error.message);
+        return '';
+      })
+    : '';
+
+  return {
+    data: {
+      ok: true,
+      data: {
+        song,
+        album,
+        lyricsText,
+        assets: {
+          coverUrl: song.coverUrl ? proxyMusicAssetUrl(song.coverUrl, publicApiBase, 'image') : '',
+          coverDeUrl: song.coverDeUrl ? proxyMusicAssetUrl(song.coverDeUrl, publicApiBase, 'image') : '',
+          albumCoverUrl: album?.coverUrl ? proxyMusicAssetUrl(album.coverUrl, publicApiBase, 'image') : '',
+          albumCoverDeUrl: album?.coverDeUrl ? proxyMusicAssetUrl(album.coverDeUrl, publicApiBase, 'image') : '',
+          audioUrl: song.sourceUrl ? proxyMusicAssetUrl(song.sourceUrl, publicApiBase, 'audio') : '',
+          lyricUrl: song.lyricUrl ? proxyMusicAssetUrl(song.lyricUrl, publicApiBase, 'lyrics') : '',
+        },
+      },
+    },
+    source: albumSource ? `${songResult.source}+${albumSource}` : songResult.source,
+    updatedAt: songResult.updatedAt,
+  };
+}
+
+async function fetchLyricsText(rawUrl) {
+  if (!isAllowedMusicAssetUrl(rawUrl, 'lyrics')) {
+    return '';
+  }
+
+  const response = await fetch(rawUrl, {
+    cf: {
+      cacheTtl: 60 * 60 * 6,
+      cacheEverything: true,
+    },
+  });
+
+  if (!response.ok) {
+    return '';
+  }
+
+  return response.text();
+}
+
+function proxyMusicAssetUrl(rawUrl, publicApiBase, type) {
+  const proxyPath = type === 'audio'
+    ? '/proxy-audio'
+    : type === 'lyrics'
+      ? '/proxy-lyrics'
+      : '/proxy-image';
+  return `${publicApiBase}${proxyPath}?url=${encodeURIComponent(rawUrl)}`;
+}
+
+async function searchMusicJson(env, query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) {
+    return {
+      ok: true,
+      query: '',
+      albums: [],
+      songs: [],
+      count: 0,
+    };
+  }
+
+  const [albumsResult, songsResult] = await Promise.all([
+    getMusicJson(env, `${MUSIC_CACHE_PREFIX}albums`, '/api/albums'),
+    getMusicJson(env, `${MUSIC_CACHE_PREFIX}songs`, '/api/songs'),
+  ]);
+  const albums = getMusicAlbumList(albumsResult.data);
+  const songs = getMusicSongList(songsResult.data);
+  const matchedAlbums = albums
+    .filter((album) => musicItemMatches(album, normalizedQuery))
+    .slice(0, 50);
+  const matchedSongs = songs
+    .filter((song) => musicItemMatches(song, normalizedQuery))
+    .slice(0, 50);
+
+  return {
+    ok: true,
+    query,
+    albums: matchedAlbums,
+    songs: matchedSongs,
+    count: matchedAlbums.length + matchedSongs.length,
+  };
+}
+
+function musicItemMatches(item, normalizedQuery) {
+  const haystack = normalizeSearchText([
+    item?.name,
+    item?.cid,
+    ...(item?.artistes || item?.artists || []),
+  ].filter(Boolean).join(' '));
+  return haystack.includes(normalizedQuery);
+}
+
+function normalizeSearchText(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+async function handleLyricsTranslateRequest(request, env) {
+  let payload;
+  try {
+    payload = await request.json();
+  } catch {
+    return json({ ok: false, error: 'Invalid JSON body' }, 400);
+  }
+
+  const targetLocale = normalizeTranslationLocale(payload.locale || payload.targetLocale);
+  const lines = normalizeTranslationLines(payload);
+  if (lines.length === 0) {
+    return json({
+      ok: true,
+      targetLocale,
+      translations: [],
+      translation: '',
+    });
+  }
+
+  const translatedLines = await translateServerLines(env, lines, targetLocale);
+  const translations = translatedLines.map((line) => line.translation || '');
+
+  return json({
+    ok: true,
+    targetLocale,
+    translations,
+    translation: translations[0] || '',
+  }, 200, 3600);
+}
+
+function normalizeTranslationLines(payload) {
+  if (Array.isArray(payload.lines)) {
+    return payload.lines
+      .slice(0, 200)
+      .map((line, index) => ({
+        index,
+        text: String(line?.text || line || '').trim(),
+      }));
+  }
+
+  const text = String(payload.text || '').trim();
+  return text ? [{ index: 0, text }] : [];
+}
+
+async function translateServerLines(env, lines, targetLocale) {
+  const result = lines.map((line) => ({
+    ...line,
+    sourceLocale: detectTranslationSourceLocale(line.text, targetLocale),
+    translation: '',
+  }));
+  const translatableLines = [];
+
+  for (const line of result) {
+    if (shouldSkipServerTranslation(line.text, line.sourceLocale, targetLocale)) {
+      continue;
+    }
+
+    const cached = await readServerTranslationCache(env, line.text, line.sourceLocale, targetLocale);
+    if (cached != null) {
+      line.translation = cached;
+      continue;
+    }
+
+    translatableLines.push(line);
+  }
+
+  for (const batch of createServerTranslationBatches(translatableLines)) {
+    try {
+      const translatedParts = await translateServerBatch(batch, targetLocale);
+      for (let index = 0; index < batch.length; index += 1) {
+        const line = batch[index];
+        const translation = translatedParts[index] || '';
+        if (isInvalidServerTranslation(line.text, translation, line.sourceLocale, targetLocale)) {
+          line.translation = '';
+          continue;
+        }
+
+        line.translation = translation;
+        await writeServerTranslationCache(env, line.text, line.sourceLocale, targetLocale, translation);
+      }
+    } catch (error) {
+      console.warn('Server lyric translation batch failed:', error.message);
+    }
+  }
+
+  return result;
+}
+
+function createServerTranslationBatches(lines) {
+  const batches = [];
+  let currentBatch = [];
+  let currentLength = 0;
+  let currentSourceLocale = '';
+
+  for (const line of lines) {
+    const nextLength = currentLength + line.text.length + TRANSLATION_LINE_SEPARATOR.length;
+    if (
+      currentBatch.length > 0 &&
+      (nextLength > MAX_TRANSLATION_BATCH_TEXT_LENGTH || line.sourceLocale !== currentSourceLocale)
+    ) {
+      batches.push(currentBatch);
+      currentBatch = [];
+      currentLength = 0;
+      currentSourceLocale = '';
+    }
+
+    currentSourceLocale = line.sourceLocale;
+    currentBatch.push(line);
+    currentLength += line.text.length + TRANSLATION_LINE_SEPARATOR.length;
+  }
+
+  if (currentBatch.length > 0) {
+    batches.push(currentBatch);
+  }
+
+  return batches;
+}
+
+async function translateServerBatch(batch, targetLocale) {
+  const text = batch.map((line) => line.text).join(TRANSLATION_LINE_SEPARATOR);
+  const sourceLocale = batch[0]?.sourceLocale || 'auto';
+  const params = new URLSearchParams({
+    client: 'gtx',
+    sl: sourceLocale,
+    tl: targetLocale,
+    dt: 't',
+    q: text,
+  });
+  const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`Translate request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return readGoogleTranslateResponse(data).split(TRANSLATION_LINE_SEPARATOR);
+}
+
+function readGoogleTranslateResponse(data) {
+  if (!Array.isArray(data) || !Array.isArray(data[0])) {
+    return '';
+  }
+
+  return data[0]
+    .map((part) => (Array.isArray(part) ? part[0] : ''))
+    .filter(Boolean)
+    .join('')
+    .trim();
+}
+
+function normalizeTranslationLocale(locale) {
+  return SUPPORTED_TRANSLATION_LOCALES.has(locale) ? locale : 'zh-TW';
+}
+
+function detectTranslationSourceLocale(text, targetLocale) {
+  const sample = String(text || '').trim();
+  if (!sample) {
+    return 'auto';
+  }
+
+  const hasLatin = /[a-z]/i.test(sample);
+  const hasKana = /[\u3040-\u30ff\u31f0-\u31ff]/i.test(sample);
+  const hasHangul = /[\uac00-\ud7af]/i.test(sample);
+  const hasHan = /[\u3400-\u4dbf\u4e00-\u9fff]/i.test(sample);
+
+  if ((targetLocale === 'zh-TW' || targetLocale === 'zh-CN') && hasLatin) {
+    return 'en';
+  }
+
+  if (hasKana) {
+    return 'ja';
+  }
+
+  if (hasHangul) {
+    return 'ko';
+  }
+
+  if (hasLatin) {
+    return 'en';
+  }
+
+  if (hasHan) {
+    return 'zh';
+  }
+
+  return 'auto';
+}
+
+function shouldSkipServerTranslation(text, sourceLocale, targetLocale) {
+  const sample = String(text || '').trim();
+  if (!sample) {
+    return true;
+  }
+
+  if ((targetLocale === 'zh-TW' || targetLocale === 'zh-CN') && sourceLocale === 'zh') {
+    return true;
+  }
+
+  return sourceLocale === targetLocale;
+}
+
+function isInvalidServerTranslation(sourceText, translation, sourceLocale, targetLocale) {
+  if (!translation) {
+    return true;
+  }
+
+  if (sourceLocale !== 'en' || (targetLocale !== 'zh-TW' && targetLocale !== 'zh-CN')) {
+    return false;
+  }
+
+  return String(sourceText || '').trim().toLowerCase() === String(translation || '').trim().toLowerCase();
+}
+
+async function readServerTranslationCache(env, text, sourceLocale, targetLocale) {
+  if (!env.ARKNIGHTS_DATA) {
+    return null;
+  }
+
+  const key = await getServerTranslationCacheKey(text, sourceLocale, targetLocale);
+  return env.ARKNIGHTS_DATA.get(key);
+}
+
+async function writeServerTranslationCache(env, text, sourceLocale, targetLocale, translation) {
+  if (!env.ARKNIGHTS_DATA) {
+    return;
+  }
+
+  const key = await getServerTranslationCacheKey(text, sourceLocale, targetLocale);
+  await env.ARKNIGHTS_DATA.put(key, translation, {
+    expirationTtl: 60 * 60 * 24 * 90,
+  });
+}
+
+async function getServerTranslationCacheKey(text, sourceLocale, targetLocale) {
+  const digest = await sha256Hex(`${sourceLocale}:${targetLocale}:${text}`);
+  return `${LYRICS_TRANSLATION_CACHE_PREFIX}${digest}`;
+}
+
+async function sha256Hex(text) {
+  const bytes = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 async function syncMusicCache(env, options = {}) {
@@ -1483,8 +2004,34 @@ function json(data, status = 200, cacheSeconds = 0, extraHeaders = {}) {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, HEAD, POST, OPTIONS',
+      'access-control-allow-headers': 'content-type, authorization',
       'cache-control': cacheSeconds ? `public, max-age=${cacheSeconds}` : 'no-store',
       ...extraHeaders,
+    },
+  });
+}
+
+function corsResponse() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, HEAD, POST, OPTIONS',
+      'access-control-allow-headers': 'content-type, authorization',
+      'access-control-max-age': '86400',
+    },
+  });
+}
+
+function methodNotAllowed(allow) {
+  return new Response('Method not allowed', {
+    status: 405,
+    headers: {
+      allow,
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, HEAD, POST, OPTIONS',
+      'access-control-allow-headers': 'content-type, authorization',
     },
   });
 }

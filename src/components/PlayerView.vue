@@ -124,7 +124,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations, togglePlayMode } from '../stores/player.js';
-import { getProxyImageUrl } from '../services/api.js';
+import { createSongShareUrl as createSongSharePageUrl, getProxyImageUrl } from '../services/api.js';
 import { formatTime } from '../utils/time.js';
 
 const { t, locale } = useI18n();
@@ -237,9 +237,9 @@ const createSongShareUrl = () => {
     return '';
   }
 
-  const url = new URL(window.location.href);
-  url.searchParams.set('song', songId);
-  return url.toString();
+  const appUrl = new URL(window.location.href);
+  appUrl.searchParams.set('song', songId);
+  return createSongSharePageUrl(songId, appUrl.toString());
 };
 
 const copyText = async (text) => {

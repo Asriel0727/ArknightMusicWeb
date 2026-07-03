@@ -27,7 +27,16 @@ async function loadApiModule() {
 async function fetchMasterSongDetails(songId) {
   if (!masterSongDetailsPromises.has(songId)) {
     const promise = loadApiModule()
-      .then(({ fetchSongDetails }) => fetchSongDetails(songId))
+      .then(({ fetchFullSongDetails, fetchSongDetails }) =>
+        fetchFullSongDetails(songId)
+          .then((fullSong) => ({
+            ...fullSong.song,
+            album: fullSong.album,
+            preloadedLyrics: fullSong.lyrics,
+            assets: fullSong.assets,
+          }))
+          .catch(() => fetchSongDetails(songId))
+      )
       .finally(() => {
         masterSongDetailsPromises.delete(songId);
       });
@@ -206,10 +215,16 @@ export async function playSong(song, coverUrl, coverDeUrl) {
 
     playerState.currentSong = fullSong;
     playerState.lyrics = [];
+    playerState.showLyricTranslation = false;
     playerState.isTranslatingLyrics = false;
     const currentLyricLoadToken = ++lyricLoadToken;
 
-    if (fullSong.lyricUrl) {
+    if (Array.isArray(songDetails.preloadedLyrics) && songDetails.preloadedLyrics.length > 0) {
+      playerState.lyrics = songDetails.preloadedLyrics.map((line) => ({
+        ...line,
+        translation: '',
+      }));
+    } else if (fullSong.lyricUrl) {
       fetchLyrics(fullSong.lyricUrl)
         .then(async (lyrics) => {
           if (currentLyricLoadToken !== lyricLoadToken) {
@@ -326,7 +341,8 @@ export async function playSongFromMasterList(song) {
   try {
     const { fetchAlbumDetails } = await loadApiModule();
     const songDetails = await fetchMasterSongDetails(song.cid);
-    const albumCid = songDetails.albumCid;
+    const albumDetailsFromFull = songDetails.album || null;
+    const albumCid = songDetails.albumCid || albumDetailsFromFull?.cid;
     if (!albumCid) {
       console.error('歌曲沒有專輯ID');
       return;
@@ -335,16 +351,20 @@ export async function playSongFromMasterList(song) {
     const songToPlay = {
       ...songDetails,
       artistes: songDetails.artistes || song.artistes || [unknownArtistLabel()],
-      coverUrl: song.coverUrl,
-      coverDeUrl: song.coverDeUrl,
+      coverUrl: song.coverUrl || albumDetailsFromFull?.coverUrl || songDetails.coverUrl,
+      coverDeUrl: song.coverDeUrl || albumDetailsFromFull?.coverDeUrl || songDetails.coverDeUrl,
       albumCid
     };
 
     playerState.currentPlaylist = [songToPlay];
     playerState.currentSongIndex = 0;
-    await playSong(songToPlay, song.coverUrl, song.coverDeUrl);
+    await playSong(songToPlay, songToPlay.coverUrl, songToPlay.coverDeUrl);
 
-    fetchAlbumDetails(albumCid)
+    const albumDetailsPromise = albumDetailsFromFull
+      ? Promise.resolve(albumDetailsFromFull)
+      : fetchAlbumDetails(albumCid);
+
+    albumDetailsPromise
       .then((albumDetails) => {
         const currentSong = playerState.currentSong;
         if (!currentSong || currentSong.cid !== song.cid) {

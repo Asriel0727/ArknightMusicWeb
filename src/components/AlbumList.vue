@@ -68,7 +68,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AlbumCard from './AlbumCard.vue';
 import { albumState, modalState, searchState } from '../stores/player.js';
-import { fetchAlbums, getProxyImageUrl } from '../services/api.js';
+import { fetchAlbums, getProxyImageUrl, searchMusic } from '../services/api.js';
 
 const { t, locale } = useI18n();
 const containerRef = ref(null);
@@ -183,7 +183,7 @@ const initializeAlbums = async () => {
 };
 
 // 處理搜索
-const handleSearch = (query) => {
+const handleSearch = async (query) => {
   if (!query) {
     searchState.query = '';
     searchState.filteredAlbums = [];
@@ -191,11 +191,19 @@ const handleSearch = (query) => {
     return;
   }
   
-  searchState.filteredAlbums = albumState.allAlbums.filter(album => {
-    const nameMatch = album.name.toLowerCase().includes(query);
-    const artistMatch = album.artistes.join(', ').toLowerCase().includes(query);
-    return nameMatch || artistMatch;
-  });
+  searchState.query = query;
+
+  try {
+    const result = await searchMusic(query);
+    searchState.filteredAlbums = result.albums || [];
+  } catch (error) {
+    console.warn('Backend search failed, fallback to local search:', error);
+    searchState.filteredAlbums = albumState.allAlbums.filter(album => {
+      const nameMatch = album.name.toLowerCase().includes(query);
+      const artistMatch = album.artistes.join(', ').toLowerCase().includes(query);
+      return nameMatch || artistMatch;
+    });
+  }
   
   // 搜索後重置到第一頁
   albumState.currentPage = 1;
