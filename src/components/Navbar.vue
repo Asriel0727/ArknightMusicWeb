@@ -9,7 +9,7 @@
           @click="changePage('auth')"
         >
           <i class="fas fa-user-circle"></i>
-          <span>?餃/閮餃?</span>
+          <span>登入/註冊</span>
         </button>
         <button 
           class="nav-tab" 
