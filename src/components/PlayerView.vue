@@ -74,18 +74,19 @@
               <span class="toggle-track" aria-hidden="true">
                 <span class="toggle-thumb"></span>
               </span>
-              <span class="toggle-label">ç¿»è­¯</span>
+              <span class="toggle-label">{{ t('player.translationToggle') }}</span>
             </label>
             <div v-if="authState.user && playerState.currentSong" class="library-actions">
-              <button class="library-btn" type="button" :title="isFavoriteSong ? 'Remove favorite' : 'Add favorite'" @click="toggleFavoriteSong">
+              <button class="library-btn" type="button" :disabled="favoriteActionPending" :title="isFavoriteSong ? t('userLibrary.removeFavorite') : t('userLibrary.addFavorite')" @click="toggleFavoriteSong">
                 <i :class="isFavoriteSong ? 'fas fa-heart' : 'far fa-heart'"></i>
               </button>
               <select v-model="selectedPlaylistId" class="playlist-select" @focus="loadUserPlaylists">
-                <option value="">????</option>
+                <option value="">{{ t('userLibrary.selectPlaylist') }}</option>
                 <option v-for="playlist in userPlaylists" :key="playlist.id" :value="playlist.id">{{ playlist.name }}</option>
               </select>
-              <button class="library-btn" type="button" @click="addCurrentSongToPlaylist">??</button>
+              <button class="library-btn" type="button" :disabled="isAddingToPlaylist" @click="addCurrentSongToPlaylist">{{ t('userLibrary.addToPlaylist') }}</button>
             </div>
+            <p v-if="libraryActionError" class="library-action-error">{{ libraryActionError }}</p>
           </div>
         </div>
       </div>
@@ -128,6 +129,33 @@
       <p v-else class="no-lyrics">{{ t('common.noLyrics') }}</p>
     </div>
   </div>
+  <div v-if="isCreatePlaylistDialogOpen" class="playlist-dialog-backdrop" @click.self="closeCreatePlaylistDialog">
+    <section class="playlist-dialog" role="dialog" aria-modal="true" :aria-label="t('userLibrary.createPlaylistTitle')">
+      <h3>{{ t('userLibrary.createPlaylistTitle') }}</h3>
+      <p>{{ t('userLibrary.createPlaylistDescription') }}</p>
+      <form class="playlist-dialog-form" @submit.prevent="createPlaylistAndAddCurrentSong">
+        <label>
+          <span>{{ t('userLibrary.playlistName') }}</span>
+          <input
+            v-model.trim="newPlaylistName"
+            type="text"
+            :placeholder="t('userLibrary.playlistNamePrompt')"
+            maxlength="80"
+            autofocus
+          >
+        </label>
+        <p v-if="libraryActionError" class="library-action-error">{{ libraryActionError }}</p>
+        <div class="playlist-dialog-actions">
+          <button class="library-btn secondary" type="button" @click="closeCreatePlaylistDialog">
+            {{ t('userLibrary.cancel') }}
+          </button>
+          <button class="library-btn primary" type="submit" :disabled="isAddingToPlaylist || !newPlaylistName.trim()">
+            {{ isAddingToPlaylist ? t('userLibrary.adding') : t('userLibrary.createAndAdd') }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
 </template>
 
 <script setup>
@@ -146,14 +174,23 @@ const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);
 const hasCopiedShareLink = ref(false);
 const isFavoriteSong = ref(false);
+const favoriteActionPending = ref(false);
+const libraryActionError = ref('');
 const userPlaylists = ref([]);
 const selectedPlaylistId = ref('');
+const isCreatePlaylistDialogOpen = ref(false);
+const newPlaylistName = ref('');
+const isAddingToPlaylist = ref(false);
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
 let shareStatusTimeout = null;
 
 const LYRICS_TIME_OFFSET = 0.5;
+
+const setLibraryActionError = (error) => {
+  libraryActionError.value = error?.message || t('userLibrary.actionFailed');
+};
 
 const loadUserPlaylists = async () => {
   if (!authState.user) return;
@@ -172,32 +209,86 @@ const refreshFavoriteState = async () => {
 
 const toggleFavoriteSong = async () => {
   const songId = playerState.currentSong?.cid;
-  if (!authState.user || !songId) return;
+  if (!authState.user || !songId || favoriteActionPending.value) return;
 
-  if (isFavoriteSong.value) {
-    await removeFavoriteSong(songId);
-    isFavoriteSong.value = false;
-    return;
+  libraryActionError.value = '';
+  favoriteActionPending.value = true;
+  try {
+    if (isFavoriteSong.value) {
+      await removeFavoriteSong(songId);
+      isFavoriteSong.value = false;
+      return;
+    }
+
+    await addFavoriteSong(songId);
+    isFavoriteSong.value = true;
+  } catch (error) {
+    setLibraryActionError(error);
+  } finally {
+    favoriteActionPending.value = false;
   }
+};
 
-  await addFavoriteSong(songId);
-  isFavoriteSong.value = true;
+const openCreatePlaylistDialog = () => {
+  newPlaylistName.value = '';
+  isCreatePlaylistDialogOpen.value = true;
+};
+
+const closeCreatePlaylistDialog = () => {
+  if (isAddingToPlaylist.value) return;
+  isCreatePlaylistDialogOpen.value = false;
+  newPlaylistName.value = '';
+};
+
+const createPlaylistAndAddCurrentSong = async () => {
+  const songId = playerState.currentSong?.cid;
+  const playlistName = newPlaylistName.value.trim();
+  if (!authState.user || !songId || !playlistName || isAddingToPlaylist.value) return;
+
+  libraryActionError.value = '';
+  isAddingToPlaylist.value = true;
+  try {
+    const playlist = await createPlaylist(playlistName);
+    await loadUserPlaylists();
+    selectedPlaylistId.value = playlist?.id || '';
+    if (selectedPlaylistId.value) {
+      await addSongToPlaylist(selectedPlaylistId.value, songId);
+    }
+    isCreatePlaylistDialogOpen.value = false;
+    newPlaylistName.value = '';
+  } catch (error) {
+    setLibraryActionError(error);
+  } finally {
+    isAddingToPlaylist.value = false;
+  }
 };
 
 const addCurrentSongToPlaylist = async () => {
   const songId = playerState.currentSong?.cid;
-  if (!authState.user || !songId) return;
+  if (!authState.user || !songId || isAddingToPlaylist.value) return;
 
-  if (!selectedPlaylistId.value) {
-    const name = window.prompt('????????');
-    if (!name) return;
-    const playlist = await createPlaylist(name);
+  libraryActionError.value = '';
+  isAddingToPlaylist.value = true;
+  try {
     await loadUserPlaylists();
-    selectedPlaylistId.value = playlist?.id || '';
+  } catch (error) {
+    setLibraryActionError(error);
+    isAddingToPlaylist.value = false;
+    return;
   }
 
-  if (selectedPlaylistId.value) {
+  if (!selectedPlaylistId.value) {
+    isAddingToPlaylist.value = false;
+    openCreatePlaylistDialog();
+    return;
+  }
+
+  try {
     await addSongToPlaylist(selectedPlaylistId.value, songId);
+  } catch (error) {
+    setLibraryActionError(error);
+  } finally {
+    isAddingToPlaylist.value = false;
   }
 };
 
@@ -225,7 +316,7 @@ const shareIcon = computed(() => {
 });
 
 const shareButtonTitle = computed(() => {
-  return hasCopiedShareLink.value ? 'å·²è?è£½æ??²é€??' : '?†äº«æ­Œæ›²???';
+  return hasCopiedShareLink.value ? t('player.copiedShareLink') : t('player.shareSong');
 });
 
 const playModeIcon = computed(() => {
@@ -242,14 +333,14 @@ const playModeIcon = computed(() => {
 
 const playModeTitle = computed(() => {
   if (playerState.playMode === 'repeat-one') {
-    return '?®é?å¾ªç’°';
+    return t('player.repeatOne');
   }
 
   if (playerState.playMode === 'shuffle') {
-    return '?¨æ??­æ”¾';
+    return t('player.shuffle');
   }
 
-  return '?—è¡¨å¾ªç’°';
+  return t('player.repeatAll');
 });
 
 const proxyImageUrl = (url) => {
@@ -812,5 +903,17 @@ onUnmounted(() => {
 <style scoped>
 .library-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .library-btn { border: 1px solid var(--primary-color); border-radius: 6px; background: transparent; color: var(--primary-color); padding: 6px 9px; cursor: pointer; }
+.library-btn:disabled { cursor: not-allowed; opacity: 0.55; }
+.library-btn.primary { background: var(--primary-color); color: #111; }
+.library-btn.secondary { color: var(--text-secondary); border-color: var(--border-color); }
 .playlist-select { max-width: 150px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color); padding: 6px; }
+.playlist-dialog-backdrop { position: fixed; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0, 0, 0, 0.62); }
+.playlist-dialog { width: min(420px, 100%); border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-color); padding: 20px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35); }
+.playlist-dialog h3 { margin: 0 0 8px; color: var(--primary-color); font-size: 1.1rem; }
+.playlist-dialog p { margin: 0 0 16px; color: var(--text-secondary); line-height: 1.6; }
+.playlist-dialog-form { display: grid; gap: 16px; }
+.playlist-dialog-form label { display: grid; gap: 7px; color: var(--text-color); }
+.playlist-dialog-form input { border: 1px solid var(--border-color); border-radius: 6px; background: rgba(255, 255, 255, 0.05); color: var(--text-color); padding: 10px 12px; }
+.playlist-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.library-action-error { width: 100%; margin: 4px 0 0; color: #ff7b72; font-size: 0.82rem; line-height: 1.4; }
 </style>

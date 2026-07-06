@@ -9,7 +9,7 @@
           @click="changePage('auth')"
         >
           <i class="fas fa-user-circle"></i>
-          <span>登入/註冊</span>
+          <span>{{ $t('auth.nav') }}</span>
         </button>
         <button 
           class="nav-tab" 
@@ -42,7 +42,7 @@
           @click="changePage('library')"
         >
           <i class="fas fa-bookmark"></i>
-          <span>???嗉?</span>
+          <span>{{ $t('userLibrary.nav') }}</span>
         </button>
       </div>
     </div>
@@ -50,10 +50,10 @@
       <div class="auth-box">
         <template v-if="authState.user">
           <span class="auth-email">{{ authState.user.loginKey }}</span>
-          <button class="auth-btn ghost" type="button" @click="handleSignOut">?餃</button>
+          <button class="auth-btn ghost" type="button" @click="handleSignOut">{{ $t('auth.signOut') }}</button>
         </template>
         <template v-else>
-          <span class="auth-email">Guest</span>
+          <span class="auth-email">{{ $t('auth.guest') }}</span>
         </template>
       </div>
       <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />

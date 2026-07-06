@@ -2,13 +2,15 @@
   <main class="auth-page">
     <section class="auth-panel">
       <div class="auth-header">
-        <h1>帳號</h1>
-        <p>登入後可以同步我的最愛、歌單與角色清單。不登入也可以照常使用播放器與查看角色資料。</p>
+        <h1>{{ t('auth.title') }}</h1>
+        <p>{{ t('auth.description') }}</p>
       </div>
 
       <div v-if="authState.user" class="signed-in-panel">
-        <span>目前登入：{{ authState.user.loginKey }}</span>
-        <button class="auth-submit secondary" type="button" @click="signOut">登出</button>
+        <span>{{ t('auth.currentUser', { name: authState.user.loginKey }) }}</span>
+        <button class="auth-submit secondary" type="button" @click="signOut">
+          {{ t('auth.signOut') }}
+        </button>
       </div>
 
       <template v-else>
@@ -18,39 +20,39 @@
             :class="{ active: mode === 'sign-in' }"
             @click="mode = 'sign-in'"
           >
-            登入
+            {{ t('auth.signIn') }}
           </button>
           <button
             type="button"
             :class="{ active: mode === 'sign-up' }"
             @click="mode = 'sign-up'"
           >
-            註冊
+            {{ t('auth.signUp') }}
           </button>
         </div>
 
         <form class="auth-form" @submit.prevent="handleSubmit">
           <label>
-            <span>帳號</span>
+            <span>{{ t('auth.loginKey') }}</span>
             <input
               v-model.trim="loginKey"
               autocomplete="username"
-              placeholder="例如 Example01"
+              :placeholder="t('auth.loginKeyPlaceholder')"
             >
           </label>
           <label>
-            <span>密碼</span>
+            <span>{{ t('auth.password') }}</span>
             <input
               v-model="password"
               autocomplete="current-password"
               type="password"
-              placeholder="至少 6 個字"
+              :placeholder="t('auth.passwordPlaceholder')"
             >
           </label>
-          <p class="auth-hint">帳號只能使用英文小寫、數字、底線與減號，長度 3-32。</p>
+          <p class="auth-hint">{{ t('auth.keyHint') }}</p>
           <p v-if="authState.error" class="auth-error">{{ authState.error }}</p>
           <button class="auth-submit" type="submit" :disabled="authState.isLoading">
-            {{ mode === 'sign-in' ? '登入' : '註冊' }}
+            {{ mode === 'sign-in' ? t('auth.signIn') : t('auth.signUp') }}
           </button>
         </form>
       </template>
@@ -60,8 +62,10 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { authState, signIn, signOut, signUp } from '../services/auth.js';
 
+const { t } = useI18n();
 const mode = ref('sign-in');
 const loginKey = ref('');
 const password = ref('');

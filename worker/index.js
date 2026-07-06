@@ -29,8 +29,9 @@ const MUSIC_SONG_DETAIL_MAX_AGE_MS = 10 * 60 * 1000;
 
 export default {
   async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    const publicApiBase = getPublicApiBase(request, env);
+    try {
+      const url = new URL(request.url);
+      const publicApiBase = getPublicApiBase(request, env);
 
     if (request.method === 'OPTIONS') {
       return corsResponse();
@@ -196,7 +197,17 @@ export default {
       return json(data, 200, 3600);
     }
 
-    return json({ ok: false, error: 'Not found', path: url.pathname }, 404);
+      return json({ ok: false, error: 'Not found', path: url.pathname }, 404);
+    } catch (error) {
+      console.error('Worker request failed:', error);
+      return json(
+        {
+          ok: false,
+          error: error?.message || 'Worker request failed',
+        },
+        500
+      );
+    }
   },
 
   async scheduled(event, env, ctx) {
@@ -2489,7 +2500,7 @@ function json(data, status = 200, cacheSeconds = 0, extraHeaders = {}) {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'access-control-allow-origin': '*',
-      'access-control-allow-methods': 'GET, HEAD, POST, OPTIONS',
+      'access-control-allow-methods': 'GET, HEAD, POST, PATCH, DELETE, OPTIONS',
       'access-control-allow-headers': 'content-type, authorization',
       'cache-control': cacheSeconds ? `public, max-age=${cacheSeconds}` : 'no-store',
       ...extraHeaders,
@@ -2502,7 +2513,7 @@ function corsResponse() {
     status: 204,
     headers: {
       'access-control-allow-origin': '*',
-      'access-control-allow-methods': 'GET, HEAD, POST, OPTIONS',
+      'access-control-allow-methods': 'GET, HEAD, POST, PATCH, DELETE, OPTIONS',
       'access-control-allow-headers': 'content-type, authorization',
       'access-control-max-age': '86400',
     },
@@ -2515,7 +2526,7 @@ function methodNotAllowed(allow) {
     headers: {
       allow,
       'access-control-allow-origin': '*',
-      'access-control-allow-methods': 'GET, HEAD, POST, OPTIONS',
+      'access-control-allow-methods': 'GET, HEAD, POST, PATCH, DELETE, OPTIONS',
       'access-control-allow-headers': 'content-type, authorization',
     },
   });

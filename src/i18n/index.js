@@ -4,6 +4,7 @@ import zhCN from './locales/zh-CN.json';
 import en from './locales/en.json';
 import ja from './locales/ja.json';
 import ko from './locales/ko.json';
+import { userLibraryMessages } from './userLibraryMessages.js';
 import { setGameDataFolderFromUiLocale } from '../services/gameDataSource.js';
 import { APP_LOCALE_STORAGE_KEY } from './constants.js';
 
@@ -29,10 +30,10 @@ export const i18n = createI18n({
   locale: initialLocale,
   fallbackLocale: 'en',
   messages: {
-    'zh-TW': zhTW,
-    'zh-CN': zhCN,
-    en,
-    ja,
-    ko,
+    'zh-TW': { ...zhTW, ...userLibraryMessages['zh-TW'] },
+    'zh-CN': { ...zhCN, ...userLibraryMessages['zh-CN'] },
+    en: { ...en, ...userLibraryMessages.en },
+    ja: { ...ja, ...userLibraryMessages.ja },
+    ko: { ...ko, ...userLibraryMessages.ko },
   },
 });

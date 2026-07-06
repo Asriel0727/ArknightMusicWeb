@@ -22,13 +22,13 @@
         </div>
         <div v-if="authState.user" class="character-list-actions">
           <select v-model="selectedCharacterListId" class="character-list-select" @focus="loadUserCharacterLists">
-            <option value="">選擇角色清單</option>
+            <option value="">{{ t('userLibrary.selectCharacterList') }}</option>
             <option v-for="list in userCharacterLists" :key="list.id" :value="list.id">
               {{ list.name }}
             </option>
           </select>
           <button class="character-list-btn" type="button" @click="addCurrentCharacterToList">
-            加入清單
+            {{ t('userLibrary.addToCharacterList') }}
           </button>
         </div>
       </div>
@@ -333,7 +333,7 @@ const addCurrentCharacterToList = async () => {
   if (!authState.user || !props.character?.id) return;
 
   if (!selectedCharacterListId.value) {
-    const name = window.prompt('Character list name');
+    const name = window.prompt(t('userLibrary.characterListNamePrompt'));
     if (!name) return;
     const list = await createCharacterList(name);
     await loadUserCharacterLists();

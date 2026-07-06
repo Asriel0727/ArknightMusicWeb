@@ -1,12 +1,16 @@
 <template>
   <main class="library-page">
-    <h1 class="page-title">我的收藏</h1>
-    <div v-if="!authState.user" class="library-empty">請先登入。</div>
+    <h1 class="page-title">{{ t('userLibrary.pageTitle') }}</h1>
+    <div v-if="!authState.user" class="library-empty">{{ t('userLibrary.loginRequired') }}</div>
     <div v-else class="library-grid">
       <section class="library-section">
-        <h2><i class="fas fa-heart"></i> 我的最愛</h2>
-        <button class="refresh-btn" type="button" @click="loadLibrary">重新整理</button>
-        <div v-if="favorites.length === 0" class="library-empty">還沒有收藏歌曲。</div>
+        <h2><i class="fas fa-heart"></i> {{ t('userLibrary.favorites') }}</h2>
+        <button class="refresh-btn" type="button" @click="loadLibrary">
+          {{ t('userLibrary.refresh') }}
+        </button>
+        <div v-if="favorites.length === 0" class="library-empty">
+          {{ t('userLibrary.noFavorites') }}
+        </div>
         <button
           v-for="favorite in favorites"
           :key="favorite.song_cid"
@@ -20,12 +24,16 @@
       </section>
 
       <section class="library-section">
-        <h2><i class="fas fa-list"></i> 我的歌單</h2>
-        <div v-if="playlists.length === 0" class="library-empty">還沒有歌單。</div>
+        <h2><i class="fas fa-list"></i> {{ t('userLibrary.playlists') }}</h2>
+        <div v-if="playlists.length === 0" class="library-empty">
+          {{ t('userLibrary.noPlaylists') }}
+        </div>
         <article v-for="playlist in playlists" :key="playlist.id" class="library-group">
           <h3>{{ playlist.name }}</h3>
           <p v-if="playlist.description">{{ playlist.description }}</p>
-          <div v-if="!playlist.songs || playlist.songs.length === 0" class="library-empty small">尚未加入歌曲。</div>
+          <div v-if="!playlist.songs || playlist.songs.length === 0" class="library-empty small">
+            {{ t('userLibrary.noPlaylistSongs') }}
+          </div>
           <button
             v-for="song in playlist.songs || []"
             :key="song.song_cid"
@@ -40,12 +48,16 @@
       </section>
 
       <section class="library-section">
-        <h2><i class="fas fa-users"></i> 角色清單</h2>
-        <div v-if="characterLists.length === 0" class="library-empty">還沒有角色清單。</div>
+        <h2><i class="fas fa-users"></i> {{ t('userLibrary.characterLists') }}</h2>
+        <div v-if="characterLists.length === 0" class="library-empty">
+          {{ t('userLibrary.noCharacterLists') }}
+        </div>
         <article v-for="list in characterLists" :key="list.id" class="library-group">
           <h3>{{ list.name }}</h3>
           <p v-if="list.description">{{ list.description }}</p>
-          <div v-if="!list.items || list.items.length === 0" class="library-empty small">尚未加入角色。</div>
+          <div v-if="!list.items || list.items.length === 0" class="library-empty small">
+            {{ t('userLibrary.noCharacterItems') }}
+          </div>
           <div v-for="item in list.items || []" :key="item.character_id" class="library-row static">
             {{ item.character_id }}
           </div>
@@ -57,6 +69,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { modalState } from '../stores/player.js';
 import { playSongFromMasterList } from '../stores/player.js';
 import { authState } from '../services/auth.js';
@@ -66,6 +79,7 @@ import {
   fetchPlaylists,
 } from '../services/userLibrary.js';
 
+const { t } = useI18n();
 const favorites = ref([]);
 const playlists = ref([]);
 const characterLists = ref([]);
