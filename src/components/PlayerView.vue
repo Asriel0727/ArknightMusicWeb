@@ -86,7 +86,32 @@
               </select>
               <button class="library-btn" type="button" :disabled="isAddingToPlaylist" @click="addCurrentSongToPlaylist">{{ t('userLibrary.addToPlaylist') }}</button>
             </div>
-            <p v-if="libraryActionError" class="library-action-error">{{ libraryActionError }}</p>
+            <div v-if="authState.user && playerState.currentSong" class="library-feedback-panel">
+              <div class="playlist-membership" :class="{ empty: currentSongPlaylists.length === 0 }">
+                <span class="membership-icon"><i class="fas fa-list-ul"></i></span>
+                <div class="membership-content">
+                  <span class="membership-label">
+                    {{ currentSongPlaylists.length > 0 ? t('userLibrary.currentSongPlaylistGroup') : t('userLibrary.notInAnyPlaylist') }}
+                  </span>
+                  <div v-if="currentSongPlaylists.length > 0" class="playlist-chip-list" :title="currentSongPlaylistLabel">
+                    <span v-for="playlist in visibleCurrentSongPlaylists" :key="playlist.id" class="playlist-chip">
+                      {{ playlist.name }}
+                    </span>
+                    <span v-if="hiddenCurrentSongPlaylistCount > 0" class="playlist-chip more">
+                      +{{ hiddenCurrentSongPlaylistCount }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div v-if="libraryActionSuccess" class="library-action-toast success">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ libraryActionSuccess }}</span>
+              </div>
+              <div v-if="libraryActionError" class="library-action-toast error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ libraryActionError }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -176,6 +201,7 @@ const hasCopiedShareLink = ref(false);
 const isFavoriteSong = ref(false);
 const favoriteActionPending = ref(false);
 const libraryActionError = ref('');
+const libraryActionSuccess = ref('');
 const userPlaylists = ref([]);
 const selectedPlaylistId = ref('');
 const isCreatePlaylistDialogOpen = ref(false);
@@ -185,17 +211,66 @@ let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
 let shareStatusTimeout = null;
+let libraryActionStatusTimeout = null;
 
 const LYRICS_TIME_OFFSET = 0.5;
 
+const clearLibraryActionStatus = () => {
+  if (libraryActionStatusTimeout) {
+    clearTimeout(libraryActionStatusTimeout);
+    libraryActionStatusTimeout = null;
+  }
+  libraryActionError.value = '';
+  libraryActionSuccess.value = '';
+};
+
 const setLibraryActionError = (error) => {
+  clearLibraryActionStatus();
   libraryActionError.value = error?.message || t('userLibrary.actionFailed');
+};
+
+const setLibraryActionSuccess = (message) => {
+  clearLibraryActionStatus();
+  libraryActionSuccess.value = message;
+  libraryActionStatusTimeout = setTimeout(() => {
+    libraryActionSuccess.value = '';
+    libraryActionStatusTimeout = null;
+  }, 2400);
 };
 
 const loadUserPlaylists = async () => {
   if (!authState.user) return;
   userPlaylists.value = await fetchPlaylists();
 };
+
+const playlistNameSeparator = computed(() => {
+  return ', ';
+});
+
+const currentSongPlaylists = computed(() => {
+  const songId = playerState.currentSong?.cid;
+  if (!songId) return [];
+
+  return userPlaylists.value.filter((playlist) => {
+    return (playlist.songs || []).some((song) => song.song_cid === songId);
+  });
+});
+
+const visibleCurrentSongPlaylists = computed(() => currentSongPlaylists.value.slice(0, 3));
+
+const hiddenCurrentSongPlaylistCount = computed(() => Math.max(currentSongPlaylists.value.length - visibleCurrentSongPlaylists.value.length, 0));
+
+const currentSongPlaylistNames = computed(() => {
+  return currentSongPlaylists.value.map((playlist) => playlist.name).join(playlistNameSeparator.value);
+});
+
+const currentSongPlaylistLabel = computed(() => {
+  if (!currentSongPlaylistNames.value) {
+    return t('userLibrary.notInAnyPlaylist');
+  }
+
+  return t('userLibrary.alreadyInPlaylists', { names: currentSongPlaylistNames.value });
+});
 
 const refreshFavoriteState = async () => {
   if (!authState.user || !playerState.currentSong?.cid) {
@@ -211,7 +286,7 @@ const toggleFavoriteSong = async () => {
   const songId = playerState.currentSong?.cid;
   if (!authState.user || !songId || favoriteActionPending.value) return;
 
-  libraryActionError.value = '';
+  clearLibraryActionStatus();
   favoriteActionPending.value = true;
   try {
     if (isFavoriteSong.value) {
@@ -245,14 +320,15 @@ const createPlaylistAndAddCurrentSong = async () => {
   const playlistName = newPlaylistName.value.trim();
   if (!authState.user || !songId || !playlistName || isAddingToPlaylist.value) return;
 
-  libraryActionError.value = '';
+  clearLibraryActionStatus();
   isAddingToPlaylist.value = true;
   try {
     const playlist = await createPlaylist(playlistName);
-    await loadUserPlaylists();
     selectedPlaylistId.value = playlist?.id || '';
     if (selectedPlaylistId.value) {
       await addSongToPlaylist(selectedPlaylistId.value, songId);
+      await loadUserPlaylists();
+      setLibraryActionSuccess(t('userLibrary.addedToPlaylist', { name: playlist?.name || playlistName }));
     }
     isCreatePlaylistDialogOpen.value = false;
     newPlaylistName.value = '';
@@ -267,7 +343,7 @@ const addCurrentSongToPlaylist = async () => {
   const songId = playerState.currentSong?.cid;
   if (!authState.user || !songId || isAddingToPlaylist.value) return;
 
-  libraryActionError.value = '';
+  clearLibraryActionStatus();
   isAddingToPlaylist.value = true;
   try {
     await loadUserPlaylists();
@@ -284,7 +360,17 @@ const addCurrentSongToPlaylist = async () => {
   }
 
   try {
+    const selectedPlaylist = userPlaylists.value.find((playlist) => playlist.id === selectedPlaylistId.value);
+    const playlistName = selectedPlaylist?.name || '';
+    const isAlreadyInPlaylist = (selectedPlaylist?.songs || []).some((song) => song.song_cid === songId);
+    if (isAlreadyInPlaylist) {
+      setLibraryActionSuccess(t('userLibrary.alreadyInPlaylist', { name: playlistName || selectedPlaylistId.value }));
+      return;
+    }
+
     await addSongToPlaylist(selectedPlaylistId.value, songId);
+    await loadUserPlaylists();
+    setLibraryActionSuccess(t('userLibrary.addedToPlaylist', { name: playlistName || selectedPlaylistId.value }));
   } catch (error) {
     setLibraryActionError(error);
   } finally {
@@ -514,6 +600,9 @@ watch(() => playerState.isPlaying, (isPlaying) => {
 
 watch(() => playerState.currentSong, (newSong) => {
   activeLyricIndex.value = -1;
+  clearLibraryActionStatus();
+  refreshFavoriteState().catch(() => {});
+  loadUserPlaylists().catch(() => {});
   if (lyricsContainerRef.value) {
     lyricsContainerRef.value.scrollTop = 0;
   }
@@ -547,6 +636,9 @@ onUnmounted(() => {
   }
   if (shareStatusTimeout) {
     clearTimeout(shareStatusTimeout);
+  }
+  if (libraryActionStatusTimeout) {
+    clearTimeout(libraryActionStatusTimeout);
   }
 });
 </script>
@@ -736,6 +828,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
 }
 
 .volume-control {
@@ -995,12 +1089,124 @@ onUnmounted(() => {
   box-shadow: 0 8px 22px rgba(92, 178, 255, 0.18);
 }
 
-.library-action-error {
+.library-feedback-panel {
+  position: relative;
+  flex: 1 0 100%;
+  min-width: 0;
+  height: 42px;
+  margin-top: 2px;
+}
+
+.playlist-membership {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
   width: 100%;
-  margin: 4px 0 0;
-  color: #ff8b86;
+  height: 42px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 7px 9px;
+}
+
+.membership-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: rgba(92, 178, 255, 0.14);
+  color: var(--primary-color);
+  font-size: 0.72rem;
+}
+
+.playlist-membership.empty .membership-icon {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+.membership-content {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.membership-label {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.playlist-membership.empty .membership-content {
+  display: block;
+}
+
+.playlist-chip-list {
+  min-width: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow: hidden;
+  padding: 1px 0;
+}
+
+.playlist-chip {
+  flex: 0 1 auto;
+  max-width: 112px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid rgba(92, 178, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(92, 178, 255, 0.11);
+  color: var(--text-color);
+  padding: 3px 8px;
+  font-size: 0.76rem;
+  line-height: 1.2;
+}
+
+.playlist-chip.more {
+  flex: 0 0 auto;
+  color: var(--primary-color);
+  background: rgba(92, 178, 255, 0.07);
+}
+
+.library-action-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 7px 10px;
   font-size: 0.82rem;
-  line-height: 1.4;
+  line-height: 1.3;
+}
+
+.library-action-toast span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library-action-toast.success {
+  border: 1px solid rgba(126, 231, 135, 0.24);
+  background: rgba(18, 35, 24, 0.96);
+  color: #7ee787;
+}
+
+.library-action-toast.error {
+  border: 1px solid rgba(255, 139, 134, 0.26);
+  background: rgba(42, 22, 24, 0.96);
+  color: #ff8b86;
 }
 
 @media (max-width: 520px) {
