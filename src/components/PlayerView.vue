@@ -907,13 +907,118 @@ onUnmounted(() => {
 .library-btn.primary { background: var(--primary-color); color: #111; }
 .library-btn.secondary { color: var(--text-secondary); border-color: var(--border-color); }
 .playlist-select { max-width: 150px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color); padding: 6px; }
-.playlist-dialog-backdrop { position: fixed; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0, 0, 0, 0.62); }
-.playlist-dialog { width: min(420px, 100%); border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-color); padding: 20px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35); }
-.playlist-dialog h3 { margin: 0 0 8px; color: var(--primary-color); font-size: 1.1rem; }
-.playlist-dialog p { margin: 0 0 16px; color: var(--text-secondary); line-height: 1.6; }
-.playlist-dialog-form { display: grid; gap: 16px; }
-.playlist-dialog-form label { display: grid; gap: 7px; color: var(--text-color); }
-.playlist-dialog-form input { border: 1px solid var(--border-color); border-radius: 6px; background: rgba(255, 255, 255, 0.05); color: var(--text-color); padding: 10px 12px; }
-.playlist-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
-.library-action-error { width: 100%; margin: 4px 0 0; color: #ff7b72; font-size: 0.82rem; line-height: 1.4; }
+.playlist-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(2, 6, 12, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.playlist-dialog {
+  width: min(430px, 100%);
+  border: 1px solid rgba(92, 178, 255, 0.24);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(24, 31, 42, 0.98), rgba(13, 17, 23, 0.98));
+  color: var(--text-color);
+  padding: 22px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.playlist-dialog h3 {
+  margin: 0 0 8px;
+  color: var(--primary-color);
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.playlist-dialog p {
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.playlist-dialog-form {
+  display: grid;
+  gap: 16px;
+}
+
+.playlist-dialog-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.playlist-dialog-form input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-color);
+  padding: 11px 12px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.playlist-dialog-form input:focus {
+  border-color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(92, 178, 255, 0.16);
+}
+
+.playlist-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.playlist-dialog .library-btn {
+  min-height: 36px;
+  padding: 8px 12px;
+  transition: transform 140ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease;
+}
+
+.playlist-dialog .library-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.playlist-dialog .library-btn.primary {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 22px rgba(92, 178, 255, 0.18);
+}
+
+.library-action-error {
+  width: 100%;
+  margin: 4px 0 0;
+  color: #ff8b86;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 520px) {
+  .playlist-dialog-backdrop {
+    align-items: flex-end;
+    padding: 12px;
+  }
+
+  .playlist-dialog {
+    padding: 18px;
+  }
+
+  .playlist-dialog-actions {
+    justify-content: stretch;
+  }
+
+  .playlist-dialog-actions .library-btn {
+    flex: 1 1 140px;
+  }
+}
 </style>
