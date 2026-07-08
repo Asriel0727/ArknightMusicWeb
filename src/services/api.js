@@ -260,7 +260,17 @@ export async function fetchLyrics(lyricUrl) {
  * @returns {string} 代理後的圖片URL
  */
 export function getProxyImageUrl(imageUrl) {
-  return `${API_ORIGIN}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+  if (!imageUrl) return '';
+
+  const normalizedUrl = String(imageUrl);
+  if (
+    normalizedUrl.startsWith(`${API_ORIGIN}/proxy-image`) ||
+    normalizedUrl.startsWith('/proxy-image')
+  ) {
+    return normalizedUrl;
+  }
+
+  return `${API_ORIGIN}/proxy-image?url=${encodeURIComponent(normalizedUrl)}`;
 }
 
 export function getProxyAudioUrl(audioUrl) {

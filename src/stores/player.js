@@ -102,6 +102,7 @@ export const playerState = reactive({
   currentSong: null,
   currentSongIndex: 0,
   currentPlaylist: [],
+  sourceContext: null,
   lyrics: [],
   showLyricTranslation: false,
   isTranslatingLyrics: false,
@@ -322,6 +323,7 @@ export async function playSongFromAlbum(index, albumId) {
     
     playerState.currentPlaylist = albumState.currentAlbumSongs;
     playerState.currentSongIndex = index;
+    playerState.sourceContext = { type: 'album', albumCid: album.cid };
     
     const song = albumState.currentAlbumSongs[index];
     await playSong(song, album.coverUrl, album.coverDeUrl);
@@ -346,11 +348,13 @@ export async function playSongFromMasterList(song) {
       artistes: songDetails.artistes || song.artistes || [unknownArtistLabel()],
       coverUrl: song.coverUrl || albumDetailsFromFull?.coverUrl || songDetails.coverUrl,
       coverDeUrl: song.coverDeUrl || albumDetailsFromFull?.coverDeUrl || songDetails.coverDeUrl,
+      album: albumDetailsFromFull || songDetails.album || song.album || null,
       albumCid
     };
 
     playerState.currentPlaylist = [songToPlay];
     playerState.currentSongIndex = 0;
+    playerState.sourceContext = { type: 'song', albumCid };
     await playSong(songToPlay, songToPlay.coverUrl, songToPlay.coverDeUrl);
 
     const albumDetailsPromise = albumDetailsFromFull
@@ -381,6 +385,43 @@ export async function playSongFromMasterList(song) {
       });
   } catch (error) {
     console.error(`播放歌曲 ${song.cid} 時出錯:`, error);
+  }
+}
+
+export async function playSongQueueFromMasterList(songs, startIndex = 0, sourceContext = null) {
+  const queue = Array.isArray(songs)
+    ? songs.filter((song) => song?.cid)
+    : [];
+
+  if (queue.length === 0) {
+    return;
+  }
+
+  const safeStartIndex = Math.min(Math.max(startIndex, 0), queue.length - 1);
+  const selectedSong = queue[safeStartIndex];
+
+  try {
+    const songDetails = await fetchMasterSongDetails(selectedSong.cid);
+    const albumDetailsFromFull = songDetails.album || selectedSong.album || null;
+    const albumCid = songDetails.albumCid || selectedSong.albumCid || albumDetailsFromFull?.cid;
+
+    const songToPlay = {
+      ...selectedSong,
+      ...songDetails,
+      artistes: songDetails.artistes || selectedSong.artistes || albumDetailsFromFull?.artistes || [unknownArtistLabel()],
+      coverUrl: selectedSong.coverUrl || songDetails.coverUrl || albumDetailsFromFull?.coverUrl,
+      coverDeUrl: selectedSong.coverDeUrl || songDetails.coverDeUrl || albumDetailsFromFull?.coverDeUrl,
+      album: albumDetailsFromFull || songDetails.album || null,
+      albumCid,
+    };
+
+    queue[safeStartIndex] = songToPlay;
+    playerState.currentPlaylist = queue;
+    playerState.currentSongIndex = safeStartIndex;
+    playerState.sourceContext = sourceContext || { type: 'queue' };
+    await playSong(songToPlay, songToPlay.coverUrl, songToPlay.coverDeUrl);
+  } catch (error) {
+    console.error(`播放歌曲佇列 ${selectedSong.cid} 時出錯:`, error);
   }
 }
 

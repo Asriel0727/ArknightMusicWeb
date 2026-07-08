@@ -3,17 +3,10 @@
     <div class="player-view-left">
       <div class="player-container">
         <div class="player-header">
-          <div class="player-cover" :class="{ playing: playerState.isPlaying }"
-          >
-            <img 
-              v-if="playerState.currentSong && playerState.currentSong.coverUrl"
-              :src="proxyImageUrl(playerState.currentSong.coverUrl)" 
-              :alt="playerState.currentSong.name"
-              decoding="async"
-              fetchpriority="high"
-              @load="handleImageLoad"
-              @error="handleImageError"
-            >
+          <div class="player-cover" :class="{ playing: playerState.isPlaying }">
+            <img v-if="playerState.currentSong && playerState.currentSong.coverUrl"
+              :src="proxyImageUrl(playerState.currentSong.coverUrl)" :alt="playerState.currentSong.name"
+              decoding="async" fetchpriority="high" @load="handleImageLoad" @error="handleImageError">
             <div v-else class="no-cover">{{ t('common.noCover') }}</div>
           </div>
           <div class="player-info">
@@ -35,12 +28,8 @@
             <button class="control-btn" @click="playNextSong">
               <i class="fas fa-step-forward"></i>
             </button>
-            <button
-              class="control-btn"
-              :disabled="!playerState.currentSong"
-              :title="shareButtonTitle"
-              @click="handleShareSong"
-            >
+            <button class="control-btn" :disabled="!playerState.currentSong" :title="shareButtonTitle"
+              @click="handleShareSong">
               <i :class="shareIcon"></i>
             </button>
           </div>
@@ -56,60 +45,41 @@
               <button class="control-btn" @click="toggleMute">
                 <i :class="volumeIcon"></i>
               </button>
-              <input 
-                type="range" 
-                v-model.number="playerState.volume" 
-                min="0" 
-                max="1" 
-                step="0.05"
-                @input="handleVolumeChange"
-              >
+              <input type="range" v-model.number="playerState.volume" min="0" max="1" step="0.05"
+                @input="handleVolumeChange">
             </div>
             <label class="lyrics-translation-toggle">
-              <input
-                v-model="playerState.showLyricTranslation"
-                type="checkbox"
-                @change="handleLyricTranslationToggle"
-              >
+              <input v-model="playerState.showLyricTranslation" type="checkbox" @change="handleLyricTranslationToggle">
               <span class="toggle-track" aria-hidden="true">
                 <span class="toggle-thumb"></span>
               </span>
               <span class="toggle-label">{{ t('player.translationToggle') }}</span>
             </label>
             <div v-if="authState.user && playerState.currentSong" class="library-actions">
-              <button class="library-btn" type="button" :disabled="favoriteActionPending" :title="isFavoriteSong ? t('userLibrary.removeFavorite') : t('userLibrary.addFavorite')" @click="toggleFavoriteSong">
+              <button class="library-btn" type="button" :disabled="favoriteActionPending"
+                :title="isFavoriteSong ? t('userLibrary.removeFavorite') : t('userLibrary.addFavorite')"
+                @click="toggleFavoriteSong">
                 <i :class="isFavoriteSong ? 'fas fa-heart' : 'far fa-heart'"></i>
               </button>
-              <select v-model="selectedPlaylistId" class="playlist-select" @focus="loadUserPlaylists">
-                <option value="">{{ t('userLibrary.selectPlaylist') }}</option>
-                <option v-for="playlist in userPlaylists" :key="playlist.id" :value="playlist.id">{{ playlist.name }}</option>
-              </select>
-              <button class="library-btn" type="button" :disabled="isAddingToPlaylist" @click="addCurrentSongToPlaylist">{{ t('userLibrary.addToPlaylist') }}</button>
             </div>
             <div v-if="authState.user && playerState.currentSong" class="library-feedback-panel">
               <div class="playlist-membership" :class="{ empty: currentSongPlaylists.length === 0 }">
                 <span class="membership-icon"><i class="fas fa-list-ul"></i></span>
                 <div class="membership-content">
                   <span class="membership-label">
-                    {{ currentSongPlaylists.length > 0 ? t('userLibrary.currentSongPlaylistGroup') : t('userLibrary.notInAnyPlaylist') }}
+                    {{ currentSongPlaylists.length > 0 ? t('userLibrary.currentSongPlaylistGroup') :
+                      t('userLibrary.notInAnyPlaylist') }}
                   </span>
-                  <div v-if="currentSongPlaylists.length > 0" class="playlist-chip-list" :title="currentSongPlaylistLabel">
+                  <div class="playlist-chip-list"
+                    :title="currentSongPlaylistLabel">
                     <span v-for="playlist in visibleCurrentSongPlaylists" :key="playlist.id" class="playlist-chip">
                       {{ playlist.name }}
                     </span>
-                    <span v-if="hiddenCurrentSongPlaylistCount > 0" class="playlist-chip more">
-                      +{{ hiddenCurrentSongPlaylistCount }}
-                    </span>
+                    <button class="playlist-chip more" type="button" @click="openPlaylistManager">
+                      {{ t('userLibrary.managePlaylists') }}
+                    </button>
                   </div>
                 </div>
-              </div>
-              <div v-if="libraryActionSuccess" class="library-action-toast success">
-                <i class="fas fa-check-circle"></i>
-                <span>{{ libraryActionSuccess }}</span>
-              </div>
-              <div v-if="libraryActionError" class="library-action-toast error">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{ libraryActionError }}</span>
               </div>
             </div>
           </div>
@@ -117,36 +87,18 @@
       </div>
     </div>
     <div class="player-view-right">
-      <img 
-        v-if="playerState.currentSong && playerState.currentSong.coverDeUrl"
-        :src="proxyImageUrl(playerState.currentSong.coverDeUrl)" 
-        :alt="playerState.currentSong.name" 
-        class="album-grid-visual-small"
-        decoding="async"
-        fetchpriority="high"
-        @load="handleImageLoad"
-        @error="handleImageError"
-      >
-      <div 
-        v-if="playerState.lyrics && playerState.lyrics.length > 0" 
-        class="lyrics-container"
-        ref="lyricsContainerRef"
-        @scroll="handleLyricsScroll"
-      >
-        <div 
-          v-for="(line, index) in playerState.lyrics" 
-          :key="index"
-          class="lyrics-line"
-          :class="{ active: activeLyricIndex === index }"
-          :data-time="line.time"
-        >
+      <img v-if="playerState.currentSong && playerState.currentSong.coverDeUrl"
+        :src="proxyImageUrl(playerState.currentSong.coverDeUrl)" :alt="playerState.currentSong.name"
+        class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
+        @error="handleImageError">
+      <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-container" ref="lyricsContainerRef"
+        @scroll="handleLyricsScroll">
+        <div v-for="(line, index) in playerState.lyrics" :key="index" class="lyrics-line"
+          :class="{ active: activeLyricIndex === index }" :data-time="line.time">
           <div class="lyrics-original">
             {{ line.text }}
           </div>
-          <div
-            v-if="playerState.showLyricTranslation && line.translation"
-            class="lyrics-translation"
-          >
+          <div v-if="playerState.showLyricTranslation && line.translation" class="lyrics-translation">
             {{ line.translation }}
           </div>
         </div>
@@ -161,13 +113,8 @@
       <form class="playlist-dialog-form" @submit.prevent="createPlaylistAndAddCurrentSong">
         <label>
           <span>{{ t('userLibrary.playlistName') }}</span>
-          <input
-            v-model.trim="newPlaylistName"
-            type="text"
-            :placeholder="t('userLibrary.playlistNamePrompt')"
-            maxlength="80"
-            autofocus
-          >
+          <input v-model.trim="newPlaylistName" type="text" :placeholder="t('userLibrary.playlistNamePrompt')"
+            maxlength="80" autofocus>
         </label>
         <p v-if="libraryActionError" class="library-action-error">{{ libraryActionError }}</p>
         <div class="playlist-dialog-actions">
@@ -181,6 +128,48 @@
       </form>
     </section>
   </div>
+  <div v-if="isPlaylistManagerOpen" class="playlist-dialog-backdrop" @click.self="closePlaylistManager">
+    <section class="playlist-dialog playlist-manager-dialog" role="dialog" aria-modal="true"
+      :aria-label="t('userLibrary.managePlaylistTitle')">
+      <div class="playlist-manager-header">
+        <div>
+          <h3>{{ t('userLibrary.managePlaylistTitle') }}</h3>
+          <p>{{ playerState.currentSong?.name || t('common.unknownSong') }}</p>
+        </div>
+        <button class="library-icon-btn" type="button" :title="t('userLibrary.cancel')" @click="closePlaylistManager">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <input v-model.trim="playlistSearchQuery" class="playlist-manager-search" type="search"
+        :placeholder="t('userLibrary.searchPlaylists')">
+      <div class="playlist-manager-list">
+        <label v-for="playlist in filteredUserPlaylists" :key="playlist.id" class="playlist-manager-item">
+          <input type="checkbox" :checked="isSongInPlaylist(playlist)" :disabled="isPlaylistMembershipPending(playlist.id)"
+            @change="togglePlaylistMembership(playlist, $event.target.checked)">
+          <span class="playlist-manager-check" aria-hidden="true">
+            <i class="fas fa-check"></i>
+          </span>
+          <span class="playlist-manager-name">{{ playlist.name }}</span>
+        </label>
+        <p v-if="filteredUserPlaylists.length === 0" class="playlist-manager-empty">
+          {{ t('userLibrary.noPlaylists') }}
+        </p>
+      </div>
+      <div class="playlist-dialog-actions">
+        <button class="library-btn secondary" type="button" @click="openCreatePlaylistDialog">
+          {{ t('userLibrary.createPlaylistTitle') }}
+        </button>
+        <button class="library-btn primary" type="button" @click="closePlaylistManager">
+          {{ t('userLibrary.done') }}
+        </button>
+      </div>
+    </section>
+  </div>
+  <div v-if="libraryActionSuccess || libraryActionError" class="global-library-toast"
+    :class="{ success: libraryActionSuccess, error: libraryActionError }">
+    <i :class="libraryActionSuccess ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i>
+    <span>{{ libraryActionSuccess || libraryActionError }}</span>
+  </div>
 </template>
 
 <script setup>
@@ -189,7 +178,7 @@ import { useI18n } from 'vue-i18n';
 import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations, togglePlayMode } from '../stores/player.js';
 import { createSongShareUrl as createSongSharePageUrl, getProxyImageUrl } from '../services/api.js';
 import { authState } from '../services/auth.js';
-import { addFavoriteSong, addSongToPlaylist, createPlaylist, fetchFavoriteSongs, fetchPlaylists, removeFavoriteSong } from '../services/userLibrary.js';
+import { addFavoriteSong, addSongToPlaylist, createPlaylist, fetchFavoriteSongs, fetchPlaylists, removeFavoriteSong, removeSongFromPlaylist } from '../services/userLibrary.js';
 import { formatTime } from '../utils/time.js';
 
 const { t, locale } = useI18n();
@@ -203,7 +192,9 @@ const favoriteActionPending = ref(false);
 const libraryActionError = ref('');
 const libraryActionSuccess = ref('');
 const userPlaylists = ref([]);
-const selectedPlaylistId = ref('');
+const isPlaylistManagerOpen = ref(false);
+const playlistSearchQuery = ref('');
+const playlistMembershipPendingIds = ref(new Set());
 const isCreatePlaylistDialogOpen = ref(false);
 const newPlaylistName = ref('');
 const isAddingToPlaylist = ref(false);
@@ -212,30 +203,50 @@ let isUserScrolling = false;
 let userScrollTimeout = null;
 let shareStatusTimeout = null;
 let libraryActionStatusTimeout = null;
+const libraryActionStatusQueue = [];
 
 const LYRICS_TIME_OFFSET = 0.5;
 
-const clearLibraryActionStatus = () => {
+const clearLibraryActionStatus = ({ clearQueue = true } = {}) => {
   if (libraryActionStatusTimeout) {
     clearTimeout(libraryActionStatusTimeout);
     libraryActionStatusTimeout = null;
+  }
+  if (clearQueue) {
+    libraryActionStatusQueue.length = 0;
   }
   libraryActionError.value = '';
   libraryActionSuccess.value = '';
 };
 
+const showNextLibraryActionStatus = () => {
+  if (libraryActionStatusQueue.length === 0) {
+    clearLibraryActionStatus({ clearQueue: false });
+    return;
+  }
+
+  const nextStatus = libraryActionStatusQueue.shift();
+  libraryActionError.value = nextStatus.type === 'error' ? nextStatus.message : '';
+  libraryActionSuccess.value = nextStatus.type === 'success' ? nextStatus.message : '';
+  libraryActionStatusTimeout = setTimeout(() => {
+    libraryActionStatusTimeout = null;
+    showNextLibraryActionStatus();
+  }, 2400);
+};
+
+const enqueueLibraryActionStatus = (type, message) => {
+  libraryActionStatusQueue.push({ type, message });
+  if (!libraryActionStatusTimeout && !libraryActionSuccess.value && !libraryActionError.value) {
+    showNextLibraryActionStatus();
+  }
+};
+
 const setLibraryActionError = (error) => {
-  clearLibraryActionStatus();
-  libraryActionError.value = error?.message || t('userLibrary.actionFailed');
+  enqueueLibraryActionStatus('error', error?.message || t('userLibrary.actionFailed'));
 };
 
 const setLibraryActionSuccess = (message) => {
-  clearLibraryActionStatus();
-  libraryActionSuccess.value = message;
-  libraryActionStatusTimeout = setTimeout(() => {
-    libraryActionSuccess.value = '';
-    libraryActionStatusTimeout = null;
-  }, 2400);
+  enqueueLibraryActionStatus('success', message);
 };
 
 const loadUserPlaylists = async () => {
@@ -256,9 +267,16 @@ const currentSongPlaylists = computed(() => {
   });
 });
 
-const visibleCurrentSongPlaylists = computed(() => currentSongPlaylists.value.slice(0, 3));
+const filteredUserPlaylists = computed(() => {
+  const keyword = playlistSearchQuery.value.trim().toLowerCase();
+  if (!keyword) return userPlaylists.value;
 
-const hiddenCurrentSongPlaylistCount = computed(() => Math.max(currentSongPlaylists.value.length - visibleCurrentSongPlaylists.value.length, 0));
+  return userPlaylists.value.filter((playlist) => {
+    return String(playlist.name || '').toLowerCase().includes(keyword);
+  });
+});
+
+const visibleCurrentSongPlaylists = computed(() => currentSongPlaylists.value.slice(0, 2));
 
 const currentSongPlaylistNames = computed(() => {
   return currentSongPlaylists.value.map((playlist) => playlist.name).join(playlistNameSeparator.value);
@@ -271,6 +289,63 @@ const currentSongPlaylistLabel = computed(() => {
 
   return t('userLibrary.alreadyInPlaylists', { names: currentSongPlaylistNames.value });
 });
+
+const isSongInPlaylist = (playlist) => {
+  const songId = playerState.currentSong?.cid;
+  if (!songId) return false;
+  return (playlist?.songs || []).some((song) => song.song_cid === songId);
+};
+
+const isPlaylistMembershipPending = (playlistId) => {
+  return playlistMembershipPendingIds.value.has(playlistId);
+};
+
+const setPlaylistMembershipPending = (playlistId, isPending) => {
+  const nextPendingIds = new Set(playlistMembershipPendingIds.value);
+  if (isPending) {
+    nextPendingIds.add(playlistId);
+  } else {
+    nextPendingIds.delete(playlistId);
+  }
+  playlistMembershipPendingIds.value = nextPendingIds;
+};
+
+const openPlaylistManager = async () => {
+  if (!authState.user || !playerState.currentSong?.cid) return;
+  playlistSearchQuery.value = '';
+  isPlaylistManagerOpen.value = true;
+  try {
+    await loadUserPlaylists();
+  } catch (error) {
+    setLibraryActionError(error);
+  }
+};
+
+const closePlaylistManager = () => {
+  isPlaylistManagerOpen.value = false;
+  playlistSearchQuery.value = '';
+};
+
+const togglePlaylistMembership = async (playlist, shouldIncludeSong) => {
+  const songId = playerState.currentSong?.cid;
+  if (!authState.user || !songId || !playlist?.id || isPlaylistMembershipPending(playlist.id)) return;
+
+  setPlaylistMembershipPending(playlist.id, true);
+  try {
+    if (shouldIncludeSong) {
+      await addSongToPlaylist(playlist.id, songId);
+      setLibraryActionSuccess(t('userLibrary.addedToPlaylist', { name: playlist.name || playlist.id }));
+    } else {
+      await removeSongFromPlaylist(playlist.id, songId);
+      setLibraryActionSuccess(t('userLibrary.removedFromPlaylist', { name: playlist.name || playlist.id }));
+    }
+    await loadUserPlaylists();
+  } catch (error) {
+    setLibraryActionError(error);
+  } finally {
+    setPlaylistMembershipPending(playlist.id, false);
+  }
+};
 
 const refreshFavoriteState = async () => {
   if (!authState.user || !playerState.currentSong?.cid) {
@@ -286,17 +361,18 @@ const toggleFavoriteSong = async () => {
   const songId = playerState.currentSong?.cid;
   if (!authState.user || !songId || favoriteActionPending.value) return;
 
-  clearLibraryActionStatus();
   favoriteActionPending.value = true;
   try {
     if (isFavoriteSong.value) {
       await removeFavoriteSong(songId);
       isFavoriteSong.value = false;
+      setLibraryActionSuccess(t('userLibrary.favoriteRemoved'));
       return;
     }
 
     await addFavoriteSong(songId);
     isFavoriteSong.value = true;
+    setLibraryActionSuccess(t('userLibrary.favoriteAdded'));
   } catch (error) {
     setLibraryActionError(error);
   } finally {
@@ -306,6 +382,7 @@ const toggleFavoriteSong = async () => {
 
 const openCreatePlaylistDialog = () => {
   newPlaylistName.value = '';
+  isPlaylistManagerOpen.value = false;
   isCreatePlaylistDialogOpen.value = true;
 };
 
@@ -320,57 +397,16 @@ const createPlaylistAndAddCurrentSong = async () => {
   const playlistName = newPlaylistName.value.trim();
   if (!authState.user || !songId || !playlistName || isAddingToPlaylist.value) return;
 
-  clearLibraryActionStatus();
   isAddingToPlaylist.value = true;
   try {
     const playlist = await createPlaylist(playlistName);
-    selectedPlaylistId.value = playlist?.id || '';
-    if (selectedPlaylistId.value) {
-      await addSongToPlaylist(selectedPlaylistId.value, songId);
+    if (playlist?.id) {
+      await addSongToPlaylist(playlist.id, songId);
       await loadUserPlaylists();
       setLibraryActionSuccess(t('userLibrary.addedToPlaylist', { name: playlist?.name || playlistName }));
     }
     isCreatePlaylistDialogOpen.value = false;
     newPlaylistName.value = '';
-  } catch (error) {
-    setLibraryActionError(error);
-  } finally {
-    isAddingToPlaylist.value = false;
-  }
-};
-
-const addCurrentSongToPlaylist = async () => {
-  const songId = playerState.currentSong?.cid;
-  if (!authState.user || !songId || isAddingToPlaylist.value) return;
-
-  clearLibraryActionStatus();
-  isAddingToPlaylist.value = true;
-  try {
-    await loadUserPlaylists();
-  } catch (error) {
-    setLibraryActionError(error);
-    isAddingToPlaylist.value = false;
-    return;
-  }
-
-  if (!selectedPlaylistId.value) {
-    isAddingToPlaylist.value = false;
-    openCreatePlaylistDialog();
-    return;
-  }
-
-  try {
-    const selectedPlaylist = userPlaylists.value.find((playlist) => playlist.id === selectedPlaylistId.value);
-    const playlistName = selectedPlaylist?.name || '';
-    const isAlreadyInPlaylist = (selectedPlaylist?.songs || []).some((song) => song.song_cid === songId);
-    if (isAlreadyInPlaylist) {
-      setLibraryActionSuccess(t('userLibrary.alreadyInPlaylist', { name: playlistName || selectedPlaylistId.value }));
-      return;
-    }
-
-    await addSongToPlaylist(selectedPlaylistId.value, songId);
-    await loadUserPlaylists();
-    setLibraryActionSuccess(t('userLibrary.addedToPlaylist', { name: playlistName || selectedPlaylistId.value }));
   } catch (error) {
     setLibraryActionError(error);
   } finally {
@@ -441,7 +477,7 @@ const handleImageLoad = (event) => {
 };
 
 const handleImageError = (event) => {
-  console.error('?–ç?? è?å¤±æ?:', event.target.src);
+  console.error('?ï¿½ï¿½??ï¿½ï¿½?å¤±ï¿½?:', event.target.src);
 };
 
 const handleSeek = (event) => {
@@ -515,7 +551,7 @@ const handleShareSong = async () => {
   }, 1600);
 };
 
-// ?Œæ­¥æ­Œè?é«˜äº®?Œæ»¾??
+// ?ï¿½æ­¥æ­Œï¿½?é«˜äº®?ï¿½æ»¾??
 const syncLyricsHighlight = (currentTime) => {
   if (!playerState.lyrics || playerState.lyrics.length === 0) return;
   if (!lyricsContainerRef.value) return;
@@ -533,12 +569,12 @@ const syncLyricsHighlight = (currentTime) => {
 
   if (newActiveIndex !== activeLyricIndex.value && newActiveIndex !== -1) {
     activeLyricIndex.value = newActiveIndex;
-    
+
     if (!isUserScrolling) {
       const activeElement = lyricsContainerRef.value.querySelector(
         `.lyrics-line[data-time="${playerState.lyrics[newActiveIndex].time}"]`
       );
-      
+
       if (activeElement) {
         const containerHeight = lyricsContainerRef.value.clientHeight;
         const lineTop = activeElement.offsetTop;
@@ -554,11 +590,11 @@ const syncLyricsHighlight = (currentTime) => {
   }
 };
 
-// ä½¿ç”¨ requestAnimationFrame å¯¦ç¾é«˜é »?‡æ?è©žå?æ­?
+// ä½¿ç”¨ requestAnimationFrame å¯¦ç¾é«˜é »?ï¿½ï¿½?è©žï¿½?ï¿½?
 const startLyricsSync = () => {
   const sync = () => {
     if (playerState.audioPlayer && playerState.isPlaying) {
-      // ?´æŽ¥å¾?audio ?ƒç??²å??¶å??‚é?ï¼Œæ›´æº–ç¢º
+      // ?ï¿½æŽ¥ï¿½?audio ?ï¿½ï¿½??ï¿½ï¿½??ï¿½ï¿½??ï¿½ï¿½?ï¼Œæ›´æº–ç¢º
       const currentTime = playerState.audioPlayer.currentTime;
       syncLyricsHighlight(currentTime);
     }
@@ -575,21 +611,21 @@ const stopLyricsSync = () => {
 };
 
 const handleLyricsScroll = () => {
-  // ?¨æˆ¶ä¸»å?æ»¾å??‚ï??«æ??œæ­¢?ªå?æ»¾å?ä½†ç¹¼çºŒæ›´?°é?äº?
+  // ?ï¿½æˆ¶ä¸»ï¿½?æ»¾ï¿½??ï¿½ï¿½??ï¿½ï¿½??ï¿½æ­¢?ï¿½ï¿½?æ»¾ï¿½?ä½†ç¹¼çºŒæ›´?ï¿½ï¿½?ï¿½?
   isUserScrolling = true;
-  
-  // æ¸…é™¤ä¹‹å??„è???
+
+  // æ¸…é™¤ä¹‹ï¿½??ï¿½ï¿½???
   if (userScrollTimeout) {
     clearTimeout(userScrollTimeout);
   }
-  
-  // 3ç§’å??¢å¾©?ªå?æ»¾å?
+
+  // 3ç§’ï¿½??ï¿½å¾©?ï¿½ï¿½?æ»¾ï¿½?
   userScrollTimeout = setTimeout(() => {
     isUserScrolling = false;
   }, 3000);
 };
 
-// ??½?­æ”¾?€?‹ï??§åˆ¶æ­Œè??Œæ­¥å¾ªç’°
+// ??ï¿½ï¿½?ï¿½æ”¾?ï¿½?ï¿½ï¿½??ï¿½åˆ¶æ­Œï¿½??ï¿½æ­¥å¾ªç’°
 watch(() => playerState.isPlaying, (isPlaying) => {
   if (isPlaying) {
     startLyricsSync();
@@ -601,15 +637,16 @@ watch(() => playerState.isPlaying, (isPlaying) => {
 watch(() => playerState.currentSong, (newSong) => {
   activeLyricIndex.value = -1;
   clearLibraryActionStatus();
-  refreshFavoriteState().catch(() => {});
-  loadUserPlaylists().catch(() => {});
+  closePlaylistManager();
+  refreshFavoriteState().catch(() => { });
+  loadUserPlaylists().catch(() => { });
   if (lyricsContainerRef.value) {
     lyricsContainerRef.value.scrollTop = 0;
   }
 });
 
 watch(() => playerState.lyrics, (newLyrics) => {
-  // æ­Œè??´æ–°?‚é?ç½®é?äº®ç´¢å¼?
+  // æ­Œï¿½??ï¿½æ–°?ï¿½ï¿½?ç½®ï¿½?äº®ç´¢ï¿½?
   activeLyricIndex.value = -1;
 }, { deep: true });
 
@@ -619,16 +656,16 @@ watch(locale, () => {
   }
 });
 
-// çµ„ä»¶?›è??‚ï?å¦‚æ?æ­?œ¨?­æ”¾?‡å??•å?æ­?
+// çµ„ä»¶?ï¿½ï¿½??ï¿½ï¿½?å¦‚ï¿½?ï¿½?ï¿½ï¿½?ï¿½æ”¾?ï¿½ï¿½??ï¿½ï¿½?ï¿½?
 onMounted(() => {
-  refreshFavoriteState().catch(() => {});
-  loadUserPlaylists().catch(() => {});
+  refreshFavoriteState().catch(() => { });
+  loadUserPlaylists().catch(() => { });
   if (playerState.isPlaying) {
     startLyricsSync();
   }
 });
 
-// çµ„ä»¶?¸è??‚æ??†å??«å¾ª?°å?è¶…æ?
+// çµ„ä»¶?ï¿½ï¿½??ï¿½ï¿½??ï¿½ï¿½??ï¿½å¾ª?ï¿½ï¿½?è¶…ï¿½?
 onUnmounted(() => {
   stopLyricsSync();
   if (userScrollTimeout) {
@@ -646,8 +683,9 @@ onUnmounted(() => {
 <style scoped>
 .player-view-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
+  grid-template-columns: repeat(2, minmax(0, 520px));
+  justify-content: center;
+  gap: clamp(24px, 4vw, 48px);
   align-items: center;
 }
 
@@ -655,13 +693,22 @@ onUnmounted(() => {
 .player-view-right {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 520px;
   height: 100%;
+  justify-self: center;
+  min-height: 0;
 }
 
 .player-view-left .player-container {
   margin-top: 0;
   padding: 0;
   background: none;
+}
+
+.player-view-right {
+  justify-content: flex-start;
+  gap: 15px;
 }
 
 .player-container {
@@ -880,16 +927,16 @@ onUnmounted(() => {
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.lyrics-translation-toggle input:checked + .toggle-track {
+.lyrics-translation-toggle input:checked+.toggle-track {
   background: rgba(88, 166, 255, 0.32);
 }
 
-.lyrics-translation-toggle input:checked + .toggle-track .toggle-thumb {
+.lyrics-translation-toggle input:checked+.toggle-track .toggle-thumb {
   transform: translateX(20px);
   background: var(--primary-color);
 }
 
-.lyrics-translation-toggle input:focus-visible + .toggle-track {
+.lyrics-translation-toggle input:focus-visible+.toggle-track {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
@@ -899,7 +946,7 @@ onUnmounted(() => {
 }
 
 .album-grid-visual-small {
-  width: 80%;
+  width: min(100%, 360px);
   max-width: 400px;
   height: auto;
   border-radius: 8px;
@@ -918,8 +965,8 @@ onUnmounted(() => {
 }
 
 .lyrics-container {
-  margin-top: 0;
-  max-height: 250px;
+  height: clamp(280px, 42vh, 380px);
+  max-height: 380px;
   overflow-y: auto;
   background: rgba(13, 17, 23, 0.5);
   padding: 20px;
@@ -981,12 +1028,17 @@ onUnmounted(() => {
   .player-view-grid {
     grid-template-columns: 1fr;
   }
-  
+
+  .playlist-popover {
+    top: calc(100% + 8px);
+    bottom: auto;
+  }
+
   .player-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .player-cover {
     margin-right: 0;
     margin-bottom: 15px;
@@ -995,12 +1047,37 @@ onUnmounted(() => {
 </style>
 
 <style scoped>
-.library-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.library-btn { border: 1px solid var(--primary-color); border-radius: 6px; background: transparent; color: var(--primary-color); padding: 6px 9px; cursor: pointer; }
-.library-btn:disabled { cursor: not-allowed; opacity: 0.55; }
-.library-btn.primary { background: var(--primary-color); color: #111; }
-.library-btn.secondary { color: var(--text-secondary); border-color: var(--border-color); }
-.playlist-select { max-width: 150px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color); padding: 6px; }
+.library-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.library-btn {
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary-color);
+  padding: 6px 9px;
+  cursor: pointer;
+}
+
+.library-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.library-btn.primary {
+  background: var(--primary-color);
+  color: #111;
+}
+
+.library-btn.secondary {
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
 .playlist-dialog-backdrop {
   position: fixed;
   inset: 0;
@@ -1089,12 +1166,132 @@ onUnmounted(() => {
   box-shadow: 0 8px 22px rgba(92, 178, 255, 0.18);
 }
 
+.playlist-manager-dialog {
+  width: min(480px, 100%);
+  display: grid;
+  gap: 16px;
+}
+
+.playlist-manager-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.playlist-manager-header h3 {
+  margin-bottom: 4px;
+}
+
+.playlist-manager-header p {
+  margin: 0;
+}
+
+.library-icon-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.library-icon-btn:hover {
+  color: var(--primary-color);
+  border-color: rgba(92, 178, 255, 0.38);
+}
+
+.playlist-manager-search {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-color);
+  padding: 11px 12px;
+  outline: none;
+}
+
+.playlist-manager-search:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(92, 178, 255, 0.16);
+}
+
+.playlist-manager-list {
+  display: grid;
+  gap: 8px;
+  max-height: min(360px, 46vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+
+.playlist-manager-item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-color);
+  padding: 9px 10px;
+  cursor: pointer;
+}
+
+.playlist-manager-item:hover {
+  border-color: rgba(92, 178, 255, 0.28);
+  background: rgba(92, 178, 255, 0.08);
+}
+
+.playlist-manager-item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.playlist-manager-check {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  color: transparent;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.72rem;
+}
+
+.playlist-manager-item input:checked + .playlist-manager-check {
+  border-color: var(--primary-color);
+  background: rgba(92, 178, 255, 0.22);
+  color: var(--primary-color);
+}
+
+.playlist-manager-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-manager-empty {
+  margin: 0;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  text-align: center;
+}
+
 .library-feedback-panel {
   position: relative;
   flex: 1 0 100%;
   min-width: 0;
   height: 42px;
   margin-top: 2px;
+  z-index: 5;
 }
 
 .playlist-membership {
@@ -1104,7 +1301,7 @@ onUnmounted(() => {
   align-items: center;
   width: 100%;
   height: 42px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.035);
@@ -1174,38 +1371,88 @@ onUnmounted(() => {
 
 .playlist-chip.more {
   flex: 0 0 auto;
+  cursor: pointer;
   color: var(--primary-color);
   background: rgba(92, 178, 255, 0.07);
 }
 
-.library-action-toast {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  max-width: 100%;
-  width: fit-content;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 0.82rem;
-  line-height: 1.3;
+.membership-content {
+  position: relative;
 }
 
-.library-action-toast span {
+.playlist-popover {
+  position: absolute;
+  top: auto;
+  bottom: calc(100% + 8px);
+  right: 0;
+  z-index: 1300;
+  width: min(280px, calc(100vw - 40px));
+  max-height: min(220px, 32vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid rgba(92, 178, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(13, 17, 23, 0.98);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+  padding: 10px;
+}
+
+.playlist-popover-title {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  margin-bottom: 8px;
+}
+
+.playlist-popover-list {
+  display: grid;
+  gap: 6px;
+}
+
+.playlist-popover-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+  padding: 7px 8px;
+  font-size: 0.82rem;
+}
+
+.global-library-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 72px;
+  transform: translateX(-50%);
+  z-index: 1400;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(420px, calc(100vw - 32px));
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(10px);
+}
+
+.global-library-toast span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.library-action-toast.success {
+.global-library-toast.success {
   border: 1px solid rgba(126, 231, 135, 0.24);
-  background: rgba(18, 35, 24, 0.96);
+  background: rgba(18, 35, 24, 0.94);
   color: #7ee787;
 }
 
-.library-action-toast.error {
+.global-library-toast.error {
   border: 1px solid rgba(255, 139, 134, 0.26);
-  background: rgba(42, 22, 24, 0.96);
+  background: rgba(42, 22, 24, 0.94);
   color: #ff8b86;
 }
 
@@ -1225,6 +1472,44 @@ onUnmounted(() => {
 
   .playlist-dialog-actions .library-btn {
     flex: 1 1 140px;
+  }
+
+  .global-library-toast {
+    bottom: 88px;
+    width: calc(100vw - 28px);
+    justify-content: center;
+  }
+
+  .library-feedback-panel {
+    height: auto;
+  }
+
+  .playlist-membership {
+    height: auto;
+    min-height: 42px;
+    align-items: start;
+  }
+
+  .membership-content {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+  }
+
+  .playlist-chip-list {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  .playlist-chip {
+    max-width: 120px;
+  }
+
+  .playlist-popover {
+    right: auto;
+    left: 0;
+    width: min(280px, calc(100vw - 32px));
+    max-height: 28vh;
   }
 }
 </style>

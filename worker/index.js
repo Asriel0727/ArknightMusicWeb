@@ -3,11 +3,17 @@ const EXCEL_BASE =
 
 const IMAGE_BASE =
   'https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main';
+const IMAGE_MIRROR_ACESHIP =
+  'https://raw.githubusercontent.com/Aceship/Arknight-Images/main';
+const IMAGE_MIRROR_RESOURCE =
+  'https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main';
+const IMAGE_MIRROR_DYNAMIC =
+  'https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts';
 
 const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
-const RECRUIT_OPERATORS_KEY = 'recruit:operators:v2';
-const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v2:';
+const RECRUIT_OPERATORS_KEY = 'recruit:operators:v3';
+const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v3:';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
 const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
@@ -1018,6 +1024,10 @@ async function handlePlaylistRequest(request, env, user, playlistId, isSongsRout
 
     if (request.method === 'DELETE') {
       const songCid = new URL(request.url).searchParams.get('songCid') || '';
+      if (!songCid) {
+        return json({ ok: false, error: 'songCid is required' }, 400);
+      }
+
       await supabaseRestRequest(env, 'user_playlist_songs', {
         method: 'DELETE',
         query: `?playlist_id=eq.${encodeURIComponent(playlistId)}&song_cid=eq.${encodeURIComponent(songCid)}`,
@@ -2010,7 +2020,7 @@ async function buildRecruitOperators(publicApiBase) {
         rarity: parseRarity(char.rarity),
         factionId,
         factionName: teamTable?.[factionId]?.powerName || factionId || '',
-        avatarUrl: proxyImageUrl(`${IMAGE_BASE}/avatars/${id}.png`, publicApiBase),
+        avatarUrl: proxyImageUrl(getAvatarUrls(id)[0], publicApiBase, getAvatarUrls(id).slice(1)),
       };
     })
     .sort((a, b) => b.rarity - a.rarity || a.name.localeCompare(b.name));
@@ -2088,7 +2098,7 @@ function buildRecruitOperatorDetailFromTables(
       traitDescription: getTraitDescription(char),
       recruitVoiceText: getRecruitVoiceText(charId, charwordTable),
       portraits: getPortraits(charId, char, skinTable, publicApiBase),
-      avatarUrl: proxyImageUrl(`${IMAGE_BASE}/avatars/${charId}.png`, publicApiBase),
+      avatarUrl: proxyImageUrl(getAvatarUrls(charId)[0], publicApiBase, getAvatarUrls(charId).slice(1)),
     },
   };
 }
@@ -2285,25 +2295,37 @@ function getPortraitUrls(portraitId, alternativeIds = [], publicApiBase) {
 
     const rawUrls = [
       `${IMAGE_BASE}/characters/${encodedId}.png`,
-      `https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/${encodedId}.png`,
-      `https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/${encodedId}.png`,
-      `https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/${encodedId}.png`,
+      `${IMAGE_MIRROR_RESOURCE}/charportraits/${encodedId}.png`,
+      `${IMAGE_MIRROR_ACESHIP}/characters/${encodedId}.png`,
+      `${IMAGE_MIRROR_DYNAMIC}/charportraits/${encodedId}.png`,
       `https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/${encodedId}.png`
     ];
 
-    urls.push(...rawUrls.map((url) => proxyImageUrl(url, publicApiBase)));
+    urls.push(proxyImageUrl(rawUrls[0], publicApiBase, rawUrls.slice(1)));
   });
 
   return urls;
+}
+
+function getAvatarUrls(charId) {
+  const encodedId = encodeURIComponent(charId);
+  return [
+    `${IMAGE_BASE}/avatars/${encodedId}.png`,
+    `${IMAGE_MIRROR_ACESHIP}/avatars/${encodedId}.png`,
+    `${IMAGE_MIRROR_RESOURCE}/avatar/${encodedId}.png`,
+    `${IMAGE_MIRROR_DYNAMIC}/charavatars/${encodedId}.png`,
+  ];
 }
 
 function getPublicApiBase(request, env) {
   return (env.RECRUIT_API_BASE || new URL(request.url).origin || DEFAULT_PUBLIC_API_BASE).replace(/\/$/, '');
 }
 
-function proxyImageUrl(rawUrl, publicApiBase) {
+function proxyImageUrl(rawUrl, publicApiBase, fallbackUrls = []) {
   const base = (publicApiBase || DEFAULT_PUBLIC_API_BASE).replace(/\/$/, '');
-  return `${base}/api/recruit/image?url=${encodeURIComponent(rawUrl)}`;
+  const params = new URLSearchParams({ url: rawUrl });
+  fallbackUrls.filter(Boolean).forEach((url) => params.append('alt', url));
+  return `${base}/api/recruit/image?${params.toString()}`;
 }
 
 function isAllowedImageUrl(rawUrl) {
@@ -2332,8 +2354,10 @@ async function proxyRecruitImage(request) {
 
   const requestUrl = new URL(request.url);
   const rawUrl = requestUrl.searchParams.get('url') || '';
+  const fallbackUrls = requestUrl.searchParams.getAll('alt').filter(Boolean);
+  const candidateUrls = [rawUrl, ...fallbackUrls].filter(Boolean);
 
-  if (!isAllowedImageUrl(rawUrl)) {
+  if (candidateUrls.length === 0 || candidateUrls.some((url) => !isAllowedImageUrl(url))) {
     return json({ ok: false, error: 'Invalid image url' }, 400);
   }
 
@@ -2344,16 +2368,28 @@ async function proxyRecruitImage(request) {
     return request.method === 'HEAD' ? new Response(null, cached) : cached;
   }
 
-  const upstream = await fetch(rawUrl, {
-    cf: {
-      cacheTtl: 60 * 60 * 24 * 30,
-      cacheEverything: true,
-    },
-  });
+  let upstream = null;
+  let failedStatus = 502;
 
-  if (!upstream.ok) {
+  for (const candidateUrl of candidateUrls) {
+    const candidateResponse = await fetch(candidateUrl, {
+      cf: {
+        cacheTtl: 60 * 60 * 24 * 30,
+        cacheEverything: true,
+      },
+    });
+
+    if (candidateResponse.ok) {
+      upstream = candidateResponse;
+      break;
+    }
+
+    failedStatus = candidateResponse.status;
+  }
+
+  if (!upstream) {
     return new Response('Image not found', {
-      status: upstream.status,
+      status: failedStatus,
       headers: {
         'access-control-allow-origin': '*',
         'cache-control': 'public, max-age=300',

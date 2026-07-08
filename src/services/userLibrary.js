@@ -54,12 +54,32 @@ export async function createPlaylist(name, description = '') {
   return data.playlist;
 }
 
+export async function updatePlaylist(playlistId, updates) {
+  const data = await userRequest(`/api/user/playlists/${encodeURIComponent(playlistId)}`, {
+    method: 'PATCH',
+    body: updates,
+  });
+  return data.playlist;
+}
+
+export async function deletePlaylist(playlistId) {
+  return userRequest(`/api/user/playlists/${encodeURIComponent(playlistId)}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function addSongToPlaylist(playlistId, songCid) {
   const data = await userRequest(`/api/user/playlists/${encodeURIComponent(playlistId)}/songs`, {
     method: 'POST',
     body: { songCid },
   });
   return data.item;
+}
+
+export async function removeSongFromPlaylist(playlistId, songCid) {
+  return userRequest(`/api/user/playlists/${encodeURIComponent(playlistId)}/songs?songCid=${encodeURIComponent(songCid)}`, {
+    method: 'DELETE',
+  });
 }
 
 export async function fetchCharacterLists() {

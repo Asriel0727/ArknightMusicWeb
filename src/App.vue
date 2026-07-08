@@ -96,8 +96,11 @@ const handleViewAlbum = async (albumId) => {
   }
 };
 
-const handleModalClose = () => {
+const handleModalClose = (target) => {
   modalState.isOpen = false;
+  if (target === 'home') {
+    currentPage.value = 'albums';
+  }
 };
 
 const handleSharedSongLink = async () => {
@@ -108,9 +111,9 @@ const handleSharedSongLink = async () => {
     return;
   }
 
+  await playSongFromMasterList({ cid: songId });
   modalState.currentView = 'player';
   modalState.isOpen = true;
-  await playSongFromMasterList({ cid: songId });
 };
 
 onMounted(() => {

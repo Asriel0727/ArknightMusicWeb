@@ -2,16 +2,24 @@
   <div class="modal" :class="{ show: modalState.isOpen }" @click="handleBackdropClick">
     <div class="modal-content" @click.stop>
       <div class="modal-actions" aria-label="頁面導覽">
-        <button class="modal-nav" title="回首頁" @click="handleClose">
+        <button
+          v-if="modalState.currentView === 'character'"
+          class="modal-nav"
+          title="回角色清單"
+          @click="closeModal()"
+        >
+          <i class="fas fa-users"></i>
+        </button>
+        <button class="modal-nav" title="回首頁" @click="handleHomeNav">
           <i class="fas fa-home"></i>
         </button>
         <button
           v-if="modalState.currentView === 'player'"
           class="modal-nav"
-          title="回專輯頁面"
-          @click="handleViewAlbumFromPlayer"
+          :title="playerSecondaryNavTitle"
+          @click="handlePlayerSecondaryNav"
         >
-          <i class="fas fa-compact-disc"></i>
+          <i :class="playerSecondaryNavIcon"></i>
         </button>
       </div>
 
@@ -53,20 +61,24 @@ const characterDetailsKey = computed(() => {
   return id ? `character-${id}-${locale.value}` : 'character';
 });
 
+const isPlaylistPlayer = computed(() => playerState.sourceContext?.type === 'playlist');
+const playerSecondaryNavTitle = computed(() => (isPlaylistPlayer.value ? '回到歌單' : '回到專輯頁面'));
+const playerSecondaryNavIcon = computed(() => (isPlaylistPlayer.value ? 'fas fa-list-ul' : 'fas fa-compact-disc'));
+
 const emit = defineEmits(['close']);
 
-const closeModal = () => {
+const closeModal = (target = 'context') => {
   modalState.isOpen = false;
-  emit('close');
+  emit('close', target);
 };
 
-const handleClose = () => {
-  closeModal();
+const handleHomeNav = () => {
+  closeModal('home');
 };
 
 const handleBackdropClick = (event) => {
   if (event.target.classList.contains('modal')) {
-    handleClose();
+    closeModal();
   }
 };
 
@@ -90,6 +102,15 @@ const handleViewAlbumFromPlayer = async () => {
   }
 
   modalState.currentView = 'album';
+};
+
+const handlePlayerSecondaryNav = async () => {
+  if (isPlaylistPlayer.value) {
+    closeModal();
+    return;
+  }
+
+  await handleViewAlbumFromPlayer();
 };
 
 watch(() => playerState.currentSong, (newSong) => {

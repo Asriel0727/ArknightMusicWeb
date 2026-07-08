@@ -310,7 +310,7 @@ import {
   fetchCharacterLists,
 } from '../services/userLibrary.js';
 
-const { t } = useI18n();
+const { t, te } = useI18n();
 
 const props = defineProps({
   character: {
@@ -432,8 +432,8 @@ const getProfessionName = (profession) => {
 const getFactionLabel = (factionId) => {
   if (!factionId) return '';
   const key = `nation.${factionId}`;
-  const translated = t(key);
-  return translated === key ? factionId : translated;
+  const translated = te(key) ? t(key) : '';
+  return translated || factionId;
 };
 
 const getRoomTypeName = (roomType) => {
