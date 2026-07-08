@@ -47,26 +47,28 @@
       </div>
     </div>
     <div class="navbar-right">
-      <div class="auth-box">
-        <template v-if="authState.user">
-          <span class="auth-email">{{ authState.user.loginKey }}</span>
-          <button class="auth-btn ghost" type="button" @click="handleSignOut">{{ $t('auth.signOut') }}</button>
-        </template>
-        <template v-else>
-          <span class="auth-email">{{ $t('auth.guest') }}</span>
-        </template>
+      <div class="navbar-controls">
+        <div class="auth-box">
+          <template v-if="authState.user">
+            <span class="auth-email">{{ authState.user.loginKey }}</span>
+            <button class="auth-btn ghost" type="button" @click="handleSignOut">{{ $t('auth.signOut') }}</button>
+          </template>
+          <template v-else>
+            <span class="auth-email">{{ $t('auth.guest') }}</span>
+          </template>
+        </div>
+        <label class="nav-locale-wrap">
+          <span class="nav-locale-label" :title="$t('language.label')" aria-hidden="true">
+            <i class="fas fa-globe"></i>
+          </span>
+          <select v-model="localeModel" class="nav-locale" :aria-label="$t('language.label')">
+            <option v-for="option in localeOptions" :key="option.value" :value="option.value">
+              {{ $t(option.labelKey) }}
+            </option>
+          </select>
+        </label>
       </div>
       <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />
-      <label class="nav-locale-wrap">
-        <span class="nav-locale-label" :title="$t('language.label')" aria-hidden="true">
-          <i class="fas fa-globe"></i>
-        </span>
-        <select v-model="localeModel" class="nav-locale" :aria-label="$t('language.label')">
-          <option v-for="option in localeOptions" :key="option.value" :value="option.value">
-            {{ $t(option.labelKey) }}
-          </option>
-        </select>
-      </label>
     </div>
   </nav>
 </template>
@@ -145,20 +147,26 @@ onMounted(() => {
 }
 
 .navbar-right {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, auto) auto;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
   flex-shrink: 0;
+}
+
+.navbar-controls {
+  min-width: 0;
+  display: grid;
+  justify-items: end;
+  gap: 7px;
 }
 
 .auth-box {
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: 360px;
-  flex-wrap: wrap;
-  justify-content: center;
+  max-width: 220px;
+  justify-content: flex-end;
 }
 
 .auth-input {
@@ -178,17 +186,16 @@ onMounted(() => {
 
 .auth-btn {
   border: 1px solid var(--primary-color);
-  border-radius: 6px;
-  background: var(--primary-color);
-  color: #111;
-  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(88, 166, 255, 0.1);
+  color: var(--primary-color);
+  padding: 5px 9px;
   font-size: 0.75rem;
   cursor: pointer;
 }
 
 .auth-btn.ghost {
-  background: transparent;
-  color: var(--primary-color);
+  background: rgba(88, 166, 255, 0.1);
 }
 
 .auth-btn:disabled {
@@ -199,9 +206,10 @@ onMounted(() => {
 .auth-email {
   color: var(--text-secondary);
   font-size: 0.75rem;
-  max-width: 160px;
+  max-width: 96px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .auth-error {
@@ -215,14 +223,14 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   flex-shrink: 0;
   cursor: pointer;
 }
 
 .nav-locale-label {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   color: var(--text-secondary);
   line-height: 1;
   display: inline-flex;
@@ -237,14 +245,14 @@ onMounted(() => {
 
 .nav-locale {
   appearance: auto;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
   color: var(--text-color);
   font-size: 0.72rem;
-  padding: 3px 6px;
+  padding: 4px 8px;
   cursor: pointer;
-  max-width: 118px;
+  max-width: 124px;
   line-height: 1.3;
 }
 
@@ -331,8 +339,16 @@ onMounted(() => {
     display: none;
   }
 
+  .navbar-right {
+    gap: 8px;
+  }
+
+  .auth-email {
+    max-width: 70px;
+  }
+
   .nav-locale {
-    max-width: 108px;
+    max-width: 104px;
     font-size: 0.7rem;
     padding: 4px 6px;
   }

@@ -1289,9 +1289,9 @@ onUnmounted(() => {
   position: relative;
   flex: 1 0 100%;
   min-width: 0;
-  height: 42px;
+  min-height: 42px;
   margin-top: 2px;
-  z-index: 5;
+  z-index: auto;
 }
 
 .playlist-membership {
@@ -1300,8 +1300,8 @@ onUnmounted(() => {
   gap: 8px;
   align-items: center;
   width: 100%;
-  height: 42px;
-  overflow: visible;
+  min-height: 42px;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.035);
@@ -1328,7 +1328,7 @@ onUnmounted(() => {
 .membership-content {
   min-width: 0;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
   align-items: center;
   gap: 8px;
 }
@@ -1340,10 +1340,6 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.playlist-membership.empty .membership-content {
-  display: block;
-}
-
 .playlist-chip-list {
   min-width: 0;
   display: flex;
@@ -1351,6 +1347,10 @@ onUnmounted(() => {
   gap: 6px;
   overflow: hidden;
   padding: 1px 0;
+}
+
+.playlist-membership.empty .playlist-chip-list {
+  justify-content: flex-end;
 }
 
 .playlist-chip {

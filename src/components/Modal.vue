@@ -146,7 +146,7 @@ watch(() => playerState.currentSong, (newSong) => {
 .modal-content {
   background: var(--card-bg);
   border-radius: 10px;
-  padding: 25px;
+  padding: 68px 25px 25px;
   width: 90%;
   max-width: 900px;
   max-height: 90vh;
@@ -158,23 +158,23 @@ watch(() => playerState.currentSong, (newSong) => {
 
 .modal-actions {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 16px;
+  right: 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   z-index: 2;
 }
 
 .modal-nav {
-  background: rgba(13, 17, 23, 0.72);
-  border: 1px solid var(--border-color);
+  background: rgba(13, 17, 23, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--text-color);
   font-size: 1rem;
   cursor: pointer;
-  transition: color 0.2s, background 0.2s, border-color 0.2s;
-  width: 40px;
-  height: 40px;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, transform 0.2s;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,8 +184,9 @@ watch(() => playerState.currentSong, (newSong) => {
 
 .modal-nav:hover {
   color: var(--primary-color);
-  background: rgba(88, 166, 255, 0.12);
-  border-color: var(--primary-color);
+  background: rgba(88, 166, 255, 0.16);
+  border-color: rgba(88, 166, 255, 0.42);
+  transform: translateY(-1px);
 }
 
 .modal-nav:focus-visible {
@@ -195,7 +196,7 @@ watch(() => playerState.currentSong, (newSong) => {
 
 @media (max-width: 480px) {
   .modal-content {
-    padding: 15px;
+    padding: 60px 15px 15px;
     width: 95%;
   }
 

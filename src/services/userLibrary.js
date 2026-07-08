@@ -102,3 +102,9 @@ export async function addCharacterToList(listId, characterId) {
   });
   return data.item;
 }
+
+export async function removeCharacterFromList(listId, characterId) {
+  return userRequest(`/api/user/character-lists/${encodeURIComponent(listId)}/items?characterId=${encodeURIComponent(characterId)}`, {
+    method: 'DELETE',
+  });
+}

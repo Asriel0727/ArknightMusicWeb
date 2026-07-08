@@ -21,15 +21,11 @@
           <span v-if="getFactionLabel(character.factionId)" class="tag nation">{{ getFactionLabel(character.factionId) }}</span>
         </div>
         <div v-if="authState.user" class="character-list-actions">
-          <select v-model="selectedCharacterListId" class="character-list-select" @focus="loadUserCharacterLists">
-            <option value="">{{ t('userLibrary.selectCharacterList') }}</option>
-            <option v-for="list in userCharacterLists" :key="list.id" :value="list.id">
-              {{ list.name }}
-            </option>
-          </select>
-          <button class="character-list-btn" type="button" @click="addCurrentCharacterToList">
-            {{ t('userLibrary.addToCharacterList') }}
+          <button class="character-list-btn" type="button" @click="openCharacterListManager">
+            <i class="fas fa-list-check"></i>
+            <span>{{ t('userLibrary.manageCharacterLists') }}</span>
           </button>
+          <span class="character-list-status">{{ currentCharacterListLabel }}</span>
         </div>
       </div>
     </div>
@@ -297,6 +293,71 @@
       </div>
     </div>
   </div>
+
+  <div v-if="isCreateCharacterListDialogOpen" class="character-list-dialog-backdrop create" @click.self="closeCreateCharacterListDialog">
+    <section class="character-list-dialog" role="dialog" aria-modal="true" :aria-label="t('userLibrary.createCharacterListTitle')">
+      <h3>{{ t('userLibrary.createCharacterListTitle') }}</h3>
+      <form class="character-list-dialog-form" @submit.prevent="createCharacterListAndAddCurrentCharacter">
+        <label>
+          <span>{{ t('userLibrary.characterListName') }}</span>
+          <input v-model.trim="newCharacterListName" type="text" :placeholder="t('userLibrary.characterListNamePrompt')" maxlength="80" autofocus>
+        </label>
+        <p v-if="characterListActionError" class="character-list-action-error">{{ characterListActionError }}</p>
+        <div class="character-list-dialog-actions">
+          <button class="character-list-btn secondary" type="button" @click="closeCreateCharacterListDialog">
+            {{ t('userLibrary.cancel') }}
+          </button>
+          <button class="character-list-btn primary" type="submit" :disabled="isCharacterListActionPending || !newCharacterListName.trim()">
+            {{ isCharacterListActionPending ? t('userLibrary.adding') : t('userLibrary.createAndAdd') }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div v-if="isCharacterListManagerOpen" class="character-list-dialog-backdrop" @click.self="closeCharacterListManager">
+    <section class="character-list-dialog character-list-manager-dialog" role="dialog" aria-modal="true"
+      :aria-label="t('userLibrary.manageCharacterListTitle')">
+      <div class="character-list-manager-header">
+        <div>
+          <h3>{{ t('userLibrary.manageCharacterListTitle') }}</h3>
+          <p>{{ character.name }}</p>
+        </div>
+        <button class="character-list-icon-btn" type="button" :title="t('userLibrary.cancel')" @click="closeCharacterListManager">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <input v-model.trim="characterListSearchQuery" class="character-list-manager-search" type="search"
+        :placeholder="t('userLibrary.searchCharacterLists')">
+      <div class="character-list-manager-list">
+        <label v-for="list in filteredUserCharacterLists" :key="list.id" class="character-list-manager-item">
+          <input type="checkbox" :checked="isCharacterInList(list)" :disabled="isCharacterListMembershipPending(list.id)"
+            @change="toggleCharacterListMembership(list, $event.target.checked)">
+          <span class="character-list-manager-check" aria-hidden="true">
+            <i class="fas fa-check"></i>
+          </span>
+          <span class="character-list-manager-name">{{ list.name }}</span>
+        </label>
+        <p v-if="filteredUserCharacterLists.length === 0" class="character-list-manager-empty">
+          {{ t('userLibrary.noCharacterLists') }}
+        </p>
+      </div>
+      <div class="character-list-dialog-actions">
+        <button class="character-list-btn secondary" type="button" @click="openCreateCharacterListDialog">
+          {{ t('userLibrary.createCharacterListTitle') }}
+        </button>
+        <button class="character-list-btn primary" type="button" @click="closeCharacterListManager">
+          {{ t('userLibrary.done') }}
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div v-if="characterListActionSuccess || characterListActionError" class="character-list-toast"
+    :class="{ success: characterListActionSuccess, error: characterListActionError }">
+    <i :class="characterListActionSuccess ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i>
+    <span>{{ characterListActionSuccess || characterListActionError }}</span>
+  </div>
 </template>
 
 <script setup>
@@ -308,6 +369,7 @@ import {
   addCharacterToList,
   createCharacterList,
   fetchCharacterLists,
+  removeCharacterFromList,
 } from '../services/userLibrary.js';
 
 const { t, te } = useI18n();
@@ -322,26 +384,147 @@ const props = defineProps({
 const currentPortraitIndex = ref(0);
 const currentPortraitUrlIndex = ref(0);
 const userCharacterLists = ref([]);
-const selectedCharacterListId = ref('');
+const characterListSearchQuery = ref('');
+const characterListActionError = ref('');
+const characterListActionSuccess = ref('');
+const characterListMembershipPendingIds = ref(new Set());
+const isCharacterListManagerOpen = ref(false);
+const isCreateCharacterListDialogOpen = ref(false);
+const isCharacterListActionPending = ref(false);
+const newCharacterListName = ref('');
+
+const currentCharacterLists = computed(() => {
+  const characterId = props.character?.id;
+  if (!characterId) return [];
+  return userCharacterLists.value.filter((list) => {
+    return (list.items || []).some((item) => item.character_id === characterId);
+  });
+});
+
+const filteredUserCharacterLists = computed(() => {
+  const keyword = characterListSearchQuery.value.trim().toLowerCase();
+  if (!keyword) return userCharacterLists.value;
+  return userCharacterLists.value.filter((list) => {
+    return String(list.name || '').toLowerCase().includes(keyword);
+  });
+});
+
+const currentCharacterListLabel = computed(() => {
+  if (currentCharacterLists.value.length === 0) {
+    return t('userLibrary.notInAnyCharacterList');
+  }
+  return t('userLibrary.alreadyInCharacterLists', {
+    names: currentCharacterLists.value.map((list) => list.name).join('、'),
+  });
+});
+
+const setCharacterListActionSuccess = (message) => {
+  characterListActionSuccess.value = message;
+  characterListActionError.value = '';
+  window.setTimeout(() => {
+    if (characterListActionSuccess.value === message) {
+      characterListActionSuccess.value = '';
+    }
+  }, 2200);
+};
+
+const setCharacterListActionError = (message) => {
+  characterListActionError.value = message;
+  characterListActionSuccess.value = '';
+};
 
 const loadUserCharacterLists = async () => {
   if (!authState.user) return;
   userCharacterLists.value = await fetchCharacterLists();
 };
 
-const addCurrentCharacterToList = async () => {
-  if (!authState.user || !props.character?.id) return;
+const isCharacterInList = (list) => {
+  const characterId = props.character?.id;
+  return (list?.items || []).some((item) => item.character_id === characterId);
+};
 
-  if (!selectedCharacterListId.value) {
-    const name = window.prompt(t('userLibrary.characterListNamePrompt'));
-    if (!name) return;
-    const list = await createCharacterList(name);
-    await loadUserCharacterLists();
-    selectedCharacterListId.value = list?.id || '';
+const isCharacterListMembershipPending = (listId) => {
+  return characterListMembershipPendingIds.value.has(listId);
+};
+
+const setCharacterListMembershipPending = (listId, isPending) => {
+  const nextPendingIds = new Set(characterListMembershipPendingIds.value);
+  if (isPending) {
+    nextPendingIds.add(listId);
+  } else {
+    nextPendingIds.delete(listId);
   }
+  characterListMembershipPendingIds.value = nextPendingIds;
+};
 
-  if (selectedCharacterListId.value) {
-    await addCharacterToList(selectedCharacterListId.value, props.character.id);
+const openCharacterListManager = async () => {
+  characterListSearchQuery.value = '';
+  setCharacterListActionError('');
+  isCharacterListManagerOpen.value = true;
+  await loadUserCharacterLists();
+};
+
+const closeCharacterListManager = () => {
+  isCharacterListManagerOpen.value = false;
+  characterListSearchQuery.value = '';
+};
+
+const openCreateCharacterListDialog = () => {
+  newCharacterListName.value = '';
+  setCharacterListActionError('');
+  isCreateCharacterListDialogOpen.value = true;
+};
+
+const closeCreateCharacterListDialog = () => {
+  if (isCharacterListActionPending.value) return;
+  isCreateCharacterListDialogOpen.value = false;
+  newCharacterListName.value = '';
+};
+
+const toggleCharacterListMembership = async (list, shouldIncludeCharacter) => {
+  const characterId = props.character?.id;
+  if (!authState.user || !characterId || !list?.id || isCharacterListMembershipPending(list.id)) return;
+
+  setCharacterListMembershipPending(list.id, true);
+  try {
+    if (shouldIncludeCharacter) {
+      const item = await addCharacterToList(list.id, characterId);
+      list.items = [...(list.items || []).filter((existingItem) => existingItem.character_id !== characterId), item || { character_id: characterId }];
+      setCharacterListActionSuccess(t('userLibrary.addedToCharacterList', { name: list.name || list.id }));
+    } else {
+      await removeCharacterFromList(list.id, characterId);
+      list.items = (list.items || []).filter((item) => item.character_id !== characterId);
+      setCharacterListActionSuccess(t('userLibrary.removedFromCharacterList', { name: list.name || list.id }));
+    }
+  } catch (error) {
+    setCharacterListActionError(error?.message || t('userLibrary.actionFailed'));
+  } finally {
+    setCharacterListMembershipPending(list.id, false);
+  }
+};
+
+const createCharacterListAndAddCurrentCharacter = async () => {
+  const characterId = props.character?.id;
+  const listName = newCharacterListName.value.trim();
+  if (!authState.user || !characterId || !listName || isCharacterListActionPending.value) return;
+
+  isCharacterListActionPending.value = true;
+  try {
+    const list = await createCharacterList(listName);
+    if (list?.id) {
+      const item = await addCharacterToList(list.id, characterId);
+      userCharacterLists.value = [
+        { ...list, items: [item || { character_id: characterId }] },
+        ...userCharacterLists.value.filter((existingList) => existingList.id !== list.id),
+      ];
+      setCharacterListActionSuccess(t('userLibrary.addedToCharacterList', { name: list?.name || listName }));
+    }
+    isCreateCharacterListDialogOpen.value = false;
+    newCharacterListName.value = '';
+  } catch (error) {
+    setCharacterListActionError(error?.message || t('userLibrary.actionFailed'));
+  } finally {
+    isCharacterListActionPending.value = false;
   }
 };
 
@@ -633,6 +816,7 @@ const handleMaterialError = (event) => {
 
 .character-info-header {
   flex: 1;
+  min-width: 0;
 }
 
 .character-name-large {
@@ -1190,7 +1374,236 @@ const handleMaterialError = (event) => {
 </style>
 
 <style scoped>
-.character-list-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-.character-list-select { border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color); padding: 7px 9px; }
-.character-list-btn { border: 1px solid var(--primary-color); border-radius: 6px; background: transparent; color: var(--primary-color); padding: 7px 10px; cursor: pointer; }
+.character-list-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  max-width: 100%;
+}
+
+.character-list-status {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.character-list-btn {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--primary-color);
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.character-list-btn.primary {
+  background: var(--primary-color);
+  color: #0d1117;
+}
+
+.character-list-btn.secondary {
+  border-color: rgba(92, 178, 255, 0.32);
+}
+
+.character-list-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.character-list-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(2, 6, 12, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.character-list-dialog-backdrop.create {
+  z-index: 1510;
+}
+
+.character-list-dialog {
+  width: min(420px, 100%);
+  border: 1px solid rgba(92, 178, 255, 0.24);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(24, 31, 42, 0.98), rgba(13, 17, 23, 0.98));
+  color: var(--text-color);
+  padding: 18px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+
+.character-list-dialog h3 {
+  margin: 0 0 12px;
+  font-size: 1.08rem;
+}
+
+.character-list-dialog-form {
+  display: grid;
+  gap: 12px;
+}
+
+.character-list-dialog-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+}
+
+.character-list-dialog-form input,
+.character-list-manager-search {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+  padding: 10px 11px;
+  outline: none;
+}
+
+.character-list-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.character-list-manager-dialog {
+  width: min(520px, 100%);
+}
+
+.character-list-manager-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.character-list-manager-header h3,
+.character-list-manager-header p {
+  margin: 0;
+}
+
+.character-list-manager-header p {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  margin-top: 4px;
+}
+
+.character-list-icon-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.character-list-manager-list {
+  display: grid;
+  gap: 8px;
+  max-height: min(300px, 42vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px 4px 0 0;
+}
+
+.character-list-manager-item {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+  cursor: pointer;
+}
+
+.character-list-manager-item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.character-list-manager-check {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(92, 178, 255, 0.32);
+  border-radius: 6px;
+  color: transparent;
+}
+
+.character-list-manager-item input:checked + .character-list-manager-check {
+  background: var(--primary-color);
+  color: #0d1117;
+}
+
+.character-list-manager-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.character-list-manager-empty,
+.character-list-action-error {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+}
+
+.character-list-action-error {
+  color: #ff8b86;
+}
+
+.character-list-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 72px;
+  z-index: 1550;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(420px, calc(100vw - 32px));
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(18, 35, 24, 0.94);
+  color: #7ee787;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
+}
+
+.character-list-toast.error {
+  background: rgba(48, 20, 20, 0.94);
+  color: #ff8b86;
+}
+
+@media (max-width: 640px) {
+  .character-list-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .character-list-btn {
+    width: 100%;
+  }
+}
 </style>

@@ -92,34 +92,29 @@
         </div>
 
         <div v-else class="playlist-workspace" :class="{ 'detail-open': selectedPlaylist }">
-          <div v-if="!selectedPlaylist || isWidePlaylistLayout" class="playlist-card-grid">
+          <div v-if="!selectedPlaylist || isWidePlaylistLayout" class="playlist-list">
             <article
               v-for="playlist in playlists"
               :key="playlist.id"
-              class="playlist-card"
+              class="playlist-list-item"
               :class="{ active: selectedPlaylistId === playlist.id }"
             >
-              <button class="playlist-card-main" type="button" @click="selectPlaylist(playlist.id)">
-                <span class="playlist-card-icon"><i class="fas fa-list-ul"></i></span>
-                <span class="playlist-card-copy">
-                  <span class="playlist-card-title-row">
+              <button class="playlist-list-main" type="button" @click="selectPlaylist(playlist.id)">
+                <span class="playlist-list-icon"><i class="fas fa-list-ul"></i></span>
+                <span class="playlist-list-copy">
+                  <span class="playlist-list-title-row">
                     <strong>{{ playlist.name }}</strong>
                     <small>{{ t('userLibrary.songCount', { count: getPlaylistSongIds(playlist).length }) }}</small>
                   </span>
+                  <span v-if="playlist.description" class="playlist-list-description">{{ playlist.description }}</span>
+                  <span v-else-if="getPlaylistSongIds(playlist).length > 0" class="playlist-list-tags">
+                    <span v-for="tag in getPlaylistPreviewTags(playlist)" :key="tag">{{ tag }}</span>
+                  </span>
                 </span>
               </button>
-              <p v-if="playlist.description" class="playlist-card-description">{{ playlist.description }}</p>
-              <div v-if="getPlaylistSongIds(playlist).length > 0" class="playlist-preview">
-                <span v-for="tag in getPlaylistPreviewTags(playlist)" :key="tag">
-                  {{ tag }}
-                </span>
-              </div>
-              <div class="playlist-card-actions">
-                <button type="button" @click="selectPlaylist(playlist.id)">
-                  <i class="fas fa-arrow-right"></i>
-                  <span>{{ t('userLibrary.openPlaylist') }}</span>
-                </button>
-              </div>
+              <button class="row-icon-btn playlist-open-btn" type="button" :title="t('userLibrary.openPlaylist')" @click="selectPlaylist(playlist.id)">
+                <i class="fas fa-arrow-right"></i>
+              </button>
             </article>
           </div>
 
@@ -202,38 +197,75 @@
           <h2>{{ t('userLibrary.noCharacterLists') }}</h2>
         </div>
 
-        <div v-else class="character-list-grid">
-          <article v-for="list in characterLists" :key="list.id" class="character-list-card">
-            <h3>{{ list.name }}</h3>
-            <p v-if="list.description">{{ list.description }}</p>
-            <div v-if="!list.items || list.items.length === 0" class="library-empty small">
-              {{ t('userLibrary.noCharacterItems') }}
+        <div v-else class="character-workspace" :class="{ 'detail-open': selectedCharacterList }">
+          <div v-if="!selectedCharacterList || isWidePlaylistLayout" class="character-list">
+            <article
+              v-for="list in characterLists"
+              :key="list.id"
+              class="character-list-item"
+              :class="{ active: selectedCharacterListId === list.id }"
+            >
+              <button class="character-list-main" type="button" @click="selectCharacterList(list.id)">
+                <span class="character-list-icon"><i class="fas fa-users"></i></span>
+                <span class="character-list-copy">
+                  <span class="character-list-title-row">
+                    <strong>{{ list.name }}</strong>
+                    <small>{{ getCharacterListItemCount(list) }}</small>
+                  </span>
+                  <span v-if="list.description" class="character-list-description">{{ list.description }}</span>
+                </span>
+              </button>
+              <button class="row-icon-btn character-open-btn" type="button" :title="t('userLibrary.selectCharacterList')" @click="selectCharacterList(list.id)">
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </article>
+          </div>
+
+          <aside v-if="selectedCharacterList" class="character-detail">
+            <div class="playlist-detail-header">
+              <button class="library-action-btn back" type="button" @click="backToCharacterLists">
+                <i class="fas fa-arrow-left"></i>
+                <span>{{ t('userLibrary.selectCharacterList') }}</span>
+              </button>
+              <div>
+                <h3>{{ selectedCharacterList.name }}</h3>
+                <p>{{ getCharacterListItemCount(selectedCharacterList) }}</p>
+              </div>
             </div>
-            <div v-else class="character-chip-list">
+
+            <div v-if="selectedCharacterItems.length === 0" class="library-empty-state compact">
+              <i class="fas fa-user"></i>
+              <h2>{{ t('userLibrary.noCharacterItems') }}</h2>
+            </div>
+
+            <div v-else class="character-row-list">
               <button
-                v-for="item in list.items"
+                v-for="item in selectedCharacterItems"
                 :key="item.character_id"
-                class="character-chip"
+                class="character-row"
                 type="button"
                 @click="openCharacterDetails(item.character_id)"
               >
-                <span class="character-chip-avatar">
+                <span class="character-row-avatar">
                   <img
                     v-if="getCharacterImage(item.character_id)"
                     :src="getCharacterImage(item.character_id)"
                     :alt="getCharacterName(item.character_id)"
                     loading="lazy"
-                    @error="handleCharacterAvatarError"
+                    @error="handleCharacterAvatarError($event, item.character_id)"
                   >
                   <i class="fas fa-user"></i>
                 </span>
-                <span>
+                <span class="character-row-copy">
                   <strong>{{ getCharacterName(item.character_id) }}</strong>
                   <small>{{ getCharacterMetaText(item.character_id) }}</small>
                 </span>
+                <span class="row-icon-btn character-row-arrow" aria-hidden="true">
+                  <i class="fas fa-arrow-right"></i>
+                </span>
               </button>
             </div>
-          </article>
+          </aside>
         </div>
       </section>
     </section>
@@ -267,6 +299,7 @@ import {
   fetchCharacterDetails,
   fetchRecruitCharacters,
   fetchSongs,
+  getCharacterAvatarUrls,
   getProxyImageUrl,
 } from '../services/api.js';
 import { authState } from '../services/auth.js';
@@ -288,7 +321,9 @@ const characterLists = ref([]);
 const songCatalog = ref({});
 const albumCatalog = ref({});
 const characterCatalog = ref({});
+const characterAvatarIndexMap = ref(new Map());
 const selectedPlaylistId = ref('');
+const selectedCharacterListId = ref('');
 const isLoading = ref(false);
 const loadError = ref('');
 const actionMessage = ref('');
@@ -313,6 +348,14 @@ const selectedPlaylist = computed(() => {
 
 const selectedPlaylistSongIds = computed(() => getPlaylistSongIds(selectedPlaylist.value));
 
+const selectedCharacterList = computed(() => {
+  return characterLists.value.find((list) => list.id === selectedCharacterListId.value) || null;
+});
+
+const selectedCharacterItems = computed(() => {
+  return (selectedCharacterList.value?.items || []).filter((item) => item.character_id);
+});
+
 const setActionMessage = (message) => {
   actionMessage.value = message;
   window.setTimeout(() => {
@@ -324,6 +367,10 @@ const setActionMessage = (message) => {
 
 const getPlaylistSongIds = (playlist) => {
   return (playlist?.songs || []).map((song) => song.song_cid).filter(Boolean);
+};
+
+const getCharacterListItemCount = (list) => {
+  return t('userLibrary.characterCount', { count: (list?.items || []).length });
 };
 
 const getSongInfo = (songCid) => {
@@ -434,13 +481,31 @@ const getCharacterMetaText = (characterId) => {
   return [getProfessionName(characterId), getFactionName(characterId)].filter(Boolean).join(' · ');
 };
 
-const getCharacterImage = (characterId) => {
+const getCharacterAvatarCandidates = (characterId) => {
   const avatarUrl = getCharacterInfo(characterId).avatarUrl || '';
+  return [...new Set([avatarUrl, ...getCharacterAvatarUrls(characterId)].filter(Boolean))];
+};
+
+const getCharacterImage = (characterId) => {
+  const urls = getCharacterAvatarCandidates(characterId);
+  const currentIndex = characterAvatarIndexMap.value.get(characterId) || 0;
+  const avatarUrl = urls[currentIndex] || urls[0] || '';
   return avatarUrl ? getProxyImageUrl(avatarUrl) : '';
 };
 
-const handleCharacterAvatarError = (event) => {
-  event.target.style.display = 'none';
+const handleCharacterAvatarError = (event, characterId) => {
+  const img = event.target;
+  const urls = getCharacterAvatarCandidates(characterId);
+  const currentIndex = characterAvatarIndexMap.value.get(characterId) || 0;
+  const nextIndex = currentIndex + 1;
+
+  if (nextIndex < urls.length) {
+    characterAvatarIndexMap.value.set(characterId, nextIndex);
+    img.src = getProxyImageUrl(urls[nextIndex]);
+    return;
+  }
+
+  img.style.display = 'none';
 };
 
 const loadSongCatalog = async () => {
@@ -470,6 +535,7 @@ const loadSongCatalog = async () => {
       }
       return nextCatalog;
     }, {});
+    characterAvatarIndexMap.value.clear();
   } catch (error) {
     console.warn('角色清單 catalog 載入失敗，將保留角色 ID fallback:', error);
     characterCatalog.value = {};
@@ -485,6 +551,7 @@ const loadCharacterCatalog = async () => {
     }
     return nextCatalog;
   }, {});
+    characterAvatarIndexMap.value.clear();
   } catch (error) {
     console.warn('角色清單 catalog 載入失敗，將保留角色 ID fallback:', error);
     characterCatalog.value = {};
@@ -496,6 +563,7 @@ const loadLibrary = async () => {
     favorites.value = [];
     playlists.value = [];
     characterLists.value = [];
+    selectedCharacterListId.value = '';
     return;
   }
 
@@ -513,6 +581,12 @@ const loadLibrary = async () => {
     characterLists.value = nextCharacterLists || [];
     if (selectedPlaylistId.value && !playlists.value.some((playlist) => playlist.id === selectedPlaylistId.value)) {
       selectedPlaylistId.value = '';
+    }
+    if (selectedCharacterListId.value && !characterLists.value.some((list) => list.id === selectedCharacterListId.value)) {
+      selectedCharacterListId.value = '';
+    }
+    if (!selectedCharacterListId.value && characterLists.value.length > 0) {
+      selectedCharacterListId.value = characterLists.value[0].id;
     }
   } catch (error) {
     loadError.value = error?.message || t('userLibrary.loadFailed');
@@ -583,6 +657,14 @@ const selectPlaylist = (playlistId) => {
 const backToPlaylists = () => {
   selectedPlaylistId.value = '';
   cancelEditPlaylist();
+};
+
+const selectCharacterList = (listId) => {
+  selectedCharacterListId.value = listId;
+};
+
+const backToCharacterLists = () => {
+  selectedCharacterListId.value = '';
 };
 
 const syncPlaylistLayoutMode = () => {
@@ -769,7 +851,8 @@ onUnmounted(() => {
 }
 
 .library-panel-header h2,
-.playlist-detail h3 {
+.playlist-detail h3,
+.character-detail h3 {
   margin: 0;
   color: var(--text-color);
   font-size: 1.08rem;
@@ -795,7 +878,6 @@ onUnmounted(() => {
 }
 
 .library-action-btn:disabled,
-.playlist-card-actions button:disabled,
 .row-icon-btn:disabled {
   cursor: not-allowed;
   opacity: 0.52;
@@ -859,7 +941,7 @@ onUnmounted(() => {
 }
 
 .song-copy strong,
-.playlist-card-main strong {
+.playlist-list-main strong {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -867,7 +949,7 @@ onUnmounted(() => {
 }
 
 .song-copy small,
-.playlist-card-main small,
+.playlist-list-main small,
 .playlist-detail-header p {
   color: var(--text-secondary);
   font-size: 0.82rem;
@@ -930,15 +1012,21 @@ onUnmounted(() => {
   gap: 16px;
 }
 
-.playlist-card-grid,
+.playlist-list,
+.character-list,
 .character-list-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 10px;
 }
 
-.playlist-card,
+.character-list-grid {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.playlist-list-item,
 .playlist-detail,
+.character-list-item,
+.character-detail,
 .character-list-card {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
@@ -946,12 +1034,31 @@ onUnmounted(() => {
   padding: 12px;
 }
 
-.playlist-card.active {
+.playlist-list-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+}
+
+.character-list-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+}
+
+.playlist-list-item.active {
   border-color: rgba(92, 178, 255, 0.4);
   background: rgba(92, 178, 255, 0.08);
 }
 
-.playlist-card-main {
+.character-list-item.active {
+  border-color: rgba(92, 178, 255, 0.4);
+  background: rgba(92, 178, 255, 0.08);
+}
+
+.playlist-list-main {
   width: 100%;
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr);
@@ -965,7 +1072,21 @@ onUnmounted(() => {
   text-align: left;
 }
 
-.playlist-card-icon {
+.character-list-main {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.playlist-list-icon {
   width: 36px;
   height: 36px;
   display: inline-flex;
@@ -976,12 +1097,30 @@ onUnmounted(() => {
   color: var(--primary-color);
 }
 
-.playlist-card-copy {
-  min-width: 0;
-  display: block;
+.character-list-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(92, 178, 255, 0.14);
+  color: var(--primary-color);
 }
 
-.playlist-card-title-row {
+.playlist-list-copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.character-list-copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.playlist-list-title-row {
   min-width: 0;
   display: inline-flex;
   align-items: center;
@@ -989,7 +1128,15 @@ onUnmounted(() => {
   max-width: 100%;
 }
 
-.playlist-card-copy small {
+.character-list-title-row {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+}
+
+.playlist-list-copy small {
   flex: 0 0 auto;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
@@ -997,29 +1144,57 @@ onUnmounted(() => {
   line-height: 1.25;
 }
 
-.playlist-card-description,
+.character-list-copy small {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  padding: 2px 7px;
+  line-height: 1.25;
+  font-size: 0.82rem;
+}
+
+.playlist-list-description,
+.character-list-description,
 .character-list-card p {
-  margin: 8px 0 0;
   color: var(--text-secondary);
   font-size: 0.86rem;
 }
 
-.playlist-card-description {
+.character-list-card p {
+  margin: 8px 0 0;
+}
+
+.playlist-list-description {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   line-height: 1.45;
 }
 
-.playlist-preview {
+.character-list-description {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-height: 1.45;
+}
+
+.character-list-main strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-color);
+}
+
+.playlist-list-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 10px;
 }
 
-.playlist-preview span {
+.playlist-list-tags span {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1031,34 +1206,12 @@ onUnmounted(() => {
   font-size: 0.78rem;
 }
 
-.playlist-card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.playlist-card-actions button {
-  min-height: 32px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
-  padding: 6px 9px;
-  cursor: pointer;
-}
-
-.playlist-card-actions button:hover {
+.playlist-open-btn {
   color: var(--primary-color);
-  border-color: rgba(92, 178, 255, 0.34);
 }
 
-.playlist-card-actions button.danger:hover {
-  color: #ff8b86;
-  border-color: rgba(255, 139, 134, 0.34);
+.character-open-btn {
+  color: var(--primary-color);
 }
 
 .playlist-detail-actions {
@@ -1100,7 +1253,7 @@ onUnmounted(() => {
 }
 
 .compact-list {
-  max-height: 420px;
+  max-height: min(520px, calc(100vh - 320px));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 4px;
@@ -1110,6 +1263,93 @@ onUnmounted(() => {
   margin: 0;
   color: var(--text-color);
   font-size: 1rem;
+}
+
+.character-workspace {
+  display: grid;
+  gap: 16px;
+}
+
+.character-row-list {
+  display: grid;
+  gap: 8px;
+  max-height: min(520px, calc(100vh - 320px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+
+.character-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.character-row:hover {
+  border-color: rgba(92, 178, 255, 0.34);
+  background: rgba(92, 178, 255, 0.08);
+}
+
+.character-row-avatar {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(92, 178, 255, 0.12);
+  color: var(--primary-color);
+  overflow: hidden;
+}
+
+.character-row-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.character-row-avatar i {
+  font-size: 1rem;
+}
+
+.character-row-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.character-row-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-color);
+}
+
+.character-row-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.character-row-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
 }
 
 .character-chip-list {
@@ -1299,19 +1539,56 @@ onUnmounted(() => {
 
 @media (min-width: 980px) {
   .playlist-workspace.detail-open {
+    --playlist-panel-height: min(640px, calc(100vh - 260px));
     grid-template-columns: minmax(260px, 360px) minmax(420px, 1fr);
     align-items: start;
   }
 
-  .playlist-workspace.detail-open .playlist-card-grid {
+  .playlist-workspace.detail-open .playlist-list {
     grid-template-columns: 1fr;
-    max-height: 620px;
+    max-height: var(--playlist-panel-height);
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-right: 4px;
   }
 
+  .playlist-workspace.detail-open .playlist-detail {
+    max-height: var(--playlist-panel-height);
+    overflow: hidden;
+  }
+
+  .playlist-workspace.detail-open .compact-list {
+    max-height: calc(var(--playlist-panel-height) - 110px);
+  }
+
   .playlist-workspace.detail-open .library-action-btn.back {
+    display: none;
+  }
+
+  .character-workspace.detail-open {
+    --character-panel-height: min(640px, calc(100vh - 260px));
+    grid-template-columns: minmax(260px, 360px) minmax(420px, 1fr);
+    align-items: start;
+  }
+
+  .character-workspace.detail-open .character-list {
+    grid-template-columns: 1fr;
+    max-height: var(--character-panel-height);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+  }
+
+  .character-workspace.detail-open .character-detail {
+    max-height: var(--character-panel-height);
+    overflow: hidden;
+  }
+
+  .character-workspace.detail-open .character-row-list {
+    max-height: calc(var(--character-panel-height) - 72px);
+  }
+
+  .character-workspace.detail-open .library-action-btn.back {
     display: none;
   }
 }
