@@ -1,262 +1,62 @@
-# 明日方舟音樂播放器 (Vue版本)
+# Arknights Music Web
 
-這是一個使用 Vue 3 框架重構的明日方舟網站。
+一個以塞壬唱片與明日方舟角色資料為核心的音樂播放器網站。網站可以瀏覽專輯、播放歌曲、查看歌詞與翻譯、分享歌曲連結，也支援登入後建立自己的歌單、收藏歌曲與角色清單。
 
-## 項目結構
+## 主要功能
 
-```
-ArknightMusicWeb/
-├── src/
-│   ├── components/          # Vue 組件
-│   │   ├── Navbar.vue       # 頂部導覽列（支援頁面切換）
-│   │   ├── TopBar.vue       # 頂部工具欄（播放列和搜索）
-│   │   ├── NowPlayingBar.vue # 當前播放列
-│   │   ├── SearchBar.vue    # 搜索欄
-│   │   ├── AlbumList.vue    # 專輯列表
-│   │   ├── AlbumCard.vue    # 專輯卡片
-│   │   ├── AlbumDetails.vue # 專輯詳情
-│   │   ├── PlayerView.vue   # 播放器視圖
-│   │   ├── CharacterList.vue # 幹員列表
-│   │   ├── CharacterDetails.vue # 幹員詳情
-│   │   ├── ParticleBackground.vue # 粒子背景動畫
-│   │   └── Modal.vue        # 模態框（支援專輯、播放器、幹員詳情）
-│   ├── services/            # 服務層
-│   │   ├── api.js          # API 調用（包含音樂和幹員 API）
-│   │   └── cache.js        # 緩存服務
-│   ├── stores/             # 狀態管理
-│   │   └── player.js       # 播放器狀態
-│   ├── utils/              # 工具函數
-│   │   ├── time.js         # 時間格式化
-│   │   ├── lyrics.js       # 歌詞解析
-│   │   └── textGlitch.js   # 文字亂碼動畫工具
-│   ├── directives/         # Vue 指令
-│   │   └── textGlitch.js   # 文字亂碼動畫指令
-│   ├── composables/        # 組合式函數
-│   │   └── useTextGlitch.js # 文字亂碼動畫組合式函數
-│   ├── App.vue             # 主應用組件
-│   └── main.js             # 入口文件
-├── public/
-│   ├── images/             # 圖片資源
-│   └── logo.png            # Logo
-├── .github/
-│   └── workflows/
-│       └── deploy.yml      # GitHub Actions 部署配置
-├── index.html              # HTML 模板
-├── package.json            # 項目配置
-├── vite.config.js          # Vite 配置
-├── vercel.json             # Vercel 部署配置
-├── DEPLOY.md               # 部署指南
-└── README.md              # 說明文檔
-```
+- 瀏覽塞壬唱片專輯與歌曲。
+- 播放歌曲，支援音量、進度、上一首/下一首、循環、單曲循環、隨機播放。
+- 查看歌曲詳情、專輯資訊、歌詞與歌詞翻譯。
+- 分享歌曲連結，支援 Open Graph 預覽。
+- 多國語系介面。
+- 登入後可使用：
+  - 我的最愛歌曲
+  - 自訂歌單
+  - 自訂角色清單
+- 查看幹員圖鑑與角色詳情。
+- 製作招募卡。
 
-## 功能特性
+## 專案畫面與流程
 
-### 音樂播放功能
-- 專輯瀏覽和搜索
-- 音樂播放功能
-- 歌詞顯示和同步
-- 點擊顯示正在播放的音樂
-- 下拉式選單支持快速切換歌曲
+![使用者流程](docs/assets/user-flow.svg)
 
-### 幹員圖鑑功能
-- 完整的幹員列表瀏覽
-- 多條件篩選（稀有度多選、職業篩選、名稱搜索）
-- 詳細的幹員資料顯示：
-  - 幹員立繪（精一、精二）
-  - 特性說明
-  - 獲得方式
-  - 屬性數值（各精英階段）
-  - 攻擊範圍視覺化
-  - 天賦詳情
-  - 潛能提升效果
-  - 技能詳情（含 SP 消耗、持續時間等）
-  - 後勤技能
-  - 精英化材料（含材料圖片和名稱）
-  - 技能升級材料（含材料圖片和名稱）
-  - 模組資訊
-  - 幹員檔案
-
-### 其他功能
-- 響應式設計
-- 文字亂碼動畫效果
-- GitHub Pages 自動部署
-
-## 安裝和運行
-
-### 安裝依賴
+## 快速開始
 
 ```bash
 npm install
-```
-
-### 開發模式
-
-```bash
 npm run dev
 ```
 
-### 構建生產版本
+預設開發網址通常是：
+
+```txt
+http://localhost:3000/
+```
+
+建置正式版：
 
 ```bash
 npm run build
 ```
 
-### 構建可下載成品包
-
-```bash
-npm run build:portable
-```
-
-可下載成品會輸出到 `dist-portable/`，路徑使用相對位置，適合打包成 ZIP 後放到 GitHub Actions artifact、Release，或上傳到任意靜態網站空間。
-
-### 預覽生產版本
+預覽正式版：
 
 ```bash
 npm run preview
 ```
 
-## 技術棧
+## 專案文件
 
-- **Vue 3** - 前端框架
-- **Vite** - 構建工具
-- **Font Awesome** - 圖標庫
+- [功能規格文件](docs/specification.md)
+- [開發與維護手冊](docs/maintenance.md)
+- [技術線與架構文件](docs/technical-stack.md)
+- [Cloudflare Worker API 筆記](docs/cloudflare-recruit-api.md)
+- [使用者資料庫 Schema](docs/user-library-schema.sql)
+- [GitHub Pages 部署筆記](docs/deployment/github-pages.md)
 
-## 項目特點
+## 技術概覽
 
-1. **組件化設計**：功能模塊清晰分離，易於維護
-2. **狀態管理**：使用 Vue 3 的 reactive API 進行狀態管理
-3. **服務層分離**：API 調用和業務邏輯分離
-4. **工具函數**：可復用的工具函數獨立管理
-5. **響應式設計**：適配各種屏幕尺寸
-6. **文字動畫效果**：獨特的亂碼解碼動畫，增強視覺體驗
-7. **GitHub Pages 部署**：自動化部署流程，支持 GitHub Pages
+![技術架構](docs/assets/technical-architecture.svg)
 
-## 開發說明
-
-### 組件結構
-
-**音樂播放相關：**
-- **Navbar**: 頂部導覽列（支援切換音樂和幹員圖鑑頁面）
-- **TopBar**: 包含播放列和搜索欄的頂部工具欄
-- **AlbumList**: 專輯列表，支持無限滾動和搜索
-- **AlbumDetails**: 專輯詳情頁面
-- **Modal**: 模態框，用於顯示專輯詳情、播放器和幹員詳情
-- **PlayerView**: 播放器視圖，包含播放控制和歌詞顯示
-
-**幹員圖鑑相關：**
-- **CharacterList**: 幹員列表頁面，包含篩選和搜索功能
-- **CharacterDetails**: 幹員詳情頁面，顯示完整的幹員資料
-
-### 狀態管理
-
-所有狀態集中在 `src/stores/player.js` 中管理：
-- `playerState`: 播放器相關狀態
-- `albumState`: 專輯相關狀態
-- `searchState`: 搜索相關狀態
-- `modalState`: 模態框狀態（支援 'album'、'player'、'character' 三種視圖）
-- `dropdownState`: 下拉列表狀態
-- `characterState`: 幹員相關狀態（包含當前查看的幹員詳情）
-
-### API 服務
-
-所有 API 調用都在 `src/services/api.js` 中：
-
-**音樂相關 API：**
-- `fetchAlbums()`: 獲取專輯列表
-- `fetchAlbumDetails()`: 獲取專輯詳情
-- `fetchSongs()`: 獲取歌曲列表
-- `fetchSongDetails()`: 獲取歌曲詳情
-- `fetchLyrics()`: 獲取歌詞
-
-**幹員相關 API：**
-- `fetchCharacters()`: 獲取所有幹員列表
-- `fetchCharacterDetails(charId)`: 獲取幹員詳細資料
-- `getCharacterAvatarUrls(charId)`: 獲取幹員頭像 URL 列表（多來源）
-- `getCharacterAvatarFallbackUrl(charId, index)`: 獲取備用頭像 URL
-
-### 幹員圖鑑系統
-
-#### 功能概述
-完整的明日方舟幹員資料查詢系統，包含所有遊戲內幹員的詳細資訊。
-
-#### 主要特色
-1. **完整的資料展示**
-   - 幹員立繪：支援精一、精二立繪切換查看
-   - 特性說明：自動解析遊戲內特殊標籤和變數
-   - 屬性數值：顯示各精英階段的完整屬性
-   - 攻擊範圍：視覺化顯示各階段的攻擊範圍網格
-   - 天賦詳情：包含解鎖條件和完整描述
-   - 潛能提升：格式化顯示潛能效果
-   - 技能詳情：包含 SP 消耗、持續時間、技能類型等
-   - 後勤技能：顯示基建技能資訊
-   - 材料需求：精英化和技能升級所需材料（含圖片）
-   - 模組資訊：顯示模組名稱、描述和解鎖條件
-   - 幹員檔案：可展開查看的檔案內容
-
-2. **強大的篩選功能**
-   - 稀有度多選：可同時選擇多個稀有度（1-6星）
-   - 職業篩選：按職業類型篩選
-   - 名稱搜索：即時搜索幹員名稱
-
-3. **圖片載入優化**
-   - 多來源備援：自動嘗試多個圖片 CDN 來源
-   - 智能降級：當一個來源失敗時自動切換下一個
-   - 錯誤處理：完善的錯誤處理和佔位符顯示
-
-4. **資料來源**
-   - 使用開源的明日方舟遊戲資料庫
-   - 從 GitHub 多個倉庫獲取資料和圖片
-   - 自動解析和格式化遊戲資料
-
-### 音樂播放器改進
-
-#### 歌詞同步優化
-- 使用 `requestAnimationFrame` 實現高頻率同步
-- 支援手動滾動時仍保持歌詞高亮同步
-- 自動恢復滾動功能（手動滾動後 3 秒恢復）
-
-#### 交互改進
-- **點擊正在播放的音樂標題**：直接打開播放器視圖，查看詳細信息和歌詞
-- **下拉式選單**：
-  - 點擊按鈕顯示所有歌曲列表
-  - 按鈕圖標會根據選單狀態切換（向上/向下箭頭）
-  - 在小屏幕上自動調整寬度，確保完整顯示
-- **搜索欄優化**：在小屏幕上自動占滿可用寬度，不再居中顯示
-
-### 文字亂碼動畫效果
-- 頁面首次加載時，所有文字會從亂碼逐漸解碼為正常文字
-- 動畫持續 3 秒，提供獨特的視覺體驗
-- 支持中文、日文、英文和符號的智能解碼
-- 動畫僅在首次加載時執行一次
-
-### 響應式設計增強
-- 搜索欄在手機端自動適配寬度
-- 下拉選單在小屏幕上自動調整大小
-- 專輯列表支持分頁瀏覽
-- 所有組件都針對移動設備進行了優化
-- 觸控設備自動隱藏滑鼠特效
-
-### 圖片路徑修復
-- 所有圖片路徑都支持 GitHub Pages 的 base 路徑
-- 自動適配不同的部署環境
-
-## 部署
-
-本專案已配置 GitHub Pages 自動部署。每次推送到 main 分支時，GitHub Actions 會自動建構並部署網站。
-
-網站地址：https://asriel0727.github.io/ArknightMusicWeb/
-
-## 下載即用版本
-
-每次推送到 `main` 分支後，GitHub Actions 也會產生 `ArknightMusicWeb-portable` 成品包。下載後可將內容上傳到任意靜態網站空間使用，不需要另外執行 `npm install` 或手動安裝 `opencc-js`。
-
-如果要發布正式下載版，推送 `v*` tag（例如 `v2.0.1`）後，GitHub Actions 會自動建立 GitHub Release，並附上 `ArknightMusicWeb-portable.zip`。
-
-### 部署配置
-
-- **構建工具**：Vite
-- **部署方式**：GitHub Actions
-- **Base 路徑**：`/ArknightMusicWeb/`（在 `vite.config.js` 中配置）
-
-詳細部署說明請參考 `DEPLOY.md` 文件。
+前端使用 Vue 3 + Vite。音樂、角色、翻譯、使用者歌單與收藏等資料主要透過 Cloudflare Worker 統一存取，並搭配 Supabase 與 Cloudflare KV/cache 降低外部 API 與 GitHub raw 的不穩定性。
 

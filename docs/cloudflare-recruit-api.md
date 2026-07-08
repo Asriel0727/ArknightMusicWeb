@@ -39,15 +39,17 @@ of song details and album details.
 Current keys:
 
 ```txt
-recruit:operators:v2
-recruit:operator:v2:{charId}
+recruit:operators:v3
+recruit:operator:v3:{charId}
 ```
 
-Old keys without `v2` can be deleted:
+Old keys without `v3` can be deleted after the new cache is warmed:
 
 ```txt
 recruit:operators
+recruit:operators:v2
 recruit:operator:{charId}
+recruit:operator:v2:{charId}
 ```
 
 ## API Endpoints
@@ -88,8 +90,8 @@ Authorization: <SYNC_TOKEN>
 
 ## Current Cache Strategy
 
-- Operator list is stored in KV under `recruit:operators:v2`.
-- Operator detail JSON is stored in KV under `recruit:operator:v2:{charId}`.
+- Operator list is stored in KV under `recruit:operators:v3`.
+- Operator detail JSON is stored in KV under `recruit:operator:v3:{charId}`.
 - Music API JSON can be mirrored into Supabase table `music_cache`.
 - Music cache keys use the prefix `music:api:v1:`.
 - Music song details are prewarmed in batches into `music:api:v1:song:{songId}`.
@@ -98,6 +100,13 @@ Authorization: <SYNC_TOKEN>
 - Album detail prewarm progress is stored in `music:api:v1:prewarm:album-detail-cursor`.
 - All 418 operator detail entries were prewarmed into remote KV during setup.
 - Image URLs returned by the API go through `/api/recruit/image`.
+- Recruit images support fallback mirrors with repeated `alt` query params:
+
+```txt
+GET /api/recruit/image?url=<primary>&alt=<fallback1>&alt=<fallback2>
+```
+
+- The Worker tries each image URL in order and caches the first successful response.
 - The image proxy only allows `https://raw.githubusercontent.com/...` image URLs.
 - Image responses use Cloudflare cache with:
 
@@ -267,12 +276,12 @@ Count prewarmed remote detail keys:
 $keys = npx wrangler kv key list `
   --binding=ARKNIGHTS_DATA `
   --remote `
-  --prefix="recruit:operator:v2:" | ConvertFrom-Json
+  --prefix="recruit:operator:v3:" | ConvertFrom-Json
 
 $keys.Count
 ```
 
-Delete old non-v2 detail keys:
+Delete old non-v3 detail keys:
 
 ```powershell
 $keys = npx wrangler kv key list `
@@ -282,7 +291,7 @@ $keys = npx wrangler kv key list `
 
 $oldKeys = $keys | Where-Object {
   $_.name -like "recruit:operator:*" -and
-  $_.name -notlike "recruit:operator:v2:*"
+  $_.name -notlike "recruit:operator:v3:*"
 }
 
 $oldKeys | ForEach-Object {
