@@ -27,8 +27,3 @@ coverage/
 *.sln
 *.sw?
 AGENTS.md
-
-# Large locally synced game assets. Rebuild with npm.cmd run assets:sync.
-public/images/operators/portraits/
-public/images/items/
-public/images/skills/
