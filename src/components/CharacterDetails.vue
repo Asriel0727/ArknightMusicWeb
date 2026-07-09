@@ -363,7 +363,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCharacterAvatarUrls } from '../services/api.js';
+import { getCharacterAvatarUrls, getProxyImageUrl } from '../services/api.js';
+import { getLocalOperatorAvatarUrl, loadOperatorAssetManifest } from '../services/operatorAssetManifest.js';
 import { authState } from '../services/auth.js';
 import {
   addCharacterToList,
@@ -392,6 +393,7 @@ const isCharacterListManagerOpen = ref(false);
 const isCreateCharacterListDialogOpen = ref(false);
 const isCharacterListActionPending = ref(false);
 const newCharacterListName = ref('');
+const assetManifestVersion = ref(0);
 
 const currentCharacterLists = computed(() => {
   const characterId = props.character?.id;
@@ -533,6 +535,13 @@ watch(() => authState.user, () => {
 });
 
 onMounted(() => {
+  loadOperatorAssetManifest()
+    .then(() => {
+      assetManifestVersion.value += 1;
+    })
+    .catch((error) => {
+      console.warn('Operator asset manifest load failed:', error);
+    });
   loadUserCharacterLists().catch(() => {});
 });
 const expandedStories = ref([0]); // 預設展開第一個檔案
@@ -541,12 +550,20 @@ const expandedStories = ref([0]); // 預設展開第一個檔案
 const avatarIndex = ref(0);
 
 // 取得當前角色可用的所有頭像 URL
-const avatarUrls = computed(() => getCharacterAvatarUrls(props.character.id));
+const avatarUrls = computed(() => {
+  void assetManifestVersion.value;
+  return [...new Set([
+    getLocalOperatorAvatarUrl(props.character.id),
+    props.character.avatarUrl,
+    ...getCharacterAvatarUrls(props.character.id),
+  ].filter(Boolean))];
+});
 
 // 目前應顯示的頭像 URL（會隨錯誤自動切換來源）
 const currentAvatarUrl = computed(() => {
   const urls = avatarUrls.value || [];
-  return urls[avatarIndex.value] || urls[0] || '';
+  const url = urls[avatarIndex.value] || urls[0] || '';
+  return url ? getProxyImageUrl(url) : '';
 });
 
 // 獲取立繪列表
@@ -581,7 +598,7 @@ const currentPortraitUrl = computed(() => {
   }
   const url = portrait.urls[currentPortraitUrlIndex.value] || portrait.urls[0] || '';
   console.log('[組件調試] 當前立繪URL:', url, '索引:', currentPortraitUrlIndex.value, '/', portrait.urls.length);
-  return url;
+  return url ? getProxyImageUrl(url) : '';
 });
 
 const hasHandbookContent = computed(() => {
@@ -707,7 +724,7 @@ const handleImageError = (event) => {
   // 嘗試下一個頭像來源
   if (nextIndex < urls.length) {
     avatarIndex.value = nextIndex;
-    img.src = urls[nextIndex];
+    img.src = getProxyImageUrl(urls[nextIndex]);
     return;
   }
 
@@ -743,6 +760,8 @@ const handlePortraitError = (event) => {
       console.log('[組件調試] 嘗試下一個URL:', nextUrl, '索引:', currentPortraitUrlIndex.value, '/', portrait.urls.length);
       
       if (nextUrl && nextUrl !== failedUrl) {
+        event.target.src = getProxyImageUrl(nextUrl);
+        return;
         // 使用 nextTick 確保響應式更新
         setTimeout(() => {
           console.log('[組件調試] 設置新URL:', nextUrl);

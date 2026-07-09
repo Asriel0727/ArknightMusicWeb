@@ -19,6 +19,10 @@ import {
   professionToClassSlug,
   RECRUIT_FACTION_LOGO_OPTIONS,
 } from '../utils/recruitCard.js';
+import {
+  getLocalFactionLogoUrl,
+  getLocalProfessionIconUrl,
+} from './operatorAssetManifest.js';
 
 const DEFAULT_MUSIC_API_ORIGIN = 'https://arknights-recruit-api.molly27molly.workers.dev';
 export const API_ORIGIN = (
@@ -264,8 +268,20 @@ export function getProxyImageUrl(imageUrl) {
 
   const normalizedUrl = String(imageUrl);
   if (
+    normalizedUrl.startsWith('/') ||
+    normalizedUrl.startsWith('./') ||
+    normalizedUrl.startsWith('../') ||
+    normalizedUrl.startsWith('data:') ||
+    normalizedUrl.startsWith('blob:')
+  ) {
+    return normalizedUrl;
+  }
+
+  if (
     normalizedUrl.startsWith(`${API_ORIGIN}/proxy-image`) ||
-    normalizedUrl.startsWith('/proxy-image')
+    normalizedUrl.startsWith('/proxy-image') ||
+    normalizedUrl.startsWith(`${API_ORIGIN}/api/recruit/image`) ||
+    normalizedUrl.startsWith('/api/recruit/image')
   ) {
     return normalizedUrl;
   }
@@ -289,14 +305,12 @@ const ARKNIGHT_IMAGES_MIRROR_ACESHIP =
 
 /** 招募卡：陣營 logo（Arknight-Images/factions） */
 export function getRecruitFactionLogoUrl(logoKey) {
-  const key = logoKey?.startsWith('logo_') ? logoKey : factionIdToLogoKey(logoKey);
-  return `${ARKNIGHT_IMAGES_BASE}/factions/${key}.png`;
+  return getLocalFactionLogoUrl(logoKey);
 }
 
 /** 招募卡：職業 icon（Arknight-Images/classes） */
 export function getRecruitProfessionIconUrl(profession) {
-  const slug = professionToClassSlug(profession);
-  return `${ARKNIGHT_IMAGES_BASE}/classes/class_${slug}.png`;
+  return getLocalProfessionIconUrl(profession);
 }
 
 export { RECRUIT_FACTION_LOGO_OPTIONS, factionIdToLogoKey, professionToClassSlug };
@@ -421,10 +435,10 @@ function resolveRecruitVoiceText(charId, charwordTable) {
 
 // 多個圖片來源（按優先順序）
 const AVATAR_SOURCES = [
-  (id) => `${ARKNIGHT_IMAGES_BASE}/avatars/${id}.png`,
-  (id) => `${ARKNIGHT_IMAGES_MIRROR_ACESHIP}/avatars/${id}.png`,
   (id) => `https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/avatar/${id}.png`,
   (id) => `https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charavatars/${id}.png`,
+  (id) => `${ARKNIGHT_IMAGES_MIRROR_ACESHIP}/avatars/${id}.png`,
+  (id) => `${ARKNIGHT_IMAGES_BASE}/avatars/${id}.png`,
 ];
 
 /** 幹員顯示名：簡中表多有 name；YoStar 表常見 name 為空但 appellation 有值，列表／詳情需一致 */

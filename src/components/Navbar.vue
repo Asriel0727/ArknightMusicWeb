@@ -47,28 +47,34 @@
       </div>
     </div>
     <div class="navbar-right">
-      <div class="navbar-controls">
-        <div class="auth-box">
-          <template v-if="authState.user">
-            <span class="auth-email">{{ authState.user.loginKey }}</span>
-            <button class="auth-btn ghost" type="button" @click="handleSignOut">{{ $t('auth.signOut') }}</button>
-          </template>
-          <template v-else>
-            <span class="auth-email">{{ $t('auth.guest') }}</span>
-          </template>
+      <div class="nav-utility-panel">
+        <div class="utility-stack">
+          <div class="auth-box" :class="{ signed: authState.user }">
+            <span class="session-indicator" aria-hidden="true"></span>
+            <i class="fas fa-user-circle auth-icon" aria-hidden="true"></i>
+            <template v-if="authState.user">
+              <span class="auth-email">{{ authState.user.loginKey }}</span>
+              <button class="auth-btn ghost" type="button" @click="handleSignOut">{{ $t('auth.signOut') }}</button>
+            </template>
+            <template v-else>
+              <span class="auth-email">{{ $t('auth.guest') }}</span>
+            </template>
+          </div>
+          <label class="nav-locale-wrap">
+            <span class="nav-locale-label" :title="$t('language.label')" aria-hidden="true">
+              <i class="fas fa-globe"></i>
+            </span>
+            <select v-model="localeModel" class="nav-locale" :aria-label="$t('language.label')">
+              <option v-for="option in localeOptions" :key="option.value" :value="option.value">
+                {{ $t(option.labelKey) }}
+              </option>
+            </select>
+          </label>
         </div>
-        <label class="nav-locale-wrap">
-          <span class="nav-locale-label" :title="$t('language.label')" aria-hidden="true">
-            <i class="fas fa-globe"></i>
-          </span>
-          <select v-model="localeModel" class="nav-locale" :aria-label="$t('language.label')">
-            <option v-for="option in localeOptions" :key="option.value" :value="option.value">
-              {{ $t(option.labelKey) }}
-            </option>
-          </select>
-        </label>
+        <div class="brand-mark">
+          <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />
+        </div>
       </div>
-      <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />
     </div>
   </nav>
 </template>
@@ -95,7 +101,7 @@ const localeOptions = [
   { value: 'ko', labelKey: 'language.ko' },
 ];
 
-// 雿輻 Vite ??BASE_URL ?交??GitHub Pages ??base 頝臬?
+// Use Vite BASE_URL so assets still resolve under GitHub Pages base paths.
 const baseUrl = import.meta.env.BASE_URL;
 
 const props = defineProps({
@@ -147,26 +153,64 @@ onMounted(() => {
 }
 
 .navbar-right {
-  display: grid;
-  grid-template-columns: minmax(0, auto) auto;
+  display: flex;
   align-items: center;
-  gap: 12px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
-.navbar-controls {
+.nav-utility-panel {
   min-width: 0;
   display: grid;
-  justify-items: end;
-  gap: 7px;
+  grid-template-columns: minmax(168px, auto) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(88, 166, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(13, 17, 23, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.utility-stack {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
 }
 
 .auth-box {
   display: flex;
   align-items: center;
-  gap: 6px;
-  max-width: 220px;
-  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+  justify-content: flex-start;
+  color: var(--text-secondary);
+}
+
+.auth-box.signed {
+  color: var(--text-color);
+}
+
+.session-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(139, 148, 158, 0.85);
+  box-shadow: 0 0 0 3px rgba(139, 148, 158, 0.1);
+  flex: 0 0 auto;
+}
+
+.auth-box.signed .session-indicator {
+  background: #3fb950;
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.14);
+}
+
+.auth-icon {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  flex: 0 0 auto;
 }
 
 .auth-input {
@@ -189,9 +233,11 @@ onMounted(() => {
   border-radius: 8px;
   background: rgba(88, 166, 255, 0.1);
   color: var(--primary-color);
-  padding: 5px 9px;
+  padding: 4px 9px;
   font-size: 0.75rem;
+  line-height: 1.2;
   cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .auth-btn.ghost {
@@ -206,10 +252,11 @@ onMounted(() => {
 .auth-email {
   color: var(--text-secondary);
   font-size: 0.75rem;
-  max-width: 96px;
+  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
 
 .auth-error {
@@ -220,23 +267,27 @@ onMounted(() => {
 }
 
 .nav-locale-wrap {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
   align-items: center;
-  gap: 7px;
+  gap: 6px;
+  min-width: 0;
   flex-shrink: 0;
   cursor: pointer;
 }
 
 .nav-locale-label {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   color: var(--text-secondary);
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border-radius: 8px;
+  background: rgba(88, 166, 255, 0.08);
+  border: 1px solid rgba(88, 166, 255, 0.14);
 }
 
 .nav-locale-label i {
@@ -245,15 +296,21 @@ onMounted(() => {
 
 .nav-locale {
   appearance: auto;
-  background: rgba(255, 255, 255, 0.035);
+  background: #161b22;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  color: var(--text-color);
+  color: #f0f6fc;
   font-size: 0.72rem;
-  padding: 4px 8px;
+  padding: 5px 8px;
   cursor: pointer;
-  max-width: 124px;
+  width: 100%;
+  max-width: 136px;
   line-height: 1.3;
+}
+
+.nav-locale option {
+  background: #161b22;
+  color: #f0f6fc;
 }
 
 .nav-locale:focus {
@@ -297,10 +354,20 @@ onMounted(() => {
 }
 
 .logo-img {
-  height: 40px;
+  height: 38px;
   width: auto;
+  max-width: 116px;
   object-fit: contain;
   display: block;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 94px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 900px) {
@@ -321,6 +388,11 @@ onMounted(() => {
   .logo-img {
     height: 35px;
   }
+
+  .nav-utility-panel {
+    grid-template-columns: minmax(150px, auto) auto;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -340,11 +412,26 @@ onMounted(() => {
   }
 
   .navbar-right {
+    flex-shrink: 0;
+  }
+
+  .nav-utility-panel {
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px;
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .utility-stack {
+    gap: 6px;
+  }
+
+  .auth-box {
+    gap: 5px;
   }
 
   .auth-email {
-    max-width: 70px;
+    max-width: 82px;
   }
 
   .nav-locale {
@@ -358,7 +445,17 @@ onMounted(() => {
   }
   
   .logo-img {
-    height: 30px;
+    height: 28px;
+    max-width: 92px;
+  }
+
+  .brand-mark {
+    justify-content: flex-start;
+    min-width: 0;
+    padding-left: 0;
+    padding-top: 7px;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
 </style>

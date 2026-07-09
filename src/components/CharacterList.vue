@@ -90,6 +90,11 @@
       {{ t('character.count', { n: filteredCharacters.length }) }}
     </div>
 
+    <div v-if="detailLoadMessage" class="character-detail-toast">
+      <i class="fas fa-circle-exclamation"></i>
+      <span>{{ detailLoadMessage }}</span>
+    </div>
+
     <!-- 載入中 -->
     <div v-if="isLoading" class="loading-container">
       <div class="spinner"></div>
@@ -110,7 +115,9 @@
         :key="char.id"
         class="character-card"
         :class="`rarity-${getRarityStars(char.rarity)}`"
-        @click="handleCharacterClick(char)"
+        @mouseenter="prefetchCharacterDetails(char)"
+        @focusin="prefetchCharacterDetails(char)"
+        @click="handleCharacterOpen(char)"
       >
         <div class="character-avatar">
           <img 
@@ -120,7 +127,7 @@
             loading="lazy"
             decoding="async"
             fetchpriority="low"
-            @error="handleImageError($event, char)"
+            @error="handleAvatarError($event, char)"
           />
           <div class="rarity-badge">{{ getRarityStars(char.rarity) }}★</div>
         </div>
@@ -137,31 +144,46 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { fetchRecruitCharacters, getCharacterAvatarFallbackUrl, getCharacterAvatarUrls, fetchCharacterDetails, syncFactionI18nMessages } from '../services/api.js';
+import { fetchRecruitCharacters, getCharacterAvatarUrls, fetchCharacterDetails, getProxyImageUrl, syncFactionI18nMessages } from '../services/api.js';
+import { getLocalOperatorAvatarUrl, loadOperatorAssetManifest } from '../services/operatorAssetManifest.js';
 import { modalState, characterState } from '../stores/player.js';
 import { i18n } from '../i18n/index.js';
 
-const { t, locale } = useI18n();
+const { t, te, locale } = useI18n();
 
 const characters = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 const searchQuery = ref('');
 const selectedRarity = ref([]); // 改為數組，支援多選
-const selectedFactions = ref([]);
 const selectedProfession = ref(null);
 const isFactionFilterExpanded = ref(false);
+const assetManifestVersion = ref(0);
+const selectedFactions = ref([]);
+const detailLoadMessage = ref('');
+const characterDetailPromiseMap = new Map();
+let detailLoadMessageTimer = null;
 
 // 記錄每個角色當前使用的圖片來源索引（使用 reactive Map）
 const avatarIndexMap = ref(new Map());
 
 // 獲取角色當前應該顯示的頭像 URL
+const getCharacterAvatarCandidates = (char) => {
+  void assetManifestVersion.value;
+  return [...new Set([
+    getLocalOperatorAvatarUrl(char.id),
+    char.avatarUrl,
+    ...getCharacterAvatarUrls(char.id),
+  ].filter(Boolean))];
+};
+
 const getCurrentAvatarUrl = (char) => {
   const currentIndex = avatarIndexMap.value.get(char.id) || 0;
-  const urls = getCharacterAvatarUrls(char.id);
-  return urls[currentIndex] || urls[0] || '';
+  const urls = getCharacterAvatarCandidates(char);
+  const url = urls[currentIndex] || urls[0] || '';
+  return url ? getProxyImageUrl(url) : '';
 };
 
 const professions = computed(() => [
@@ -183,8 +205,7 @@ const getProfessionName = (profession) => {
 const getFactionLabel = (factionId) => {
   if (!factionId) return '';
   const key = `nation.${factionId}`;
-  const label = t(key);
-  return label === key ? factionId : label;
+  return te(key) ? t(key) : factionId;
 };
 
 const factionFilterOptions = computed(() => {
@@ -221,7 +242,7 @@ const getRarityStars = (rarity) => {
   }
   // 確保在 0-5 範圍內
   numRarity = Math.max(0, Math.min(5, numRarity));
-  return numRarity + 1; // 返回 1-6 星
+  return numRarity + 1;
 };
 
 const filteredCharacters = computed(() => {
@@ -257,13 +278,12 @@ const filteredCharacters = computed(() => {
   });
 });
 
+
 const toggleRarity = (rarity) => {
   const index = selectedRarity.value.indexOf(rarity);
   if (index > -1) {
-    // 如果已選中，則移除
     selectedRarity.value.splice(index, 1);
   } else {
-    // 如果未選中，則添加
     selectedRarity.value.push(rarity);
   }
 };
@@ -281,26 +301,75 @@ const toggleProfession = (profession) => {
   selectedProfession.value = selectedProfession.value === profession ? null : profession;
 };
 
-const handleImageError = (event, char) => {
+const handleAvatarError = (event, char) => {
   const img = event.target;
-  const charId = char.id;
-  
-  // 獲取當前嘗試的索引
+  const charId = char?.id;
+  if (!img || !charId) return;
+
+  const urls = getCharacterAvatarCandidates(char);
   const currentIndex = avatarIndexMap.value.get(charId) || 0;
   const nextIndex = currentIndex + 1;
-  
-  // 獲取所有可用的圖片 URL
-  const urls = getCharacterAvatarUrls(charId);
-  
-  // 如果還有下一個來源，嘗試它
+
   if (nextIndex < urls.length) {
     avatarIndexMap.value.set(charId, nextIndex);
-    img.src = urls[nextIndex];
+    img.src = getProxyImageUrl(urls[nextIndex]);
     return;
   }
-  
-  // 所有來源都失敗，使用預設圖片
-  img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%2330363d" width="100" height="100"/><text fill="%238b949e" x="50" y="55" text-anchor="middle" font-size="12">No Image</text></svg>';
+
+  img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%2330363d" width="100" height="100"/%3E%3Ctext fill="%238b949e" x="50" y="55" text-anchor="middle" font-size="12"%3ENo Image%3C/text%3E%3C/svg%3E';
+};
+
+
+const loadCharacterDetails = (charId) => {
+  if (!characterDetailPromiseMap.has(charId)) {
+    const promise = fetchCharacterDetails(charId).finally(() => {
+      characterDetailPromiseMap.delete(charId);
+    });
+    characterDetailPromiseMap.set(charId, promise);
+  }
+  return characterDetailPromiseMap.get(charId);
+};
+
+const showDetailLoadMessage = () => {
+  detailLoadMessage.value = t('character.loadDetailError');
+  if (detailLoadMessageTimer) {
+    window.clearTimeout(detailLoadMessageTimer);
+  }
+  detailLoadMessageTimer = window.setTimeout(() => {
+    detailLoadMessage.value = '';
+    detailLoadMessageTimer = null;
+  }, 2800);
+};
+
+const prefetchCharacterDetails = (char) => {
+  if (!char?.id) return;
+  loadCharacterDetails(char.id).catch(() => {});
+};
+
+const handleCharacterOpen = async (char) => {
+  if (!char?.id) return;
+
+  characterState.currentCharacterDetails = {
+    ...char,
+    portraits: char.portraits || [],
+    traitDescription: char.traitDescription || '',
+  };
+  modalState.currentView = 'character';
+  modalState.isOpen = true;
+
+  try {
+    const details = await loadCharacterDetails(char.id);
+    if (
+      modalState.isOpen &&
+      modalState.currentView === 'character' &&
+      characterState.currentCharacterDetails?.id === char.id
+    ) {
+      characterState.currentCharacterDetails = details;
+    }
+  } catch (error) {
+    console.error('角色詳情載入失敗:', error);
+    showDetailLoadMessage();
+  }
 };
 
 const handleCharacterClick = async (char) => {
@@ -311,7 +380,7 @@ const handleCharacterClick = async (char) => {
     modalState.isOpen = true;
   } catch (error) {
     console.error('獲取角色詳情失敗:', error);
-    alert(t('character.loadDetailError'));
+    showDetailLoadMessage();
   }
 };
 
@@ -337,7 +406,20 @@ const loadCharacters = async () => {
 
 onMounted(async () => {
   await syncFactionI18nMessages(i18n);
+  loadOperatorAssetManifest()
+    .then(() => {
+      assetManifestVersion.value += 1;
+    })
+    .catch((error) => {
+      console.warn('Operator asset manifest load failed:', error);
+    });
   loadCharacters();
+});
+
+onUnmounted(() => {
+  if (detailLoadMessageTimer) {
+    window.clearTimeout(detailLoadMessageTimer);
+  }
 });
 
 watch(locale, async () => {
@@ -489,6 +571,24 @@ watch(locale, async () => {
   font-size: 0.9rem;
   margin-bottom: 15px;
   padding-left: 5px;
+}
+
+.character-detail-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 76px;
+  z-index: 1600;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(420px, calc(100vw - 32px));
+  border: 1px solid rgba(255, 193, 7, 0.24);
+  border-radius: 999px;
+  background: rgba(35, 28, 12, 0.94);
+  color: #ffd166;
+  padding: 10px 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
 }
 
 /* 載入中 */

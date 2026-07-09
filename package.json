@@ -6,7 +6,9 @@
     "dev": "vite",
     "build": "vite build",
     "build:portable": "vite build --base ./ --outDir dist-portable",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "assets:audit": "node scripts/assets/audit-operator-assets.mjs",
+    "assets:sync": "node scripts/assets/sync-operator-assets.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",

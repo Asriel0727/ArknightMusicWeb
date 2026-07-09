@@ -244,6 +244,8 @@
                 :key="item.character_id"
                 class="character-row"
                 type="button"
+                @mouseenter="prefetchCharacterDetails(item.character_id)"
+                @focusin="prefetchCharacterDetails(item.character_id)"
                 @click="openCharacterDetails(item.character_id)"
               >
                 <span class="character-row-avatar">
@@ -302,6 +304,7 @@ import {
   getCharacterAvatarUrls,
   getProxyImageUrl,
 } from '../services/api.js';
+import { getLocalOperatorAvatarUrl, loadOperatorAssetManifest } from '../services/operatorAssetManifest.js';
 import { authState } from '../services/auth.js';
 import {
   deletePlaylist,
@@ -322,6 +325,8 @@ const songCatalog = ref({});
 const albumCatalog = ref({});
 const characterCatalog = ref({});
 const characterAvatarIndexMap = ref(new Map());
+const characterDetailPromiseMap = new Map();
+const assetManifestVersion = ref(0);
 const selectedPlaylistId = ref('');
 const selectedCharacterListId = ref('');
 const isLoading = ref(false);
@@ -482,8 +487,13 @@ const getCharacterMetaText = (characterId) => {
 };
 
 const getCharacterAvatarCandidates = (characterId) => {
+  void assetManifestVersion.value;
   const avatarUrl = getCharacterInfo(characterId).avatarUrl || '';
-  return [...new Set([avatarUrl, ...getCharacterAvatarUrls(characterId)].filter(Boolean))];
+  return [...new Set([
+    getLocalOperatorAvatarUrl(characterId),
+    avatarUrl,
+    ...getCharacterAvatarUrls(characterId),
+  ].filter(Boolean))];
 };
 
 const getCharacterImage = (characterId) => {
@@ -634,13 +644,43 @@ const playSelectedPlaylistSong = async (songCid) => {
   await playSongCollection(selectedPlaylistSongIds.value, startIndex >= 0 ? startIndex : 0);
 };
 
+const loadCharacterDetails = (characterId) => {
+  if (!characterDetailPromiseMap.has(characterId)) {
+    const promise = fetchCharacterDetails(characterId).finally(() => {
+      characterDetailPromiseMap.delete(characterId);
+    });
+    characterDetailPromiseMap.set(characterId, promise);
+  }
+  return characterDetailPromiseMap.get(characterId);
+};
+
+const prefetchCharacterDetails = (characterId) => {
+  if (!characterId) return;
+  loadCharacterDetails(characterId).catch(() => {});
+};
+
 const openCharacterDetails = async (characterId) => {
   if (!characterId || actionPending.value) return;
+  const summary = getCharacterInfo(characterId);
+  characterState.currentCharacterDetails = {
+    ...summary,
+    id: characterId,
+    portraits: summary.portraits || [],
+    traitDescription: summary.traitDescription || '',
+  };
+  modalState.currentView = 'character';
+  modalState.isOpen = true;
+
   actionPending.value = true;
   try {
-    characterState.currentCharacterDetails = await fetchCharacterDetails(characterId);
-    modalState.currentView = 'character';
-    modalState.isOpen = true;
+    const details = await loadCharacterDetails(characterId);
+    if (
+      modalState.isOpen &&
+      modalState.currentView === 'character' &&
+      characterState.currentCharacterDetails?.id === characterId
+    ) {
+      characterState.currentCharacterDetails = details;
+    }
   } catch (error) {
     console.error('載入角色詳情失敗:', error);
     setActionMessage(t('character.loadDetailError'));
@@ -761,6 +801,13 @@ watch(() => authState.user, () => {
 onMounted(() => {
   syncPlaylistLayoutMode();
   window.addEventListener('resize', syncPlaylistLayoutMode);
+  loadOperatorAssetManifest()
+    .then(() => {
+      assetManifestVersion.value += 1;
+    })
+    .catch((error) => {
+      console.warn('Operator asset manifest load failed:', error);
+    });
   loadLibrary().catch(() => {});
 });
 

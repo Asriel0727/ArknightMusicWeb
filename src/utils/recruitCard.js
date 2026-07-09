@@ -80,20 +80,23 @@ export const RECRUIT_STAR_IMAGE_URL =
 
 export const RECRUIT_CARD_SIZE = { width: 1920, height: 1080 };
 
-export const RECRUIT_DEFAULT_BACKGROUND_URL = `${import.meta.env.BASE_URL}images/recruit/recruit-bg.webp`;
-export const RECRUIT_NEW_BADGE_URL = `${import.meta.env.BASE_URL}images/recruit/recruit-new.webp`;
+function withAppBase(path) {
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+  const cleanPath = String(path || '').replace(/^\/+/, '');
+  return `${base}/${cleanPath}`.replace(/^\/\//, '/');
+}
 
-const ARKNIGHT_IMAGES_BASE =
-  'https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main';
+export const RECRUIT_DEFAULT_BACKGROUND_URL = withAppBase('images/recruit/recruit-bg.webp');
+export const RECRUIT_NEW_BADGE_URL = withAppBase('images/recruit/recruit-new.webp');
 
 export function getRecruitFactionLogoUrl(logoKey) {
   const key = logoKey?.startsWith('logo_') ? logoKey : factionIdToLogoKey(logoKey);
-  return `${ARKNIGHT_IMAGES_BASE}/factions/${key}.png`;
+  return withAppBase(`images/factions/${key}.png`);
 }
 
 export function getRecruitProfessionIconUrl(profession) {
   const slug = professionToClassSlug(profession);
-  return `${ARKNIGHT_IMAGES_BASE}/classes/class_${slug}.png`;
+  return withAppBase(`images/classes/class_${slug}.png`);
 }
 
 export const DEFAULT_RECRUIT_BACKGROUND = `linear-gradient(

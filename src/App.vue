@@ -100,6 +100,8 @@ const handleModalClose = (target) => {
   modalState.isOpen = false;
   if (target === 'home') {
     currentPage.value = 'albums';
+  } else if (target === 'characters') {
+    currentPage.value = 'characters';
   }
 };
 

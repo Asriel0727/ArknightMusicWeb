@@ -2294,10 +2294,10 @@ function getPortraitUrls(portraitId, alternativeIds = [], publicApiBase) {
     const encodedId = encodeURIComponent(id);
 
     const rawUrls = [
-      `${IMAGE_BASE}/characters/${encodedId}.png`,
       `${IMAGE_MIRROR_RESOURCE}/charportraits/${encodedId}.png`,
-      `${IMAGE_MIRROR_ACESHIP}/characters/${encodedId}.png`,
       `${IMAGE_MIRROR_DYNAMIC}/charportraits/${encodedId}.png`,
+      `${IMAGE_MIRROR_ACESHIP}/characters/${encodedId}.png`,
+      `${IMAGE_BASE}/characters/${encodedId}.png`,
       `https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/${encodedId}.png`
     ];
 
@@ -2310,10 +2310,10 @@ function getPortraitUrls(portraitId, alternativeIds = [], publicApiBase) {
 function getAvatarUrls(charId) {
   const encodedId = encodeURIComponent(charId);
   return [
-    `${IMAGE_BASE}/avatars/${encodedId}.png`,
-    `${IMAGE_MIRROR_ACESHIP}/avatars/${encodedId}.png`,
     `${IMAGE_MIRROR_RESOURCE}/avatar/${encodedId}.png`,
     `${IMAGE_MIRROR_DYNAMIC}/charavatars/${encodedId}.png`,
+    `${IMAGE_MIRROR_ACESHIP}/avatars/${encodedId}.png`,
+    `${IMAGE_BASE}/avatars/${encodedId}.png`,
   ];
 }
 
@@ -2355,7 +2355,7 @@ async function proxyRecruitImage(request) {
   const requestUrl = new URL(request.url);
   const rawUrl = requestUrl.searchParams.get('url') || '';
   const fallbackUrls = requestUrl.searchParams.getAll('alt').filter(Boolean);
-  const candidateUrls = [rawUrl, ...fallbackUrls].filter(Boolean);
+  const candidateUrls = sortRecruitImageCandidates([rawUrl, ...fallbackUrls].filter(Boolean));
 
   if (candidateUrls.length === 0 || candidateUrls.some((url) => !isAllowedImageUrl(url))) {
     return json({ ok: false, error: 'Invalid image url' }, 400);
@@ -2404,6 +2404,29 @@ async function proxyRecruitImage(request) {
 
   await cache.put(cacheKey, response.clone());
   return request.method === 'HEAD' ? new Response(null, response) : response;
+}
+
+function sortRecruitImageCandidates(urls) {
+  return urls
+    .map((url, index) => ({ url, index, priority: getRecruitImagePriority(url) }))
+    .sort((a, b) => a.priority - b.priority || a.index - b.index)
+    .map((entry) => entry.url);
+}
+
+function getRecruitImagePriority(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    const value = `${url.hostname}${url.pathname}`;
+
+    if (value.includes('yuanyan3060/ArknightsGameResource')) return 0;
+    if (value.includes('ArknightsAssets/ArknightsAssets')) return 1;
+    if (value.includes('Aceship/Arknight-Images')) return 2;
+    if (value.includes('PuppiizSunniiz/Arknight-Images')) return 3;
+    if (value.includes('ak-cn-archive/arknights-operator-image')) return 4;
+    return 10;
+  } catch {
+    return 10;
+  }
 }
 
 function isAllowedMusicAssetUrl(rawUrl, type) {
