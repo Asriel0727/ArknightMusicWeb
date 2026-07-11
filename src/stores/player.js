@@ -22,6 +22,24 @@ let lyricTranslationToken = 0;
 let lyricsTranslationPluginPromise = null;
 const masterSongDetailsPromises = new Map();
 const PLAY_MODES = ['repeat-all', 'repeat-one', 'shuffle'];
+const PLAYER_VOLUME_STORAGE_KEY = 'arknight-music-player-volume';
+
+function readStoredVolume() {
+  try {
+    const stored = Number.parseFloat(localStorage.getItem(PLAYER_VOLUME_STORAGE_KEY));
+    return Number.isFinite(stored) ? Math.min(1, Math.max(0, stored)) : 1;
+  } catch {
+    return 1;
+  }
+}
+
+function persistVolume(volume) {
+  try {
+    localStorage.setItem(PLAYER_VOLUME_STORAGE_KEY, String(volume));
+  } catch {
+    // Storage can be unavailable in private or restricted browser contexts.
+  }
+}
 
 async function fetchMasterSongDetails(songId) {
   if (!masterSongDetailsPromises.has(songId)) {
@@ -47,6 +65,20 @@ async function loadLyricsTranslationPlugin() {
     lyricsTranslationPluginPromise = import('../services/lyricsTranslationPlugin.js');
   }
   return lyricsTranslationPluginPromise;
+}
+
+function prefetchCurrentLyricTranslations(expectedLyricLoadToken) {
+  const songId = playerState.currentSong?.cid || '';
+  if (!songId || playerState.lyrics.length === 0) return;
+
+  loadLyricsTranslationPlugin()
+    .then(({ prefetchLyricLines }) => {
+      if (expectedLyricLoadToken !== lyricLoadToken) return null;
+      return prefetchLyricLines(playerState.lyrics, getCurrentLocale(), songId);
+    })
+    .catch((error) => {
+      console.warn('Lyric translation prefetch plugin failed:', error.message);
+    });
 }
 
 function normalizePlaybackTime(value) {
@@ -97,7 +129,7 @@ export const playerState = reactive({
   isPlaying: false,
   currentTime: 0,
   duration: 0,
-  volume: 1,
+  volume: readStoredVolume(),
   isMuted: false,
   currentSong: null,
   currentSongIndex: 0,
@@ -151,6 +183,7 @@ export function initAudioPlayer(audioElement) {
   playerState.audioPlayer = audioElement;
   
   if (audioElement) {
+    audioElement.volume = playerState.volume;
     audioElement.addEventListener('timeupdate', () => {
       playerState.currentTime = normalizePlaybackTime(audioElement.currentTime);
       syncLyrics(audioElement.currentTime);
@@ -168,6 +201,7 @@ export function initAudioPlayer(audioElement) {
     audioElement.addEventListener('volumechange', () => {
       playerState.volume = audioElement.volume;
       playerState.isMuted = audioElement.muted;
+      persistVolume(audioElement.volume);
     });
     
     audioElement.addEventListener('play', () => {
@@ -188,6 +222,9 @@ export function initAudioPlayer(audioElement) {
 export async function playSong(song, coverUrl, coverDeUrl) {
   try {
     resetPlaybackProgress();
+    playerState.showLyricTranslation = false;
+    playerState.isTranslatingLyrics = false;
+    lyricTranslationToken += 1;
 
     let songDetails = song;
     if (!song.sourceUrl) {
@@ -211,7 +248,6 @@ export async function playSong(song, coverUrl, coverDeUrl) {
 
     playerState.currentSong = fullSong;
     playerState.lyrics = [];
-    playerState.showLyricTranslation = false;
     playerState.isTranslatingLyrics = false;
     const currentLyricLoadToken = ++lyricLoadToken;
 
@@ -220,6 +256,7 @@ export async function playSong(song, coverUrl, coverDeUrl) {
         ...line,
         translation: '',
       }));
+      prefetchCurrentLyricTranslations(currentLyricLoadToken);
     } else if (fullSong.lyricUrl) {
       fetchLyrics(fullSong.lyricUrl)
         .then(async (lyrics) => {
@@ -231,6 +268,7 @@ export async function playSong(song, coverUrl, coverDeUrl) {
             ...line,
             translation: '',
           }));
+          prefetchCurrentLyricTranslations(currentLyricLoadToken);
 
           if (playerState.showLyricTranslation) {
             await refreshLyricTranslations(currentLyricLoadToken);
@@ -288,7 +326,11 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
 
   try {
     const { translateLyricLines } = await loadLyricsTranslationPlugin();
-    const translatedLyrics = await translateLyricLines(playerState.lyrics, getCurrentLocale());
+    const translatedLyrics = await translateLyricLines(
+      playerState.lyrics,
+      getCurrentLocale(),
+      playerState.currentSong?.cid || ''
+    );
 
     if (
       expectedLyricLoadToken !== lyricLoadToken ||
@@ -489,6 +531,7 @@ export function setVolume(volume) {
   playerState.audioPlayer.volume = nextVolume;
   playerState.volume = nextVolume;
   playerState.isMuted = nextVolume === 0;
+  persistVolume(nextVolume);
 }
 
 export function toggleMute() {

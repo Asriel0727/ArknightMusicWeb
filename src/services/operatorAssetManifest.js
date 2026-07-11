@@ -61,6 +61,22 @@ export function getLocalOperatorAvatarUrl(operatorId) {
   return normalizePublicPath(entry);
 }
 
+export function getLocalOperatorPortraitUrl(operatorId, portraitId) {
+  if (!operatorId || !portraitId || !operatorAssetManifest) return '';
+  const entry = operatorAssetManifest.assets?.portraits?.[`${operatorId}:${portraitId}`];
+  return normalizePublicPath(entry);
+}
+
+export function getLocalItemIconUrl(iconId) {
+  if (!iconId || !operatorAssetManifest) return '';
+  return normalizePublicPath(operatorAssetManifest.assets?.items?.[iconId]);
+}
+
+export function getLocalSkillIconUrl(iconId) {
+  if (!iconId || !operatorAssetManifest) return '';
+  return normalizePublicPath(operatorAssetManifest.assets?.skills?.[iconId]);
+}
+
 export function getLocalFactionLogoUrl(factionOrLogoKey) {
   const logoKey = String(factionOrLogoKey || '').startsWith('logo_')
     ? factionOrLogoKey

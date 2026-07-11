@@ -21,7 +21,11 @@ import {
 } from '../utils/recruitCard.js';
 import {
   getLocalFactionLogoUrl,
+  getLocalItemIconUrl,
   getLocalProfessionIconUrl,
+  getLocalOperatorPortraitUrl,
+  getLocalSkillIconUrl,
+  loadOperatorAssetManifest,
 } from './operatorAssetManifest.js';
 
 const DEFAULT_MUSIC_API_ORIGIN = 'https://arknights-recruit-api.molly27molly.workers.dev';
@@ -50,13 +54,45 @@ const lyricsCache = new Map();
 /** handbook_team_table：依 nationId 顯示陣營名（隨 excel 基底切換而失效） */
 let handbookTeamTableCache = { base: '', data: null };
 
+const GAME_DATA_CACHE_TTL_MS = 60 * 60 * 1000;
+const gameDataTableCache = new Map();
+const gameDataTableLoading = new Map();
+
+async function getGameDataJson(url, fallback) {
+  const cached = gameDataTableCache.get(url);
+  if (cached && Date.now() - cached.cachedAt < GAME_DATA_CACHE_TTL_MS) {
+    return cached.data;
+  }
+
+  if (!gameDataTableLoading.has(url)) {
+    const loading = fetch(url, { cache: 'force-cache' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`GameData request failed: ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        gameDataTableCache.set(url, { data, cachedAt: Date.now() });
+        return data;
+      })
+      .catch((error) => {
+        if (fallback !== undefined) return fallback;
+        throw error;
+      })
+      .finally(() => {
+        gameDataTableLoading.delete(url);
+      });
+    gameDataTableLoading.set(url, loading);
+  }
+
+  return gameDataTableLoading.get(url);
+}
+
 async function getHandbookTeamTable() {
   const base = getGameDataExcelBase();
   if (handbookTeamTableCache.base === base && handbookTeamTableCache.data) {
     return handbookTeamTableCache.data;
   }
-  const res = await fetch(`${base}/handbook_team_table.json`);
-  const data = res.ok ? await res.json() : {};
+  const data = await getGameDataJson(`${base}/handbook_team_table.json`, {});
   handbookTeamTableCache = { base, data };
   return data;
 }
@@ -169,7 +205,7 @@ export async function searchMusic(query) {
   };
 }
 
-export async function translateLyricsOnServer(lines, locale) {
+export async function translateLyricsOnServer(lines, locale, songId = '') {
   const response = await fetch(`${API_BASE}/lyrics/translate`, {
     method: 'POST',
     headers: {
@@ -177,6 +213,7 @@ export async function translateLyricsOnServer(lines, locale) {
     },
     body: JSON.stringify({
       locale,
+      songId,
       lines: lines.map((line) => ({ text: line.text || '' })),
     }),
   });
@@ -336,6 +373,8 @@ export function invalidateArknightsCaches() {
   charwordTableCachedAt = 0;
   charwordTableLoadingPromise = undefined;
   handbookTeamTableCache = { base: '', data: null };
+  gameDataTableCache.clear();
+  gameDataTableLoading.clear();
   songDetailsCache.clear();
   lyricsCache.clear();
 }
@@ -770,6 +809,14 @@ function getPortraitUrls(portraitId, alternativeIds = []) {
   return urls;
 }
 
+function getLocalFirstPortraitUrls(operatorId, portraitId, alternativeIds = []) {
+  const ids = [...new Set([portraitId, ...alternativeIds].filter(Boolean))];
+  return [...new Set([
+    ...ids.map((id) => getLocalOperatorPortraitUrl(operatorId, id)).filter(Boolean),
+    ...getPortraitUrls(portraitId, alternativeIds),
+  ])];
+}
+
 function resolveCharacterPortraits(charId, charData, skinTable) {
   const portraits = [];
   const displaySkins = charData.displaySkins || [];
@@ -791,7 +838,7 @@ function resolveCharacterPortraits(charId, charData, skinTable) {
     portraits.push({
       name: eliteLabels.elite1,
       portraitId: displayId1,
-      urls: getPortraitUrls(displayId1, alternativeIds1),
+      urls: getLocalFirstPortraitUrls(charId, displayId1, alternativeIds1),
       skinId: null
     });
   }
@@ -806,7 +853,7 @@ function resolveCharacterPortraits(charId, charData, skinTable) {
     portraits.push({
       name: eliteLabels.elite2,
       portraitId: displayId2,
-      urls: getPortraitUrls(displayId2),
+      urls: getLocalFirstPortraitUrls(charId, displayId2),
       skinId: null
     });
   }
@@ -855,7 +902,7 @@ function resolveCharacterPortraits(charId, charData, skinTable) {
       portraits.push({
         name: row.tabName,
         portraitId: row.portraitId,
-        urls: getPortraitUrls(row.portraitId),
+        urls: getLocalFirstPortraitUrls(charId, row.portraitId),
         skinId: row.skinId
       });
     }
@@ -867,15 +914,13 @@ function resolveCharacterPortraits(charId, charData, skinTable) {
 async function fetchRecruitCharacterDetailsFromGameData(charId) {
   try {
     const excel = getGameDataExcelBase();
-    const [charTableRes, skinTable, teamTable, charwordTable] = await Promise.all([
-      fetch(`${excel}/character_table.json`),
+    const [charTable, skinTable, teamTable, charwordTable] = await Promise.all([
+      getGameDataJson(`${excel}/character_table.json`),
       getSkinTableShared(),
       getHandbookTeamTable(),
       getCharwordTableShared(),
     ]);
 
-    if (!charTableRes.ok) throw new Error('無法獲取角色資料');
-    const charTable = await charTableRes.json();
     const charData = charTable[charId];
     if (!charData) throw new Error('角色不存在');
 
@@ -935,30 +980,22 @@ export async function fetchCharacterDetails(charId) {
   try {
     // 並行獲取所有需要的數據
     const excel = getGameDataExcelBase();
-    const [charTableRes, skillTableRes, buildingDataRes, uniequipTableRes, handbookInfoTableRes, itemTableRes, rangeTableRes, skinTable, teamTable, charwordTable] = await Promise.all([
-      fetch(`${excel}/character_table.json`),
-      fetch(`${excel}/skill_table.json`).catch(() => null),
-      fetch(`${excel}/building_data.json`).catch(() => null),
-      fetch(`${excel}/uniequip_table.json`).catch(() => null),
-      fetch(`${excel}/handbook_info_table.json`).catch(() => null),
-      fetch(`${excel}/item_table.json`).catch(() => null),
-      fetch(`${excel}/range_table.json`).catch(() => null),
+    const [charTable, skillTable, buildingData, uniequipTable, handbookInfo, itemTable, rangeTable, skinTable, teamTable, charwordTable] = await Promise.all([
+      getGameDataJson(`${excel}/character_table.json`),
+      getGameDataJson(`${excel}/skill_table.json`, {}),
+      getGameDataJson(`${excel}/building_data.json`, {}),
+      getGameDataJson(`${excel}/uniequip_table.json`, {}),
+      getGameDataJson(`${excel}/handbook_info_table.json`, {}),
+      getGameDataJson(`${excel}/item_table.json`, {}),
+      getGameDataJson(`${excel}/range_table.json`, {}),
       getSkinTableShared(),
       getHandbookTeamTable(),
       getCharwordTableShared(),
+      loadOperatorAssetManifest().catch(() => null),
     ]);
-    
-    if (!charTableRes.ok) throw new Error('無法獲取角色資料');
-    const charTable = await charTableRes.json();
+
     const charData = charTable[charId];
     if (!charData) throw new Error('角色不存在');
-    
-    const skillTable = skillTableRes?.ok ? await skillTableRes.json() : {};
-    const buildingData = buildingDataRes?.ok ? await buildingDataRes.json() : {};
-    const uniequipTable = uniequipTableRes?.ok ? await uniequipTableRes.json() : {};
-    const handbookInfo = handbookInfoTableRes?.ok ? await handbookInfoTableRes.json() : {};
-    const itemTable = itemTableRes?.ok ? await itemTableRes.json() : {};
-    const rangeTable = rangeTableRes?.ok ? await rangeTableRes.json() : {};
     
     // 解析稀有度
     const parseRarity = (rarity) => {
@@ -977,12 +1014,18 @@ export async function fetchCharacterDetails(charId) {
     // 獲取材料信息的輔助函數
     const getItemInfo = (itemId) => {
       const item = itemTable?.items?.[itemId];
+      const iconId = item?.iconId || itemId;
+      const iconUrls = [
+        getLocalItemIconUrl(iconId),
+        `${ARKNIGHT_IMAGES_BASE}/items/${iconId}.png`,
+      ].filter(Boolean);
       return {
         id: itemId,
         name: toTraditionalGameDataText(item?.name || itemId),
-        iconId: item?.iconId || itemId,
+        iconId,
         rarity: item?.rarity || 0,
-        iconUrl: `${ARKNIGHT_IMAGES_BASE}/items/${item?.iconId || itemId}.png`
+        iconUrl: iconUrls[0] || '',
+        iconUrls,
       };
     };
     
@@ -1008,7 +1051,11 @@ export async function fetchCharacterDetails(charId) {
             duration: maxLevel.duration || 0,
             blackboard: blackboard,
             rangeId: maxLevel.rangeId || '',
-            iconId: skill.iconId || skillId
+            iconId: skill.iconId || skillId,
+            iconUrls: [
+              getLocalSkillIconUrl(skill.iconId || skillId),
+              `${ARKNIGHT_IMAGES_BASE}/skills/skill_icon_${skill.iconId || skillId}.png`,
+            ].filter(Boolean),
           });
         }
       }
@@ -1178,7 +1225,7 @@ export async function fetchCharacterDetails(charId) {
       portraits.push({
         name: eliteLabels.elite1,
         portraitId: displayId1,
-        urls: getPortraitUrls(displayId1, alternativeIds1),
+        urls: getLocalFirstPortraitUrls(charId, displayId1, alternativeIds1),
         skinId: null
       });
     }
@@ -1200,7 +1247,7 @@ export async function fetchCharacterDetails(charId) {
       portraits.push({
         name: eliteLabels.elite2,
         portraitId: displayId2,
-        urls: getPortraitUrls(displayId2),
+        urls: getLocalFirstPortraitUrls(charId, displayId2),
         skinId: null
       });
     }
@@ -1253,7 +1300,7 @@ export async function fetchCharacterDetails(charId) {
         portraits.push({
           name: row.tabName,
           portraitId: row.portraitId,
-          urls: getPortraitUrls(row.portraitId),
+          urls: getLocalFirstPortraitUrls(charId, row.portraitId),
           skinId: row.skinId
         });
       }

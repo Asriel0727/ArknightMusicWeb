@@ -238,17 +238,29 @@ function getItemIconSourceUrls(iconId) {
 }
 
 function getSkillIconSourceUrls(iconId) {
-  const id = encodeURIComponent(iconId);
-  return [
-    `${IMAGE_CDN_BASE}/skills/${id}.png`,
-    `${IMAGE_CDN_MIRROR_ACESHIP}/skills/${id}.png`,
-    `${IMAGE_CDN_BASE}/skill/${id}.png`,
-    `${IMAGE_CDN_MIRROR_ACESHIP}/skill/${id}.png`,
-    `${IMAGE_BASE}/skills/${id}.png`,
-    `${IMAGE_MIRROR_ACESHIP}/skills/${id}.png`,
-    `${IMAGE_BASE}/skill/${id}.png`,
-    `${IMAGE_MIRROR_ACESHIP}/skill/${id}.png`,
-  ];
+  const ids = uniqueBy(
+    [iconId, String(iconId || '').startsWith('skill_icon_') ? iconId : `skill_icon_${iconId}`].filter(Boolean),
+    (id) => id
+  );
+  const urls = [];
+
+  for (const candidateId of ids) {
+    const id = encodeURIComponent(candidateId);
+    urls.push(
+      `${IMAGE_CDN_BASE}/skills/${id}.png`,
+      `${IMAGE_CDN_MIRROR_ACESHIP}/skills/${id}.png`,
+      `${IMAGE_CDN_RESOURCE}/skill/${id}.png`,
+      `${IMAGE_CDN_BASE}/skill/${id}.png`,
+      `${IMAGE_CDN_MIRROR_ACESHIP}/skill/${id}.png`,
+      `${IMAGE_BASE}/skills/${id}.png`,
+      `${IMAGE_MIRROR_ACESHIP}/skills/${id}.png`,
+      `${IMAGE_MIRROR_RESOURCE}/skill/${id}.png`,
+      `${IMAGE_BASE}/skill/${id}.png`,
+      `${IMAGE_MIRROR_ACESHIP}/skill/${id}.png`,
+    );
+  }
+
+  return urls;
 }
 
 function safeAssetName(value) {

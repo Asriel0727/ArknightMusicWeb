@@ -2,6 +2,7 @@ import OpenCC from 'opencc-js';
 import { shouldApplyS2tGameData, shouldApplyS2tMusicApi } from '../services/gameDataSource.js';
 
 let converter;
+let simplifiedConverter;
 
 function getConverter() {
   if (!converter) {
@@ -16,6 +17,26 @@ function runS2t(str) {
   } catch {
     return str;
   }
+}
+
+function runToSimplified(str) {
+  try {
+    if (!simplifiedConverter) {
+      simplifiedConverter = OpenCC.Converter({ from: 'tw', to: 'cn' });
+    }
+    return simplifiedConverter(str);
+  } catch {
+    return str;
+  }
+}
+
+/** 中文歌詞依介面語系直接正規化，避免把簡繁轉換顯示成第二行翻譯。 */
+export function normalizeChineseMusicText(input, locale) {
+  if (input == null || input === '') return input == null ? '' : String(input);
+  const text = typeof input === 'string' ? input : String(input);
+  if (locale === 'zh-TW') return runS2t(text);
+  if (locale === 'zh-CN') return runToSimplified(text);
+  return text;
 }
 
 /** 明日方舟表格（簡中來源）→ 台灣繁體 */

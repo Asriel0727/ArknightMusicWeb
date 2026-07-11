@@ -4,6 +4,7 @@ compatibility_date = "2026-06-10"
 
 [vars]
 SUPABASE_URL = "https://rdneemerltoxlfosazcz.supabase.co"
+LYRICS_PREWARM_LOCALES = "zh-TW,zh-CN,en,ja,ko"
 
 [[kv_namespaces]]
 binding = "ARKNIGHTS_DATA"

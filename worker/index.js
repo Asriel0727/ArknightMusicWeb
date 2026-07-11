@@ -17,7 +17,12 @@ const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v3:';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
 const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
+const MUSIC_LYRICS_TRANSLATION_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-translation-cursor`;
+const MUSIC_LYRICS_KNOWN_SONGS_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-known-songs`;
 const LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:server:v1:';
+const SONG_LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:song:v2:';
+const SONG_LYRICS_TRANSLATION_CACHE_TTL_SECONDS = 60 * 60 * 24 * 90;
+const SONG_LYRICS_TRANSLATION_SCHEMA_VERSION = 1;
 const USER_ACCOUNT_KEY_PREFIX = 'userAccount:v1:';
 const USER_SESSION_KEY_PREFIX = 'userSession:v1:';
 const USER_SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
@@ -31,6 +36,9 @@ const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
 const MAX_SONG_DETAIL_PREWARM_LIMIT = 10;
 const DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT = 5;
 const MAX_ALBUM_DETAIL_PREWARM_LIMIT = 5;
+const DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT = 5;
+const MAX_LYRICS_TRANSLATION_PREWARM_LIMIT = 5;
+const DEFAULT_LYRICS_TRANSLATION_PREWARM_LOCALES = ['zh-TW', 'zh-CN', 'en', 'ja', 'ko'];
 const MUSIC_SONG_DETAIL_MAX_AGE_MS = 10 * 60 * 1000;
 
 export default {
@@ -62,7 +70,7 @@ export default {
       return shareResponse;
     }
 
-    const musicResponse = await handleMusicApiRequest(request, env, url);
+    const musicResponse = await handleMusicApiRequest(request, env, url, ctx);
     if (musicResponse) {
       return musicResponse;
     }
@@ -87,9 +95,17 @@ export default {
 
       const detailLimit = parseMusicPrewarmLimit(url.searchParams.get('songDetailLimit'));
       const albumDetailLimit = parseAlbumPrewarmLimit(url.searchParams.get('albumDetailLimit'));
+      const lyricsTranslationLimit = parseLyricsTranslationPrewarmLimit(
+        url.searchParams.get('lyricsTranslationLimit')
+      );
+      const lyricsTranslationLocales = parseTranslationPrewarmLocales(
+        url.searchParams.get('lyricsTranslationLocales')
+      );
       const result = await syncMusicCache(env, {
         songDetailLimit: detailLimit,
         albumDetailLimit,
+        lyricsTranslationLimit,
+        lyricsTranslationLocales,
       });
       return json({
         ok: true,
@@ -140,6 +156,24 @@ export default {
       await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
       await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumRows(albums.data));
       const result = await prewarmMusicAlbumDetails(env, albums.data, { limit });
+
+      return json({
+        ok: true,
+        ...result,
+        time: new Date().toISOString(),
+      });
+    }
+
+    if (url.pathname === '/api/admin/prewarm-lyrics') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) {
+        return unauthorized;
+      }
+
+      const limit = parseLyricsTranslationPrewarmLimit(url.searchParams.get('limit'));
+      const locales = parseTranslationPrewarmLocales(url.searchParams.get('locales'));
+      const songs = await getMusicJson(env, `${MUSIC_CACHE_PREFIX}songs`, '/api/songs');
+      const result = await prewarmMusicLyricsTranslations(env, songs.data, { limit, locales });
 
       return json({
         ok: true,
@@ -279,6 +313,32 @@ function parseMusicPrewarmLimit(rawLimit) {
     MAX_SONG_DETAIL_PREWARM_LIMIT,
     Math.max(0, Math.floor(limit))
   );
+}
+
+function parseLyricsTranslationPrewarmLimit(rawLimit) {
+  if (rawLimit == null || rawLimit === '') {
+    return DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT;
+  }
+
+  const limit = Number(rawLimit);
+  if (!Number.isFinite(limit)) {
+    return DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT;
+  }
+
+  return Math.min(
+    MAX_LYRICS_TRANSLATION_PREWARM_LIMIT,
+    Math.max(0, Math.floor(limit))
+  );
+}
+
+function parseTranslationPrewarmLocales(rawLocales) {
+  const requested = String(rawLocales || '')
+    .split(',')
+    .map((locale) => locale.trim())
+    .filter((locale) => SUPPORTED_TRANSLATION_LOCALES.has(locale));
+  return requested.length > 0
+    ? [...new Set(requested)]
+    : DEFAULT_LYRICS_TRANSLATION_PREWARM_LOCALES;
 }
 
 function parseAlbumPrewarmLimit(rawLimit) {
@@ -1202,13 +1262,13 @@ async function readJsonBody(request) {
   }
 }
 
-async function handleMusicApiRequest(request, env, url) {
+async function handleMusicApiRequest(request, env, url, ctx) {
   if (url.pathname === '/api/lyrics/translate') {
     if (request.method !== 'POST') {
       return methodNotAllowed('POST');
     }
 
-    return handleLyricsTranslateRequest(request, env);
+    return handleLyricsTranslateRequest(request, env, ctx);
   }
 
   if (request.method !== 'GET' && request.method !== 'HEAD') {
@@ -1417,7 +1477,7 @@ function normalizeSearchText(value) {
   return String(value || '').trim().toLowerCase();
 }
 
-async function handleLyricsTranslateRequest(request, env) {
+async function handleLyricsTranslateRequest(request, env, ctx) {
   let payload;
   try {
     payload = await request.json();
@@ -1436,15 +1496,64 @@ async function handleLyricsTranslateRequest(request, env) {
     });
   }
 
-  const translatedLines = await translateServerLines(env, lines, targetLocale);
+  const songId = normalizeTranslationSongId(payload.songId || payload.songCid);
+  const lyricsHash = songId ? await getLyricsHash(lines) : '';
+  if (songId) {
+    const cached = await readSongLyricsTranslation(env, songId, lyricsHash, targetLocale, lines);
+    if (cached) {
+      return json({
+        ok: true,
+        songId,
+        lyricsHash,
+        targetLocale,
+        translations: cached.translations,
+        translation: cached.translations[0] || '',
+        source: cached.source,
+      }, 200, 3600);
+    }
+  }
+
+  const translatedLines = await translateServerLines(env, lines, targetLocale, {
+    useLineCache: !songId,
+  });
   const translations = translatedLines.map((line) => line.translation || '');
+
+  if (songId) {
+    const persistTranslation = writeSongLyricsTranslation(env, {
+      songId,
+      lyricsHash,
+      targetLocale,
+      lines,
+      translations,
+      provider: 'google-translate',
+    }).catch((error) => {
+      console.warn('Song lyric translation persistence failed:', songId, targetLocale, error.message);
+    });
+    if (ctx) {
+      ctx.waitUntil(persistTranslation);
+    } else {
+      await persistTranslation;
+    }
+  }
 
   return json({
     ok: true,
+    songId: songId || null,
+    lyricsHash: lyricsHash || null,
     targetLocale,
     translations,
     translation: translations[0] || '',
+    source: songId ? 'translated' : 'line-cache',
   }, 200, 3600);
+}
+
+function normalizeTranslationSongId(value) {
+  const songId = String(value || '').trim();
+  return songId.slice(0, 160);
+}
+
+async function getLyricsHash(lines) {
+  return sha256Hex(lines.map((line) => line.text).join(TRANSLATION_LINE_SEPARATOR));
 }
 
 function normalizeTranslationLines(payload) {
@@ -1461,7 +1570,140 @@ function normalizeTranslationLines(payload) {
   return text ? [{ index: 0, text }] : [];
 }
 
-async function translateServerLines(env, lines, targetLocale) {
+function getSongLyricsTranslationCacheKey(songId, lyricsHash, targetLocale) {
+  return `${SONG_LYRICS_TRANSLATION_CACHE_PREFIX}${encodeURIComponent(songId)}:${lyricsHash}:${targetLocale}`;
+}
+
+function isValidSongTranslationRecord(record, lyricsHash, targetLocale, lines) {
+  const translations = record?.translations;
+  const hasTranslatableLine = lines.some((line) => {
+    const sourceLocale = detectTranslationSourceLocale(line.text, targetLocale);
+    return !shouldSkipServerTranslation(line.text, sourceLocale, targetLocale);
+  });
+  const hasTranslation = Array.isArray(translations) && translations.some(Boolean);
+
+  return Boolean(
+    record &&
+    record.lyricsHash === lyricsHash &&
+    record.targetLocale === targetLocale &&
+    Array.isArray(translations) &&
+    translations.length === lines.length &&
+    (!hasTranslatableLine || hasTranslation)
+  );
+}
+
+async function readSongLyricsTranslation(env, songId, lyricsHash, targetLocale, lines) {
+  const cacheKey = getSongLyricsTranslationCacheKey(songId, lyricsHash, targetLocale);
+  const cached = await env.ARKNIGHTS_DATA.get(cacheKey, 'json');
+  if (
+    cached &&
+    isValidSongTranslationRecord(
+      cached,
+      lyricsHash,
+      targetLocale,
+      lines
+    )
+  ) {
+    return { ...cached, source: 'kv' };
+  }
+
+  if (!hasSupabaseConfig(env)) {
+    return null;
+  }
+
+  try {
+    const params = new URLSearchParams({
+      song_cid: `eq.${songId}`,
+      lyrics_hash: `eq.${lyricsHash}`,
+      target_locale: `eq.${targetLocale}`,
+      select: 'song_cid,lyrics_hash,target_locale,translations,line_count,provider,updated_at',
+      limit: '1',
+    });
+    const rows = await supabaseRestRequest(env, 'music_lyric_translations', {
+      query: `?${params.toString()}`,
+    });
+    const row = rows?.[0];
+    const record = row ? {
+      schemaVersion: SONG_LYRICS_TRANSLATION_SCHEMA_VERSION,
+      songId: row.song_cid,
+      lyricsHash: row.lyrics_hash,
+      targetLocale: row.target_locale,
+      translations: row.translations,
+      lineCount: row.line_count,
+      provider: row.provider,
+      updatedAt: row.updated_at,
+    } : null;
+
+    if (!isValidSongTranslationRecord(
+      record,
+      lyricsHash,
+      targetLocale,
+      lines
+    )) {
+      return null;
+    }
+
+    await env.ARKNIGHTS_DATA.put(cacheKey, JSON.stringify(record), {
+      expirationTtl: SONG_LYRICS_TRANSLATION_CACHE_TTL_SECONDS,
+    });
+    return { ...record, source: 'supabase' };
+  } catch (error) {
+    console.warn('Supabase lyric translation read failed:', songId, targetLocale, error.message);
+    return null;
+  }
+}
+
+async function writeSongLyricsTranslation(env, options) {
+  const sourceLocales = [...new Set(
+    options.lines.map((line) => detectTranslationSourceLocale(line.text, options.targetLocale))
+  )];
+  const sourceLocale = sourceLocales.length === 1 ? sourceLocales[0] : 'mixed';
+  const updatedAt = new Date().toISOString();
+  const record = {
+    schemaVersion: SONG_LYRICS_TRANSLATION_SCHEMA_VERSION,
+    songId: options.songId,
+    lyricsHash: options.lyricsHash,
+    sourceLocale,
+    targetLocale: options.targetLocale,
+    translations: options.translations,
+    lineCount: options.lines.length,
+    provider: options.provider,
+    updatedAt,
+  };
+  const cacheKey = getSongLyricsTranslationCacheKey(
+    options.songId,
+    options.lyricsHash,
+    options.targetLocale
+  );
+
+  const writes = [
+    env.ARKNIGHTS_DATA.put(cacheKey, JSON.stringify(record), {
+      expirationTtl: SONG_LYRICS_TRANSLATION_CACHE_TTL_SECONDS,
+    }),
+  ];
+
+  if (hasSupabaseConfig(env)) {
+    writes.push(upsertSupabaseRows(env, 'music_lyric_translations', [{
+      song_cid: options.songId,
+      lyrics_hash: options.lyricsHash,
+      source_locale: sourceLocale,
+      target_locale: options.targetLocale,
+      source_lyrics: options.lines.map((line) => line.text).join(TRANSLATION_LINE_SEPARATOR),
+      translated_lyrics: options.translations.join(TRANSLATION_LINE_SEPARATOR),
+      translations: options.translations,
+      line_count: options.lines.length,
+      provider: options.provider,
+      schema_version: SONG_LYRICS_TRANSLATION_SCHEMA_VERSION,
+      updated_at: updatedAt,
+    }]));
+  }
+
+  await Promise.all(writes);
+  return record;
+}
+
+async function translateServerLines(env, lines, targetLocale, options = {}) {
+  const useLineCache = options.useLineCache !== false;
   const result = lines.map((line) => ({
     ...line,
     sourceLocale: detectTranslationSourceLocale(line.text, targetLocale),
@@ -1474,10 +1716,12 @@ async function translateServerLines(env, lines, targetLocale) {
       continue;
     }
 
-    const cached = await readServerTranslationCache(env, line.text, line.sourceLocale, targetLocale);
-    if (cached != null) {
-      line.translation = cached;
-      continue;
+    if (useLineCache) {
+      const cached = await readServerTranslationCache(env, line.text, line.sourceLocale, targetLocale);
+      if (cached != null) {
+        line.translation = cached;
+        continue;
+      }
     }
 
     translatableLines.push(line);
@@ -1495,7 +1739,9 @@ async function translateServerLines(env, lines, targetLocale) {
         }
 
         line.translation = translation;
-        await writeServerTranslationCache(env, line.text, line.sourceLocale, targetLocale, translation);
+        if (useLineCache) {
+          await writeServerTranslationCache(env, line.text, line.sourceLocale, targetLocale, translation);
+        }
       }
     } catch (error) {
       console.warn('Server lyric translation batch failed:', error.message);
@@ -1581,10 +1827,6 @@ function detectTranslationSourceLocale(text, targetLocale) {
   const hasHangul = /[\uac00-\ud7af]/i.test(sample);
   const hasHan = /[\u3400-\u4dbf\u4e00-\u9fff]/i.test(sample);
 
-  if ((targetLocale === 'zh-TW' || targetLocale === 'zh-CN') && hasLatin) {
-    return 'en';
-  }
-
   if (hasKana) {
     return 'ja';
   }
@@ -1593,12 +1835,12 @@ function detectTranslationSourceLocale(text, targetLocale) {
     return 'ko';
   }
 
-  if (hasLatin) {
-    return 'en';
-  }
-
   if (hasHan) {
     return 'zh';
+  }
+
+  if (hasLatin) {
+    return 'en';
   }
 
   return 'auto';
@@ -1676,6 +1918,8 @@ async function syncMusicCache(env, options = {}) {
     options.songDetailLimit ?? DEFAULT_SONG_DETAIL_PREWARM_LIMIT;
   const albumDetailLimit =
     options.albumDetailLimit ?? DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT;
+  const lyricsTranslationLimit =
+    options.lyricsTranslationLimit ?? DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT;
   const albums = await fetchMusicJson('/api/albums');
   await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
   const normalizedAlbums = normalizeMusicAlbumRows(albums.data);
@@ -1715,6 +1959,17 @@ async function syncMusicCache(env, options = {}) {
   synced.push({
     key: `${MUSIC_CACHE_PREFIX}song:{songId}`,
     ...songDetails,
+  });
+
+  const lyricTranslations = await prewarmMusicLyricsTranslations(env, songs.data, {
+    limit: lyricsTranslationLimit,
+    locales: options.lyricsTranslationLocales || parseTranslationPrewarmLocales(
+      env.LYRICS_PREWARM_LOCALES
+    ),
+  });
+  synced.push({
+    key: `${SONG_LYRICS_TRANSLATION_CACHE_PREFIX}{songId}:{lyricsHash}:{locale}`,
+    ...lyricTranslations,
   });
 
   return {
@@ -1874,6 +2129,177 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
     stored,
     errors,
     total: songs.length,
+    startIndex,
+    nextIndex,
+    wrapped,
+    done: wrapped,
+  };
+}
+
+function parseTranslationLinesFromLrc(lyricsText) {
+  const timestampPattern = /\[(\d{2}):(\d{2})[.:](\d{2,3})\]/;
+
+  return String(lyricsText || '')
+    .replace(/^\uFEFF/, '')
+    .split(/\r?\n/)
+    .map((rawLine) => rawLine.trim())
+    .filter((line) => line && timestampPattern.test(line))
+    .map((line) => line.replace(timestampPattern, '').trim())
+    .filter(Boolean)
+    .slice(0, 200)
+    .map((text, index) => ({ index, text }));
+}
+
+async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
+  const songs = Array.isArray(songsPayload?.data?.list)
+    ? songsPayload.data.list
+    : [];
+  const limit = Math.min(
+    MAX_LYRICS_TRANSLATION_PREWARM_LIMIT,
+    Math.max(0, Math.floor(options.limit ?? DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT))
+  );
+  const locales = parseTranslationPrewarmLocales(
+    Array.isArray(options.locales) ? options.locales.join(',') : options.locales
+  );
+
+  if (songs.length === 0 || limit === 0) {
+    return {
+      synced: 'music:lyric-translations',
+      attempted: 0,
+      translated: 0,
+      cacheHits: 0,
+      skipped: 0,
+      errors: 0,
+      total: songs.length,
+      locales,
+      nextIndex: 0,
+      done: songs.length === 0,
+    };
+  }
+
+  const cursorRow = await readSupabaseCache(env, MUSIC_LYRICS_TRANSLATION_CURSOR_KEY);
+  const startIndex = normalizeCursorIndex(cursorRow?.data?.nextIndex, songs.length);
+  const knownSongIds = new Set(
+    (await env.ARKNIGHTS_DATA.get(MUSIC_LYRICS_KNOWN_SONGS_KEY, 'json')) || []
+  );
+  const newCandidates = songs
+    .filter((song) => song?.cid && !knownSongIds.has(song.cid))
+    .slice(0, limit)
+    .map((item, index) => ({ index, item, isNew: true }));
+  const rotatingCandidates = buildCircularBatch(
+    songs,
+    startIndex,
+    Math.max(0, limit - newCandidates.length)
+  ).filter((candidate) => !newCandidates.some(
+    (newCandidate) => newCandidate.item?.cid === candidate.item?.cid
+  ));
+  const candidates = [...newCandidates, ...rotatingCandidates].slice(0, limit);
+  const completedSongIds = [];
+  let translated = 0;
+  let cacheHits = 0;
+  let skipped = 0;
+  let errors = 0;
+
+  for (const item of candidates) {
+    const songId = item.item?.cid;
+    if (!songId) {
+      skipped += 1;
+      continue;
+    }
+
+    try {
+      const detail = await getMusicSongJson(
+        env,
+        `${MUSIC_CACHE_PREFIX}song:${songId}`,
+        `/api/song/${encodeURIComponent(songId)}`
+      );
+      const song = detail.data?.data || {};
+      if (!song.lyricUrl) {
+        skipped += 1;
+        completedSongIds.push(songId);
+        continue;
+      }
+
+      const lyricsText = await fetchLyricsText(song.lyricUrl);
+      const lines = parseTranslationLinesFromLrc(lyricsText);
+      if (lines.length === 0) {
+        skipped += 1;
+        completedSongIds.push(songId);
+        continue;
+      }
+
+      const lyricsHash = await getLyricsHash(lines);
+      for (const targetLocale of locales) {
+        const cached = await readSongLyricsTranslation(
+          env,
+          songId,
+          lyricsHash,
+          targetLocale,
+          lines
+        );
+        if (cached) {
+          cacheHits += 1;
+          continue;
+        }
+
+        const translatedLines = await translateServerLines(env, lines, targetLocale, {
+          useLineCache: false,
+        });
+        const translations = translatedLines.map((line) => line.translation || '');
+        await writeSongLyricsTranslation(env, {
+          songId,
+          lyricsHash,
+          targetLocale,
+          lines,
+          translations,
+          provider: 'google-translate',
+        });
+        translated += 1;
+      }
+      completedSongIds.push(songId);
+    } catch (error) {
+      errors += 1;
+      console.warn('Music lyric translation prewarm failed:', songId, error.message);
+    }
+  }
+
+  completedSongIds.forEach((songId) => knownSongIds.add(songId));
+  await env.ARKNIGHTS_DATA.put(
+    MUSIC_LYRICS_KNOWN_SONGS_KEY,
+    JSON.stringify([...knownSongIds])
+  );
+
+  const nextIndex = (startIndex + rotatingCandidates.length) % songs.length;
+  const wrapped = didCircularBatchWrap(startIndex, rotatingCandidates.length, songs.length);
+  await writeSupabaseCache(
+    env,
+    MUSIC_LYRICS_TRANSLATION_CURSOR_KEY,
+    {
+      nextIndex,
+      total: songs.length,
+      lastBatchSize: candidates.length,
+      lastTranslated: translated,
+      lastCacheHits: cacheHits,
+      lastSkipped: skipped,
+      lastErrors: errors,
+      lastNewSongs: newCandidates.length,
+      lastWrapped: wrapped,
+      locales,
+      updatedAt: new Date().toISOString(),
+    },
+    'worker:prewarm-lyric-translations'
+  );
+
+  return {
+    synced: 'music:lyric-translations',
+    attempted: candidates.length,
+    translated,
+    cacheHits,
+    skipped,
+    errors,
+    newSongs: newCandidates.length,
+    total: songs.length,
+    locales,
     startIndex,
     nextIndex,
     wrapped,

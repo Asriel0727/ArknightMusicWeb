@@ -115,6 +115,7 @@
     "collapseFactions": "진영 접기",
     "melee": "근거리",
     "ranged": "원거리",
+    "navigation": { "previous": "이전", "next": "다음" },
     "sections": {
       "portrait": "1. 초상화",
       "trait": "2. 특성",

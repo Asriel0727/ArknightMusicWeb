@@ -115,6 +115,7 @@
     "collapseFactions": "Hide factions",
     "melee": "Melee",
     "ranged": "Ranged",
+    "navigation": { "previous": "Previous", "next": "Next" },
     "sections": {
       "portrait": "1. Artwork",
       "trait": "2. Trait",

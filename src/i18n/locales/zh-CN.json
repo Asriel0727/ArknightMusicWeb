@@ -115,6 +115,7 @@
     "collapseFactions": "收起阵营",
     "melee": "近战",
     "ranged": "远程",
+    "navigation": { "previous": "上一个", "next": "下一个" },
     "sections": {
       "portrait": "1. 干员立绘",
       "trait": "2. 特性",

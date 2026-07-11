@@ -48,13 +48,6 @@
               <input type="range" v-model.number="playerState.volume" min="0" max="1" step="0.05"
                 @input="handleVolumeChange">
             </div>
-            <label class="lyrics-translation-toggle">
-              <input v-model="playerState.showLyricTranslation" type="checkbox" @change="handleLyricTranslationToggle">
-              <span class="toggle-track" aria-hidden="true">
-                <span class="toggle-thumb"></span>
-              </span>
-              <span class="toggle-label">{{ t('player.translationToggle') }}</span>
-            </label>
             <div v-if="authState.user && playerState.currentSong" class="library-actions">
               <button class="library-btn" type="button" :disabled="favoriteActionPending"
                 :title="isFavoriteSong ? t('userLibrary.removeFavorite') : t('userLibrary.addFavorite')"
@@ -91,6 +84,14 @@
         :src="proxyImageUrl(playerState.currentSong.coverDeUrl)" :alt="playerState.currentSong.name"
         class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
         @error="handleImageError">
+      <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-toolbar">
+        <span class="lyrics-toolbar-title"><i class="fas fa-align-left"></i> {{ t('player.lyrics') }}</span>
+        <label class="lyrics-translation-toggle">
+          <input v-model="playerState.showLyricTranslation" type="checkbox" @change="handleLyricTranslationToggle">
+          <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">{{ t('player.translationToggle') }}</span>
+        </label>
+      </div>
       <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-container" ref="lyricsContainerRef"
         @scroll="handleLyricsScroll">
         <div v-for="(line, index) in playerState.lyrics" :key="index" class="lyrics-line"
@@ -1292,6 +1293,19 @@ onUnmounted(() => {
   min-height: 42px;
   margin-top: 2px;
   z-index: auto;
+}
+
+.lyrics-toolbar {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lyrics-toolbar-title {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
 .playlist-membership {

@@ -60,8 +60,8 @@
         </div>
 
         <div v-else class="song-list">
-          <article v-for="favorite in favorites" :key="favorite.song_cid" class="song-row">
-            <button class="song-main" type="button" @click="playSongItem(favorite.song_cid)">
+          <article v-for="favorite in favorites" :key="favorite.song_cid" class="song-row favorite-song-row">
+            <div class="song-main">
               <span class="song-cover">
                 <img v-if="getSongImage(favorite.song_cid)" :src="getSongImage(favorite.song_cid)" :alt="getSongName(favorite.song_cid)">
                 <i v-else class="fas fa-music"></i>
@@ -73,6 +73,9 @@
                   <span v-for="tag in getSongTags(favorite.song_cid)" :key="tag">{{ tag }}</span>
                 </span>
               </span>
+            </div>
+            <button class="row-icon-btn play" type="button" :title="t('userLibrary.playSong')" @click="playFavoriteSong(favorite.song_cid)">
+              <i class="fas fa-play"></i>
             </button>
             <button class="row-icon-btn" type="button" :title="t('userLibrary.removeFavorite')" @click="removeFavorite(favorite.song_cid)">
               <i class="fas fa-heart-crack"></i>
@@ -295,7 +298,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { characterState, modalState, playSongFromMasterList, playSongQueueFromMasterList } from '../stores/player.js';
+import { characterState, modalState, playSongQueueFromMasterList } from '../stores/player.js';
 import {
   fetchAlbums,
   fetchCharacterDetails,
@@ -610,9 +613,9 @@ const openPlayer = () => {
   modalState.isOpen = true;
 };
 
-const playSongItem = async (songCid) => {
-  await playSongFromMasterList(normalizeSongForPlayback(songCid));
-  openPlayer();
+const playFavoriteSong = async (songCid) => {
+  const startIndex = favoriteSongIds.value.indexOf(songCid);
+  await playSongCollection(favoriteSongIds.value, startIndex >= 0 ? startIndex : 0);
 };
 
 const getLibraryPlaybackContext = () => {
@@ -947,6 +950,10 @@ onUnmounted(() => {
 }
 
 .playlist-song-row {
+  grid-template-columns: minmax(0, 1fr) 36px 36px;
+}
+
+.favorite-song-row {
   grid-template-columns: minmax(0, 1fr) 36px 36px;
 }
 

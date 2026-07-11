@@ -75,6 +75,7 @@ import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
 import { getProxyImageUrl } from '../services/api.js';
 import { playSongFromAlbum } from '../stores/player.js';
 import { decodeTextLeftToRight } from '../utils/textGlitch.js';
+import { normalizeChineseMusicText } from '../utils/s2tApiText.js';
 
 const { t, locale } = useI18n();
 
@@ -250,7 +251,9 @@ const refreshIntroTranslation = async () => {
     return;
   }
 
-  if (targetLocale === 'zh-TW') {
+  const hasChineseSource = /[\u3400-\u9fff]/u.test(sourceText);
+  if ((targetLocale === 'zh-TW' || targetLocale === 'zh-CN') && hasChineseSource) {
+    translatedIntro.value = normalizeChineseMusicText(sourceText, targetLocale);
     return;
   }
 

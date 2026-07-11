@@ -30,7 +30,7 @@
 
         <div class="recruit-panel">
           <!-- 立绘 -->
-          <div v-show="activeTab === 'appearance'" class="tab-pane">
+          <div v-if="activeTab === 'appearance'" class="tab-pane">
             <p class="panel-hint">{{ t('recruit.appearanceHint') }}</p>
             <label class="field">
               <span>{{ t('recruit.uploadPortrait') }}</span>
@@ -58,7 +58,7 @@
           </div>
 
           <!-- 阵营 -->
-          <div v-show="activeTab === 'organization'" class="tab-pane">
+          <div v-else-if="activeTab === 'organization'" class="tab-pane">
             <label class="field checkbox-field">
               <input v-model="showNewBadge" type="checkbox" />
               <span>{{ t('recruit.showNewBadge') }}</span>
@@ -78,7 +78,7 @@
           </div>
 
           <!-- 角色 -->
-          <div v-show="activeTab === 'role'" class="tab-pane">
+          <div v-else-if="activeTab === 'role'" class="tab-pane">
             <label class="field">
               <span>{{ t('recruit.searchOperator') }}</span>
               <input v-model="charSearch" type="search" :placeholder="t('recruit.searchPlaceholder')" />
@@ -91,7 +91,7 @@
                 :class="{ active: selectedCharId === char.id }"
               >
                 <button type="button" @click="applyCharacter(char)">
-                  <img :src="char.avatarUrl" :alt="char.name" loading="lazy" @error="onAvatarError($event, char.id)" />
+                  <img :src="getRecruitCharacterAvatarUrl(char)" :alt="char.name" loading="lazy" decoding="async" @error="onAvatarError($event, char.id)" />
                   <span>{{ char.name }}</span>
                   <small>{{ getRarityStars(char.rarity) }}★</small>
                 </button>
@@ -143,7 +143,7 @@
           </div>
 
           <!-- 文本 -->
-          <div v-show="activeTab === 'text'" class="tab-pane">
+          <div v-else class="tab-pane">
             <label class="field">
               <span>{{ t('recruit.nameZh') }}</span>
               <input :value="nameZh" type="text" @input="onNameZhInput" />
@@ -263,6 +263,10 @@ import {
   rarityToStars,
   factionIdToLogoKey,
 } from '../utils/recruitCard.js';
+import {
+  getLocalOperatorAvatarUrl,
+  loadOperatorAssetManifest,
+} from '../services/operatorAssetManifest.js';
 
 const { t, locale } = useI18n();
 
@@ -354,7 +358,9 @@ let dragState = null;
 let charSearchDebounceTimer = null;
 let recruitCharactersLoadToken = 0;
 let recruitCharacterDetailToken = 0;
+let recruitCharactersIdleHandle = null;
 const failedImageUrls = new Set();
+const assetManifestVersion = ref(0);
 
 const professionOptions = computed(() => [
   { value: 'PIONEER', label: t('profession.PIONEER') },
@@ -418,6 +424,11 @@ const filteredCharacters = computed(() => {
 });
 
 const selectedCharacterPortraits = computed(() => selectedCharacterDetails.value?.portraits || []);
+
+function getRecruitCharacterAvatarUrl(char) {
+  void assetManifestVersion.value;
+  return getLocalOperatorAvatarUrl(char?.id) || char?.avatarUrl || getCharacterAvatarFallbackUrl(char?.id);
+}
 
 function getRarityStars(rarity) {
   return rarityToStars(rarity);
@@ -687,8 +698,13 @@ async function pickRandomOperator() {
 
 async function loadRecruitCharacters() {
   const loadToken = ++recruitCharactersLoadToken;
-  await syncFactionI18nMessages(globalI18n);
-  const loadedCharacters = await fetchRecruitCharacters();
+  const [, loadedCharacters] = await Promise.all([
+    syncFactionI18nMessages(globalI18n),
+    fetchRecruitCharacters(),
+    loadOperatorAssetManifest().then(() => {
+      assetManifestVersion.value += 1;
+    }).catch(() => null),
+  ]);
   if (loadToken !== recruitCharactersLoadToken) return;
 
   characters.value = loadedCharacters;
@@ -748,16 +764,33 @@ onMounted(async () => {
   window.addEventListener('touchend', endPortraitDrag);
   window.addEventListener('app-locale-changed', handleAppLocaleChanged);
 
-  try {
-    await loadRecruitCharacters();
-  } catch (err) {
-    console.error(err);
-  } finally {
-    isLoadingChars.value = false;
+  const loadWhenIdle = async () => {
+    recruitCharactersIdleHandle = null;
+    try {
+      await loadRecruitCharacters();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      isLoadingChars.value = false;
+    }
+  };
+
+  if ('requestIdleCallback' in window) {
+    recruitCharactersIdleHandle = window.requestIdleCallback(loadWhenIdle, { timeout: 1200 });
+  } else {
+    recruitCharactersIdleHandle = window.setTimeout(loadWhenIdle, 0);
   }
 });
 
 onUnmounted(() => {
+  if (recruitCharactersIdleHandle != null) {
+    if ('cancelIdleCallback' in window) {
+      window.cancelIdleCallback(recruitCharactersIdleHandle);
+    } else {
+      window.clearTimeout(recruitCharactersIdleHandle);
+    }
+    recruitCharactersIdleHandle = null;
+  }
   if (charSearchDebounceTimer) {
     clearTimeout(charSearchDebounceTimer);
     charSearchDebounceTimer = null;

@@ -115,6 +115,7 @@
     "collapseFactions": "陣営を隠す",
     "melee": "近距離",
     "ranged": "遠距離",
+    "navigation": { "previous": "前へ", "next": "次へ" },
     "sections": {
       "portrait": "1. 立ち絵",
       "trait": "2. 特性",
