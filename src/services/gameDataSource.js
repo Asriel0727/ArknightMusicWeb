@@ -102,6 +102,12 @@ export function getGameDataExcelBase() {
   return gameDataFolder === 'zh_CN' ? CN_EXCEL_BASE : yostarExcelBase(gameDataFolder);
 }
 
+export function getRecruitmentGameDataExcelBase(server, uiLocale = currentUiLocale) {
+  if (server === 'cn' || server === 'tw') return CN_EXCEL_BASE;
+  const folder = uiLocale === 'ja' ? 'ja_JP' : uiLocale === 'ko' ? 'ko_KR' : 'en_US';
+  return yostarExcelBase(folder);
+}
+
 export function getCnGameDataExcelBase() {
   return CN_EXCEL_BASE;
 }

@@ -22,6 +22,10 @@
       <RecruitCardMaker />
     </template>
 
+    <template v-else-if="currentPage === 'recruitment'">
+      <RecruitmentCalculator />
+    </template>
+
     <template v-else-if="currentPage === 'library'">
       <UserLibraryView />
       <Modal @close="handleModalClose" />
@@ -47,6 +51,7 @@ import { initAudioPlayer, modalState, albumState, characterState, playSongFromMa
 const AlbumList = defineAsyncComponent(() => import('./components/AlbumList.vue'));
 const CharacterList = defineAsyncComponent(() => import('./components/CharacterList.vue'));
 const RecruitCardMaker = defineAsyncComponent(() => import('./components/RecruitCardMaker.vue'));
+const RecruitmentCalculator = defineAsyncComponent(() => import('./components/RecruitmentCalculator.vue'));
 const UserLibraryView = defineAsyncComponent(() => import('./components/UserLibraryView.vue'));
 const AuthView = defineAsyncComponent(() => import('./components/AuthView.vue'));
 

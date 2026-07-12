@@ -685,6 +685,12 @@ export async function fetchRecruitCharacters() {
   }
 }
 
+export async function fetchRecruitReleaseDates(server) {
+  const normalized = ['cn', 'tw', 'global'].includes(server) ? server : 'global';
+  const data = await fetchRecruitApiJson(`/api/recruit/releases?server=${normalized}`);
+  return data.releases || [];
+}
+
 function normalizeReleaseLookupName(value) {
   return String(value || '')
     .normalize('NFKD')

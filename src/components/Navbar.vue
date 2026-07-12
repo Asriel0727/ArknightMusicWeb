@@ -36,6 +36,14 @@
           <span>{{ $t('nav.recruit') }}</span>
         </button>
         <button
+          class="nav-tab"
+          :class="{ active: currentPage === 'recruitment' }"
+          @click="changePage('recruitment')"
+        >
+          <i class="fas fa-tags"></i>
+          <span>{{ $t('nav.recruitment') }}</span>
+        </button>
+        <button
           v-if="authState.user"
           class="nav-tab"
           :class="{ active: currentPage === 'library' }"
