@@ -2,7 +2,7 @@
   <main class="library-page">
     <header class="library-header">
       <div>
-        <h1 class="page-title">{{ t('userLibrary.pageTitle') }}</h1>
+        <h1 class="library-title">{{ t('userLibrary.pageTitle') }}</h1>
         <p v-if="authState.user" class="library-subtitle">{{ t('userLibrary.librarySubtitle') }}</p>
       </div>
       <button v-if="authState.user" class="library-action-btn" type="button" :disabled="isLoading" @click="loadLibrary">
@@ -87,7 +87,15 @@
       <section v-else-if="activeTab === 'playlists'" class="library-panel">
         <div class="library-panel-header">
           <h2>{{ t('userLibrary.playlists') }}</h2>
+          <button class="library-action-btn" type="button" @click="isCreatingPlaylist = !isCreatingPlaylist">
+            <i class="fas fa-plus"></i><span>{{ t('userLibrary.createPlaylistTitle') }}</span>
+          </button>
         </div>
+        <form v-if="isCreatingPlaylist" class="library-create-form" @submit.prevent="submitCreatePlaylist">
+          <input v-model.trim="newPlaylistName" type="text" :placeholder="t('userLibrary.playlistNamePrompt')" maxlength="80" autofocus>
+          <input v-model.trim="newPlaylistDescription" type="text" :placeholder="t('userLibrary.description')" maxlength="240">
+          <button class="library-action-btn primary" type="submit" :disabled="actionPending || !newPlaylistName">{{ t('userLibrary.save') }}</button>
+        </form>
 
         <div v-if="playlists.length === 0" class="library-empty-state compact">
           <i class="fas fa-list"></i>
@@ -193,7 +201,15 @@
       <section v-else class="library-panel">
         <div class="library-panel-header">
           <h2>{{ t('userLibrary.characterLists') }}</h2>
+          <button class="library-action-btn" type="button" @click="isCreatingCharacterList = !isCreatingCharacterList">
+            <i class="fas fa-plus"></i><span>{{ t('userLibrary.createCharacterListTitle') }}</span>
+          </button>
         </div>
+        <form v-if="isCreatingCharacterList" class="library-create-form" @submit.prevent="submitCreateCharacterList">
+          <input v-model.trim="newCharacterListName" type="text" :placeholder="t('userLibrary.characterListName')" maxlength="80" autofocus>
+          <input v-model.trim="newCharacterListDescription" type="text" :placeholder="t('userLibrary.description')" maxlength="240">
+          <button class="library-action-btn primary" type="submit" :disabled="actionPending || !newCharacterListName">{{ t('userLibrary.save') }}</button>
+        </form>
 
         <div v-if="characterLists.length === 0" class="library-empty-state compact">
           <i class="fas fa-users"></i>
@@ -310,6 +326,8 @@ import {
 import { getLocalOperatorAvatarUrl, loadOperatorAssetManifest } from '../services/operatorAssetManifest.js';
 import { authState } from '../services/auth.js';
 import {
+  createCharacterList,
+  createPlaylist,
   deletePlaylist,
   fetchCharacterLists,
   fetchFavoriteSongs,
@@ -341,6 +359,12 @@ const playlistEditName = ref('');
 const playlistEditDescription = ref('');
 const playlistPendingDelete = ref(null);
 const isWidePlaylistLayout = ref(false);
+const isCreatingPlaylist = ref(false);
+const isCreatingCharacterList = ref(false);
+const newPlaylistName = ref('');
+const newPlaylistDescription = ref('');
+const newCharacterListName = ref('');
+const newCharacterListDescription = ref('');
 
 const tabs = computed(() => [
   { id: 'favorites', label: t('userLibrary.favorites'), icon: 'fas fa-heart', count: favorites.value.length },
@@ -797,6 +821,38 @@ const confirmDeletePlaylist = async () => {
   }
 };
 
+const submitCreatePlaylist = async () => {
+  if (!newPlaylistName.value || actionPending.value) return;
+  actionPending.value = true;
+  try {
+    const playlist = await createPlaylist(newPlaylistName.value, newPlaylistDescription.value);
+    playlists.value.unshift({ ...playlist, songs: playlist.songs || [] });
+    selectedPlaylistId.value = playlist.id;
+    newPlaylistName.value = '';
+    newPlaylistDescription.value = '';
+    isCreatingPlaylist.value = false;
+    setActionMessage(t('userLibrary.playlistCreated'));
+  } finally {
+    actionPending.value = false;
+  }
+};
+
+const submitCreateCharacterList = async () => {
+  if (!newCharacterListName.value || actionPending.value) return;
+  actionPending.value = true;
+  try {
+    const list = await createCharacterList(newCharacterListName.value, newCharacterListDescription.value);
+    characterLists.value.unshift({ ...list, items: list.items || [] });
+    selectedCharacterListId.value = list.id;
+    newCharacterListName.value = '';
+    newCharacterListDescription.value = '';
+    isCreatingCharacterList.value = false;
+    setActionMessage(t('userLibrary.characterListCreated'));
+  } finally {
+    actionPending.value = false;
+  }
+};
+
 watch(() => authState.user, () => {
   loadLibrary().catch(() => {});
 });
@@ -824,7 +880,8 @@ onUnmounted(() => {
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
-  padding: 22px 32px;
+  padding: 22px clamp(16px, 3vw, 32px);
+  box-sizing: border-box;
 }
 
 .library-header {
@@ -844,6 +901,21 @@ onUnmounted(() => {
 .library-shell {
   display: grid;
   gap: 16px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.library-header > div { min-width: 0; }
+.library-title {
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-align: left;
+  transform: none;
 }
 
 .library-tabs {
@@ -906,6 +978,29 @@ onUnmounted(() => {
   margin: 0;
   color: var(--text-color);
   font-size: 1.08rem;
+}
+
+.library-create-form {
+  margin: -2px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: rgba(13, 17, 23, 0.46);
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(220px, 1.4fr) auto;
+  gap: 8px;
+}
+.library-create-form input {
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: rgba(13, 17, 23, 0.72);
+  color: var(--text-color);
+}
+@media (max-width: 700px) {
+  .library-create-form { grid-template-columns: 1fr; }
 }
 
 .library-action-btn {

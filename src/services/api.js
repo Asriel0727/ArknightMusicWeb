@@ -7,6 +7,7 @@ import {
 } from '../utils/s2tApiText.js';
 import {
   getGameDataExcelBase,
+  getCnGameDataExcelBase,
   getGameDataFolder,
   getApiBuiltLabels,
   getCurrentUiLocale,
@@ -514,6 +515,7 @@ function normalizeWorkerOperator(operator) {
     nation: operator.nation || factionId,
     factionId,
     factionOrder: operator.factionOrder ?? 9999,
+    releaseOrder: operator.releaseOrder ?? 0,
     nationName: toTraditionalGameDataText(factionName),
     avatarUrl: operator.avatarUrl || AVATAR_SOURCES[0](operator.id),
   };
@@ -567,20 +569,164 @@ function shouldUseRecruitWorkerApi() {
 }
 
 export async function fetchRecruitCharacters() {
-  if (!shouldUseRecruitWorkerApi()) {
-    return fetchCharacters();
+  let operators;
+  try {
+    if (shouldUseRecruitWorkerApi()) {
+      const [data, sourceResponse] = await Promise.all([
+        fetchRecruitApiJson('/api/recruit/operators'),
+        fetch(`${getGameDataExcelBase()}/character_table.json`),
+      ]);
+      if (!Array.isArray(data.operators)) {
+        throw new Error('Recruit API operators payload is invalid');
+      }
+      const sourceTable = sourceResponse.ok ? await sourceResponse.json() : {};
+      const releaseOrder = new Map(Object.keys(sourceTable).map((id, index) => [id, index]));
+      operators = data.operators.map((operator) => normalizeWorkerOperator({
+        ...operator,
+        releaseOrder: releaseOrder.get(operator.id) ?? 0,
+      }));
+    } else {
+      operators = await fetchCharacters();
+    }
+  } catch (error) {
+    console.warn('Recruit API operators fallback to local source:', error);
+    operators = await fetchCharacters();
   }
 
   try {
-    const data = await fetchRecruitApiJson('/api/recruit/operators');
-    if (!Array.isArray(data.operators)) {
-      throw new Error('Recruit API operators payload is invalid');
+    const locale = getCurrentUiLocale();
+    const server = locale === 'zh-TW' ? 'tw' : locale === 'zh-CN' ? 'cn' : 'global';
+    const releaseResults = await Promise.allSettled([
+      fetchRecruitApiJson(`/api/recruit/releases?server=${server}`),
+      server === 'cn' ? Promise.resolve(null) : fetchRecruitApiJson('/api/recruit/releases?server=cn'),
+      fetchRecruitApiJson('/api/recruit/operators'),
+      fetchRecruitApiJson('/api/recruit/operator-catalog'),
+    ]);
+    const releaseData = releaseResults[0].status === 'fulfilled'
+      ? releaseResults[0].value
+      : { releases: [] };
+    const cnReleaseData = releaseResults[1].status === 'fulfilled'
+      ? releaseResults[1].value
+      : null;
+    const cnData = releaseResults[2].status === 'fulfilled'
+      ? releaseResults[2].value
+      : { operators: [] };
+    const catalogData = releaseResults[3].status === 'fulfilled'
+      ? releaseResults[3].value
+      : { operators: [] };
+    releaseResults.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        console.warn('Recruit release request failed:', index, result.reason);
+      }
+    });
+    const releaseRows = releaseData.releases || [];
+    const cnReleaseRows = cnReleaseData?.releases || releaseRows;
+    const releaseMap = buildOperatorReleaseMap(releaseRows);
+    const cnReleaseMap = buildOperatorReleaseMap(cnReleaseRows);
+    const catalogMap = new Map((catalogData.operators || []).map((row) => [
+      normalizeReleaseLookupName(row.operator_name), row,
+    ]));
+    const now = Date.now();
+    const activeServerRelease = releaseRows
+      .filter((row) => Number.isFinite(Date.parse(row.release_at)) && Date.parse(row.release_at) <= now)
+      .sort((a, b) => Date.parse(b.release_at) - Date.parse(a.release_at))[0] || null;
+    const progressEventName = activeServerRelease?.event_name || '';
+    const progressCutoffCn = cnReleaseRows
+      .filter((row) => row.event_name === progressEventName)
+      .reduce((latest, row) => Math.max(latest, Date.parse(row.release_at) || 0), 0);
+    const localizedIds = new Set(operators.map((operator) => operator.id));
+    const existingIds = new Set(operators.map((operator) => operator.id));
+    for (const rawOperator of cnData.operators || []) {
+      if (existingIds.has(rawOperator.id)) continue;
+      const fallback = normalizeWorkerOperator(rawOperator);
+      const release = findOperatorRelease(cnReleaseMap, fallback);
+      operators.push({
+        ...fallback,
+        name: release
+          ? (getLocalizedWikiOperatorName(release, locale) || release.operator_name || fallback.appellation)
+          : (fallback.appellation || fallback.name),
+      });
+      existingIds.add(fallback.id);
     }
-    return data.operators.map(normalizeWorkerOperator);
+
+    return operators.map((operator) => {
+      const release = findOperatorRelease(releaseMap, operator);
+      const cnRelease = findOperatorRelease(cnReleaseMap, operator);
+      const timestamp = release?.release_at ? Date.parse(release.release_at) : NaN;
+      const cnTimestamp = cnRelease?.release_at ? Date.parse(cnRelease.release_at) : NaN;
+      const catalogEntry = catalogMap.get(normalizeReleaseLookupName(operator.appellation))
+        || catalogMap.get(normalizeReleaseLookupName(operator.name));
+      const releasedByActivityProgress = server !== 'cn'
+        && progressCutoffCn > 0
+        && Number.isFinite(cnTimestamp)
+        && cnTimestamp <= progressCutoffCn;
+      const releasedByLocalizedGameData = server === 'global' && localizedIds.has(operator.id);
+      const releasedByCatalog = server !== 'cn'
+        && !cnRelease
+        && catalogEntry
+        && catalogEntry.is_cn !== '1';
+      return {
+        ...operator,
+        releaseAt: release?.release_at || null,
+        cnReleaseAt: cnRelease?.release_at || null,
+        releaseServer: server,
+        progressEventName,
+        isReleased: server === 'cn'
+          || releasedByActivityProgress
+          || (Number.isFinite(timestamp) && timestamp <= now)
+          || releasedByLocalizedGameData
+          || releasedByCatalog
+          || (server === 'tw' && Boolean(cnRelease?.tw_name)),
+      };
+    });
   } catch (error) {
-    console.warn('Recruit API operators fallback to local source:', error);
-    return fetchCharacters();
+    console.warn('Operator release dates unavailable:', error);
+    return operators;
   }
+}
+
+function normalizeReleaseLookupName(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function buildOperatorReleaseMap(rows) {
+  const map = new Map();
+  for (const row of rows || []) {
+    if (row.character_id) map.set(`id:${row.character_id}`, row);
+    map.set(`name:${normalizeReleaseLookupName(row.operator_name)}`, row);
+  }
+  return map;
+}
+
+function findOperatorRelease(map, operator) {
+  return map.get(`id:${operator.id}`)
+    || map.get(`name:${normalizeReleaseLookupName(operator.appellation)}`)
+    || map.get(`name:${normalizeReleaseLookupName(operator.name)}`)
+    || null;
+}
+
+function getLocalizedWikiOperatorName(release, locale) {
+  const safeName = (value) => {
+    const name = String(value || '').trim();
+    if (
+      !name
+      || name.length > 80
+      || /^[|*{}\[]/.test(name)
+      || /https?:\/\//i.test(name)
+      || /^\w+\s*=/.test(name)
+    ) return '';
+    return name;
+  };
+  const operatorName = safeName(release.operator_name);
+  if (locale === 'zh-TW') return safeName(release.tw_name) || safeName(release.cn_name) || operatorName;
+  if (locale === 'zh-CN') return safeName(release.cn_name) || operatorName;
+  if (locale === 'ja') return safeName(release.jp_name) || operatorName;
+  if (locale === 'ko') return safeName(release.kr_name) || operatorName;
+  return operatorName;
 }
 
 /**
@@ -635,7 +781,7 @@ export async function fetchCharacters() {
         }
         return true;
       })
-      .map(([id, char]) => {
+      .map(([id, char], releaseOrder) => {
         const rarity = parseRarity(char.rarity);
         const factionId = resolveFactionId(char);
         const factionOrder = factionId ? (teamTable[factionId]?.orderNum ?? 9999) : 9999;
@@ -650,6 +796,7 @@ export async function fetchCharacters() {
           nation: char.nationId,
           factionId,
           factionOrder,
+          releaseOrder,
           nationName: factionIdToDisplayName(factionId, teamTable),
           // 使用第一個圖片來源
           avatarUrl: AVATAR_SOURCES[0](id)
@@ -976,10 +1123,10 @@ export async function fetchRecruitCharacterDetails(charId) {
  * @param {string} charId - 角色ID
  * @returns {Promise<Object>} 角色詳細資料
  */
-export async function fetchCharacterDetails(charId) {
+export async function fetchCharacterDetails(charId, excelOverride = '') {
   try {
     // 並行獲取所有需要的數據
-    const excel = getGameDataExcelBase();
+    const excel = excelOverride || getGameDataExcelBase();
     const [charTable, skillTable, buildingData, uniequipTable, handbookInfo, itemTable, rangeTable, skinTable, teamTable, charwordTable] = await Promise.all([
       getGameDataJson(`${excel}/character_table.json`),
       getGameDataJson(`${excel}/skill_table.json`, {}),
@@ -988,9 +1135,9 @@ export async function fetchCharacterDetails(charId) {
       getGameDataJson(`${excel}/handbook_info_table.json`, {}),
       getGameDataJson(`${excel}/item_table.json`, {}),
       getGameDataJson(`${excel}/range_table.json`, {}),
-      getSkinTableShared(),
-      getHandbookTeamTable(),
-      getCharwordTableShared(),
+      getGameDataJson(`${excel}/skin_table.json`, {}),
+      getGameDataJson(`${excel}/handbook_team_table.json`, {}),
+      getGameDataJson(`${excel}/charword_table.json`, {}),
       loadOperatorAssetManifest().catch(() => null),
     ]);
 
@@ -1148,11 +1295,14 @@ export async function fetchCharacterDetails(charId) {
     const modules = [];
     if (uniequipTable?.equipDict) {
       Object.entries(uniequipTable.equipDict).forEach(([equipId, equipData]) => {
-        if (equipData.charId === charId) {
+        if (equipData.charId === charId && !equipId.startsWith('uniequip_001_')) {
           modules.push({
             id: equipId,
             uniEquipName: toTraditionalGameDataText(equipData.uniEquipName || ''),
             uniEquipDesc: cleanDescription(equipData.uniEquipDesc || ''),
+            uniEquipIcon: equipId,
+            uniEquipIconType: equipData.uniEquipIcon || '',
+            uniEquipGetTime: equipData.uniEquipGetTime || 0,
             typeName1: toTraditionalGameDataText(equipData.typeName1 || ''),
             typeName2: toTraditionalGameDataText(equipData.typeName2 || ''),
             typeIcon: equipData.typeIcon || '',
@@ -1161,6 +1311,7 @@ export async function fetchCharacterDetails(charId) {
             unlockLevel: equipData.unlockLevel || 1,
             unlockFavorPoint: equipData.unlockFavorPoint || 0,
             missionList: equipData.missionList || [],
+            story: cleanDescription(equipData.uniEquipDesc || ''),
             itemCost: equipData.itemCost || {}
           });
         }
@@ -1410,6 +1561,10 @@ export async function fetchCharacterDetails(charId) {
       avatarUrl: AVATAR_SOURCES[0](charId)
     };
   } catch (error) {
+    if (!excelOverride && getGameDataExcelBase() !== getCnGameDataExcelBase()) {
+      console.warn('Localized character detail missing; falling back to CN GameData:', charId);
+      return fetchCharacterDetails(charId, getCnGameDataExcelBase());
+    }
     console.error('獲取角色詳情失敗:', error);
     throw error;
   }

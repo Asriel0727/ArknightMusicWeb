@@ -17,12 +17,19 @@ let gameDataFolder = 'zh_CN';
 let currentUiLocale = 'zh-TW';
 
 const UI_LOCALE_TO_FOLDER = {
+  // 繁中服目前沒有受維護的公開 GameData 鏡像；保留 CN fallback，避免混用國際服進度。
   'zh-TW': 'zh_CN',
   'zh-CN': 'zh_CN',
   en: 'en_US',
   ja: 'ja_JP',
   ko: 'ko_KR',
 };
+
+export function getGameDataServer() {
+  if (currentUiLocale === 'zh-TW') return 'tw-fallback-cn';
+  if (currentUiLocale === 'zh-CN') return 'cn';
+  return 'global';
+}
 
 const LABELS = {
   zh_CN: {
@@ -93,6 +100,10 @@ const LABELS = {
 
 export function getGameDataExcelBase() {
   return gameDataFolder === 'zh_CN' ? CN_EXCEL_BASE : yostarExcelBase(gameDataFolder);
+}
+
+export function getCnGameDataExcelBase() {
+  return CN_EXCEL_BASE;
 }
 
 export function setGameDataFolderFromUiLocale(uiLocale) {

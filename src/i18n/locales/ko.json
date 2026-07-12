@@ -32,8 +32,10 @@
       "appearance": "일러스트",
       "organization": "진영",
       "role": "오퍼레이터",
+      "specs": "희귀도／직군",
       "text": "텍스트"
     },
+    "specsHint": "모집 카드에 표시할 희귀도와 직군을 조정합니다.",
     "faction": {
       "rhodes": "로도스",
       "yan": "염",
@@ -107,6 +109,12 @@
     "search": "검색",
     "searchPlaceholder": "오퍼레이터 이름…",
     "count": "오퍼레이터 {n}명",
+    "sortNewestFirst": "최신 출시순",
+    "releaseDate": "서버 출시일",
+    "futureOperator": "이 서버에 아직 출시되지 않음",
+    "releasedOperators": "출시됨",
+    "unreleasedOperators": "미출시",
+    "serverProgress": "서버 진행도",
     "loadList": "오퍼레이터 불러오는 중…",
     "loadListError": "오퍼레이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
     "loadDetailError": "상세 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",

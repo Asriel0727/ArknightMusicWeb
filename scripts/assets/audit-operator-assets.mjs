@@ -19,6 +19,9 @@ const IMAGE_CDN_RESOURCE = 'https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGam
 const IMAGE_CDN_DYNAMIC = 'https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts';
 const IMAGE_CDN_OPERATOR_ARCHIVE = 'https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main';
 const IMAGE_OPERATOR_ARCHIVE = 'https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main';
+const MODULE_ICON_INDEX_URL =
+  'https://api.github.com/repos/ArknightsAssets/ArknightsAssets/contents/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall?ref=cn';
+const PRTS_WIKI_API = 'https://prts.wiki/api.php';
 
 const PROFESSION_TO_CLASS_SLUG = {
   PIONEER: 'vanguard',
@@ -263,6 +266,111 @@ function getSkillIconSourceUrls(iconId) {
   return urls;
 }
 
+function getModuleIconSourceUrls(equipId) {
+  const id = encodeURIComponent(equipId);
+  return [
+    `${IMAGE_CDN_DYNAMIC}/ui/uniequipimgsmall/${id}.png`,
+    `${IMAGE_CDN_DYNAMIC}/ui/uniequipimg/${id}.png`,
+    `${IMAGE_MIRROR_DYNAMIC}/ui/uniequipimgsmall/${id}.png`,
+    `${IMAGE_MIRROR_DYNAMIC}/ui/uniequipimg/${id}.png`,
+  ];
+}
+
+async function fetchAvailableModuleIconIds() {
+  try {
+    const entries = await fetchJson(MODULE_ICON_INDEX_URL);
+    if (!Array.isArray(entries)) return null;
+    return new Set(
+      entries
+        .map((entry) => entry?.name)
+        .filter((name) => typeof name === 'string' && name.endsWith('.png'))
+        .map((name) => name.replace(/\.png$/, ''))
+    );
+  } catch (error) {
+    console.warn(
+      `Unable to fetch module icon index. Module audit will keep all records. ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+    return null;
+  }
+}
+
+async function fetchPrtsModuleIconUrl(moduleName) {
+  if (!moduleName) return '';
+  const params = new URLSearchParams({
+    action: 'query',
+    titles: `文件:模组 ${moduleName}.png`,
+    prop: 'imageinfo',
+    iiprop: 'url',
+    format: 'json',
+    formatversion: '2',
+  });
+  try {
+    const payload = await fetchJson(`${PRTS_WIKI_API}?${params.toString()}`);
+    const exactUrl = payload?.query?.pages?.[0]?.imageinfo?.[0]?.url || '';
+    if (exactUrl) return exactUrl;
+
+    const normalizedName = normalizePrtsAssetLabel(moduleName);
+    const prefix = [...normalizedName].slice(0, 2).join('');
+    if (!prefix) return '';
+    const searchParams = new URLSearchParams({
+      action: 'query',
+      list: 'allimages',
+      aiprefix: `模组 ${prefix}`,
+      ailimit: '50',
+      aiprop: 'url',
+      format: 'json',
+      formatversion: '2',
+    });
+    const searchPayload = await fetchJson(`${PRTS_WIKI_API}?${searchParams.toString()}`);
+    const candidates = (searchPayload?.query?.allimages || [])
+      .filter((image) => /^模组[ _]/.test(image?.name || ''))
+      .map((image) => ({
+        image,
+        score: assetLabelSimilarity(normalizedName, normalizePrtsAssetLabel(image.name.replace(/^模组[ _]/, '').replace(/\.png$/i, ''))),
+      }))
+      .sort((left, right) => right.score - left.score);
+    return candidates[0]?.score >= 0.5 ? candidates[0].image.url || '' : '';
+  } catch (error) {
+    console.warn(`Unable to resolve PRTS module image for ${moduleName}: ${error.message}`);
+    return '';
+  }
+}
+
+function normalizePrtsAssetLabel(value) {
+  return String(value || '')
+    .normalize('NFKC')
+    .replace(/[“”"'‘’\s_，。、《》【】（）()]/g, '')
+    .replace(/與/g, '和');
+}
+
+function assetLabelSimilarity(left, right) {
+  const leftChars = new Set([...left]);
+  const rightChars = new Set([...right]);
+  if (!leftChars.size || !rightChars.size) return 0;
+  const shared = [...leftChars].filter((char) => rightChars.has(char)).length;
+  return shared / new Set([...leftChars, ...rightChars]).size;
+}
+
+async function fetchPrtsFileUrl(title) {
+  const params = new URLSearchParams({
+    action: 'query',
+    titles: title,
+    prop: 'imageinfo',
+    iiprop: 'url',
+    format: 'json',
+    formatversion: '2',
+  });
+  try {
+    const payload = await fetchJson(`${PRTS_WIKI_API}?${params.toString()}`);
+    return payload?.query?.pages?.[0]?.imageinfo?.[0]?.url || '';
+  } catch (error) {
+    console.warn(`Unable to resolve PRTS image ${title}: ${error.message}`);
+    return '';
+  }
+}
+
 function safeAssetName(value) {
   const raw = String(value || 'unknown');
   const safe = raw.replace(/[^a-zA-Z0-9_.-]/g, '_');
@@ -328,19 +436,26 @@ async function buildAssetRecord({ type, id, label, relativePath, sourceUrls = []
 
 async function auditAvatars(operators) {
   return Promise.all(
-    operators.map((operator) => buildAssetRecord({
-      type: 'avatar',
-      id: operator.id,
-      label: operator.name || operator.id,
-      relativePath: path.join('public/images/operators/avatars', `${operator.id}.png`),
-      sourceUrls: getAvatarSourceUrls(operator),
-      extra: {
-        operatorId: operator.id,
-        rarity: operator.rarity,
-        factionId: operator.factionId,
-        profession: operator.profession,
-      },
-    }))
+    operators.map(async (operator) => {
+      const record = await buildAssetRecord({
+        type: 'avatar',
+        id: operator.id,
+        label: operator.name || operator.id,
+        relativePath: path.join('public/images/operators/avatars', `${operator.id}.png`),
+        sourceUrls: getAvatarSourceUrls(operator),
+        extra: {
+          operatorId: operator.id,
+          rarity: operator.rarity,
+          factionId: operator.factionId,
+          profession: operator.profession,
+        },
+      });
+      if (!record.exists && operator.name) {
+        const prtsUrl = await fetchPrtsFileUrl(`文件:头像 ${operator.name}.png`);
+        if (prtsUrl) record.sourceUrls.unshift(prtsUrl);
+      }
+      return record;
+    })
   );
 }
 
@@ -616,6 +731,31 @@ async function auditSkills(options, operators) {
   );
 }
 
+async function auditModules(options, operators) {
+  const [table, availableModuleIconIds] = await Promise.all([
+    fetchGameDataTable(options.gameDataBase, 'uniequip_table', { equipDict: {} }),
+    fetchAvailableModuleIconIds(),
+  ]);
+  const operatorIds = new Set(operators.map((operator) => operator.id));
+  const modules = Object.entries(table?.equipDict || {}).filter(([equipId, data]) => (
+    operatorIds.has(data?.charId)
+    && !equipId.startsWith('uniequip_001_')
+  ));
+  return Promise.all(modules.map(async ([equipId, data]) => {
+    const iconId = equipId;
+    const isInAssetIndex = !availableModuleIconIds || availableModuleIconIds.has(equipId);
+    const prtsUrl = isInAssetIndex ? '' : await fetchPrtsModuleIconUrl(data?.uniEquipName || '');
+    return buildAssetRecord({
+      type: 'module',
+      id: iconId,
+      label: data?.uniEquipName || equipId,
+      relativePath: path.join('public/images/modules', `${safeAssetName(iconId)}.png`),
+      sourceUrls: [prtsUrl, ...getModuleIconSourceUrls(equipId)].filter(Boolean),
+      extra: { equipId, iconId, charId: data?.charId, story: data?.uniEquipDesc || '' },
+    });
+  }));
+}
+
 function summarize(records) {
   const total = records.length;
   const existing = records.filter((record) => record.exists).length;
@@ -636,6 +776,7 @@ async function ensureOutputDirs(outputPath) {
     'public/images/operators/portraits',
     'public/images/items',
     'public/images/skills',
+    'public/images/modules',
     path.dirname(outputPath),
   ];
 
@@ -656,6 +797,7 @@ function printSummary(report) {
     portraits: report.summary.portraits,
     items: report.summary.items,
     skills: report.summary.skills,
+    modules: report.summary.modules,
   });
   console.log(`Report: ${report.output}`);
 }
@@ -670,13 +812,14 @@ async function main() {
   const operators = await fetchOperators(options.apiBase);
   console.log(`Operators: ${operators.length}`);
 
-  const [avatars, factions, classes, portraitAudit, items, skills] = await Promise.all([
+  const [avatars, factions, classes, portraitAudit, items, skills, modules] = await Promise.all([
     auditAvatars(operators),
     auditFactions(operators),
     auditClasses(operators),
     auditPortraits(options, operators),
     auditItems(options, operators),
     auditSkills(options, operators),
+    auditModules(options, operators),
   ]);
   const portraits = portraitAudit.records;
 
@@ -697,6 +840,7 @@ async function main() {
       portraits: 'public/images/operators/portraits',
       items: 'public/images/items',
       skills: 'public/images/skills',
+      modules: 'public/images/modules',
     },
     summary: {
       operators: operators.length,
@@ -706,6 +850,7 @@ async function main() {
       portraits: summarize(portraits),
       items: summarize(items),
       skills: summarize(skills),
+      modules: summarize(modules),
     },
     missing: {
       avatars: missingPaths(avatars),
@@ -714,6 +859,7 @@ async function main() {
       portraits: missingPaths(portraits),
       items: missingPaths(items),
       skills: missingPaths(skills),
+      modules: missingPaths(modules),
     },
     errors: {
       portraits: portraitAudit.errors,
@@ -725,6 +871,7 @@ async function main() {
       portraits,
       items,
       skills,
+      modules,
     },
   };
 

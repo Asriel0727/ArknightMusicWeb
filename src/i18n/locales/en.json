@@ -32,8 +32,10 @@
       "appearance": "Portrait",
       "organization": "Faction",
       "role": "Operator",
+      "specs": "Rarity / Class",
       "text": "Text"
     },
+    "specsHint": "Adjust the rarity and class shown on the recruitment card.",
     "faction": {
       "rhodes": "Rhodes Island",
       "yan": "Yan",
@@ -107,6 +109,12 @@
     "search": "Search",
     "searchPlaceholder": "Operator name…",
     "count": "{n} operators",
+    "sortNewestFirst": "Newest releases first",
+    "releaseDate": "Server release date",
+    "futureOperator": "Not released on this server",
+    "releasedOperators": "Released",
+    "unreleasedOperators": "Upcoming",
+    "serverProgress": "Server progress",
     "loadList": "Loading operators…",
     "loadListError": "Could not load operators. Please try again.",
     "loadDetailError": "Could not load operator details. Please try again.",

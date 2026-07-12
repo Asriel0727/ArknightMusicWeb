@@ -32,8 +32,10 @@
       "appearance": "立ち絵",
       "organization": "陣営",
       "role": "オペレーター",
+      "specs": "レア度／職分",
       "text": "テキスト"
     },
+    "specsHint": "募集カードに表示するレア度と職分を調整します。",
     "faction": {
       "rhodes": "ロドス",
       "yan": "炎",
@@ -107,6 +109,12 @@
     "search": "検索",
     "searchPlaceholder": "オペレーター名…",
     "count": "オペレーター {n} 人",
+    "sortNewestFirst": "実装が新しい順",
+    "releaseDate": "サーバー実装日",
+    "futureOperator": "このサーバーでは未実装",
+    "releasedOperators": "実装済み",
+    "unreleasedOperators": "未実装",
+    "serverProgress": "サーバー進行状況",
     "loadList": "オペレーターを読み込み中…",
     "loadListError": "オペレーターを読み込めませんでした。しばらくしてから再度お試しください。",
     "loadDetailError": "詳細を読み込めませんでした。しばらくしてから再度お試しください。",

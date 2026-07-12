@@ -1,6 +1,6 @@
 <template>
   <div class="modal" :class="{ show: modalState.isOpen }" @click="handleBackdropClick">
-    <div class="modal-content" @click.stop>
+    <div class="modal-content" :class="{ 'character-share-modal': modalState.currentView === 'character-share' }" @click.stop>
       <div class="modal-action-bar" :class="`view-${modalState.currentView}`" :aria-label="navText.actions">
         <div class="modal-action-group right">
           <button
@@ -14,7 +14,7 @@
             <span>{{ navText.home }}</span>
           </button>
           <button
-            v-if="modalState.currentView === 'character'"
+            v-if="isCharacterView"
             class="modal-nav text"
             type="button"
             :title="navText.characterList"
@@ -22,6 +22,16 @@
           >
             <i class="fas fa-users"></i>
             <span>{{ navText.characterList }}</span>
+          </button>
+          <button
+            v-if="isCharacterView"
+            class="modal-nav text primary"
+            type="button"
+            :title="shareText"
+            @click="shareCharacter"
+          >
+            <i :class="shareCopied ? 'fas fa-check' : 'fas fa-share-alt'"></i>
+            <span>{{ shareText }}</span>
           </button>
         </div>
         <div class="modal-action-group right">
@@ -53,6 +63,14 @@
           v-else-if="modalState.currentView === 'character' && characterState.currentCharacterDetails"
           :key="characterDetailsKey"
           :character="characterState.currentCharacterDetails"
+          @portrait-change="handlePortraitChange"
+        />
+        <CharacterShareDetails
+          v-else-if="modalState.currentView === 'character-share' && characterState.currentCharacterDetails"
+          :key="`shared-${characterDetailsKey}`"
+          :character="characterState.currentCharacterDetails"
+          :initial-portrait-id="modalState.characterPortraitId"
+          @portrait-change="handlePortraitChange"
         />
       </div>
     </div>
@@ -60,7 +78,7 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchAlbumDetails } from '../services/api.js';
 import { modalState, albumState, playerState, characterState } from '../stores/player.js';
@@ -68,6 +86,7 @@ import { modalState, albumState, playerState, characterState } from '../stores/p
 const AlbumDetails = defineAsyncComponent(() => import('./AlbumDetails.vue'));
 const PlayerView = defineAsyncComponent(() => import('./PlayerView.vue'));
 const CharacterDetails = defineAsyncComponent(() => import('./CharacterDetails.vue'));
+const CharacterShareDetails = defineAsyncComponent(() => import('./CharacterShareDetails.vue'));
 
 const { locale } = useI18n();
 
@@ -108,6 +127,11 @@ const characterDetailsKey = computed(() => {
   const id = characterState.currentCharacterDetails?.id;
   return id ? `character-${id}-${locale.value}` : 'character';
 });
+const isCharacterView = computed(() => ['character', 'character-share'].includes(modalState.currentView));
+const shareCopied = ref(false);
+const shareText = computed(() => shareCopied.value
+  ? ({ 'zh-TW': '已複製連結', 'zh-CN': '已复制链接', ja: 'リンクをコピーしました', ko: '링크 복사됨', en: 'Link copied' }[locale.value] || 'Link copied')
+  : ({ 'zh-TW': '分享角色', 'zh-CN': '分享干员', ja: 'オペレーターを共有', ko: '오퍼레이터 공유', en: 'Share operator' }[locale.value] || 'Share operator'));
 
 const navText = computed(() => NAV_TEXT[locale.value] || NAV_TEXT.en);
 const shouldShowHomeNav = computed(() => modalState.currentView === 'album' || modalState.currentView === 'player');
@@ -126,6 +150,38 @@ const handleHomeNav = () => {
 
 const handleCharacterListNav = () => {
   closeModal('characters');
+};
+
+const shareCharacter = async () => {
+  const id = characterState.currentCharacterDetails?.id;
+  if (!id) return;
+  const url = new URL(window.location.href);
+  url.searchParams.delete('song');
+  url.searchParams.set('operator', id);
+  if (modalState.characterPortraitId) {
+    url.searchParams.set('portrait', modalState.characterPortraitId);
+  } else {
+    url.searchParams.delete('portrait');
+  }
+  const text = url.toString();
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+  } else {
+    const input = document.createElement('textarea');
+    input.value = text;
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    input.remove();
+  }
+  shareCopied.value = true;
+  window.setTimeout(() => { shareCopied.value = false; }, 1800);
+};
+
+const handlePortraitChange = (portraitId) => {
+  modalState.characterPortraitId = String(portraitId || '');
 };
 
 const handleBackdropClick = (event) => {
@@ -198,6 +254,14 @@ watch(() => playerState.currentSong, (newSong) => {
   position: relative;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
+}
+
+.modal-action-bar.view-character-share + #modal-body {
+  min-height: min(720px, calc(90vh - 110px));
+}
+
+.modal-content.character-share-modal {
+  max-width: 1180px;
 }
 
 .modal-action-bar {

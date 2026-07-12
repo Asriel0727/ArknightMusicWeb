@@ -32,8 +32,10 @@
       "appearance": "立繪",
       "organization": "陣營",
       "role": "角色",
+      "specs": "星級／職業",
       "text": "文本"
     },
+    "specsHint": "調整招募卡顯示的星級與職業圖示。",
     "faction": {
       "rhodes": "羅德島",
       "yan": "炎",
@@ -107,6 +109,12 @@
     "search": "搜尋",
     "searchPlaceholder": "輸入角色名稱…",
     "count": "共 {n} 位幹員",
+    "sortNewestFirst": "最新實裝優先",
+    "releaseDate": "伺服器實裝日期",
+    "futureOperator": "尚未在此服實裝",
+    "releasedOperators": "已實裝",
+    "unreleasedOperators": "尚未實裝",
+    "serverProgress": "伺服器進度",
     "loadList": "正在載入角色資料…",
     "loadListError": "無法載入角色資料，請稍後再試",
     "loadDetailError": "無法載入角色詳情，請稍後再試",

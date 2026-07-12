@@ -77,6 +77,11 @@ export function getLocalSkillIconUrl(iconId) {
   return normalizePublicPath(operatorAssetManifest.assets?.skills?.[iconId]);
 }
 
+export function getLocalModuleIconUrl(iconId) {
+  if (!iconId || !operatorAssetManifest) return '';
+  return normalizePublicPath(operatorAssetManifest.assets?.modules?.[iconId]);
+}
+
 export function getLocalFactionLogoUrl(factionOrLogoKey) {
   const logoKey = String(factionOrLogoKey || '').startsWith('logo_')
     ? factionOrLogoKey

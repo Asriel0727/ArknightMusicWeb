@@ -14,6 +14,7 @@ const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const RECRUIT_OPERATORS_KEY = 'recruit:operators:v3';
 const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v3:';
+const RECRUIT_OPERATOR_CATALOG_KEY = 'recruit:operator-catalog:v1';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
 const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
@@ -32,6 +33,10 @@ const MAX_TRANSLATION_BATCH_TEXT_LENGTH = 4200;
 const SUPPORTED_TRANSLATION_LOCALES = new Set(['zh-TW', 'zh-CN', 'en', 'ja', 'ko']);
 const DEFAULT_APP_ORIGIN = 'https://molly27molly.github.io/ArknightMusicWeb/';
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
+const ARKNIGHTS_WIKI_API = 'https://arknights.wiki.gg/api.php';
+const ARKNIGHTS_WIKI_OPERATOR_LIST = 'https://arknights.wiki.gg/wiki/Operator/List';
+const OPERATOR_RELEASE_SERVERS = new Set(['cn', 'global', 'tw']);
+const OPERATOR_RELEASE_UPSERT_BATCH_SIZE = 100;
 const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
 const MAX_SONG_DETAIL_PREWARM_LIMIT = 10;
 const DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT = 5;
@@ -145,6 +150,20 @@ export default {
       });
     }
 
+    if (url.pathname === '/api/admin/sync-operator-releases') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) return unauthorized;
+      const result = await syncOperatorReleaseDates(env);
+      let catalog;
+      try {
+        catalog = await syncOperatorCatalog(env);
+      } catch (error) {
+        console.warn('Operator catalog sync failed; retaining previous snapshot:', error.message);
+        catalog = { ok: false, error: error.message };
+      }
+      return json({ ok: true, ...result, catalog, time: new Date().toISOString() });
+    }
+
     if (url.pathname === '/api/admin/prewarm-music-albums') {
       const unauthorized = requireAdminToken(request, env);
       if (unauthorized) {
@@ -215,6 +234,81 @@ export default {
       return json(data, 200, 3600);
     }
 
+    if (url.pathname === '/api/recruit/releases') {
+      const server = normalizeOperatorReleaseServer(url.searchParams.get('server'));
+      if (!server) {
+        return json({ ok: false, error: 'Invalid server' }, 400);
+      }
+      if (hasSupabaseConfig(env)) {
+        try {
+          const releases = await supabaseRestRequest(env, 'operator_release_dates', {
+            query: `?server=eq.${server}&select=operator_key,operator_name,character_id,cn_name,tw_name,jp_name,kr_name,event_name,release_at,server&order=release_at.desc`,
+          });
+          return json({ ok: true, server, releases: releases || [], source: 'supabase' }, 200, 3600);
+        } catch (error) {
+          console.warn('Operator release database read failed; using Wiki live data:', error.message);
+        }
+      }
+
+      const wikiRows = await fetchWikiOperatorReleases(server);
+      const releases = wikiRows.map((row) => ({
+        operator_key: normalizeOperatorReleaseKey(row.operator_name),
+        operator_name: row.operator_name,
+        event_name: row.event_name || null,
+        release_at: normalizeWikiReleaseTimestamp(row.release_at),
+        server,
+      }));
+      return json({ ok: true, server, releases, source: 'wiki-live' }, 200, 900);
+    }
+
+    if (url.pathname === '/api/recruit/operator-catalog') {
+      const snapshot = await env.ARKNIGHTS_DATA.get(RECRUIT_OPERATOR_CATALOG_KEY, 'json');
+      if (snapshot?.operators?.length) {
+        return json({ ok: true, ...snapshot, source: 'kv-snapshot' }, 200, 300);
+      }
+
+      try {
+        const synced = await syncOperatorCatalog(env);
+        return json({ ok: true, ...synced, source: 'wiki-cargo' }, 200, 300);
+      } catch (error) {
+        return json({ ok: false, error: error.message }, 503);
+      }
+    }
+
+    if (url.pathname === '/api/recruit/server-differences') {
+      if (!hasSupabaseConfig(env)) {
+        return json({ ok: false, error: 'Supabase is not configured' }, 503);
+      }
+      const now = new Date().toISOString();
+      const rowsByServer = await Promise.all([...OPERATOR_RELEASE_SERVERS].map(async (server) => ({
+        server,
+        rows: await supabaseRestRequest(env, 'operator_release_dates', {
+          query: `?server=eq.${server}&release_at=lte.${encodeURIComponent(now)}&select=operator_key,operator_name,character_id,cn_name,tw_name,jp_name,kr_name,release_at&order=release_at.desc&limit=500`,
+        }),
+      })));
+      const cnRows = rowsByServer.find((entry) => entry.server === 'cn')?.rows || [];
+      const globalRows = rowsByServer.find((entry) => entry.server === 'global')?.rows || [];
+      const cnMap = new Map(cnRows.map((row) => [row.character_id || row.operator_key, row]));
+      const servers = Object.fromEntries(rowsByServer.map(({ server, rows }) => {
+        const ids = new Set((rows || []).map((row) => row.character_id || row.operator_key));
+        if (server === 'tw') {
+          for (const row of cnRows) {
+            if (row.tw_name) ids.add(row.character_id || row.operator_key);
+          }
+          for (const row of globalRows) {
+            if (Date.parse(row.release_at) <= Date.parse('2020-06-29T23:59:59Z')) {
+              ids.add(row.character_id || row.operator_key);
+            }
+          }
+        }
+        const missing = [...cnMap.entries()]
+          .filter(([id]) => !ids.has(id))
+          .map(([, row]) => row);
+        return [server, { count: ids.size, missingCount: missing.length, missing }];
+      }));
+      return json({ ok: true, reference: 'cn', generatedAt: now, servers }, 200, 3600);
+    }
+
     if (url.pathname === '/api/recruit/image') {
       return proxyRecruitImage(request);
     }
@@ -253,14 +347,24 @@ export default {
   async scheduled(event, env, ctx) {
     const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
     await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
+    ctx.waitUntil(
+      syncOperatorCatalog(env).catch((error) => {
+        console.warn('Operator catalog sync failed; retaining previous snapshot:', error.message);
+      })
+    );
     if (hasSupabaseConfig(env)) {
       ctx.waitUntil(
-        syncMusicCache(env, {
-          songDetailLimit: 10,
-          albumDetailLimit: 5,
-        }).catch((error) => {
-          console.warn('Music cache sync failed:', error.message);
-        })
+        Promise.all([
+          syncMusicCache(env, {
+            songDetailLimit: 10,
+            albumDetailLimit: 5,
+          }).catch((error) => {
+            console.warn('Music cache sync failed:', error.message);
+          }),
+          syncOperatorReleaseDates(env).catch((error) => {
+            console.warn('Operator release sync failed:', error.message);
+          }),
+        ])
       );
     }
     console.info({
@@ -293,6 +397,211 @@ function getSupabaseUrl(env) {
 
 function hasSupabaseConfig(env) {
   return Boolean(getSupabaseUrl(env) && env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function normalizeOperatorReleaseServer(value) {
+  const server = String(value || '').toLowerCase();
+  return OPERATOR_RELEASE_SERVERS.has(server) ? server : '';
+}
+
+function normalizeOperatorReleaseKey(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function normalizeWikiReleaseTimestamp(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  return /(?:z|[+-]\d{2}:?\d{2})$/i.test(raw) ? raw : `${raw.replace(' ', 'T')}Z`;
+}
+
+async function fetchWikiOperatorReleases(server) {
+  const where = server === 'cn'
+    ? 'ES.server="cn"'
+    : `ES.server="${server}" AND O.isCN=0`;
+  const params = new URLSearchParams({
+    action: 'cargoquery',
+    tables: 'Operators=O,EventServerDetails=ES',
+    fields: 'O.operator=operator_name,O.event=event_name,O.isCN=is_cn,ES.server=server,MIN(ES.startTime)=release_at',
+    join_on: 'O.event=ES.event',
+    where,
+    group_by: 'O.operator,O.event,O.isCN,ES.server',
+    order_by: 'ES.startTime DESC',
+    limit: '500',
+    format: 'json',
+  });
+  const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
+    headers: { 'user-agent': 'ArknightMusicWeb/2.0 (operator release sync)' },
+    cf: { cacheTtl: 3600, cacheEverything: true },
+  });
+  if (!response.ok) {
+    throw new Error(`Arknights Wiki Cargo failed: ${response.status}`);
+  }
+  const payload = await response.json();
+  const deduped = new Map();
+  for (const item of payload.cargoquery || []) {
+    const row = item.title || {};
+    if (!row.operator_name || !row.release_at) continue;
+    const key = normalizeOperatorReleaseKey(row.operator_name);
+    const existing = deduped.get(key);
+    if (!existing || Date.parse(row.release_at) < Date.parse(existing.release_at)) {
+      deduped.set(key, row);
+    }
+  }
+  return [...deduped.values()];
+}
+
+async function fetchWikiOperatorCatalog() {
+  const params = new URLSearchParams({
+    action: 'cargoquery',
+    tables: 'Operators',
+    fields: 'operator=operator_name,name,isCN=is_cn,isUnreleased=is_unreleased,event=event_name',
+    group_by: 'operator,name,isCN,isUnreleased,event',
+    limit: '500',
+    format: 'json',
+  });
+  const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
+    headers: { 'user-agent': 'ArknightMusicWeb/2.0 (operator catalog)' },
+    cf: { cacheTtl: 3600, cacheEverything: true },
+  });
+  if (!response.ok) throw new Error(`Arknights Wiki operator catalog failed: ${response.status}`);
+  const payload = await response.json();
+  return (payload.cargoquery || []).map((item) => item.title || {}).filter((row) => row.operator_name);
+}
+
+async function syncOperatorCatalog(env) {
+  const operators = await fetchWikiOperatorCatalog();
+  if (!operators.length) {
+    throw new Error('Arknights Wiki operator catalog returned no operators');
+  }
+
+  const snapshot = {
+    operators,
+    updatedAt: new Date().toISOString(),
+  };
+  await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATOR_CATALOG_KEY, JSON.stringify(snapshot));
+  return { ...snapshot, count: operators.length };
+}
+
+function readWikiInfoboxValue(content, field) {
+  const match = String(content || '').match(
+    new RegExp(`^[ \\t]*\\|${field}[ \\t]*=[ \\t]*([^\\r\\n]*)`, 'mi')
+  );
+  return sanitizeWikiInfoboxValue(match?.[1]);
+}
+
+function sanitizeWikiInfoboxValue(value) {
+  const normalized = String(value || '')
+    .replace(/<!--.*?-->/g, '')
+    .trim();
+  if (
+    !normalized
+    || normalized.length > 80
+    || /^[|*{}\[]/.test(normalized)
+    || /https?:\/\//i.test(normalized)
+    || /^\w+[ \\t]*=/.test(normalized)
+  ) {
+    return '';
+  }
+  return normalized;
+}
+
+async function fetchWikiOperatorLocalizations(operatorNames) {
+  const result = new Map();
+  const uniqueNames = [...new Set(operatorNames.filter(Boolean))];
+  for (let offset = 0; offset < uniqueNames.length; offset += 40) {
+    const batch = uniqueNames.slice(offset, offset + 40);
+    const params = new URLSearchParams({
+      action: 'query',
+      prop: 'revisions',
+      rvprop: 'content',
+      rvslots: 'main',
+      titles: batch.join('|'),
+      format: 'json',
+      formatversion: '2',
+    });
+    const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
+      headers: { 'user-agent': 'ArknightMusicWeb/2.0 (operator localization sync)' },
+      cf: { cacheTtl: 3600, cacheEverything: true },
+    });
+    if (!response.ok) throw new Error(`Arknights Wiki pages failed: ${response.status}`);
+    const payload = await response.json();
+    for (const page of payload.query?.pages || []) {
+      const content = page.revisions?.[0]?.slots?.main?.content || '';
+      const localization = {
+        character_id: readWikiInfoboxValue(content, 'filename'),
+        cn_name: readWikiInfoboxValue(content, 'cnname'),
+        tw_name: readWikiInfoboxValue(content, 'twname'),
+        jp_name: readWikiInfoboxValue(content, 'jpname'),
+        kr_name: readWikiInfoboxValue(content, 'krname'),
+      };
+      result.set(normalizeOperatorReleaseKey(page.title), localization);
+    }
+  }
+  return result;
+}
+
+async function syncOperatorReleaseDates(env) {
+  if (!hasSupabaseConfig(env)) {
+    return { synced: 0, skipped: true, reason: 'Supabase is not configured' };
+  }
+  const updatedAt = new Date().toISOString();
+  const releasesByServer = await Promise.all([...OPERATOR_RELEASE_SERVERS].map(async (server) => ({
+    server,
+    releases: await fetchWikiOperatorReleases(server),
+  })));
+  const localizations = await fetchWikiOperatorLocalizations(
+    releasesByServer.flatMap(({ releases }) => releases.map((release) => release.operator_name))
+  );
+  const serverResults = await Promise.all(releasesByServer.map(async ({ server, releases }) => {
+    const rows = releases.map((release) => ({
+      operator_key: normalizeOperatorReleaseKey(release.operator_name),
+      server,
+      operator_name: release.operator_name,
+      ...(localizations.get(normalizeOperatorReleaseKey(release.operator_name)) || {}),
+      event_name: release.event_name || null,
+      release_at: normalizeWikiReleaseTimestamp(release.release_at),
+      is_cn: release.is_cn === '1',
+      source_url: ARKNIGHTS_WIKI_OPERATOR_LIST,
+      updated_at: updatedAt,
+    })).filter((row) => row.operator_key && row.release_at);
+    const uniqueRows = deduplicateOperatorReleaseRows(rows);
+    const result = await upsertSupabaseRowsInBatches(
+      env,
+      'operator_release_dates',
+      uniqueRows,
+      OPERATOR_RELEASE_UPSERT_BATCH_SIZE
+    );
+    return {
+      server,
+      fetched: releases.length,
+      unique: uniqueRows.length,
+      duplicates: rows.length - uniqueRows.length,
+      ...result,
+    };
+  }));
+  return {
+    ok: serverResults.every((result) => result.ok),
+    synced: serverResults.reduce((total, result) => total + result.count, 0),
+    servers: serverResults,
+    source: ARKNIGHTS_WIKI_OPERATOR_LIST,
+  };
+}
+
+function deduplicateOperatorReleaseRows(rows) {
+  const uniqueRows = new Map();
+
+  rows.forEach((row) => {
+    const key = `${row.operator_key}:${row.server}`;
+    if (!uniqueRows.has(key)) {
+      uniqueRows.set(key, row);
+    }
+  });
+
+  return [...uniqueRows.values()];
 }
 
 function getSupabaseAuthKey(env) {
@@ -445,6 +754,42 @@ async function upsertSupabaseRows(env, tableName, rows) {
   return {
     ok: true,
     count: rows.length,
+  };
+}
+
+async function upsertSupabaseRowsInBatches(env, tableName, rows, batchSize) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return {
+      ok: false,
+      count: 0,
+      skipped: true,
+    };
+  }
+
+  let count = 0;
+  const batches = Math.ceil(rows.length / batchSize);
+
+  for (let offset = 0; offset < rows.length; offset += batchSize) {
+    const batch = rows.slice(offset, offset + batchSize);
+    const result = await upsertSupabaseRows(env, tableName, batch);
+
+    if (!result.ok) {
+      return {
+        ...result,
+        count,
+        attempted: rows.length,
+        failedBatch: Math.floor(offset / batchSize) + 1,
+        batches,
+      };
+    }
+
+    count += result.count;
+  }
+
+  return {
+    ok: true,
+    count,
+    batches,
   };
 }
 

@@ -8,7 +8,9 @@
               :src="proxyImageUrl(playerState.currentSong.coverUrl)" :alt="playerState.currentSong.name"
               decoding="async" fetchpriority="high" @load="handleImageLoad" @error="handleImageError">
             <div v-else class="no-cover">{{ t('common.noCover') }}</div>
+            <span class="vinyl-spindle" aria-hidden="true"></span>
           </div>
+          <span class="vinyl-tonearm" :class="{ playing: playerState.isPlaying }" aria-hidden="true"></span>
           <div class="player-info">
             <h4>{{ playerState.currentSong?.name || t('common.unknownSong') }}</h4>
             <p>{{ playerState.currentSong?.artistes?.join(', ') || t('common.unknownArtist') }}</p>
@@ -720,6 +722,7 @@ onUnmounted(() => {
 }
 
 .player-header {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -736,9 +739,10 @@ onUnmounted(() => {
   margin-bottom: 15px;
   animation: spin 20s linear infinite;
   animation-play-state: paused;
-  border: none;
-  padding: 0;
-  background: transparent;
+  border: 8px solid #07090b;
+  padding: 34px;
+  background: repeating-radial-gradient(circle, #15191d 0 2px, #090b0e 3px 5px, #20252a 6px 7px);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.42), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .player-cover.playing {
@@ -749,6 +753,59 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #0b0d0f, 0 0 0 5px rgba(255, 255, 255, 0.08);
+}
+
+.vinyl-spindle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #d8dde2;
+  border-radius: 50%;
+  background: #15191d;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
+}
+
+.vinyl-tonearm {
+  position: absolute;
+  top: 20px;
+  left: calc(50% + 92px);
+  width: 7px;
+  height: 132px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #78828b, #e0e5e9 45%, #68717a);
+  transform: rotate(-22deg);
+  transform-origin: 50% 12px;
+  transition: transform 500ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.vinyl-tonearm.playing { transform: rotate(-8deg); }
+.vinyl-tonearm::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: -7px;
+  width: 21px;
+  height: 21px;
+  border: 3px solid #30373d;
+  border-radius: 50%;
+  background: #aeb6bd;
+}
+.vinyl-tonearm::after {
+  content: '';
+  position: absolute;
+  left: -5px;
+  bottom: -9px;
+  width: 18px;
+  height: 24px;
+  border-radius: 2px;
+  background: #31383e;
 }
 
 .player-cover .no-cover {

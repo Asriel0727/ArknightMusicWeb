@@ -118,6 +118,11 @@
                 </select>
               </label>
             </div>
+          </div>
+
+          <!-- 卡片規格 -->
+          <div v-else-if="activeTab === 'specs'" class="tab-pane">
+            <p class="panel-hint">{{ t('recruit.specsHint') }}</p>
             <label class="field">
               <span>{{ t('character.rarity') }}</span>
               <div class="star-pick-row">
@@ -274,6 +279,7 @@ const tabs = [
   { id: 'appearance', labelKey: 'recruit.tabs.appearance' },
   { id: 'organization', labelKey: 'recruit.tabs.organization' },
   { id: 'role', labelKey: 'recruit.tabs.role' },
+  { id: 'specs', labelKey: 'recruit.tabs.specs' },
   { id: 'text', labelKey: 'recruit.tabs.text' },
 ];
 
@@ -548,7 +554,7 @@ function preloadPortraits(detail, activePortraitIndex) {
 
 function applyPortraitFromDetail(detail, portraitIndex) {
   const portraits = detail?.portraits || [];
-  const portrait = portraits[portraitIndex] || portraits[portraits.length - 1] || portraits[0];
+  const portrait = portraits[portraitIndex] || portraits[0];
   const urls = getUsableImageUrls(portrait?.urls);
   const url = urls[0];
   if (!url) return;
@@ -586,10 +592,38 @@ function applySelectedCharacterFaction() {
   factionLogoKey.value = factionIdToLogoKey(selectedCharacterDetails.value.factionId);
 }
 
-function pickEliteOnePortraitIndex(detail) {
+function getElitePortraitRank(portrait) {
+  if (portrait?.skinId != null) return 0;
+
+  const portraitId = String(portrait?.portraitId || '').toLowerCase();
+  const name = String(portrait?.name || '').toLowerCase();
+  if (/(?:_|#)2$/.test(portraitId) || /(?:elite|精英|菁英|昇進|정예)\s*2/.test(name)) return 2;
+  if (/(?:_|#)1$/.test(portraitId) || /(?:elite|精英|菁英|昇進|정예)\s*1/.test(name)) return 1;
+  return 0;
+}
+
+function getElitePortraitIndexes(detail) {
   const portraits = detail?.portraits || [];
-  const eliteOneIndex = portraits.findIndex((portrait) => portrait?.skinId == null);
-  return eliteOneIndex >= 0 ? eliteOneIndex : 0;
+  return portraits
+    .map((portrait, index) => ({ portrait, index, rank: getElitePortraitRank(portrait) }))
+    .filter(({ portrait, rank }) => rank > 0 && getUsableImageUrls(portrait?.urls).length)
+    .sort((left, right) => left.rank - right.rank)
+    .map(({ index }) => index);
+}
+
+function pickElitePortraitIndex(detail, randomize = false) {
+  const eliteIndexes = getElitePortraitIndexes(detail);
+  if (eliteIndexes.length) {
+    return randomize
+      ? eliteIndexes[Math.floor(Math.random() * eliteIndexes.length)]
+      : eliteIndexes[0];
+  }
+
+  const portraits = detail?.portraits || [];
+  const baseIndex = portraits.findIndex(
+    (portrait) => portrait?.skinId == null && getUsableImageUrls(portrait?.urls).length
+  );
+  return baseIndex >= 0 ? baseIndex : 0;
 }
 
 function onPortraitUpload(e) {
@@ -649,7 +683,7 @@ async function loadCharacterRecruitData(charId, options = {}) {
     if (detailToken !== recruitCharacterDetailToken) return;
 
     selectedCharacterDetails.value = detail;
-    selectedPortraitIndex.value = pickEliteOnePortraitIndex(detail);
+    selectedPortraitIndex.value = pickElitePortraitIndex(detail, options.randomizeElitePortrait === true);
     applyPortraitFromDetail(detail, selectedPortraitIndex.value);
     preloadPortraits(detail, selectedPortraitIndex.value);
     applySelectedCharacterFaction();
@@ -687,13 +721,16 @@ async function applyCharacter(char, options = {}) {
   if (useSelectedCharacterFaction.value) {
     factionLogoKey.value = factionIdToLogoKey(char.factionId);
   }
-  await loadCharacterRecruitData(char.id, { preserveUserText });
+  await loadCharacterRecruitData(char.id, {
+    preserveUserText,
+    randomizeElitePortrait: options.randomizeElitePortrait === true,
+  });
 }
 
 async function pickRandomOperator() {
   if (!characters.value.length) return;
   const char = characters.value[Math.floor(Math.random() * characters.value.length)];
-  await applyCharacter(char);
+  await applyCharacter(char, { randomizeElitePortrait: true });
 }
 
 async function loadRecruitCharacters() {

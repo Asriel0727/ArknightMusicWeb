@@ -32,8 +32,10 @@
       "appearance": "立绘",
       "organization": "阵营",
       "role": "角色",
+      "specs": "星级／职业",
       "text": "文本"
     },
+    "specsHint": "调整招募卡显示的星级与职业图标。",
     "faction": {
       "rhodes": "罗德岛",
       "yan": "炎",
@@ -107,6 +109,12 @@
     "search": "搜索",
     "searchPlaceholder": "输入角色名称…",
     "count": "共 {n} 位干员",
+    "sortNewestFirst": "最新实装优先",
+    "releaseDate": "服务器实装日期",
+    "futureOperator": "尚未在此服实装",
+    "releasedOperators": "已实装",
+    "unreleasedOperators": "尚未实装",
+    "serverProgress": "服务器进度",
     "loadList": "正在载入角色资料…",
     "loadListError": "无法载入角色资料，请稍后再试",
     "loadDetailError": "无法载入角色详情，请稍后再试",

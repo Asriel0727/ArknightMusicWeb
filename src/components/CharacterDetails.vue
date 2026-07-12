@@ -46,11 +46,14 @@
             @error="handlePortraitError" @load="handlePortraitLoad">
         </div>
         <div class="operator-skin-switcher" v-if="allPortraits.length > 1">
-          <button type="button" :aria-label="t('character.navigation.previous')" :title="t('character.navigation.previous')"
-            @click="stepPortrait(-1)"><i class="fas fa-chevron-left"></i></button>
-          <span :title="allPortraits[currentPortraitIndex]?.name">{{ allPortraits[currentPortraitIndex]?.name }}</span>
-          <button type="button" :aria-label="t('character.navigation.next')" :title="t('character.navigation.next')"
-            @click="stepPortrait(1)"><i class="fas fa-chevron-right"></i></button>
+          <div class="skin-switcher-label"><i class="fas fa-tshirt"></i><span>{{ cleanSectionLabel('portrait') }}</span></div>
+          <div class="skin-option-list">
+            <button v-for="(portrait, index) in allPortraits" :key="portrait.skinId || `skin-${index}`" type="button"
+              :class="{ active: currentPortraitIndex === index }" :title="portrait.name" @click="selectPortrait(index)">
+              <img :src="getPortraitPreviewUrl(portrait)" :alt="portrait.name" loading="lazy">
+              <span>{{ portrait.name }}</span>
+            </button>
+          </div>
         </div>
         <div class="operator-identity">
           <span class="operator-rarity">{{ getRarityStars(character.rarity) }}★</span>
@@ -61,6 +64,10 @@
             <span>{{ character.position === 'MELEE' ? t('character.melee') : t('character.ranged') }}</span>
             <span v-if="getFactionLabel(character.factionId)">{{ getFactionLabel(character.factionId) }}</span>
           </div>
+          <button v-if="authState.user" class="operator-list-command" type="button" @click="openCharacterListManager">
+            <i class="fas fa-list-check"></i>
+            <span>{{ t('userLibrary.manageCharacterLists') }}</span>
+          </button>
         </div>
       </div>
 
@@ -184,14 +191,20 @@
               <p class="api-pre-line">{{ currentGrowthDescriptionPage }}</p>
             </template>
             <template v-else-if="activeGrowthMode === 'modules'">
-              <span class="console-label">{{ selectedGrowthEntry.typeName1 }} {{ selectedGrowthEntry.typeName2 }}</span>
-              <h3>{{ selectedGrowthEntry.uniEquipName || t('character.moduleDefault') }}</h3>
+              <div class="module-title-row">
+                <img v-if="getModuleIconUrl(selectedGrowthEntry)" :src="getModuleIconUrl(selectedGrowthEntry)"
+                  :alt="selectedGrowthEntry.uniEquipName" loading="lazy">
+                <div>
+                  <span class="console-label">{{ selectedGrowthEntry.typeName1 }} {{ selectedGrowthEntry.typeName2 }}</span>
+                  <h3>{{ selectedGrowthEntry.uniEquipName || t('character.moduleDefault') }}</h3>
+                </div>
+              </div>
               <p class="api-pre-line">{{ currentGrowthDescriptionPage }}</p>
             </template>
             <template v-else>
               <span class="console-label">{{ growthEntryTitle }}</span>
               <div class="console-materials" v-if="selectedGrowthMaterials.length">
-                <div v-for="(item, index) in selectedGrowthMaterials" :key="index">
+                <div v-for="(item, index) in selectedGrowthMaterials" :key="index" :title="item.name">
                   <img :src="item.iconUrl" :alt="item.name" loading="lazy" @error="handleMaterialError">
                   <span>{{ item.name }}</span><strong>x{{ item.count }}</strong>
                 </div>
@@ -567,6 +580,7 @@ import { useI18n } from 'vue-i18n';
 import { getCharacterAvatarUrls, getProxyImageUrl } from '../services/api.js';
 import {
   getLocalOperatorAvatarUrl,
+  getLocalModuleIconUrl,
   getLocalSkillIconUrl,
   loadOperatorAssetManifest,
 } from '../services/operatorAssetManifest.js';
@@ -586,6 +600,7 @@ const props = defineProps({
     required: true
   }
 });
+const emit = defineEmits(['portrait-change']);
 
 const currentPortraitIndex = ref(0);
 const currentPortraitUrlIndex = ref(0);
@@ -972,6 +987,8 @@ watch(() => props.character?.id, () => {
   activeTalentTooltipKey.value = '';
   currentPortraitIndex.value = 0;
   currentPortraitUrlIndex.value = 0;
+  const portrait = allPortraits.value[0];
+  emit('portrait-change', portrait?.portraitId || portrait?.skinId || '0');
 });
 
 onMounted(() => {
@@ -983,6 +1000,8 @@ onMounted(() => {
       console.warn('Operator asset manifest load failed:', error);
     });
   loadUserCharacterLists().catch(() => {});
+  const portrait = allPortraits.value[currentPortraitIndex.value];
+  emit('portrait-change', portrait?.portraitId || portrait?.skinId || String(currentPortraitIndex.value));
 });
 const expandedStories = ref([0]); // 預設展開第一個檔案
 
@@ -1019,7 +1038,8 @@ const allPortraits = computed(() => {
       list.push({
         name: p.name,
         urls: p.urls,
-        skinId: p.skinId ?? null
+        skinId: p.skinId ?? null,
+        portraitId: p.portraitId || p.id || null,
       });
     });
   }
@@ -1041,6 +1061,19 @@ const currentPortraitUrl = computed(() => {
   return url ? getProxyImageUrl(url) : '';
 });
 
+const getPortraitPreviewUrl = (portrait) => {
+  const url = portrait?.urls?.[0] || '';
+  return url ? getProxyImageUrl(url) : '';
+};
+
+const getModuleIconUrl = (module) => {
+  const url = getLocalModuleIconUrl(module?.uniEquipIcon || module?.id)
+    || module?.iconUrl
+    || module?.iconUrls?.[0]
+    || '';
+  return url ? getProxyImageUrl(url) : '';
+};
+
 const hasHandbookContent = computed(() => {
   return props.character.handbook && 
     props.character.handbook.storyTextAudio && 
@@ -1051,6 +1084,8 @@ const selectPortrait = (index) => {
   console.log('[組件調試] 選擇立繪索引:', index);
   currentPortraitIndex.value = index;
   currentPortraitUrlIndex.value = 0; // 重置備用 URL 索引
+  const portrait = allPortraits.value[index];
+  emit('portrait-change', portrait?.portraitId || portrait?.skinId || String(index));
   console.log('[組件調試] 重置URL索引為0');
 };
 
@@ -1844,6 +1879,51 @@ const handleAssetCandidateError = (event, urls = []) => {
 </style>
 
 <style scoped>
+.operator-skin-switcher {
+  width: min(360px, calc(100% - 40px));
+  grid-template-columns: 1fr;
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 5px;
+  background: rgba(13, 17, 23, 0.84);
+  backdrop-filter: blur(10px);
+}
+.skin-switcher-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.skin-option-list {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.operator-skin-switcher .skin-option-list button {
+  width: 76px;
+  min-width: 76px;
+  height: 64px;
+  padding: 3px;
+  display: grid;
+  grid-template-rows: 40px 16px;
+  overflow: hidden;
+}
+.skin-option-list img { width: 100%; height: 40px; object-fit: cover; object-position: center 18%; }
+.skin-option-list button span { overflow: hidden; font-size: 0.62rem; text-overflow: ellipsis; white-space: nowrap; }
+.module-title-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.module-title-row > img { width: 52px; height: 52px; flex: 0 0 52px; object-fit: contain; }
+.module-title-row > div { min-width: 0; }
+@media (max-width: 700px) {
+  .operator-skin-switcher { width: calc(100% - 28px); left: 14px; top: 12px; }
+  .operator-data-nav { overflow-x: auto; }
+  .operator-data-nav button { min-width: max-content; padding-inline: 10px; }
+}
+</style>
+
+<style scoped>
 .character-list-actions {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -2090,6 +2170,7 @@ const handleAssetCandidateError = (event, urls = []) => {
   background: rgba(13, 17, 23, 0.96);
 }
 
+
 .character-details-header,
 .character-details-content {
   display: none;
@@ -2192,8 +2273,10 @@ const handleAssetCandidateError = (event, urls = []) => {
   bottom: 28px;
   z-index: 3;
   max-width: min(78%, 430px);
-  padding-left: 14px;
-  border-left: 3px solid var(--primary-color);
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(13, 17, 23, 0.78), rgba(13, 17, 23, 0.2));
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
@@ -2235,8 +2318,8 @@ const handleAssetCandidateError = (event, urls = []) => {
   left: 24px;
   top: 22px;
   z-index: 4;
-  display: flex;
-  gap: 5px;
+  display: grid;
+  gap: 6px;
 }
 
 .operator-skin-switcher button,
@@ -2345,7 +2428,7 @@ const handleAssetCandidateError = (event, urls = []) => {
 .archive-page {
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-left: 2px solid var(--primary-color);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.045);
   border-radius: 6px;
   background: rgba(13, 17, 23, 0.42);
 }
@@ -2434,8 +2517,8 @@ const handleAssetCandidateError = (event, urls = []) => {
 
 .console-materials {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   margin-top: 12px;
 }
 
@@ -2446,29 +2529,50 @@ const handleAssetCandidateError = (event, urls = []) => {
   border-radius: 5px;
   background: rgba(22, 27, 34, 0.7);
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  gap: 4px 7px;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 8px;
   align-items: center;
 }
 
 .console-materials img {
-  grid-row: 1 / span 2;
-  width: 36px;
-  height: 36px;
+  grid-row: auto;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
 }
 
 .console-materials span {
-  overflow: hidden;
   color: var(--text-color);
-  font-size: 0.68rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
+
+.operator-list-command {
+  min-height: 34px;
+  margin-top: 9px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  background: rgba(13, 17, 23, 0.82);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  text-shadow: none;
+}
+.operator-list-command:hover { border-color: var(--primary-color); color: var(--primary-color); }
 
 .console-materials strong {
   color: var(--primary-color);
-  font-size: 0.7rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .console-materials { grid-template-columns: 1fr; }
 }
 
 .archive-page {
@@ -2510,22 +2614,27 @@ const handleAssetCandidateError = (event, urls = []) => {
 
 @media (max-width: 700px) {
   .character-details {
-    height: min(720px, calc(92vh - 92px));
+    height: auto;
+    max-height: calc(100dvh - 24px);
     min-height: 540px;
+    overflow-y: auto;
   }
 
   .operator-data-nav button span {
-    display: none;
+    display: inline;
   }
 
   .operator-game-stage {
     grid-template-columns: 1fr;
+    grid-template-rows: minmax(260px, 38dvh) minmax(420px, auto);
+    height: auto;
+    overflow: visible;
   }
 
   .operator-art-zone {
-    position: absolute;
-    inset: 0;
-    opacity: 0.3;
+    position: relative;
+    inset: auto;
+    opacity: 1;
   }
 
   .operator-info-console {
@@ -2535,8 +2644,13 @@ const handleAssetCandidateError = (event, urls = []) => {
   }
 
   .operator-identity {
-    display: none;
+    display: block;
+    left: 14px;
+    bottom: 14px;
+    max-width: calc(100% - 28px);
   }
+
+  .operator-identity h2 { font-size: 2rem; }
 
   .console-stat-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -3225,5 +3339,39 @@ const handleAssetCandidateError = (event, urls = []) => {
     min-width: 44px;
     min-height: 36px;
   }
+}
+</style>
+
+<style scoped>
+.operator-skin-switcher {
+  left: 20px;
+  right: auto;
+  width: min(360px, calc(100% - 40px));
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 5px;
+  background: rgba(13, 17, 23, 0.84);
+  backdrop-filter: blur(10px);
+}
+.skin-switcher-label { display: flex; align-items: center; gap: 7px; color: var(--text-secondary); font-size: 0.7rem; font-weight: 700; }
+.skin-option-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; }
+.operator-skin-switcher .skin-option-list button {
+  width: 76px;
+  min-width: 76px;
+  height: 64px;
+  min-height: 64px;
+  padding: 3px;
+  display: grid;
+  grid-template-rows: 40px 16px;
+  overflow: hidden;
+}
+.skin-option-list img { width: 100%; height: 40px; object-fit: cover; object-position: center 18%; }
+.skin-option-list button span { height: auto; padding: 0; border: 0; background: transparent; overflow: hidden; font-size: 0.62rem; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 700px) {
+  .operator-skin-switcher { width: calc(100% - 28px); left: 14px; top: 12px; }
+  .operator-data-nav { overflow-x: auto; }
+  .operator-data-nav button { min-width: max-content; padding-inline: 10px; }
 }
 </style>

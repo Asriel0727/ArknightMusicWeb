@@ -86,8 +86,32 @@
     </div>
 
     <!-- 角色數量統計 -->
-    <div class="character-count">
-      {{ t('character.count', { n: filteredCharacters.length }) }}
+    <div class="character-list-toolbar">
+      <div class="character-count">{{ t('character.count', { n: filteredCharacters.length }) }}</div>
+      <div class="character-list-controls">
+        <div v-if="!isCnServer" class="operator-view-segments" role="group" :aria-label="t('character.serverProgress')">
+          <button type="button" data-state="all" :class="{ active: operatorView === 'all' }"
+            :aria-pressed="operatorView === 'all'" @click="operatorView = 'all'">
+            <i class="fas fa-layer-group"></i>
+            <span>{{ t('common.all') }}</span>
+          </button>
+          <button type="button" data-state="released" :class="{ active: operatorView === 'released' }"
+            :aria-pressed="operatorView === 'released'" @click="operatorView = 'released'">
+            <i class="fas fa-circle-check"></i>
+            <span>{{ t('character.releasedOperators') }}</span>
+          </button>
+          <button type="button" data-state="upcoming" :class="{ active: operatorView === 'upcoming' }"
+            :aria-pressed="operatorView === 'upcoming'" @click="operatorView = 'upcoming'">
+            <i class="fas fa-clock"></i>
+            <span>{{ t('character.unreleasedOperators') }}</span>
+          </button>
+        </div>
+        <button type="button" class="release-sort-command" :class="{ active: sortNewestFirst }"
+          :aria-pressed="sortNewestFirst" @click="sortNewestFirst = !sortNewestFirst">
+          <i class="fas fa-arrow-down-wide-short"></i>
+          <span>{{ t('character.sortNewestFirst') }}</span>
+        </button>
+      </div>
     </div>
 
     <div v-if="detailLoadMessage" class="character-detail-toast">
@@ -137,6 +161,13 @@
           <p v-if="getFactionLabel(char.factionId)" class="character-nation" :title="getFactionLabel(char.factionId)">
             {{ getFactionLabel(char.factionId) }}
           </p>
+          <time v-if="char.releaseAt" class="character-release-date" :datetime="char.releaseAt"
+            :title="t('character.releaseDate')">
+            <i class="far fa-calendar-alt"></i>{{ formatReleaseDate(char.releaseAt) }}
+          </time>
+          <span v-else-if="char.isReleased === false" class="character-release-date future">
+            <i class="fas fa-forward"></i>{{ t('character.futureOperator') }}
+          </span>
         </div>
       </div>
     </div>
@@ -162,6 +193,9 @@ const selectedProfession = ref(null);
 const isFactionFilterExpanded = ref(false);
 const assetManifestVersion = ref(0);
 const selectedFactions = ref([]);
+const sortNewestFirst = ref(false);
+const operatorView = ref('released');
+const isCnServer = computed(() => locale.value === 'zh-CN');
 const detailLoadMessage = ref('');
 const characterDetailPromiseMap = new Map();
 let detailLoadMessageTimer = null;
@@ -245,8 +279,22 @@ const getRarityStars = (rarity) => {
   return numRarity + 1;
 };
 
+const formatReleaseDate = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(locale.value, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+};
+
 const filteredCharacters = computed(() => {
-  return characters.value.filter(char => {
+  const filtered = characters.value.filter(char => {
+    if (!isCnServer.value) {
+      if (operatorView.value === 'released' && char.isReleased === false) return false;
+      if (operatorView.value === 'upcoming' && char.isReleased !== false) return false;
+    }
     // 搜尋篩選
     if (searchQuery.value) {
       const query = searchQuery.value.toLowerCase();
@@ -275,6 +323,13 @@ const filteredCharacters = computed(() => {
     }
     
     return true;
+  });
+  if (!sortNewestFirst.value) return filtered;
+  return filtered.slice().sort((a, b) => {
+    const aTime = a.releaseAt ? Date.parse(a.releaseAt) : 0;
+    const bTime = b.releaseAt ? Date.parse(b.releaseAt) : 0;
+    if (aTime !== bTime) return bTime - aTime;
+    return (b.releaseOrder ?? 0) - (a.releaseOrder ?? 0);
   });
 });
 
@@ -423,6 +478,7 @@ onUnmounted(() => {
 });
 
 watch(locale, async () => {
+  operatorView.value = isCnServer.value ? 'all' : 'released';
   await syncFactionI18nMessages(i18n);
   await loadCharacters();
   if (
@@ -573,6 +629,90 @@ watch(locale, async () => {
   padding-left: 5px;
 }
 
+.character-list-toolbar {
+  min-height: 42px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.character-list-toolbar .character-count { margin: 0; }
+
+.character-list-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.release-sort-command {
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: rgba(13, 17, 23, 0.7);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+.release-sort-command:hover { color: var(--text-color); border-color: rgba(255, 255, 255, 0.26); }
+.release-sort-command.active { border-color: rgba(88, 166, 255, 0.55); color: var(--primary-color); background: rgba(88, 166, 255, 0.1); }
+
+.operator-view-segments {
+  min-height: 42px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  background: rgba(13, 17, 23, 0.76);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(108px, 1fr));
+  overflow: hidden;
+}
+.operator-view-segments button {
+  position: relative;
+  min-width: 0;
+  min-height: 40px;
+  padding: 7px 12px 9px;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: color 160ms ease, background 160ms ease;
+}
+.operator-view-segments button:last-child { border-right: 0; }
+.operator-view-segments button::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 0;
+  height: 2px;
+  background: transparent;
+}
+.operator-view-segments button:hover { color: var(--text-color); background: rgba(255, 255, 255, 0.035); }
+.operator-view-segments button.active { color: #f0f6fc; background: rgba(88, 166, 255, 0.08); font-weight: 700; }
+.operator-view-segments button.active::after { background: var(--primary-color); }
+.operator-view-segments button[data-state='released'].active i { color: #56d39b; }
+.operator-view-segments button[data-state='upcoming'].active i { color: #f2c14e; }
+.operator-view-segments button[data-state='all'].active i { color: var(--primary-color); }
+
 .character-detail-toast {
   position: fixed;
   left: 50%;
@@ -651,6 +791,17 @@ watch(locale, async () => {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
+
+.character-release-date {
+  margin-top: 5px;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.character-release-date.future { color: #e6b84b; }
 
 /* 稀有度顏色 */
 .character-card.rarity-6 {
@@ -755,6 +906,26 @@ watch(locale, async () => {
     font-size: 0.8rem;
   }
 
+  .character-list-toolbar,
+  .character-list-controls {
+    width: 100%;
+  }
+
+  .character-list-controls {
+    justify-content: stretch;
+  }
+
+  .operator-view-segments {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    order: 1;
+  }
+
+  .release-sort-command {
+    order: 2;
+    margin-left: auto;
+  }
+
   .character-grid {
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 10px;
@@ -770,6 +941,14 @@ watch(locale, async () => {
 }
 
 @media (max-width: 480px) {
+  .operator-view-segments button {
+    padding-inline: 6px;
+    font-size: 0.74rem;
+  }
+
+  .operator-view-segments button i {
+    display: none;
+  }
   .character-grid {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
     gap: 8px;

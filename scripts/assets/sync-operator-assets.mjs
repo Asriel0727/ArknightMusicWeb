@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 
 const DEFAULT_AUDIT_PATH = 'public/images/manifest/operator-assets-audit.json';
 const DEFAULT_MANIFEST_PATH = 'public/images/manifest/operator-assets.json';
-const SUPPORTED_TYPES = new Set(['avatars', 'factions', 'classes', 'portraits', 'items', 'skills']);
+const SUPPORTED_TYPES = new Set(['avatars', 'factions', 'classes', 'portraits', 'items', 'skills', 'modules']);
 const IMAGE_CONTENT_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
 const __filename = fileURLToPath(import.meta.url);
@@ -70,7 +70,7 @@ Usage:
   npm.cmd run assets:sync -- --type avatars --dry-run
 
 Options:
-  --type <type>          avatars | factions | classes | portraits | items | skills. Default: avatars
+  --type <type>          avatars | factions | classes | portraits | items | skills | modules. Default: avatars
   --limit <n>            Sync at most n missing assets. 0 means no limit.
   --audit <path>         Audit report path. Default: ${DEFAULT_AUDIT_PATH}
   --manifest <path>      Output manifest path. Default: ${DEFAULT_MANIFEST_PATH}
@@ -127,6 +127,7 @@ function getManifestBucket(type) {
   if (type === 'portraits') return 'portraits';
   if (type === 'items') return 'items';
   if (type === 'skills') return 'skills';
+  if (type === 'modules') return 'modules';
   return type;
 }
 
@@ -141,6 +142,7 @@ function ensureManifestShape(manifest) {
       portraits: manifest?.assets?.portraits || {},
       items: manifest?.assets?.items || {},
       skills: manifest?.assets?.skills || {},
+      modules: manifest?.assets?.modules || {},
     },
     summary: manifest?.summary || {},
   };
@@ -235,6 +237,24 @@ function buildManifestEntry(record, image) {
   };
 }
 
+async function buildExistingManifestEntry(record) {
+  const relativePath = normalizeRelativePath(record.relativePath);
+  const buffer = await readFile(toAbsolutePath(relativePath));
+  const extension = path.extname(relativePath).toLowerCase();
+  const contentType = extension === '.webp'
+    ? 'image/webp'
+    : extension === '.jpg' || extension === '.jpeg'
+      ? 'image/jpeg'
+      : 'image/png';
+
+  return buildManifestEntry(record, {
+    hash: sha256(buffer),
+    size: buffer.length,
+    contentType,
+    sourceUrl: '',
+  });
+}
+
 function summarizeBucket(bucket) {
   return Object.keys(bucket || {}).length;
 }
@@ -249,7 +269,12 @@ async function main() {
 
   for (const record of records) {
     const exists = await fileExists(normalizeRelativePath(record.relativePath));
-    if (!options.overwrite && exists) continue;
+    const assetKey = getAssetKey(record);
+    if (!options.overwrite && exists) {
+      manifest.assets[bucketName][assetKey] = await buildExistingManifestEntry(record);
+      continue;
+    }
+    delete manifest.assets[bucketName][assetKey];
     candidates.push(record);
   }
 
@@ -318,6 +343,7 @@ async function main() {
     portraits: summarizeBucket(manifest.assets.portraits),
     items: summarizeBucket(manifest.assets.items),
     skills: summarizeBucket(manifest.assets.skills),
+    modules: summarizeBucket(manifest.assets.modules),
   };
 
   if (!options.dryRun) {

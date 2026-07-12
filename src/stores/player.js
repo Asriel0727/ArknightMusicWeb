@@ -166,7 +166,8 @@ export const characterState = reactive({
 // Modal狀態
 export const modalState = reactive({
   isOpen: false,
-  currentView: 'album', // 'album', 'player', 或 'character'
+  currentView: 'album', // 'album', 'player', 'character' 或 'character-share'
+  characterPortraitId: '',
 });
 
 // 下拉列表狀態

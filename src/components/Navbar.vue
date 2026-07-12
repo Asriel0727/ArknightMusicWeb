@@ -450,7 +450,8 @@ onMounted(() => {
   }
 
   .brand-mark {
-    justify-content: flex-start;
+    width: 100%;
+    justify-content: center;
     min-width: 0;
     padding-left: 0;
     padding-top: 7px;

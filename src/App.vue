@@ -41,8 +41,8 @@ import ParticleBackground from './components/ParticleBackground.vue';
 import Navbar from './components/Navbar.vue';
 import TopBar from './components/TopBar.vue';
 import Modal from './components/Modal.vue';
-import { fetchAlbumDetails } from './services/api.js';
-import { initAudioPlayer, modalState, albumState, playSongFromMasterList } from './stores/player.js';
+import { fetchAlbumDetails, fetchCharacterDetails } from './services/api.js';
+import { initAudioPlayer, modalState, albumState, characterState, playSongFromMasterList } from './stores/player.js';
 
 const AlbumList = defineAsyncComponent(() => import('./components/AlbumList.vue'));
 const CharacterList = defineAsyncComponent(() => import('./components/CharacterList.vue'));
@@ -76,7 +76,16 @@ const audioPreloadMode = window.matchMedia('(hover: none) and (pointer: coarse)'
   ? 'metadata'
   : 'auto';
 
+const clearSharedCharacterUrl = () => {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('operator') && !url.searchParams.has('portrait')) return;
+  url.searchParams.delete('operator');
+  url.searchParams.delete('portrait');
+  window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+};
+
 const handlePageChange = (page) => {
+  clearSharedCharacterUrl();
   currentPage.value = page;
 };
 
@@ -97,6 +106,7 @@ const handleViewAlbum = async (albumId) => {
 };
 
 const handleModalClose = (target) => {
+  clearSharedCharacterUrl();
   modalState.isOpen = false;
   if (target === 'home') {
     currentPage.value = 'albums';
@@ -118,11 +128,30 @@ const handleSharedSongLink = async () => {
   modalState.isOpen = true;
 };
 
+const handleSharedCharacterLink = async () => {
+  const params = new URLSearchParams(window.location.search);
+  const characterId = params.get('operator');
+  const portraitId = params.get('portrait') || '';
+  if (!characterId) return;
+
+  currentPage.value = 'characters';
+  try {
+    characterState.currentCharacterDetails = await fetchCharacterDetails(characterId);
+    modalState.characterPortraitId = portraitId;
+    modalState.currentView = 'character-share';
+    modalState.isOpen = true;
+    clearSharedCharacterUrl();
+  } catch (error) {
+    console.error('Error fetching shared operator:', error);
+  }
+};
+
 onMounted(() => {
   if (audioPlayerRef.value) {
     initAudioPlayer(audioPlayerRef.value);
   }
 
+  handleSharedCharacterLink();
   handleSharedSongLink();
 });
 </script>
