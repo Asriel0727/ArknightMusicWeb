@@ -7,6 +7,9 @@
     "build": "vite build",
     "build:portable": "vite build --base ./ --outDir dist-portable",
     "preview": "vite preview",
+    "worker:dev": "wrangler dev",
+    "worker:dry-run": "wrangler deploy --dry-run",
+    "worker:deploy": "wrangler deploy",
     "assets:audit": "node scripts/assets/audit-operator-assets.mjs",
     "assets:sync": "node scripts/assets/sync-operator-assets.mjs"
   },
@@ -18,6 +21,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "wrangler": "^4.111.0"
   }
 }

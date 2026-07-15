@@ -23,7 +23,8 @@
     </template>
 
     <template v-else-if="currentPage === 'recruitment'">
-      <RecruitmentCalculator />
+      <RecruitmentCalculator @view-character="handleViewCharacter" />
+      <Modal @close="handleModalClose" />
     </template>
 
     <template v-else-if="currentPage === 'library'">
@@ -107,6 +108,35 @@ const handleViewAlbum = async (albumId) => {
     modalState.isOpen = true;
   } catch (error) {
     console.error('Error fetching album details:', error);
+  }
+};
+
+let characterDetailLoadToken = 0;
+const handleViewCharacter = async (character) => {
+  if (!character?.id) return;
+
+  const loadToken = ++characterDetailLoadToken;
+  characterState.currentCharacterDetails = {
+    ...character,
+    rarity: Math.max(0, Number(character.rarity || 1) - 1),
+    portraits: character.portraits || [],
+    traitDescription: character.traitDescription || '',
+  };
+  modalState.currentView = 'character';
+  modalState.isOpen = true;
+
+  try {
+    const details = await fetchCharacterDetails(character.id);
+    if (
+      loadToken === characterDetailLoadToken
+      && modalState.isOpen
+      && modalState.currentView === 'character'
+      && characterState.currentCharacterDetails?.id === character.id
+    ) {
+      characterState.currentCharacterDetails = details;
+    }
+  } catch (error) {
+    console.error('Error fetching recruitment operator details:', error);
   }
 };
 

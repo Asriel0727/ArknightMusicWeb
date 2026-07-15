@@ -45,14 +45,23 @@
           <img :src="currentPortraitUrl" :alt="character.name" decoding="async" fetchpriority="high"
             @error="handlePortraitError" @load="handlePortraitLoad">
         </div>
-        <div class="operator-skin-switcher" v-if="allPortraits.length > 1">
-          <div class="skin-switcher-label"><i class="fas fa-tshirt"></i><span>{{ cleanSectionLabel('portrait') }}</span></div>
-          <div class="skin-option-list">
-            <button v-for="(portrait, index) in allPortraits" :key="portrait.skinId || `skin-${index}`" type="button"
-              :class="{ active: currentPortraitIndex === index }" :title="portrait.name" @click="selectPortrait(index)">
-              <img :src="getPortraitPreviewUrl(portrait)" :alt="portrait.name" loading="lazy">
-              <span>{{ portrait.name }}</span>
-            </button>
+        <div class="operator-skin-switcher" :class="{ expanded: isSkinSwitcherOpen }" v-if="allPortraits.length > 1">
+          <button class="skin-switcher-toggle" type="button" :aria-expanded="isSkinSwitcherOpen"
+            aria-controls="operator-skin-options" :aria-label="cleanSectionLabel('portrait')"
+            @click="isSkinSwitcherOpen = !isSkinSwitcherOpen">
+            <i class="fas fa-tshirt"></i>
+            <span>{{ allPortraits[currentPortraitIndex]?.name || cleanSectionLabel('portrait') }}</span>
+            <i :class="isSkinSwitcherOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+          </button>
+          <div v-show="isSkinSwitcherOpen" id="operator-skin-options" class="skin-switcher-panel">
+            <div class="skin-switcher-label"><span>{{ cleanSectionLabel('portrait') }}</span></div>
+            <div class="skin-option-list">
+              <button v-for="(portrait, index) in allPortraits" :key="portrait.skinId || `skin-${index}`" type="button"
+                :class="{ active: currentPortraitIndex === index }" :title="portrait.name" @click="selectPortrait(index)">
+                <img :src="getPortraitPreviewUrl(portrait)" :alt="portrait.name" loading="lazy">
+                <span>{{ portrait.name }}</span>
+              </button>
+            </div>
           </div>
         </div>
         <div class="operator-identity">
@@ -604,6 +613,7 @@ const emit = defineEmits(['portrait-change']);
 
 const currentPortraitIndex = ref(0);
 const currentPortraitUrlIndex = ref(0);
+const isSkinSwitcherOpen = ref(false);
 const activeDetailTab = ref('overview');
 const selectedPhaseIndex = ref(0);
 const selectedSkillIndex = ref(0);
@@ -987,6 +997,7 @@ watch(() => props.character?.id, () => {
   activeTalentTooltipKey.value = '';
   currentPortraitIndex.value = 0;
   currentPortraitUrlIndex.value = 0;
+  isSkinSwitcherOpen.value = false;
   const portrait = allPortraits.value[0];
   emit('portrait-change', portrait?.portraitId || portrait?.skinId || '0');
 });
@@ -3346,31 +3357,69 @@ const handleAssetCandidateError = (event, urls = []) => {
 .operator-skin-switcher {
   left: 20px;
   right: auto;
-  width: min(360px, calc(100% - 40px));
-  grid-template-columns: 1fr;
-  gap: 6px;
-  padding: 7px;
+  width: min(200px, calc(100% - 40px));
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 5px;
   background: rgba(13, 17, 23, 0.84);
   backdrop-filter: blur(10px);
+  overflow: hidden;
+  transition: width 0.18s ease, background 0.18s ease;
 }
-.skin-switcher-label { display: flex; align-items: center; gap: 7px; color: var(--text-secondary); font-size: 0.7rem; font-weight: 700; }
+.operator-skin-switcher.expanded {
+  width: min(320px, calc(100% - 40px));
+  background: rgba(13, 17, 23, 0.94);
+}
+.operator-skin-switcher > .skin-switcher-toggle {
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 8px;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-color);
+  text-align: left;
+}
+.skin-switcher-toggle span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.skin-switcher-toggle > i:last-child {
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+}
+.skin-switcher-panel {
+  min-width: 0;
+  padding: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.skin-switcher-label { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.66rem; font-weight: 700; }
 .skin-option-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; }
 .operator-skin-switcher .skin-option-list button {
-  width: 76px;
-  min-width: 76px;
-  height: 64px;
-  min-height: 64px;
+  width: 68px;
+  min-width: 68px;
+  height: 58px;
+  min-height: 58px;
   padding: 3px;
   display: grid;
-  grid-template-rows: 40px 16px;
+  grid-template-rows: 35px 15px;
   overflow: hidden;
 }
-.skin-option-list img { width: 100%; height: 40px; object-fit: cover; object-position: center 18%; }
-.skin-option-list button span { height: auto; padding: 0; border: 0; background: transparent; overflow: hidden; font-size: 0.62rem; text-overflow: ellipsis; white-space: nowrap; }
+.skin-option-list img { width: 100%; height: 35px; object-fit: cover; object-position: center 18%; }
+.skin-option-list button span { height: auto; padding: 0; border: 0; background: transparent; overflow: hidden; font-size: 0.58rem; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 700px) {
-  .operator-skin-switcher { width: calc(100% - 28px); left: 14px; top: 12px; }
+  .operator-skin-switcher { width: min(190px, calc(100% - 28px)); left: 14px; top: 12px; }
+  .operator-skin-switcher.expanded { width: calc(100% - 28px); }
+  .skin-switcher-panel { max-height: 128px; }
   .operator-data-nav { overflow-x: auto; }
   .operator-data-nav button { min-width: max-content; padding-inline: 10px; }
 }

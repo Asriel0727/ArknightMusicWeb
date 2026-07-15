@@ -13,7 +13,8 @@ const IMAGE_MIRROR_DYNAMIC =
 const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const RECRUIT_OPERATORS_KEY = 'recruit:operators:v3';
-const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v3:';
+const RECRUIT_CALCULATOR_KEY_PREFIX = 'recruit:calculator:v2:';
+const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v4:';
 const RECRUIT_OPERATOR_CATALOG_KEY = 'recruit:operator-catalog:v1';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
@@ -231,6 +232,22 @@ export default {
       const data = await buildRecruitOperators(publicApiBase);
       await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
 
+      return json(data, 200, 3600);
+    }
+
+    if (url.pathname === '/api/recruit/calculator') {
+      const locale = normalizeRecruitCalculatorLocale(url.searchParams.get('locale'));
+      const key = `${RECRUIT_CALCULATOR_KEY_PREFIX}${locale}`;
+      const cached = await env.ARKNIGHTS_DATA.get(key, 'json');
+
+      if (cached) {
+        return json(cached, 200, 3600);
+      }
+
+      const data = await buildRecruitCalculatorOperators(locale);
+      await env.ARKNIGHTS_DATA.put(key, JSON.stringify(data), {
+        expirationTtl: 60 * 60 * 24,
+      });
       return json(data, 200, 3600);
     }
 
@@ -2803,6 +2820,88 @@ async function buildRecruitOperators(publicApiBase) {
   };
 }
 
+function normalizeRecruitCalculatorLocale(value) {
+  return ['zh-TW', 'zh-CN', 'en', 'ja', 'ko'].includes(value) ? value : 'en';
+}
+
+function getRecruitCalculatorExcelBase(locale) {
+  if (locale === 'ja') {
+    return 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/excel';
+  }
+  if (locale === 'ko') {
+    return 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/excel';
+  }
+  if (locale === 'en') {
+    return 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel';
+  }
+  return EXCEL_BASE;
+}
+
+function normalizeRecruitOperatorName(value) {
+  return String(value || '')
+    .normalize('NFKC')
+    .replace(/[\s·・.'’]/g, '')
+    .toLowerCase();
+}
+
+function parseRecruitOperatorNames(detail) {
+  const clean = String(detail || '')
+    .replace(/<@[^>]+>/g, '')
+    .replace(/<\/>/g, '')
+    .replace(/\\n/g, '\n');
+  const names = new Set();
+
+  for (const section of clean.split(/-{5,}/)) {
+    const lines = section.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const starIndex = lines.findIndex((line) => /^★{1,6}$/.test(line));
+    if (starIndex < 0) continue;
+
+    lines.slice(starIndex + 1).join(' ').split('/').forEach((name) => {
+      const normalized = normalizeRecruitOperatorName(name);
+      if (normalized) names.add(normalized);
+    });
+  }
+
+  return names;
+}
+
+async function buildRecruitCalculatorOperators(locale) {
+  const excelBase = getRecruitCalculatorExcelBase(locale);
+  const [characterTable, gachaTable] = await Promise.all([
+    fetchJson(`${excelBase}/character_table.json`),
+    fetchJson(`${excelBase}/gacha_table.json`),
+  ]);
+  const roster = parseRecruitOperatorNames(gachaTable.recruitDetail);
+  if (!roster.size) {
+    throw new Error(`Recruit roster is empty for locale: ${locale}`);
+  }
+  const operators = Object.entries(characterTable)
+    .filter(([, char]) => (
+      roster.has(normalizeRecruitOperatorName(char.name))
+      && char.profession !== 'TOKEN'
+      && char.profession !== 'TRAP'
+    ))
+    .map(([id, char]) => ({
+      id,
+      name: char.name,
+      // GameData rarity is zero-based (0-5); calculator UI uses stars (1-6).
+      rarity: parseRarity(char.rarity) + 1,
+      profession: char.profession,
+      position: char.position,
+      abilities: Array.isArray(char.tagList) ? char.tagList : [],
+    }));
+  if (!operators.length) {
+    throw new Error(`Recruit operators are empty for locale: ${locale}`);
+  }
+
+  return {
+    ok: true,
+    locale,
+    count: operators.length,
+    operators,
+  };
+}
+
 async function fetchJson(url) {
   const response = await fetch(url, {
     cf: {
@@ -2963,6 +3062,22 @@ function getPortraits(charId, char, skinTable, publicApiBase) {
   const portraits = [];
   const displaySkins = char.displaySkins || [];
   const phases = char.phases || [];
+
+  if (phases.length <= 1) {
+    const initialSkin = Object.values(skinTable?.charSkins || {}).find((skin) => {
+      return skin?.charId === charId
+        && skin.portraitId
+        && String(skin.displaySkin?.skinGroupId || '').startsWith('ILLUST_');
+    });
+    const portraitId = initialSkin?.portraitId || phases[0]?.displayId || `${charId}_1`;
+
+    portraits.push({
+      name: '立繪',
+      portraitId,
+      skinId: null,
+      urls: getPortraitUrls(portraitId, [`${charId}_1`], publicApiBase),
+    });
+  }
 
   if (phases.length > 1) {
     const phase1 = phases[1];

@@ -39,7 +39,33 @@ const DEFAULT_RECRUIT_API_BASE = 'https://arknights-recruit-api.molly27molly.wor
 const RECRUIT_API_BASE = (
   import.meta.env.VITE_RECRUIT_API_BASE || DEFAULT_RECRUIT_API_BASE
 ).replace(/\/$/, '');
+const recruitmentCalculatorCache = new Map();
+const recruitReleaseRequestCache = new Map();
+const RECRUIT_CALCULATOR_BROWSER_CACHE_PREFIX = 'recruit-calculator:v2:';
+const RECRUIT_RELEASE_BROWSER_CACHE_PREFIX = 'recruit-releases:v1:';
+const RECRUIT_CALCULATOR_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const RECRUIT_RELEASE_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 /** 圖片／歌詞 proxy 在網站根路徑（/api/proxy-* 會 404） */
+
+function readRecruitBrowserCache(key) {
+  try {
+    if (typeof window === 'undefined') return null;
+    const cached = JSON.parse(window.localStorage.getItem(key) || 'null');
+    return cached && Number.isFinite(cached.savedAt) ? cached : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeRecruitBrowserCache(key, value) {
+  try {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    }
+  } catch (error) {
+    console.warn('Recruit browser cache write failed:', error);
+  }
+}
 
 /** 歌曲詳情記憶體快取（切歌／重播會重複請求同一 cid） */
 const SONG_DETAILS_CACHE_TTL_MS = 45 * 60 * 1000;
@@ -675,8 +701,7 @@ export async function fetchRecruitCharacters() {
           || releasedByActivityProgress
           || (Number.isFinite(timestamp) && timestamp <= now)
           || releasedByLocalizedGameData
-          || releasedByCatalog
-          || (server === 'tw' && Boolean(cnRelease?.tw_name)),
+          || releasedByCatalog,
       };
     });
   } catch (error) {
@@ -685,10 +710,94 @@ export async function fetchRecruitCharacters() {
   }
 }
 
-export async function fetchRecruitReleaseDates(server) {
+export async function fetchRecruitReleaseSnapshot(server) {
   const normalized = ['cn', 'tw', 'global'].includes(server) ? server : 'global';
-  const data = await fetchRecruitApiJson(`/api/recruit/releases?server=${normalized}`);
-  return data.releases || [];
+  const cacheKey = `${RECRUIT_RELEASE_BROWSER_CACHE_PREFIX}${normalized}`;
+  const cached = readRecruitBrowserCache(cacheKey);
+  const cacheAge = cached ? Date.now() - cached.savedAt : Number.POSITIVE_INFINITY;
+
+  if (Array.isArray(cached?.releases) && cacheAge < RECRUIT_RELEASE_CACHE_TTL_MS) {
+    return { releases: cached.releases, source: 'browser-cache', stale: false };
+  }
+
+  if (!recruitReleaseRequestCache.has(normalized)) {
+    const request = fetchRecruitApiJson(`/api/recruit/releases?server=${normalized}`)
+      .then((data) => {
+        const releases = Array.isArray(data.releases) ? data.releases : [];
+        if (releases.length === 0) {
+          throw new Error('Recruit release payload is empty');
+        }
+        writeRecruitBrowserCache(cacheKey, { savedAt: Date.now(), releases });
+        return { releases, source: 'network', stale: false };
+      })
+      .catch((error) => {
+        console.warn('Recruit release API unavailable:', error);
+        if (Array.isArray(cached?.releases) && cached.releases.length > 0) {
+          return { releases: cached.releases, source: 'browser-cache', stale: true };
+        }
+        return { releases: [], source: 'unavailable', stale: true };
+      })
+      .finally(() => recruitReleaseRequestCache.delete(normalized));
+    recruitReleaseRequestCache.set(normalized, request);
+  }
+
+  return recruitReleaseRequestCache.get(normalized);
+}
+
+export async function fetchRecruitReleaseDates(server) {
+  const snapshot = await fetchRecruitReleaseSnapshot(server);
+  return snapshot.releases;
+}
+
+export async function fetchRecruitmentOperators(server, locale) {
+  const normalizedLocale = server === 'cn' || server === 'tw'
+    ? 'zh-CN'
+    : (['en', 'ja', 'ko'].includes(locale) ? locale : 'en');
+
+  const cacheKey = `${RECRUIT_CALCULATOR_BROWSER_CACHE_PREFIX}${normalizedLocale}`;
+  const cached = readRecruitBrowserCache(cacheKey);
+  const cacheAge = cached ? Date.now() - cached.savedAt : Number.POSITIVE_INFINITY;
+
+  if (
+    !recruitmentCalculatorCache.has(normalizedLocale)
+    && Array.isArray(cached?.operators)
+    && cached.operators.length > 0
+    && cacheAge < RECRUIT_CALCULATOR_CACHE_TTL_MS
+  ) {
+    recruitmentCalculatorCache.set(normalizedLocale, Promise.resolve(cached.operators));
+  }
+
+  if (!recruitmentCalculatorCache.has(normalizedLocale)) {
+    const request = fetchRecruitApiJson(
+      `/api/recruit/calculator?locale=${encodeURIComponent(normalizedLocale)}`
+    ).then((data) => {
+      if (!Array.isArray(data.operators) || data.operators.length === 0) {
+        throw new Error('Recruit calculator payload is invalid');
+      }
+      const maximumRarity = Math.max(...data.operators.map((operator) => Number(operator.rarity) || 0));
+      const operators = maximumRarity <= 5
+        ? data.operators.map((operator) => ({
+            ...operator,
+            rarity: (Number(operator.rarity) || 0) + 1,
+          }))
+        : data.operators;
+      writeRecruitBrowserCache(cacheKey, {
+        savedAt: Date.now(),
+        operators,
+      });
+      return operators;
+    }).catch((error) => {
+      if (Array.isArray(cached?.operators) && cached.operators.length > 0) {
+        console.warn('Recruit calculator API unavailable; using stale browser cache:', error);
+        return cached.operators;
+      }
+      recruitmentCalculatorCache.delete(normalizedLocale);
+      throw error;
+    });
+    recruitmentCalculatorCache.set(normalizedLocale, request);
+  }
+
+  return recruitmentCalculatorCache.get(normalizedLocale);
 }
 
 function normalizeReleaseLookupName(value) {
@@ -974,6 +1083,21 @@ function resolveCharacterPortraits(charId, charData, skinTable) {
   const portraits = [];
   const displaySkins = charData.displaySkins || [];
   const eliteLabels = getApiBuiltLabels();
+
+  if (!charData.phases || charData.phases.length <= 1) {
+    const initialSkin = Object.values(skinTable?.charSkins || {}).find((skin) => (
+      skin?.charId === charId
+      && skin.portraitId
+      && String(skin.displaySkin?.skinGroupId || '').startsWith('ILLUST_')
+    ));
+    const portraitId = initialSkin?.portraitId || charData.phases?.[0]?.displayId || `${charId}_1`;
+    portraits.push({
+      name: eliteLabels.portraitFallback,
+      portraitId,
+      urls: getLocalFirstPortraitUrls(charId, portraitId, [`${charId}_1`]),
+      skinId: null
+    });
+  }
 
   if (charData.phases && charData.phases.length > 1) {
     const phase1 = charData.phases[1];
@@ -1356,6 +1480,21 @@ export async function fetchCharacterDetails(charId, excelOverride = '') {
     // 構建立繪列表（不包含初始：精一、精二 + skin_table 時裝）
     const portraits = [];
     const displaySkins = charData.displaySkins || [];
+
+    if (!charData.phases || charData.phases.length <= 1) {
+      const initialSkin = Object.values(skinTable?.charSkins || {}).find((skin) => (
+        skin?.charId === charId
+        && skin.portraitId
+        && String(skin.displaySkin?.skinGroupId || '').startsWith('ILLUST_')
+      ));
+      const portraitId = initialSkin?.portraitId || charData.phases?.[0]?.displayId || `${charId}_1`;
+      portraits.push({
+        name: getApiBuiltLabels().portraitFallback,
+        portraitId,
+        urls: getLocalFirstPortraitUrls(charId, portraitId, [`${charId}_1`]),
+        skinId: null
+      });
+    }
 
     // 精一立繪
     const eliteLabels = getApiBuiltLabels();
