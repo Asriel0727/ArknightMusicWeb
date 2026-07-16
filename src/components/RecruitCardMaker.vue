@@ -607,7 +607,7 @@ function getElitePortraitIndexes(detail) {
   return portraits
     .map((portrait, index) => ({ portrait, index, rank: getElitePortraitRank(portrait) }))
     .filter(({ portrait, rank }) => rank > 0 && getUsableImageUrls(portrait?.urls).length)
-    .sort((left, right) => left.rank - right.rank)
+    .sort((left, right) => right.rank - left.rank)
     .map(({ index }) => index);
 }
 

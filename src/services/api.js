@@ -41,7 +41,7 @@ const RECRUIT_API_BASE = (
 ).replace(/\/$/, '');
 const recruitmentCalculatorCache = new Map();
 const recruitReleaseRequestCache = new Map();
-const RECRUIT_CALCULATOR_BROWSER_CACHE_PREFIX = 'recruit-calculator:v2:';
+const RECRUIT_CALCULATOR_BROWSER_CACHE_PREFIX = 'recruit-calculator:v3:';
 const RECRUIT_RELEASE_BROWSER_CACHE_PREFIX = 'recruit-releases:v1:';
 const RECRUIT_CALCULATOR_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const RECRUIT_RELEASE_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
@@ -611,6 +611,31 @@ export async function fetchRecruitCharacters() {
         ...operator,
         releaseOrder: releaseOrder.get(operator.id) ?? 0,
       }));
+
+      // Worker 的角色清單是可快取快照，更新可能落後於最新 GameData。
+      // 直接合併本次已下載的 character_table，讓新角色不必等 Worker 手動重建快取才出現在角色頁與招募卡製作器。
+      const existingSourceIds = new Set(operators.map((operator) => operator.id));
+      for (const [id, char] of Object.entries(sourceTable)) {
+        if (
+          existingSourceIds.has(id)
+          || !id.startsWith('char_')
+          || !resolveCharacterTableDisplayName(char)
+          || char.rarity == null
+          || char.isNotObtainable === true
+          || char.profession === 'TOKEN'
+          || char.profession === 'TRAP'
+        ) {
+          continue;
+        }
+
+        operators.push(normalizeWorkerOperator({
+          id,
+          ...char,
+          factionId: resolveFactionId(char),
+          releaseOrder: releaseOrder.get(id) ?? 0,
+        }));
+        existingSourceIds.add(id);
+      }
     } else {
       operators = await fetchCharacters();
     }
@@ -744,17 +769,26 @@ export async function fetchRecruitReleaseSnapshot(server) {
   return recruitReleaseRequestCache.get(normalized);
 }
 
+function hasEliteRecruitPortrait(operator) {
+  return (operator?.portraits || []).some((portrait) => {
+    if (portrait?.skinId != null || !(portrait?.urls || []).some(Boolean)) return false;
+    return /(?:_|#)[12]$/.test(String(portrait.portraitId || ''));
+  });
+}
+
 export async function fetchRecruitReleaseDates(server) {
   const snapshot = await fetchRecruitReleaseSnapshot(server);
   return snapshot.releases;
 }
 
 export async function fetchRecruitmentOperators(server, locale) {
-  const normalizedLocale = server === 'cn' || server === 'tw'
-    ? 'zh-CN'
-    : (['en', 'ja', 'ko'].includes(locale) ? locale : 'en');
+  const normalizedLocale = ['zh-TW', 'zh-CN', 'en', 'ja', 'ko'].includes(locale)
+    ? locale
+    : 'en';
+  const pool = server === 'global' ? 'global' : 'cn';
+  const requestKey = `${pool}:${normalizedLocale}`;
 
-  const cacheKey = `${RECRUIT_CALCULATOR_BROWSER_CACHE_PREFIX}${normalizedLocale}`;
+  const cacheKey = `${RECRUIT_CALCULATOR_BROWSER_CACHE_PREFIX}${requestKey}`;
   const cached = readRecruitBrowserCache(cacheKey);
   const cacheAge = cached ? Date.now() - cached.savedAt : Number.POSITIVE_INFINITY;
 
@@ -767,9 +801,9 @@ export async function fetchRecruitmentOperators(server, locale) {
     recruitmentCalculatorCache.set(normalizedLocale, Promise.resolve(cached.operators));
   }
 
-  if (!recruitmentCalculatorCache.has(normalizedLocale)) {
+  if (!recruitmentCalculatorCache.has(requestKey)) {
     const request = fetchRecruitApiJson(
-      `/api/recruit/calculator?locale=${encodeURIComponent(normalizedLocale)}`
+      `/api/recruit/calculator?pool=${encodeURIComponent(pool)}&locale=${encodeURIComponent(normalizedLocale)}`
     ).then((data) => {
       if (!Array.isArray(data.operators) || data.operators.length === 0) {
         throw new Error('Recruit calculator payload is invalid');
@@ -791,13 +825,13 @@ export async function fetchRecruitmentOperators(server, locale) {
         console.warn('Recruit calculator API unavailable; using stale browser cache:', error);
         return cached.operators;
       }
-      recruitmentCalculatorCache.delete(normalizedLocale);
+      recruitmentCalculatorCache.delete(requestKey);
       throw error;
     });
-    recruitmentCalculatorCache.set(normalizedLocale, request);
+    recruitmentCalculatorCache.set(requestKey, request);
   }
 
-  return recruitmentCalculatorCache.get(normalizedLocale);
+  return recruitmentCalculatorCache.get(requestKey);
 }
 
 function normalizeReleaseLookupName(value) {
@@ -1240,6 +1274,11 @@ export async function fetchRecruitCharacterDetails(charId) {
     );
     if (!data.operator) {
       throw new Error('Recruit API operator payload is invalid');
+    }
+    // Worker 的角色詳情快取可能在新角色或圖檔補齊前缺少精一／精二立繪；
+    // 此時直接採用最新 GameData，避免招募卡沿用頭像或上一位角色的圖片。
+    if (!hasEliteRecruitPortrait(data.operator)) {
+      return fetchRecruitCharacterDetailsFromGameData(charId);
     }
     return normalizeWorkerRecruitDetail(data.operator);
   } catch (error) {

@@ -326,8 +326,10 @@ const filteredCharacters = computed(() => {
   });
   if (!sortNewestFirst.value) return filtered;
   return filtered.slice().sort((a, b) => {
-    const aTime = a.releaseAt ? Date.parse(a.releaseAt) : 0;
-    const bTime = b.releaseAt ? Date.parse(b.releaseAt) : 0;
+    // 未在目前伺服器實裝的角色沒有 releaseAt，改依陸服實裝時間排序，
+    // 才能反映後續內容的實際推出順序。
+    const aTime = Date.parse(a.releaseAt || a.cnReleaseAt || '') || 0;
+    const bTime = Date.parse(b.releaseAt || b.cnReleaseAt || '') || 0;
     if (aTime !== bTime) return bTime - aTime;
     return (b.releaseOrder ?? 0) - (a.releaseOrder ?? 0);
   });

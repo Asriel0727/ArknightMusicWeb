@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-12T15:15:45.478Z",
+  "generatedAt": "2026-07-16T03:54:22.940Z",
   "assets": {
     "avatars": {
       "char_4179_monstr": {
@@ -29289,13 +29289,30 @@
         "hash": "a0527abd92cb673953f913f86a716eb3d23accd8b3f221693a30186ef5dd49e0",
         "size": 2177505,
         "contentType": "image/png",
-        "sourceUrl": "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4215_buddy_mh%232.png",
-        "syncedAt": "2026-07-09T07:16:41.915Z",
+        "sourceUrl": "",
+        "syncedAt": "2026-07-16T03:54:21.991Z",
         "operatorId": "char_4215_buddy",
         "portraitId": "char_4215_buddy_mh#2",
         "skinId": "char_4215_buddy@mh#2",
         "category": "skin",
         "phase": null
+      },
+      "char_4215_buddy:char_4215_buddy_1": {
+        "id": "char_4215_buddy_1",
+        "type": "portrait",
+        "label": "罗德岛隐秘队 - 罗德岛隐秘队 Base",
+        "publicPath": "/images/operators/portraits/char_4215_buddy_1.png",
+        "relativePath": "public/images/operators/portraits/char_4215_buddy_1.png",
+        "hash": "2f6be0a2a40e802f1c79d10af8f4f60870bbd47475af57b750c9d70747e06ba6",
+        "size": 1232969,
+        "contentType": "image/png",
+        "sourceUrl": "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4215_buddy_1.png",
+        "syncedAt": "2026-07-16T03:54:22.940Z",
+        "operatorId": "char_4215_buddy",
+        "portraitId": "char_4215_buddy_1",
+        "skinId": null,
+        "category": "base",
+        "phase": 0
       }
     },
     "items": {
@@ -40750,7 +40767,7 @@
     "avatars": 420,
     "factions": 43,
     "classes": 8,
-    "portraits": 1286,
+    "portraits": 1287,
     "items": 85,
     "skills": 286,
     "modules": 474

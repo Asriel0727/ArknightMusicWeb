@@ -72,6 +72,9 @@
             <span>{{ getProfessionName(character.profession) }}</span>
             <span>{{ character.position === 'MELEE' ? t('character.melee') : t('character.ranged') }}</span>
             <span v-if="getFactionLabel(character.factionId)">{{ getFactionLabel(character.factionId) }}</span>
+            <span v-if="obtainTagLabel" class="operator-obtain-tag" :title="character.obtainApproach">
+              <i class="fas fa-gift"></i>{{ obtainTagLabel }}
+            </span>
           </div>
           <button v-if="authState.user" class="operator-list-command" type="button" @click="openCharacterListManager">
             <i class="fas fa-list-check"></i>
@@ -646,6 +649,14 @@ const detailTabs = computed(() => [
   { id: 'archive', label: cleanSectionLabel('handbook'), icon: 'fas fa-book' },
 ]);
 const activeTabLabel = computed(() => detailTabs.value.find((tab) => tab.id === activeDetailTab.value)?.label || '');
+const obtainTagLabel = computed(() => {
+  const text = String(props.character?.obtainApproach || '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!text) return '';
+  return text.length > 28 ? `${text.slice(0, 28)}…` : text;
+});
 const selectedPhase = computed(() => props.character?.phases?.[selectedPhaseIndex.value] || null);
 const selectedPhaseStats = computed(() => {
   const phase = selectedPhase.value;
@@ -2324,6 +2335,20 @@ const handleAssetCandidateError = (event, urls = []) => {
   font-size: 0.75rem;
 }
 
+.operator-role-line .operator-obtain-tag {
+  border-color: rgba(74, 156, 255, 0.48);
+  color: #b9dcff;
+  max-width: min(100%, 28ch);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operator-obtain-tag i {
+  margin-right: 4px;
+  color: #69b6ff;
+}
+
 .operator-skin-switcher {
   position: absolute;
   left: 24px;
@@ -2637,15 +2662,31 @@ const handleAssetCandidateError = (event, urls = []) => {
 
   .operator-game-stage {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(260px, 38dvh) minmax(420px, auto);
+    grid-template-rows: minmax(380px, 54dvh) minmax(420px, auto);
     height: auto;
     overflow: visible;
   }
 
   .operator-art-zone {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    opacity: 1;
+  }
+
+  .operator-art {
     position: relative;
     inset: auto;
-    opacity: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 50px 12px 0;
+  }
+
+  .operator-art img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    object-position: center bottom;
   }
 
   .operator-info-console {
@@ -2655,10 +2696,12 @@ const handleAssetCandidateError = (event, urls = []) => {
   }
 
   .operator-identity {
-    display: block;
-    left: 14px;
-    bottom: 14px;
-    max-width: calc(100% - 28px);
+    position: relative;
+    left: auto;
+    bottom: auto;
+    flex: 0 0 auto;
+    margin: 0 14px 14px;
+    max-width: none;
   }
 
   .operator-identity h2 { font-size: 2rem; }

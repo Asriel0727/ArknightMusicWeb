@@ -55,8 +55,8 @@
       </div>
     </div>
     <div class="navbar-right">
-      <div class="nav-utility-panel">
-        <div class="utility-stack">
+      <div class="nav-utility-panel" :class="{ 'mobile-utility-open': isMobileUtilityOpen }">
+        <div id="mobile-utility-stack" class="utility-stack">
           <div class="auth-box" :class="{ signed: authState.user }">
             <span class="session-indicator" aria-hidden="true"></span>
             <i class="fas fa-user-circle auth-icon" aria-hidden="true"></i>
@@ -82,19 +82,25 @@
         <div class="brand-mark">
           <img :src="`${baseUrl}logo.png`" :alt="$t('nav.logoAlt')" class="logo-img" />
         </div>
+        <button class="mobile-utility-toggle" type="button" :aria-expanded="isMobileUtilityOpen"
+          aria-controls="mobile-utility-stack" @click="isMobileUtilityOpen = !isMobileUtilityOpen">
+          <i :class="isMobileUtilityOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" aria-hidden="true"></i>
+          <span class="sr-only">{{ isMobileUtilityOpen ? 'Hide account options' : 'Show account options' }}</span>
+        </button>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAppLocale } from '../composables/useAppLocale.js';
 import { authState, initAuth, signOut } from '../services/auth.js';
 
 const { locale } = useI18n();
 const { setLocale } = useAppLocale();
+const isMobileUtilityOpen = ref(false);
 
 const localeModel = computed({
   get: () => locale.value,
@@ -158,6 +164,22 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   min-width: 0;
+}
+
+.mobile-utility-toggle {
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .navbar-right {
@@ -405,8 +427,40 @@ onMounted(() => {
 
 @media (max-width: 600px) {
   .main-navbar {
+    display: flex;
+    align-items: center;
     padding: 10px 10px;
     border-radius: 0 0 20px 20px;
+    overflow: hidden;
+  }
+
+  .navbar-left {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 2px 0;
+  }
+
+  .navbar-right {
+    flex: 0 0 auto;
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .nav-tabs {
+    width: max-content;
+  }
+
+  .mobile-utility-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(88, 166, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(88, 166, 255, 0.1);
+    color: var(--primary-color);
+    cursor: pointer;
   }
   
   .nav-tab {
@@ -414,23 +468,30 @@ onMounted(() => {
     font-size: 0.8rem;
     gap: 6px;
   }
-  
-  .nav-tab span {
-    display: none;
-  }
+
+  .nav-tab span { display: none; }
 
   .navbar-right {
     flex-shrink: 0;
   }
 
   .nav-utility-panel {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
-    padding: 8px;
+    grid-template-columns: auto auto;
+    gap: 6px;
+    padding: 6px;
     border-radius: 12px;
   }
 
-  .utility-stack {
+  .utility-stack { display: none; }
+
+  .nav-utility-panel.mobile-utility-open {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .nav-utility-panel.mobile-utility-open .utility-stack {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-row: 2;
     gap: 6px;
   }
 
@@ -458,13 +519,15 @@ onMounted(() => {
   }
 
   .brand-mark {
-    width: 100%;
+    width: auto;
+    grid-column: 1;
+    grid-row: 1;
     justify-content: center;
     min-width: 0;
     padding-left: 0;
-    padding-top: 7px;
+    padding-top: 0;
     border-left: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 0;
   }
 }
 </style>

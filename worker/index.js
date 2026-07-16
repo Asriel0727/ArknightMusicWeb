@@ -13,7 +13,7 @@ const IMAGE_MIRROR_DYNAMIC =
 const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const RECRUIT_OPERATORS_KEY = 'recruit:operators:v3';
-const RECRUIT_CALCULATOR_KEY_PREFIX = 'recruit:calculator:v2:';
+const RECRUIT_CALCULATOR_KEY_PREFIX = 'recruit:calculator:v3:';
 const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v4:';
 const RECRUIT_OPERATOR_CATALOG_KEY = 'recruit:operator-catalog:v1';
 const MUSIC_CACHE_PREFIX = 'music:api:v1:';
@@ -237,14 +237,15 @@ export default {
 
     if (url.pathname === '/api/recruit/calculator') {
       const locale = normalizeRecruitCalculatorLocale(url.searchParams.get('locale'));
-      const key = `${RECRUIT_CALCULATOR_KEY_PREFIX}${locale}`;
+      const pool = normalizeRecruitCalculatorPool(url.searchParams.get('pool'));
+      const key = `${RECRUIT_CALCULATOR_KEY_PREFIX}${pool}:${locale}`;
       const cached = await env.ARKNIGHTS_DATA.get(key, 'json');
 
       if (cached) {
         return json(cached, 200, 3600);
       }
 
-      const data = await buildRecruitCalculatorOperators(locale);
+      const data = await buildRecruitCalculatorOperators(locale, pool);
       await env.ARKNIGHTS_DATA.put(key, JSON.stringify(data), {
         expirationTtl: 60 * 60 * 24,
       });
@@ -2824,6 +2825,10 @@ function normalizeRecruitCalculatorLocale(value) {
   return ['zh-TW', 'zh-CN', 'en', 'ja', 'ko'].includes(value) ? value : 'en';
 }
 
+function normalizeRecruitCalculatorPool(value) {
+  return value === 'cn' || value === 'tw' ? 'cn' : 'global';
+}
+
 function getRecruitCalculatorExcelBase(locale) {
   if (locale === 'ja') {
     return 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/excel';
@@ -2865,31 +2870,41 @@ function parseRecruitOperatorNames(detail) {
   return names;
 }
 
-async function buildRecruitCalculatorOperators(locale) {
-  const excelBase = getRecruitCalculatorExcelBase(locale);
-  const [characterTable, gachaTable] = await Promise.all([
-    fetchJson(`${excelBase}/character_table.json`),
-    fetchJson(`${excelBase}/gacha_table.json`),
+async function buildRecruitCalculatorOperators(locale, pool) {
+  // 招募池與顯示語系分開：pool 決定可出現的幹員，locale 只決定姓名與 Tag。
+  const poolExcelBase = pool === 'global'
+    ? getRecruitCalculatorExcelBase('en')
+    : EXCEL_BASE;
+  const displayExcelBase = getRecruitCalculatorExcelBase(locale);
+  const [poolCharacterTable, gachaTable, displayCharacterTable] = await Promise.all([
+    fetchJson(`${poolExcelBase}/character_table.json`),
+    fetchJson(`${poolExcelBase}/gacha_table.json`),
+    displayExcelBase === poolExcelBase
+      ? Promise.resolve(null)
+      : fetchJson(`${displayExcelBase}/character_table.json`),
   ]);
   const roster = parseRecruitOperatorNames(gachaTable.recruitDetail);
   if (!roster.size) {
     throw new Error(`Recruit roster is empty for locale: ${locale}`);
   }
-  const operators = Object.entries(characterTable)
+  const operators = Object.entries(poolCharacterTable)
     .filter(([, char]) => (
       roster.has(normalizeRecruitOperatorName(char.name))
       && char.profession !== 'TOKEN'
       && char.profession !== 'TRAP'
     ))
-    .map(([id, char]) => ({
+    .map(([id, poolChar]) => {
+      const displayChar = displayCharacterTable?.[id] || poolChar;
+      return {
       id,
-      name: char.name,
+      name: displayChar.name || poolChar.name,
       // GameData rarity is zero-based (0-5); calculator UI uses stars (1-6).
-      rarity: parseRarity(char.rarity) + 1,
-      profession: char.profession,
-      position: char.position,
-      abilities: Array.isArray(char.tagList) ? char.tagList : [],
-    }));
+      rarity: parseRarity(poolChar.rarity) + 1,
+      profession: poolChar.profession,
+      position: poolChar.position,
+      abilities: Array.isArray(displayChar.tagList) ? displayChar.tagList : [],
+      };
+    });
   if (!operators.length) {
     throw new Error(`Recruit operators are empty for locale: ${locale}`);
   }
@@ -2897,6 +2912,7 @@ async function buildRecruitCalculatorOperators(locale) {
   return {
     ok: true,
     locale,
+    pool,
     count: operators.length,
     operators,
   };

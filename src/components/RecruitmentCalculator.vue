@@ -190,27 +190,44 @@ const loadData = async () => {
   loading.value = true; error.value = ''; releaseWarning.value = ''; selectedTags.value = [];
   try {
     const base = getRecruitmentGameDataExcelBase(server.value, locale.value);
-    const [loadedOperators, releases] = await Promise.all([
+    const [loadedOperators, releaseSnapshots] = await Promise.all([
       fetchRecruitmentOperators(server.value, locale.value).catch((cause) => {
         console.warn('Recruit calculator API fallback to GameData:', cause);
         return fetchFallbackOperators(base);
       }),
       server.value === 'tw'
-        ? fetchRecruitReleaseSnapshot('tw')
-        : Promise.resolve({ releases: [], source: 'not-needed', stale: false }),
+        ? Promise.all([
+            fetchRecruitReleaseSnapshot('tw'),
+            fetchRecruitReleaseSnapshot('cn'),
+          ])
+        : Promise.resolve([
+            { releases: [], source: 'not-needed', stale: false },
+            { releases: [], source: 'not-needed', stale: false },
+          ]),
     ]);
     if (currentLoadToken !== loadToken) return;
-    if (releases.source === 'unavailable') {
+    const [twReleaseSnapshot, cnReleaseSnapshot] = releaseSnapshots;
+    if (twReleaseSnapshot.source === 'unavailable') {
       releaseWarning.value = releaseWarningCopy.value.unavailable;
-    } else if (releases.stale) {
+    } else if (twReleaseSnapshot.stale || cnReleaseSnapshot.stale) {
       releaseWarning.value = releaseWarningCopy.value.stale;
     }
-    const futureReleaseRows = releases.releases.filter((row) => Date.parse(row.release_at) > Date.now());
-    const futureTwIds = new Set(futureReleaseRows.map((row) => row.character_id).filter(Boolean));
-    const futureTwNames = new Set(futureReleaseRows.flatMap((row) => [row.operator_name, row.cn_name, row.tw_name].map(normalizeName)));
+    const activeTwRelease = twReleaseSnapshot.releases
+      .filter((row) => Number.isFinite(Date.parse(row.release_at)) && Date.parse(row.release_at) <= Date.now())
+      .sort((a, b) => Date.parse(b.release_at) - Date.parse(a.release_at))[0];
+    const cnProgressCutoff = activeTwRelease?.event_name
+      ? cnReleaseSnapshot.releases
+          .filter((row) => row.event_name === activeTwRelease.event_name)
+          .reduce((latest, row) => Math.max(latest, Date.parse(row.release_at) || 0), 0)
+      : 0;
+    const unreleasedTwRows = cnProgressCutoff > 0
+      ? cnReleaseSnapshot.releases.filter((row) => Date.parse(row.release_at) > cnProgressCutoff)
+      : [];
+    const unreleasedTwIds = new Set(unreleasedTwRows.map((row) => row.character_id).filter(Boolean));
+    const unreleasedTwNames = new Set(unreleasedTwRows.flatMap((row) => [row.operator_name, row.cn_name, row.tw_name].map(normalizeName)));
     operators.value = loadedOperators.filter((operator) => (
       server.value !== 'tw'
-      || (!futureTwIds.has(operator.id) && !futureTwNames.has(normalizeName(operator.name)))
+      || (!unreleasedTwIds.has(operator.id) && !unreleasedTwNames.has(normalizeName(operator.name)))
     )).map((operator) => locale.value === 'zh-TW' ? {
       ...operator,
       name: toTraditionalGameDataText(operator.name),

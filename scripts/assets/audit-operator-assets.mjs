@@ -80,6 +80,7 @@ function parseArgs(argv) {
     output: DEFAULT_OUTPUT_PATH,
     includePortraits: false,
     detailLimit: 0,
+    operatorId: '',
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -99,6 +100,9 @@ function parseArgs(argv) {
       options.includePortraits = true;
     } else if (arg === '--detail-limit' && next) {
       options.detailLimit = Number.parseInt(next, 10) || 0;
+      index += 1;
+    } else if (arg === '--operator-id' && next) {
+      options.operatorId = next;
       index += 1;
     } else if (arg === '--help' || arg === '-h') {
       printHelp();
@@ -126,6 +130,7 @@ Options:
   --output <path>        Audit report path. Default: ${DEFAULT_OUTPUT_PATH}
   --include-portraits    Also fetch operator details and audit portrait assets.
   --detail-limit <n>     Limit detail requests when auditing portraits. 0 means no limit.
+  --operator-id <id>     Audit one operator only (useful when syncing a newly added portrait).
 `);
 }
 
@@ -396,12 +401,38 @@ async function fetchJson(url) {
   return response.json();
 }
 
-async function fetchOperators(apiBase) {
-  const payload = await fetchJson(`${apiBase}/api/recruit/operators`);
+async function fetchOperators(apiBase, gameDataBase) {
+  const [payload, characterTable] = await Promise.all([
+    fetchJson(`${apiBase}/api/recruit/operators`),
+    fetchGameDataTable(gameDataBase, 'character_table', {}),
+  ]);
   if (!Array.isArray(payload.operators)) {
     throw new Error('Recruit operators payload is invalid.');
   }
-  return payload.operators;
+  const operators = new Map(payload.operators.map((operator) => [operator.id, operator]));
+
+  // Worker roster 是快取快照；直接以最新 GameData 補齊，避免新角色等到 Worker 同步後才進入圖片排程。
+  for (const [id, character] of Object.entries(characterTable || {})) {
+    if (
+      !id.startsWith('char_')
+      || !character?.name
+      || character.rarity == null
+      || character.profession === 'TOKEN'
+      || character.profession === 'TRAP'
+      || character.isNotObtainable === true
+    ) continue;
+    if (operators.has(id)) continue;
+    operators.set(id, {
+      id,
+      name: character.name,
+      appellation: character.appellation || '',
+      rarity: character.rarity,
+      profession: character.profession,
+      factionId: character.teamId || character.groupId || character.nationId || '',
+    });
+  }
+
+  return [...operators.values()];
 }
 
 async function fetchOperatorDetail(apiBase, operatorId) {
@@ -515,9 +546,12 @@ async function auditClasses(operators) {
 async function auditPortraits(options, operators) {
   if (!options.includePortraits) return { records: [], errors: [] };
 
-  const targetOperators = options.detailLimit > 0
-    ? operators.slice(0, options.detailLimit)
+  const matchingOperators = options.operatorId
+    ? operators.filter((operator) => operator.id === options.operatorId)
     : operators;
+  const targetOperators = options.detailLimit > 0
+    ? matchingOperators.slice(0, options.detailLimit)
+    : matchingOperators;
 
   const [charTable, skinTable] = await Promise.all([
     fetchGameDataTable(options.gameDataBase, 'character_table', {}),
@@ -542,6 +576,25 @@ async function auditPortraits(options, operators) {
 
     const displaySkins = Array.isArray(charData.displaySkins) ? charData.displaySkins : [];
     const phases = Array.isArray(charData.phases) ? charData.phases : [];
+
+    if (phases.length <= 1) {
+      const initialSkin = Object.values(skinTable?.charSkins || {}).find((skin) => (
+        skin?.charId === operator.id
+        && skin.portraitId
+        && String(skin.displaySkin?.skinGroupId || '').startsWith('ILLUST_')
+      ));
+      const portraitId = initialSkin?.portraitId || phases[0]?.displayId || `${operator.id}_1`;
+      portraits.push({
+        operatorId: operator.id,
+        operatorName: operator.name || operator.id,
+        portraitId,
+        skinId: null,
+        name: `${operator.name || operator.id} Base`,
+        sourceUrls: getPortraitSourceUrls(portraitId, [`${operator.id}_1`]),
+        category: 'base',
+        phase: 0,
+      });
+    }
 
     if (phases.length > 1) {
       const phase1 = phases[1];
@@ -809,7 +862,7 @@ async function main() {
 
   console.log(`Recruit API: ${options.apiBase}`);
   console.log(`GameData: ${options.gameDataBase}`);
-  const operators = await fetchOperators(options.apiBase);
+  const operators = await fetchOperators(options.apiBase, options.gameDataBase);
   console.log(`Operators: ${operators.length}`);
 
   const [avatars, factions, classes, portraitAudit, items, skills, modules] = await Promise.all([
@@ -832,6 +885,7 @@ async function main() {
       gameDataBase: options.gameDataBase,
       includePortraits: options.includePortraits,
       detailLimit: options.detailLimit,
+      operatorId: options.operatorId,
     },
     paths: {
       avatars: 'public/images/operators/avatars',

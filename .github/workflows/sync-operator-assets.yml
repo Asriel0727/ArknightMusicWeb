@@ -3,10 +3,13 @@ name: Sync operator assets
 on:
   workflow_dispatch:
   schedule:
-    - cron: '20 18 * * 0'
+    # 每日 02:20（Asia/Taipei）
+    - cron: '20 18 * * *'
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: sync-operator-assets
@@ -16,6 +19,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    outputs:
+      assets_changed: ${{ steps.commit.outputs.assets_changed }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,10 +37,12 @@ jobs:
             npm run assets:sync -- --type "$type"
           done
       - name: Commit updated assets
+        id: commit
         shell: bash
         run: |
           if git diff --quiet; then
             echo "No asset changes."
+            echo "assets_changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -43,3 +50,28 @@ jobs:
           git add public/images
           git commit -m "chore: sync operator assets"
           git push
+          echo "assets_changed=true" >> "$GITHUB_OUTPUT"
+      - name: Build updated site
+        if: steps.commit.outputs.assets_changed == 'true'
+        run: npm run build
+      - name: Configure Pages
+        if: steps.commit.outputs.assets_changed == 'true'
+        uses: actions/configure-pages@v4
+      - name: Upload Pages artifact
+        if: steps.commit.outputs.assets_changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy-pages:
+    if: needs.sync.outputs.assets_changed == 'true'
+    needs: sync
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
