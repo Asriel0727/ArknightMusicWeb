@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-17T08:58:37.223Z",
+  "generatedAt": "2026-07-17T09:56:38.784Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -2854,6 +2854,375 @@
       "size": 1287386,
       "hash": "b440bc5458652cfdf67acc74220b1a5c0b8e1efe58dca494e25ba1d49ae21825",
       "syncedAt": "2026-07-17T08:58:37.222Z"
+    },
+    "wiki-contingency-contract-obliteration": {
+      "publicPath": "/images/activities/wiki-contingency-contract-obliteration.webp",
+      "relativePath": "public/images/activities/wiki-contingency-contract-obliteration.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Obliteration_banner.png?aac9ee",
+      "contentType": "image/webp",
+      "size": 760206,
+      "hash": "99b349d891947d11e64a44bda72c5d82bb5bd54d4251c149e9fe8fc66544667a",
+      "syncedAt": "2026-07-17T09:56:32.358Z"
+    },
+    "wiki-stronghold-protocol-alliance-2nd-half": {
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance-2nd-half.webp",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance-2nd-half.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_Alliance_2nd_Half_banner.png?2d503e",
+      "contentType": "image/webp",
+      "size": 715858,
+      "hash": "900ce4777c79a002f880dc5719c86f54f5914d4862a4ae3d0ded9f368ce3a43b",
+      "syncedAt": "2026-07-17T09:56:32.393Z"
+    },
+    "wiki-vector-breakthrough-night-of-witchcraft": {
+      "publicPath": "/images/activities/wiki-vector-breakthrough-night-of-witchcraft.webp",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-night-of-witchcraft.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_Night_of_Witchcraft_banner.png?69ae2c",
+      "contentType": "image/webp",
+      "size": 804686,
+      "hash": "ad05cd92a0b47b951ee7c987087d37cc0851ea50a191d4064d83bbcc333b39d1",
+      "syncedAt": "2026-07-17T09:56:32.425Z"
+    },
+    "wiki-sui-s-garden-of-grotesqueries-mission-event": {
+      "publicPath": "/images/activities/wiki-sui-s-garden-of-grotesqueries-mission-event.webp",
+      "relativePath": "public/images/activities/wiki-sui-s-garden-of-grotesqueries-mission-event.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Sui%27s_Garden_of_Grotesqueries_Mission_Event_banner.png?d46d74",
+      "contentType": "image/webp",
+      "size": 414562,
+      "hash": "f75b89be64003a62f91cccb3ce65af34d4ff3b87b58473dc8211456862c62fd9",
+      "syncedAt": "2026-07-17T09:56:32.450Z"
+    },
+    "wiki-medjehtiqedti-bound": {
+      "publicPath": "/images/activities/wiki-medjehtiqedti-bound.webp",
+      "relativePath": "public/images/activities/wiki-medjehtiqedti-bound.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9",
+      "contentType": "image/webp",
+      "size": 937618,
+      "hash": "976f271280b33315706608a217db8cc5144ce5a28f99752c525657a164a323fb",
+      "syncedAt": "2026-07-17T09:56:32.524Z"
+    },
+    "wiki-trials-for-navigator-6": {
+      "publicPath": "/images/activities/wiki-trials-for-navigator-6.png",
+      "relativePath": "public/images/activities/wiki-trials-for-navigator-6.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Trials_for_Navigator_6_banner.png?7eb412",
+      "contentType": "image/png",
+      "size": 1039238,
+      "hash": "56472183ac69b1edc22a1f0d1d5771615cc4136478b2edeb79e969875e12d5d5",
+      "syncedAt": "2026-07-17T09:56:32.760Z"
+    },
+    "wiki-icebreaker-games-2": {
+      "publicPath": "/images/activities/wiki-icebreaker-games-2.png",
+      "relativePath": "public/images/activities/wiki-icebreaker-games-2.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Icebreaker_Games_2_banner.png?afacfa",
+      "contentType": "image/png",
+      "size": 892254,
+      "hash": "768252bea32a3ac6e72013d2d7ee4b7654fba08161c3ede941f65a52172400d9",
+      "syncedAt": "2026-07-17T09:56:32.977Z"
+    },
+    "wiki-trials-for-navigator-5": {
+      "publicPath": "/images/activities/wiki-trials-for-navigator-5.png",
+      "relativePath": "public/images/activities/wiki-trials-for-navigator-5.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Trials_for_Navigator_5_banner.png?a25da3",
+      "contentType": "image/png",
+      "size": 460870,
+      "hash": "1872f3b65643a7971092e55393b21ad35b9d14d6d4b916ebbd8de08bca6a1deb",
+      "syncedAt": "2026-07-17T09:56:33.176Z"
+    },
+    "wiki-integrated-lookback-back-to-castle": {
+      "publicPath": "/images/activities/wiki-integrated-lookback-back-to-castle.png",
+      "relativePath": "public/images/activities/wiki-integrated-lookback-back-to-castle.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Integrated_Lookback_Back_to_Castle_banner.png?772990",
+      "contentType": "image/png",
+      "size": 908711,
+      "hash": "14d45fbdef07296d125d8f556981404fa656a131b5ce1ad8cdb8795153c81b11",
+      "syncedAt": "2026-07-17T09:56:33.366Z"
+    },
+    "wiki-act-or-die": {
+      "publicPath": "/images/activities/wiki-act-or-die.webp",
+      "relativePath": "public/images/activities/wiki-act-or-die.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Act_or_Die_banner.png?eab616",
+      "contentType": "image/webp",
+      "size": 359478,
+      "hash": "17dfb8c3f0cf88b802deca2e72783728c672bc2a574f0a5ee28495e5eafe4059",
+      "syncedAt": "2026-07-17T09:56:33.436Z"
+    },
+    "wiki-paddles-up-login-event": {
+      "publicPath": "/images/activities/wiki-paddles-up-login-event.webp",
+      "relativePath": "public/images/activities/wiki-paddles-up-login-event.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Paddles_Up_Login_Event_banner.png?ac4e05",
+      "contentType": "image/webp",
+      "size": 588040,
+      "hash": "b7fba25daa19b3e86310184d03171e8df30eaa5abf5ba332b028dd4a4794a4cf",
+      "syncedAt": "2026-07-17T09:56:33.511Z"
+    },
+    "wiki-vector-breakthrough-inorganic-matters": {
+      "publicPath": "/images/activities/wiki-vector-breakthrough-inorganic-matters.png",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-inorganic-matters.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_Inorganic_Matters_banner.png?5f4e06",
+      "contentType": "image/png",
+      "size": 296583,
+      "hash": "fad0c73897708e0fbe800f886e0c95b9079b3ee1c1e5efe2a6ae349a3026c191",
+      "syncedAt": "2026-07-17T09:56:33.706Z"
+    },
+    "wiki-contingency-contract-extinguished-sins": {
+      "publicPath": "/images/activities/wiki-contingency-contract-extinguished-sins.png",
+      "relativePath": "public/images/activities/wiki-contingency-contract-extinguished-sins.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Extinguished_Sins_banner.png?82317e",
+      "contentType": "image/png",
+      "size": 1401241,
+      "hash": "e8b44a66b5668f9e96187a37979695d5400f632673c9e9880f89afb4d975e59e",
+      "syncedAt": "2026-07-17T09:56:33.929Z"
+    },
+    "wiki-echoes-of-terra": {
+      "publicPath": "/images/activities/wiki-echoes-of-terra.png",
+      "relativePath": "public/images/activities/wiki-echoes-of-terra.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/Echoes_of_Terra_banner.png?cb304a",
+      "contentType": "image/png",
+      "size": 1737890,
+      "hash": "1bca5dc4d53f9b0534ff811d98c3d82ce69223253f3cc223196a525065777af8",
+      "syncedAt": "2026-07-17T09:56:34.203Z"
+    },
+    "wiki-integrated-strategies-mission-event": {
+      "publicPath": "/images/activities/wiki-integrated-strategies-mission-event.png",
+      "relativePath": "public/images/activities/wiki-integrated-strategies-mission-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Integrated_Strategies_Mission_Event_banner.png?c4b846",
+      "contentType": "image/png",
+      "size": 789938,
+      "hash": "e2492f4705301d22954b6ea05fb50343591677e7c2600a95b324833526302a76",
+      "syncedAt": "2026-07-17T09:56:34.427Z"
+    },
+    "wiki-a-kazdelian-rescue": {
+      "publicPath": "/images/activities/wiki-a-kazdelian-rescue.png",
+      "relativePath": "public/images/activities/wiki-a-kazdelian-rescue.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_A_Kazdelian_Rescue_banner.png?85e1d9",
+      "contentType": "image/png",
+      "size": 1302842,
+      "hash": "89e298f3b7ae6fcc2dd0c5e3c0ba48ba771c3b088c638f74b39ed3f185afe03f",
+      "syncedAt": "2026-07-17T09:56:34.727Z"
+    },
+    "wiki-tactical-support-2": {
+      "publicPath": "/images/activities/wiki-tactical-support-2.png",
+      "relativePath": "public/images/activities/wiki-tactical-support-2.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Tactical_Support_2_banner.png?622497",
+      "contentType": "image/png",
+      "size": 542336,
+      "hash": "399e117a8e1aaee889f1e9ab72f5d5236d9929c9ce337c61c2a6f4226a94aaef",
+      "syncedAt": "2026-07-17T09:56:34.955Z"
+    },
+    "wiki-ideal-city-rerun": {
+      "publicPath": "/images/activities/wiki-ideal-city-rerun.png",
+      "relativePath": "public/images/activities/wiki-ideal-city-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ideal_City_Rerun_banner.png?5f773d",
+      "contentType": "image/png",
+      "size": 1450471,
+      "hash": "c57f25764cc40a9d40cb03e4fe80d0da93247fb86222c0d3b895f581f71d2d35",
+      "syncedAt": "2026-07-17T09:56:35.204Z"
+    },
+    "wiki-trials-for-navigator-3": {
+      "publicPath": "/images/activities/wiki-trials-for-navigator-3.png",
+      "relativePath": "public/images/activities/wiki-trials-for-navigator-3.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Trials_for_Navigator_3_banner.png?a957f0",
+      "contentType": "image/png",
+      "size": 892792,
+      "hash": "af3a9cd146e770d922ca681392cef2234cae18a63aa0adea269f3055ebb62918",
+      "syncedAt": "2026-07-17T09:56:35.422Z"
+    },
+    "wiki-contingency-contract-base-point": {
+      "publicPath": "/images/activities/wiki-contingency-contract-base-point.png",
+      "relativePath": "public/images/activities/wiki-contingency-contract-base-point.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Base_Point_banner.png?7dde97",
+      "contentType": "image/png",
+      "size": 1346761,
+      "hash": "e961d085ef975a435a83bd2a242453af6ef5a269f863537238aab6716504ee69",
+      "syncedAt": "2026-07-17T09:56:35.682Z"
+    },
+    "wiki-trials-for-navigator-2": {
+      "publicPath": "/images/activities/wiki-trials-for-navigator-2.png",
+      "relativePath": "public/images/activities/wiki-trials-for-navigator-2.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Trials_for_Navigator_2_banner.png?439287",
+      "contentType": "image/png",
+      "size": 906037,
+      "hash": "2b4001386a2ded45bd14ae481fae145365c5236931db1c8dba71d909d79abb61",
+      "syncedAt": "2026-07-17T09:56:35.905Z"
+    },
+    "wiki-episode-11-warm-up": {
+      "publicPath": "/images/activities/wiki-episode-11-warm-up.png",
+      "relativePath": "public/images/activities/wiki-episode-11-warm-up.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Episode_11_Warm-Up_banner.png?c6a136",
+      "contentType": "image/png",
+      "size": 1383885,
+      "hash": "289646168e9835d8545244501c5037a8f9ef31d7cf34c7ed388ff452dd0eed29",
+      "syncedAt": "2026-07-17T09:56:36.121Z"
+    },
+    "wiki-ideal-city": {
+      "publicPath": "/images/activities/wiki-ideal-city.png",
+      "relativePath": "public/images/activities/wiki-ideal-city.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ideal_City_banner.png?967055",
+      "contentType": "image/png",
+      "size": 1448670,
+      "hash": "3abcc0f365ea30eba2d48383b3a1f8a4c49597be989aa830d05288a33301a75d",
+      "syncedAt": "2026-07-17T09:56:36.364Z"
+    },
+    "wiki-contingency-contract-pine-soot": {
+      "publicPath": "/images/activities/wiki-contingency-contract-pine-soot.png",
+      "relativePath": "public/images/activities/wiki-contingency-contract-pine-soot.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Pine_Soot_banner.png?b21373",
+      "contentType": "image/png",
+      "size": 1315921,
+      "hash": "dafaf47dca70a8b024b36d3f990c2f279e24f6f44a9ce3cf13c3c71b41a14eb7",
+      "syncedAt": "2026-07-17T09:56:36.579Z"
+    },
+    "wiki-twilight-of-wolumonde-rerun": {
+      "publicPath": "/images/activities/wiki-twilight-of-wolumonde-rerun.png",
+      "relativePath": "public/images/activities/wiki-twilight-of-wolumonde-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Twilight_of_Wolumonde_Rerun_banner.png?fedcde",
+      "contentType": "image/png",
+      "size": 699848,
+      "hash": "a9b0a28f60869beca2f64ce6f5056429e7954434aa15ca74cab3ebba75f9db14",
+      "syncedAt": "2026-07-17T09:56:36.782Z"
+    },
+    "wiki-darknights-memoir-rerun": {
+      "publicPath": "/images/activities/wiki-darknights-memoir-rerun.png",
+      "relativePath": "public/images/activities/wiki-darknights-memoir-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Darknights_Memoir_Rerun_banner.png?998844",
+      "contentType": "image/png",
+      "size": 761056,
+      "hash": "b93013e94db0becdc3523c9ee4c1e77c820f4188cfd12bb43e3eb5058be651ad",
+      "syncedAt": "2026-07-17T09:56:36.962Z"
+    },
+    "wiki-maria-nearl": {
+      "publicPath": "/images/activities/wiki-maria-nearl.webp",
+      "relativePath": "public/images/activities/wiki-maria-nearl.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Maria_Nearl_banner.png?ba444f",
+      "contentType": "image/webp",
+      "size": 720110,
+      "hash": "a301a326271dd3971b18ce885e478d99f897ce53bfaf10901b04d9a33bbb630c",
+      "syncedAt": "2026-07-17T09:56:37.046Z"
+    },
+    "wiki-contingency-contract-blade": {
+      "publicPath": "/images/activities/wiki-contingency-contract-blade.png",
+      "relativePath": "public/images/activities/wiki-contingency-contract-blade.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Blade_banner.png?25ac54",
+      "contentType": "image/png",
+      "size": 1098847,
+      "hash": "cc761e0b04cf13bcf716484af7dda9fc4143cea29259cf2e9e7802bf9a1791e4",
+      "syncedAt": "2026-07-17T09:56:37.310Z"
+    },
+    "wiki-twilight-of-wolumonde": {
+      "publicPath": "/images/activities/wiki-twilight-of-wolumonde.webp",
+      "relativePath": "public/images/activities/wiki-twilight-of-wolumonde.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Twilight_of_Wolumonde_banner.png?4964f6",
+      "contentType": "image/webp",
+      "size": 445606,
+      "hash": "e3e6fb5c64dfc445890421ccf12116744615477d70805fc9df6483d380807be7",
+      "syncedAt": "2026-07-17T09:56:37.377Z"
+    },
+    "wiki-coexistence": {
+      "publicPath": "/images/activities/wiki-coexistence.webp",
+      "relativePath": "public/images/activities/wiki-coexistence.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Coexistence_banner.png?a0aae7",
+      "contentType": "image/webp",
+      "size": 461246,
+      "hash": "5e4b645543cbc382293b671d418f781e3319f5f4fe66d3441a73b4422de9e103",
+      "syncedAt": "2026-07-17T09:56:37.447Z"
+    },
+    "wiki-darknights-memoir": {
+      "publicPath": "/images/activities/wiki-darknights-memoir.png",
+      "relativePath": "public/images/activities/wiki-darknights-memoir.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Darknights_Memoir_banner.png?3aec64",
+      "contentType": "image/png",
+      "size": 933049,
+      "hash": "a3c85f17ba46863fc18ba8eb9abaff97266b623622c3fdbc9225da9d20f84b6a",
+      "syncedAt": "2026-07-17T09:56:37.649Z"
+    },
+    "wiki-contingency-contract-barrenland": {
+      "publicPath": "/images/activities/wiki-contingency-contract-barrenland.png",
+      "relativePath": "public/images/activities/wiki-contingency-contract-barrenland.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Barrenland_banner.png?c926fe",
+      "contentType": "image/png",
+      "size": 1291698,
+      "hash": "c52171b528f9a3f240a80a6c2b1fdd3e8d6353d4ad4b374a1a7a69e5edc35f45",
+      "syncedAt": "2026-07-17T09:56:37.875Z"
+    },
+    "wiki-necessary-solutions": {
+      "publicPath": "/images/activities/wiki-necessary-solutions.png",
+      "relativePath": "public/images/activities/wiki-necessary-solutions.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Necessary_Solutions_banner.png?e328ca",
+      "contentType": "image/png",
+      "size": 904506,
+      "hash": "a89086128b1949e19ff93bffbdc397987c244e220b3c81a196a8089e99703f8b",
+      "syncedAt": "2026-07-17T09:56:38.093Z"
+    },
+    "wiki-2024-login-event": {
+      "publicPath": "/images/activities/wiki-2024-login-event.png",
+      "relativePath": "public/images/activities/wiki-2024-login-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_2024_Login_Event_banner.png?e290fb",
+      "contentType": "image/png",
+      "size": 290350,
+      "hash": "703211e29807826893183b9a3a7a171199fde69976e74b9b930e98333f4ce401",
+      "syncedAt": "2026-07-17T09:56:38.150Z"
+    },
+    "wiki-rhodes-island-vacation": {
+      "publicPath": "/images/activities/wiki-rhodes-island-vacation.webp",
+      "relativePath": "public/images/activities/wiki-rhodes-island-vacation.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/Rhodes_Island_Vacation_wallpaper.png?428452",
+      "contentType": "image/webp",
+      "size": 1730834,
+      "hash": "a8a0d7f626773bec9d7f4e28afa013a7c889b0329ef11a86106e308caba42fdb",
+      "syncedAt": "2026-07-17T09:56:38.357Z"
+    },
+    "wiki-snow-upon-autumnal-winds-login-event": {
+      "publicPath": "/images/activities/wiki-snow-upon-autumnal-winds-login-event.webp",
+      "relativePath": "public/images/activities/wiki-snow-upon-autumnal-winds-login-event.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Snow_Upon_Autumnal_Winds_Login_Event_banner.png?1898cf",
+      "contentType": "image/webp",
+      "size": 584772,
+      "hash": "6931770c755593d8575d83db9e28bdd9e233a021c4fa781bedcd2e4fc069f297",
+      "syncedAt": "2026-07-17T09:56:38.427Z"
+    },
+    "wiki-2021-login-event": {
+      "publicPath": "/images/activities/wiki-2021-login-event.png",
+      "relativePath": "public/images/activities/wiki-2021-login-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_2021_Login_Event_banner.png?bb339c",
+      "contentType": "image/png",
+      "size": 973385,
+      "hash": "fef388672dbad5f30bf1a2e00db908d843b45d7a49c6cbea8c9638a4840dad0c",
+      "syncedAt": "2026-07-17T09:56:38.511Z"
+    },
+    "wiki-half-year-anniversary-warm-up": {
+      "publicPath": "/images/activities/wiki-half-year-anniversary-warm-up.webp",
+      "relativePath": "public/images/activities/wiki-half-year-anniversary-warm-up.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/Half_Year_Anniversary_Warm-Up_banner.png?d383d6",
+      "contentType": "image/webp",
+      "size": 397242,
+      "hash": "413627c4d7c0c5c655811f5d1edf11940076de7d9f0e08d53516e38433eb6249",
+      "syncedAt": "2026-07-17T09:56:38.568Z"
+    },
+    "wiki-3-million-downloads-celebration": {
+      "publicPath": "/images/activities/wiki-3-million-downloads-celebration.webp",
+      "relativePath": "public/images/activities/wiki-3-million-downloads-celebration.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_3_Million_Downloads_Celebration_banner.png?f62422",
+      "contentType": "image/webp",
+      "size": 731430,
+      "hash": "aab12c9e8eff1d0d783234ebebfcd65193459b7543be58875bac0c3ee883bb47",
+      "syncedAt": "2026-07-17T09:56:38.639Z"
+    },
+    "wiki-lifestyle-aid": {
+      "publicPath": "/images/activities/wiki-lifestyle-aid.webp",
+      "relativePath": "public/images/activities/wiki-lifestyle-aid.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Lifestyle_Aid_banner.png?a4ceba",
+      "contentType": "image/webp",
+      "size": 915956,
+      "hash": "05c1bc838b907457f50e544c2a9d8d251232e62af184ee801526805c5f2ada30",
+      "syncedAt": "2026-07-17T09:56:38.722Z"
+    },
+    "wiki-2020-sign-in-event": {
+      "publicPath": "/images/activities/wiki-2020-sign-in-event.webp",
+      "relativePath": "public/images/activities/wiki-2020-sign-in-event.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_2020_Sign-In_Event_banner.png?f00af6",
+      "contentType": "image/webp",
+      "size": 622744,
+      "hash": "de795be42cf8014f85a31a688b665f4e1380a32048801b4798146223d64fd20f",
+      "syncedAt": "2026-07-17T09:56:38.783Z"
     }
   }
 }
