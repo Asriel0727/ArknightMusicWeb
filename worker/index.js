@@ -993,16 +993,20 @@ async function syncActivities(env) {
   const prtsByTitle = buildPrtsActivitiesByTitle(prtsActivities);
 
   const activitiesByCode = new Map();
+  let wikiImageFallbacks = 0;
   for (const eventName of eventNames) {
     const code = normalizeActivityCode(eventName);
     if (!code || activitiesByCode.has(code)) continue;
     const detail = metadata.get(eventName);
     const prtsActivity = findPrtsActivityImage(prtsByTitle, detail?.name_i18n?.['zh-CN']);
+    const wikiImageUrl = wikiImageUrls.get(detail?.image_file) || '';
+    const imageUrl = prtsActivity?.image_url || wikiImageUrl || null;
+    if (!prtsActivity?.image_url && wikiImageUrl) wikiImageFallbacks += 1;
     const row = {
       code,
       name_i18n: Object.fromEntries(Object.entries(detail?.name_i18n || { en: eventName }).filter(([, value]) => value)),
       type: prtsActivity?.type || detail?.type || 'other',
-      image_url: prtsActivity?.image_url || wikiImageUrls.get(detail?.image_file) || null,
+      image_url: imageUrl,
       source_url: prtsActivity?.source_url || `${ARKNIGHTS_WIKI_API.replace('/api.php', '/wiki/')}${encodeURIComponent(eventName).replace(/%20/g, '_')}`,
       updated_at: new Date().toISOString(),
     };
@@ -1085,6 +1089,7 @@ async function syncActivities(env) {
     activities: activityRows.length,
     windows: syncedWindows,
     servers: Object.fromEntries(windowsByServer.map(({ server, windows }) => [server, windows.length])),
+    images: { wikiCandidates: wikiImageUrls.size, wikiFallbacks: wikiImageFallbacks },
     source: { wiki: ARKNIGHTS_WIKI_API, prts: PRTS_WIKI_API },
   };
 }
