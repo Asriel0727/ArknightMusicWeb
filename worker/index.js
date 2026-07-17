@@ -43,6 +43,18 @@ const ACTIVITY_IMAGE_OVERRIDES = {
   'wiki-sui-s-garden-of-grotesqueries-mission-event': 'https://arknights.wiki.gg/images/EN_Sui%27s_Garden_of_Grotesqueries_Mission_Event_banner.png?d46d74',
   'wiki-medjehtiqedti-bound': 'https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9',
 };
+
+function getActivityImageOverride(code, eventName) {
+  if (ACTIVITY_IMAGE_OVERRIDES[code]) return ACTIVITY_IMAGE_OVERRIDES[code];
+  const normalizedName = String(eventName || '').toLowerCase();
+  if (normalizedName.includes("sui's garden of grotesqueries")) {
+    return ACTIVITY_IMAGE_OVERRIDES['wiki-sui-s-garden-of-grotesqueries-mission-event'];
+  }
+  if (normalizedName.includes('medjehtiqedti')) {
+    return ACTIVITY_IMAGE_OVERRIDES['wiki-medjehtiqedti-bound'];
+  }
+  return '';
+}
 const OPERATOR_RELEASE_UPSERT_BATCH_SIZE = 100;
 const ACTIVITY_SYNC_UPSERT_BATCH_SIZE = 100;
 const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
@@ -1019,7 +1031,7 @@ async function syncActivities(env) {
     const detail = metadata.get(eventName);
     const prtsActivity = findPrtsActivityImage(prtsByTitle, detail?.name_i18n?.['zh-CN']);
     const wikiImageUrl = wikiImageUrls.get(detail?.image_file) || '';
-    const overrideImageUrl = ACTIVITY_IMAGE_OVERRIDES[code] || '';
+    const overrideImageUrl = getActivityImageOverride(code, eventName);
     const imageUrl = prtsActivity?.image_url || wikiImageUrl || overrideImageUrl || null;
     if (!prtsActivity?.image_url && (wikiImageUrl || overrideImageUrl)) wikiImageFallbacks += 1;
     const row = {
