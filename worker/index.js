@@ -760,8 +760,8 @@ async function fetchWikiActivityWindows(server) {
 async function fetchWikiActivityMetadata(eventNames) {
   const metadata = new Map();
   const uniqueNames = [...new Set(eventNames.filter(Boolean))];
-  for (let offset = 0; offset < uniqueNames.length; offset += 40) {
-    const titles = uniqueNames.slice(offset, offset + 40);
+  for (let offset = 0; offset < uniqueNames.length; offset += 15) {
+    const titles = uniqueNames.slice(offset, offset + 15);
     const params = new URLSearchParams({
       action: 'query',
       prop: 'revisions|images',
