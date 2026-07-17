@@ -43,8 +43,10 @@ const recruitmentCalculatorCache = new Map();
 const recruitReleaseRequestCache = new Map();
 const RECRUIT_CALCULATOR_BROWSER_CACHE_PREFIX = 'recruit-calculator:v3:';
 const RECRUIT_RELEASE_BROWSER_CACHE_PREFIX = 'recruit-releases:v1:';
+const ACTIVITY_BROWSER_CACHE_PREFIX = 'activities:v1:';
 const RECRUIT_CALCULATOR_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const RECRUIT_RELEASE_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const ACTIVITY_CACHE_TTL_MS = 15 * 60 * 1000;
 /** 圖片／歌詞 proxy 在網站根路徑（/api/proxy-* 會 404） */
 
 function readRecruitBrowserCache(key) {
@@ -547,32 +549,6 @@ function normalizeWorkerOperator(operator) {
   };
 }
 
-function normalizeWorkerRecruitDetail(operator) {
-  const factionId = normalizeWorkerFactionId(operator.factionId);
-  const factionName = normalizeWorkerFactionName(operator.factionName || operator.nationName, factionId);
-  return {
-    id: operator.id,
-    name: toTraditionalGameDataText(operator.name || ''),
-    appellation: operator.appellation || '',
-    profession: operator.profession || 'PIONEER',
-    rarity: operator.rarity ?? 0,
-    factionId,
-    nationName: toTraditionalGameDataText(factionName),
-    portraits: (operator.portraits || []).map((portrait) => ({
-      ...portrait,
-      name: toTraditionalGameDataText(portrait.name || portrait.portraitId || ''),
-      urls: portrait.urls || [],
-    })),
-    traitDescription: toTraditionalGameDataText(
-      normalizeEscapedNewlines(operator.traitDescription || '')
-    ),
-    recruitVoiceText: toTraditionalGameDataText(
-      normalizeEscapedNewlines(operator.recruitVoiceText || '')
-    ),
-    avatarUrl: operator.avatarUrl || AVATAR_SOURCES[0](operator.id),
-  };
-}
-
 function normalizeWorkerFactionId(rawFactionId) {
   if (!rawFactionId) return '';
   if (typeof rawFactionId === 'object') {
@@ -769,16 +745,34 @@ export async function fetchRecruitReleaseSnapshot(server) {
   return recruitReleaseRequestCache.get(normalized);
 }
 
-function hasEliteRecruitPortrait(operator) {
-  return (operator?.portraits || []).some((portrait) => {
-    if (portrait?.skinId != null || !(portrait?.urls || []).some(Boolean)) return false;
-    return /(?:_|#)[12]$/.test(String(portrait.portraitId || ''));
-  });
-}
-
 export async function fetchRecruitReleaseDates(server) {
   const snapshot = await fetchRecruitReleaseSnapshot(server);
   return snapshot.releases;
+}
+
+export async function fetchActivities(server) {
+  const normalized = ['cn', 'tw', 'global'].includes(server) ? server : 'global';
+  const cacheKey = `${ACTIVITY_BROWSER_CACHE_PREFIX}${normalized}`;
+  const cached = readRecruitBrowserCache(cacheKey);
+  const cacheAge = cached ? Date.now() - cached.savedAt : Number.POSITIVE_INFINITY;
+
+  if (Array.isArray(cached?.activities) && cacheAge < ACTIVITY_CACHE_TTL_MS) {
+    return { activities: cached.activities, source: 'browser-cache', stale: false };
+  }
+
+  try {
+    const data = await fetchRecruitApiJson(`/api/activities?server=${encodeURIComponent(normalized)}`);
+    const activities = Array.isArray(data.activities) ? data.activities : [];
+    writeRecruitBrowserCache(cacheKey, { savedAt: Date.now(), activities });
+    return { activities, source: 'network', stale: false };
+  } catch (error) {
+    console.warn('Activity API unavailable:', error);
+    return {
+      activities: Array.isArray(cached?.activities) ? cached.activities : [],
+      source: cached?.activities ? 'browser-cache' : 'unavailable',
+      stale: Boolean(cached?.activities),
+    };
+  }
 }
 
 export async function fetchRecruitmentOperators(server, locale) {
@@ -1264,27 +1258,9 @@ async function fetchRecruitCharacterDetailsFromGameData(charId) {
 }
 
 export async function fetchRecruitCharacterDetails(charId) {
-  if (!shouldUseRecruitWorkerApi()) {
-    return fetchRecruitCharacterDetailsFromGameData(charId);
-  }
-
-  try {
-    const data = await fetchRecruitApiJson(
-      `/api/recruit/operators/${encodeURIComponent(charId)}`
-    );
-    if (!data.operator) {
-      throw new Error('Recruit API operator payload is invalid');
-    }
-    // Worker 的角色詳情快取可能在新角色或圖檔補齊前缺少精一／精二立繪；
-    // 此時直接採用最新 GameData，避免招募卡沿用頭像或上一位角色的圖片。
-    if (!hasEliteRecruitPortrait(data.operator)) {
-      return fetchRecruitCharacterDetailsFromGameData(charId);
-    }
-    return normalizeWorkerRecruitDetail(data.operator);
-  } catch (error) {
-    console.warn('Recruit API detail fallback to local source:', error);
-    return fetchRecruitCharacterDetailsFromGameData(charId);
-  }
+  // 招募卡是圖片編輯功能，正確立繪比單次點選的快取命中更重要。
+  // 固定讀最新 GameData，避免 Worker 的角色詳情快取尚未重建時回傳舊圖或缺圖。
+  return fetchRecruitCharacterDetailsFromGameData(charId);
 }
 
 /**

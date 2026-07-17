@@ -48,6 +48,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchActivities } from '../services/activityApi.js';
 import { getLocalActivityImageUrl, loadActivityAssetManifest } from '../services/activityAssetManifest.js';
+import { normalizeChineseMusicText } from '../utils/s2tApiText.js';
 
 const { locale } = useI18n();
 const server = ref(locale.value === 'zh-TW' ? 'tw' : locale.value === 'zh-CN' ? 'cn' : 'global');
@@ -70,7 +71,8 @@ function localized(value) {
   const keys = locale.value === 'zh-TW' ? ['zh-TW', 'zh_tw', 'tw', 'zh-CN', 'en']
     : locale.value === 'zh-CN' ? ['zh-CN', 'zh_cn', 'cn', 'zh-TW', 'en']
       : [locale.value, 'en', 'zh-TW', 'zh-CN'];
-  return keys.map((key) => value[key]).find(Boolean) || Object.values(value).find(Boolean) || '—';
+  const text = keys.map((key) => value[key]).find(Boolean) || Object.values(value).find(Boolean) || '—';
+  return normalizeChineseMusicText(text, locale.value);
 }
 function poolTypeLabel(type) { return copy.value.pools[type] || type; }
 function activityImageUrl(activity) { return getLocalActivityImageUrl(activity?.code); }

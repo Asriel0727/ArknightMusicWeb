@@ -557,7 +557,12 @@ function applyPortraitFromDetail(detail, portraitIndex) {
   const portrait = portraits[portraitIndex] || portraits[0];
   const urls = getUsableImageUrls(portrait?.urls);
   const url = urls[0];
-  if (!url) return;
+  if (!url) {
+    portraitUrlCandidates.value = [];
+    portraitUrlCandidateIndex.value = 0;
+    setPortraitFromUrl('');
+    return;
+  }
 
   portraitUrlCandidates.value = urls;
   portraitUrlCandidateIndex.value = 0;
@@ -576,7 +581,12 @@ function onPortraitError() {
     .slice(nextIndex)
     .find((url) => !failedImageUrls.has(url));
 
-  if (!nextUrl) return;
+  if (!nextUrl) {
+    portraitUrlCandidates.value = [];
+    portraitUrlCandidateIndex.value = 0;
+    setPortraitFromUrl('');
+    return;
+  }
 
   portraitUrlCandidateIndex.value = portraitUrlCandidates.value.indexOf(nextUrl);
   setPortraitFromUrl(nextUrl);
@@ -607,7 +617,7 @@ function getElitePortraitIndexes(detail) {
   return portraits
     .map((portrait, index) => ({ portrait, index, rank: getElitePortraitRank(portrait) }))
     .filter(({ portrait, rank }) => rank > 0 && getUsableImageUrls(portrait?.urls).length)
-    .sort((left, right) => right.rank - left.rank)
+    .sort((left, right) => left.rank - right.rank)
     .map(({ index }) => index);
 }
 
@@ -678,6 +688,9 @@ function endPortraitDrag() {
 
 async function loadCharacterRecruitData(charId, options = {}) {
   const detailToken = ++recruitCharacterDetailToken;
+  portraitUrlCandidates.value = [];
+  portraitUrlCandidateIndex.value = 0;
+  setPortraitFromUrl('');
   try {
     const detail = await fetchRecruitCharacterDetails(charId);
     if (detailToken !== recruitCharacterDetailToken) return;
