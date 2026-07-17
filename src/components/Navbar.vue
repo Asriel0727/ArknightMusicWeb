@@ -44,6 +44,14 @@
           <span>{{ $t('nav.recruitment') }}</span>
         </button>
         <button
+          class="nav-tab"
+          :class="{ active: currentPage === 'activities' }"
+          @click="changePage('activities')"
+        >
+          <i class="fas fa-calendar-days"></i>
+          <span>{{ activityLabel }}</span>
+        </button>
+        <button
           v-if="authState.user"
           class="nav-tab"
           :class="{ active: currentPage === 'library' }"
@@ -101,6 +109,14 @@ import { authState, initAuth, signOut } from '../services/auth.js';
 const { locale } = useI18n();
 const { setLocale } = useAppLocale();
 const isMobileUtilityOpen = ref(false);
+const activityLabels = {
+  'zh-TW': '活動',
+  'zh-CN': '活动',
+  en: 'Activities',
+  ja: 'イベント',
+  ko: '이벤트',
+};
+const activityLabel = computed(() => activityLabels[locale.value] || activityLabels.en);
 
 const localeModel = computed({
   get: () => locale.value,

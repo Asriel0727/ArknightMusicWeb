@@ -11,7 +11,8 @@
     "worker:dry-run": "wrangler deploy --dry-run",
     "worker:deploy": "wrangler deploy",
     "assets:audit": "node scripts/assets/audit-operator-assets.mjs",
-    "assets:sync": "node scripts/assets/sync-operator-assets.mjs"
+    "assets:sync": "node scripts/assets/sync-operator-assets.mjs",
+    "activities:sync-assets": "node scripts/assets/sync-activity-assets.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",

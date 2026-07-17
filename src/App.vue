@@ -27,6 +27,10 @@
       <Modal @close="handleModalClose" />
     </template>
 
+    <template v-else-if="currentPage === 'activities'">
+      <ActivityList />
+    </template>
+
     <template v-else-if="currentPage === 'library'">
       <UserLibraryView />
       <Modal @close="handleModalClose" />
@@ -53,6 +57,7 @@ const AlbumList = defineAsyncComponent(() => import('./components/AlbumList.vue'
 const CharacterList = defineAsyncComponent(() => import('./components/CharacterList.vue'));
 const RecruitCardMaker = defineAsyncComponent(() => import('./components/RecruitCardMaker.vue'));
 const RecruitmentCalculator = defineAsyncComponent(() => import('./components/RecruitmentCalculator.vue'));
+const ActivityList = defineAsyncComponent(() => import('./components/ActivityList.vue'));
 const UserLibraryView = defineAsyncComponent(() => import('./components/UserLibraryView.vue'));
 const AuthView = defineAsyncComponent(() => import('./components/AuthView.vue'));
 

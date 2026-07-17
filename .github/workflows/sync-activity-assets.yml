@@ -1,0 +1,80 @@
+name: Sync activity assets
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/sync-activity-assets.yml'
+      - 'scripts/assets/sync-activity-assets.mjs'
+      - 'src/components/ActivityList.vue'
+      - 'src/services/activityApi.js'
+      - 'src/services/activityAssetManifest.js'
+  schedule:
+    # Worker 會在整點同步；延後 20 分鐘下載新的活動圖片。
+    - cron: '20 */6 * * *'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sync-activity-assets
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      assets_changed: ${{ steps.commit.outputs.assets_changed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Download activity images
+        run: npm run activities:sync-assets
+      - name: Commit updated activity assets
+        id: commit
+        shell: bash
+        run: |
+          if git diff --quiet -- public/images/activities; then
+            echo "No activity asset changes."
+            echo "assets_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/activities
+          git commit -m "chore: sync activity assets"
+          git push
+          echo "assets_changed=true" >> "$GITHUB_OUTPUT"
+      - name: Build updated site
+        if: steps.commit.outputs.assets_changed == 'true'
+        run: npm run build
+      - name: Configure Pages
+        if: steps.commit.outputs.assets_changed == 'true'
+        uses: actions/configure-pages@v4
+      - name: Upload Pages artifact
+        if: steps.commit.outputs.assets_changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy-pages:
+    if: needs.sync.outputs.assets_changed == 'true'
+    needs: sync
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

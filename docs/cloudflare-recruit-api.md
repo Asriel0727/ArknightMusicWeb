@@ -17,7 +17,6 @@ This file records the current backend state so the project can be resumed from a
 - Secret required: `SYNC_TOKEN`
 - Secret required for Supabase music mirror: `SUPABASE_SERVICE_ROLE_KEY`
 - Variable: `SUPABASE_URL=https://rdneemerltoxlfosazcz.supabase.co`
-- Setup token used during local testing: `ark-sync-2026`
 
 Do not commit real production secrets if the token is changed later.
 Never commit the Supabase service role key. Store it only as a Cloudflare Worker secret.
@@ -68,7 +67,24 @@ GET /proxy-audio?url=...
 GET /api/recruit/operators
 GET /api/recruit/operators/:charId
 GET /api/recruit/image?url=...
+GET /api/activities?server=tw|global|cn
 ```
+
+## Activity and recruitment archive
+
+Run [`activity-recruitment-schema.sql`](../docs/activity-recruitment-schema.sql) in the Supabase SQL editor before deploying the activity endpoint. The endpoint returns each activity window for the requested server, together with its linked recruitment pools and non-pool operator acquisition records.
+
+The schema intentionally keeps `activities` server-neutral and puts date ranges in `activity_windows`; the same activity can therefore have different windows on CN, Global, and Traditional Chinese servers without duplicating its translated names.
+
+Activity windows are synchronized automatically during the existing cron run. To backfill immediately after deployment:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://arknights-recruit-api.molly27molly.workers.dev/api/admin/sync-activities" `
+  -Headers @{ Authorization = "<SYNC_TOKEN>" }
+```
+
+PRTS is the authoritative CN source for Chinese activity names, categories, and CN time windows. Arknights Wiki supplies the matching English, Traditional Chinese, Japanese, and Korean names plus Global / TW windows. Activities that only exist in PRTS are kept as CN-only records. Recruitment pools and free-operator records remain separate curated data because neither source exposes those relationships as normalized records.
 
 Admin:
 

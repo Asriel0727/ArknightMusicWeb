@@ -35,9 +35,12 @@ const SUPPORTED_TRANSLATION_LOCALES = new Set(['zh-TW', 'zh-CN', 'en', 'ja', 'ko
 const DEFAULT_APP_ORIGIN = 'https://molly27molly.github.io/ArknightMusicWeb/';
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
 const ARKNIGHTS_WIKI_API = 'https://arknights.wiki.gg/api.php';
+const PRTS_WIKI_API = 'https://prts.wiki/api.php';
 const ARKNIGHTS_WIKI_OPERATOR_LIST = 'https://arknights.wiki.gg/wiki/Operator/List';
 const OPERATOR_RELEASE_SERVERS = new Set(['cn', 'global', 'tw']);
+const ACTIVITY_SERVERS = new Set(['cn', 'global', 'tw']);
 const OPERATOR_RELEASE_UPSERT_BATCH_SIZE = 100;
+const ACTIVITY_SYNC_UPSERT_BATCH_SIZE = 100;
 const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
 const MAX_SONG_DETAIL_PREWARM_LIMIT = 10;
 const DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT = 5;
@@ -165,6 +168,13 @@ export default {
       return json({ ok: true, ...result, catalog, time: new Date().toISOString() });
     }
 
+    if (url.pathname === '/api/admin/sync-activities') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) return unauthorized;
+      const result = await syncActivities(env);
+      return json({ ok: true, ...result, time: new Date().toISOString() });
+    }
+
     if (url.pathname === '/api/admin/prewarm-music-albums') {
       const unauthorized = requireAdminToken(request, env);
       if (unauthorized) {
@@ -279,6 +289,57 @@ export default {
       return json({ ok: true, server, releases, source: 'wiki-live' }, 200, 900);
     }
 
+    if (url.pathname === '/api/activities') {
+      const server = normalizeActivityServer(url.searchParams.get('server'));
+      if (!server) {
+        return json({ ok: false, error: 'Invalid server' }, 400);
+      }
+      if (!hasSupabaseConfig(env)) {
+        return json({ ok: false, error: 'Supabase is not configured' }, 503);
+      }
+
+      const [windows, pools, acquisitionRecords] = await Promise.all([
+        supabaseRestRequest(env, 'activity_windows', {
+          query: `?server=eq.${server}&select=id,activity_id,server,start_at,end_at,activities(id,code,name_i18n,type,image_url,source_url)&order=start_at.desc`,
+        }),
+        supabaseRestRequest(env, 'recruitment_pools', {
+          query: `?server=eq.${server}&select=id,activity_id,kind,name_i18n,start_at,end_at,source_url&order=start_at.desc`,
+        }),
+        supabaseRestRequest(env, 'operator_acquisition_records', {
+          query: `?server=eq.${server}&select=id,activity_id,operator_id,operator_name_i18n,acquisition_type,source_url&order=created_at.desc`,
+        }),
+      ]);
+
+      const activities = new Map();
+      for (const window of windows || []) {
+        const activity = window.activities;
+        if (!activity?.id) continue;
+        activities.set(activity.id, {
+          ...activity,
+          window: {
+            id: window.id,
+            server: window.server,
+            start_at: window.start_at,
+            end_at: window.end_at,
+          },
+          recruitment_pools: [],
+          operator_acquisitions: [],
+        });
+      }
+      for (const pool of pools || []) {
+        if (pool.activity_id && activities.has(pool.activity_id)) {
+          activities.get(pool.activity_id).recruitment_pools.push(pool);
+        }
+      }
+      for (const record of acquisitionRecords || []) {
+        if (record.activity_id && activities.has(record.activity_id)) {
+          activities.get(record.activity_id).operator_acquisitions.push(record);
+        }
+      }
+
+      return json({ ok: true, server, activities: [...activities.values()] }, 200, 300);
+    }
+
     if (url.pathname === '/api/recruit/operator-catalog') {
       const snapshot = await env.ARKNIGHTS_DATA.get(RECRUIT_OPERATOR_CATALOG_KEY, 'json');
       if (snapshot?.operators?.length) {
@@ -382,6 +443,9 @@ export default {
           syncOperatorReleaseDates(env).catch((error) => {
             console.warn('Operator release sync failed:', error.message);
           }),
+          syncActivities(env).catch((error) => {
+            console.warn('Activity sync failed:', error.message);
+          }),
         ])
       );
     }
@@ -420,6 +484,11 @@ function hasSupabaseConfig(env) {
 function normalizeOperatorReleaseServer(value) {
   const server = String(value || '').toLowerCase();
   return OPERATOR_RELEASE_SERVERS.has(server) ? server : '';
+}
+
+function normalizeActivityServer(value) {
+  const server = String(value || '').toLowerCase();
+  return ACTIVITY_SERVERS.has(server) ? server : '';
 }
 
 function normalizeOperatorReleaseKey(value) {
@@ -620,6 +689,332 @@ function deduplicateOperatorReleaseRows(rows) {
   });
 
   return [...uniqueRows.values()];
+}
+
+function normalizeActivityCode(value) {
+  const normalized = String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return normalized ? `wiki-${normalized}` : '';
+}
+
+function normalizeActivityType(value) {
+  const type = String(value || '').trim().toLowerCase().replace(/[ _-]+/g, '_');
+  if (type === 'side_story') return 'side_story';
+  if (type === 'intermezzi') return 'intermezzi';
+  if (type === 'collaboration') return 'collaboration';
+  if (type === 'campaign') return 'campaign';
+  if (type === 'anniversary') return 'anniversary';
+  return 'other';
+}
+
+function normalizePrtsActivityType(categories) {
+  const values = (categories || []).map((category) => String(category || ''));
+  if (values.some((value) => value.includes('联动') || value.includes('合作'))) return 'collaboration';
+  if (values.some((value) => value.includes('周年') || value.includes('纪念'))) return 'anniversary';
+  if (values.some((value) => value.includes('支线故事'))) return 'side_story';
+  if (values.some((value) => value.includes('别传') || value.includes('插曲'))) return 'intermezzi';
+  if (values.some((value) => value.includes('活动'))) return 'campaign';
+  return 'other';
+}
+
+function hashActivitySourceKey(value) {
+  let hash = 2166136261;
+  for (const char of String(value || '')) {
+    hash ^= char.codePointAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function hasValidActivityWindow(startAt, endAt) {
+  const start = Date.parse(startAt);
+  const end = endAt ? Date.parse(endAt) : NaN;
+  return Number.isFinite(start) && (!Number.isFinite(end) || end > start);
+}
+
+async function fetchWikiActivityWindows(server) {
+  const params = new URLSearchParams({
+    action: 'cargoquery',
+    tables: 'EventServerDetails=ES',
+    fields: 'ES.event=event_name,ES.server=server,ES.startTime=start_at,ES.endTime=end_at',
+    where: `ES.server="${server}"`,
+    order_by: 'ES.startTime DESC',
+    limit: '500',
+    format: 'json',
+  });
+  const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
+    headers: { 'user-agent': 'ArknightMusicWeb/2.0 (activity sync)' },
+    cf: { cacheTtl: 3600, cacheEverything: true },
+  });
+  if (!response.ok) throw new Error(`Arknights Wiki activity windows failed: ${response.status}`);
+  const payload = await response.json();
+  return (payload.cargoquery || []).map((item) => item.title || {}).filter((row) => (
+    row.event_name && row.start_at
+  ));
+}
+
+async function fetchWikiActivityMetadata(eventNames) {
+  const metadata = new Map();
+  const uniqueNames = [...new Set(eventNames.filter(Boolean))];
+  for (let offset = 0; offset < uniqueNames.length; offset += 40) {
+    const titles = uniqueNames.slice(offset, offset + 40);
+    const params = new URLSearchParams({
+      action: 'query',
+      prop: 'revisions',
+      rvprop: 'content',
+      rvslots: 'main',
+      titles: titles.join('|'),
+      format: 'json',
+      formatversion: '2',
+    });
+    const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
+      headers: { 'user-agent': 'ArknightMusicWeb/2.0 (activity metadata sync)' },
+      cf: { cacheTtl: 3600, cacheEverything: true },
+    });
+    if (!response.ok) throw new Error(`Arknights Wiki activity metadata failed: ${response.status}`);
+    const payload = await response.json();
+    for (const page of payload.query?.pages || []) {
+      const content = page.revisions?.[0]?.slots?.main?.content || '';
+      const name = readWikiInfoboxValue(content, 'name') || page.title;
+      metadata.set(page.title, {
+        name_i18n: {
+          en: name,
+          'zh-CN': readWikiInfoboxValue(content, 'cntitle'),
+          'zh-TW': readWikiInfoboxValue(content, 'twtitle'),
+          ja: readWikiInfoboxValue(content, 'jptitle'),
+          ko: readWikiInfoboxValue(content, 'krtitle'),
+        },
+        type: normalizeActivityType(readWikiInfoboxValue(content, 'type')),
+      });
+    }
+  }
+  return metadata;
+}
+
+async function fetchPrtsCnActivities() {
+  const activities = [];
+  let offset = 0;
+  do {
+    const query = '[[分类:有活动信息的页面]]|?活动开始时间#ISO|?活动结束时间#ISO|?标题图文件名|?分类|sort=活动开始时间|order=desc|limit=500';
+    const params = new URLSearchParams({
+      action: 'ask',
+      query,
+      offset: String(offset),
+      format: 'json',
+    });
+    const response = await fetch(`${PRTS_WIKI_API}?${params.toString()}`, {
+      headers: { 'user-agent': 'ArknightMusicWeb/2.0 (PRTS activity sync)' },
+      cf: { cacheTtl: 3600, cacheEverything: true },
+    });
+    if (!response.ok) throw new Error(`PRTS activity API failed: ${response.status}`);
+    const payload = await response.json();
+    for (const result of Object.values(payload.query?.results || {})) {
+      const printouts = result.printouts || {};
+      const start = Number(printouts['活动开始时间']?.[0]?.timestamp || 0);
+      if (!result.fulltext || !Number.isFinite(start) || start <= 0) continue;
+      const end = Number(printouts['活动结束时间']?.[0]?.timestamp || 0);
+      const categories = (printouts['分类'] || []).map((item) => item.fulltext || '');
+      const activity = {
+        title: result.fulltext,
+        start_at: new Date(start * 1000).toISOString(),
+        end_at: Number.isFinite(end) && end > 0 ? new Date(end * 1000).toISOString() : null,
+        image_file: String(printouts['标题图文件名']?.[0] || '').trim(),
+        type: normalizePrtsActivityType(categories),
+        source_url: String(result.fullurl || '').startsWith('//') ? `https:${result.fullurl}` : result.fullurl,
+      };
+      if (hasValidActivityWindow(activity.start_at, activity.end_at)) {
+        activities.push(activity);
+      }
+    }
+    offset = Number(payload['query-continue-offset'] || 0);
+  } while (offset > 0);
+  return activities;
+}
+
+async function fetchPrtsImageUrls(fileNames) {
+  const urls = new Map();
+  const uniqueNames = [...new Set(fileNames.filter(Boolean))];
+  for (let offset = 0; offset < uniqueNames.length; offset += 50) {
+    const titles = uniqueNames.slice(offset, offset + 50).map((name) => `File:${name}`);
+    const params = new URLSearchParams({
+      action: 'query',
+      titles: titles.join('|'),
+      prop: 'imageinfo',
+      iiprop: 'url',
+      format: 'json',
+      formatversion: '2',
+    });
+    const response = await fetch(`${PRTS_WIKI_API}?${params.toString()}`, {
+      headers: { 'user-agent': 'ArknightMusicWeb/2.0 (PRTS activity image sync)' },
+      cf: { cacheTtl: 86400, cacheEverything: true },
+    });
+    if (!response.ok) throw new Error(`PRTS image API failed: ${response.status}`);
+    const payload = await response.json();
+    for (const page of payload.query?.pages || []) {
+      const fileName = String(page.title || '').replace(/^(?:File|文件):/i, '');
+      const url = page.imageinfo?.[0]?.url;
+      if (fileName && url) urls.set(fileName, url);
+    }
+  }
+  return urls;
+}
+
+function buildPrtsActivitiesByTitle(activities) {
+  const byTitle = new Map();
+  for (const activity of activities) {
+    const entries = byTitle.get(activity.title) || [];
+    entries.push(activity);
+    byTitle.set(activity.title, entries);
+  }
+  return byTitle;
+}
+
+function findPrtsActivity(byTitle, title, referenceStartAt = '') {
+  const entries = byTitle.get(title) || [];
+  if (entries.length <= 1 || !referenceStartAt) return entries[0] || null;
+  const referenceTime = Date.parse(normalizeWikiReleaseTimestamp(referenceStartAt));
+  if (!Number.isFinite(referenceTime)) return entries[0] || null;
+  return entries.reduce((nearest, entry) => {
+    const entryTime = Date.parse(entry.start_at);
+    const nearestTime = Date.parse(nearest.start_at);
+    return Math.abs(entryTime - referenceTime) < Math.abs(nearestTime - referenceTime)
+      ? entry
+      : nearest;
+  }, entries[0]);
+}
+
+async function syncActivities(env) {
+  if (!hasSupabaseConfig(env)) {
+    return { synced: 0, skipped: true, reason: 'Supabase is not configured' };
+  }
+
+  const windowsByServer = await Promise.all([...ACTIVITY_SERVERS].map(async (server) => ({
+    server,
+    windows: await fetchWikiActivityWindows(server),
+  })));
+  const eventNames = windowsByServer.flatMap(({ windows }) => windows.map((window) => window.event_name));
+  let metadata = new Map();
+  try {
+    metadata = await fetchWikiActivityMetadata(eventNames);
+  } catch (error) {
+    console.warn('Activity metadata sync failed; using source titles:', error.message);
+  }
+  let prtsActivities = [];
+  try {
+    prtsActivities = await fetchPrtsCnActivities();
+  } catch (error) {
+    console.warn('PRTS CN activity sync failed; retaining Wiki CN windows:', error.message);
+  }
+  try {
+    const imageUrls = await fetchPrtsImageUrls(prtsActivities.map((activity) => activity.image_file));
+    prtsActivities = prtsActivities.map((activity) => ({
+      ...activity,
+      image_url: imageUrls.get(activity.image_file) || '',
+    }));
+  } catch (error) {
+    console.warn('PRTS activity image sync failed; retaining existing images:', error.message);
+  }
+  const prtsByTitle = buildPrtsActivitiesByTitle(prtsActivities);
+
+  const activitiesByCode = new Map();
+  for (const eventName of eventNames) {
+    const code = normalizeActivityCode(eventName);
+    if (!code || activitiesByCode.has(code)) continue;
+    const detail = metadata.get(eventName);
+    const prtsActivity = findPrtsActivity(prtsByTitle, detail?.name_i18n?.['zh-CN']);
+    const row = {
+      code,
+      name_i18n: Object.fromEntries(Object.entries(detail?.name_i18n || { en: eventName }).filter(([, value]) => value)),
+      type: prtsActivity?.type || detail?.type || 'other',
+      image_url: prtsActivity?.image_url || null,
+      source_url: prtsActivity?.source_url || `${ARKNIGHTS_WIKI_API.replace('/api.php', '/wiki/')}${encodeURIComponent(eventName).replace(/%20/g, '_')}`,
+      updated_at: new Date().toISOString(),
+    };
+    activitiesByCode.set(code, row);
+  }
+  for (const prtsActivity of prtsActivities) {
+    const hasWikiMatch = [...metadata.values()].some((detail) => detail.name_i18n?.['zh-CN'] === prtsActivity.title);
+    if (hasWikiMatch) continue;
+    const code = `prts-${hashActivitySourceKey(prtsActivity.title)}`;
+    const row = {
+      code,
+      name_i18n: { 'zh-CN': prtsActivity.title },
+      type: prtsActivity.type,
+      image_url: prtsActivity.image_url || null,
+      source_url: prtsActivity.source_url,
+      updated_at: new Date().toISOString(),
+    };
+    activitiesByCode.set(code, row);
+  }
+
+  const activityRows = [...activitiesByCode.values()];
+  const activityIds = new Map();
+  for (let offset = 0; offset < activityRows.length; offset += ACTIVITY_SYNC_UPSERT_BATCH_SIZE) {
+    const batch = activityRows.slice(offset, offset + ACTIVITY_SYNC_UPSERT_BATCH_SIZE);
+    const rows = await supabaseRestRequest(env, 'activities', {
+      method: 'POST',
+      query: '?on_conflict=code',
+      prefer: 'resolution=merge-duplicates,return=representation',
+      body: batch,
+    });
+    for (const row of rows || []) {
+      if (row?.code && row?.id) activityIds.set(row.code, row.id);
+    }
+  }
+
+  const activityWindows = windowsByServer.flatMap(({ server, windows }) => windows.map((window) => {
+    const detail = metadata.get(window.event_name);
+    const prtsActivity = server === 'cn'
+      ? findPrtsActivity(prtsByTitle, detail?.name_i18n?.['zh-CN'], window.start_at)
+      : null;
+    return {
+      activity_id: activityIds.get(normalizeActivityCode(window.event_name)),
+      server,
+      start_at: prtsActivity?.start_at || normalizeWikiReleaseTimestamp(window.start_at),
+      end_at: prtsActivity?.end_at || normalizeWikiReleaseTimestamp(window.end_at) || null,
+      updated_at: new Date().toISOString(),
+    };
+  }).filter((window) => window.activity_id && window.start_at));
+  const validActivityWindows = activityWindows.filter((window) => (
+    hasValidActivityWindow(window.start_at, window.end_at)
+  ));
+
+  for (const prtsActivity of prtsActivities) {
+    const hasWikiMatch = [...metadata.values()].some((detail) => detail.name_i18n?.['zh-CN'] === prtsActivity.title);
+    if (hasWikiMatch) continue;
+    if (!hasValidActivityWindow(prtsActivity.start_at, prtsActivity.end_at)) continue;
+    validActivityWindows.push({
+      activity_id: activityIds.get(`prts-${hashActivitySourceKey(prtsActivity.title)}`),
+      server: 'cn',
+      start_at: prtsActivity.start_at,
+      end_at: prtsActivity.end_at,
+      updated_at: new Date().toISOString(),
+    });
+  }
+
+  let syncedWindows = 0;
+  for (let offset = 0; offset < validActivityWindows.length; offset += ACTIVITY_SYNC_UPSERT_BATCH_SIZE) {
+    const batch = validActivityWindows.slice(offset, offset + ACTIVITY_SYNC_UPSERT_BATCH_SIZE);
+    await supabaseRestRequest(env, 'activity_windows', {
+      method: 'POST',
+      query: '?on_conflict=activity_id,server,start_at',
+      prefer: 'resolution=merge-duplicates,return=minimal',
+      body: batch,
+    });
+    syncedWindows += batch.length;
+  }
+
+  return {
+    synced: syncedWindows,
+    activities: activityRows.length,
+    windows: syncedWindows,
+    servers: Object.fromEntries(windowsByServer.map(({ server, windows }) => [server, windows.length])),
+    source: { wiki: ARKNIGHTS_WIKI_API, prts: PRTS_WIKI_API },
+  };
 }
 
 function getSupabaseAuthKey(env) {
