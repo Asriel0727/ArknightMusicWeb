@@ -9,7 +9,7 @@ const API_ORIGIN = (process.env.ACTIVITY_API_ORIGIN || 'https://arknights-recrui
 const SERVERS = ['cn', 'global', 'tw'];
 const OUTPUT_DIR = 'public/images/activities';
 const MANIFEST_PATH = `${OUTPUT_DIR}/manifest.json`;
-const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
 const CONTENT_TYPE_EXTENSIONS = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -111,7 +111,9 @@ async function main() {
     await writeFile(absolutePath(MANIFEST_PATH), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   }
   console.table(result);
-  if (result.failed > 0) process.exitCode = 1;
+  if (result.failed > 0) {
+    console.warn(`${result.failed} images will be retried by the next scheduled sync.`);
+  }
 }
 
 main().catch((error) => {
