@@ -794,7 +794,7 @@ async function fetchWikiActivityMetadata(eventNames) {
           ko: readWikiInfoboxValue(content, 'krtitle'),
         },
         type: normalizeActivityType(readWikiInfoboxValue(content, 'type')),
-        image_file: selectWikiActivityImageFile(page.images, page.title),
+        image_file: readWikiInfoboxValue(content, 'image') || selectWikiActivityImageFile(page.images, page.title),
       });
     }
     for (const title of titles) {
@@ -920,7 +920,8 @@ async function fetchWikiImageUrls(fileNames) {
   const urls = new Map();
   const uniqueNames = [...new Set(fileNames.filter(Boolean))];
   for (let offset = 0; offset < uniqueNames.length; offset += 50) {
-    const titles = uniqueNames.slice(offset, offset + 50).map((name) => `File:${name}`);
+    const titles = uniqueNames.slice(offset, offset + 50)
+      .map((name) => `File:${String(name).replace(/^File:/i, '')}`);
     const params = new URLSearchParams({
       action: 'query',
       titles: titles.join('|'),
