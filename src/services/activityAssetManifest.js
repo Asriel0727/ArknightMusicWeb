@@ -11,7 +11,9 @@ function withAppBase(path) {
 
 export async function loadActivityAssetManifest() {
   if (!manifestPromise) {
-    manifestPromise = fetch(withAppBase(MANIFEST_PATH), { cache: 'force-cache' })
+    // 先前快取過 404 時，force-cache 會持續回傳那個失敗結果，讓所有活動圖片都變成 placeholder。
+    // no-cache 會沿用有效快取，但每次會先向伺服器確認 manifest 是否已更新。
+    manifestPromise = fetch(withAppBase(MANIFEST_PATH), { cache: 'no-cache' })
       .then((response) => response.ok ? response.json() : { assets: {} })
       .then((manifest) => {
         activityAssetManifest = manifest?.assets ? manifest : { assets: {} };
