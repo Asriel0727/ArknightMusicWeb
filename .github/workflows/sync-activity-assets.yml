@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/sync-activity-assets.yml'
       - 'scripts/assets/sync-activity-assets.mjs'
+      - 'worker/index.js'
       - 'src/components/ActivityList.vue'
       - 'src/services/activityApi.js'
       - 'src/services/activityAssetManifest.js'
