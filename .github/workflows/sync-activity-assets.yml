@@ -45,7 +45,11 @@ jobs:
         run: |
           if git diff --quiet -- public/images/activities; then
             echo "No activity asset changes."
-            echo "assets_changed=false" >> "$GITHUB_OUTPUT"
+            if [[ "${{ github.event_name }}" == "push" ]]; then
+              echo "assets_changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "assets_changed=false" >> "$GITHUB_OUTPUT"
+            fi
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -72,6 +76,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     permissions:
       pages: write
       id-token: write
