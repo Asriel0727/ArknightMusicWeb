@@ -607,6 +607,7 @@ async function fetchWikiOperatorLocalizations(operatorNames) {
       rvprop: 'content',
       rvslots: 'main',
       imlimit: '50',
+      redirects: '1',
       titles: batch.join('|'),
       format: 'json',
       formatversion: '2',
@@ -778,10 +779,13 @@ async function fetchWikiActivityMetadata(eventNames) {
     });
     if (!response.ok) throw new Error(`Arknights Wiki activity metadata failed: ${response.status}`);
     const payload = await response.json();
-    for (const page of payload.query?.pages || []) {
+    const pages = payload.query?.pages || [];
+    const redirects = new Map((payload.query?.redirects || []).map((redirect) => [redirect.from, redirect.to]));
+    const details = new Map();
+    for (const page of pages) {
       const content = page.revisions?.[0]?.slots?.main?.content || '';
       const name = readWikiInfoboxValue(content, 'name') || page.title;
-      metadata.set(page.title, {
+      details.set(page.title, {
         name_i18n: {
           en: name,
           'zh-CN': readWikiInfoboxValue(content, 'cntitle'),
@@ -793,6 +797,13 @@ async function fetchWikiActivityMetadata(eventNames) {
         image_file: selectWikiActivityImageFile(page.images),
       });
     }
+    for (const title of titles) {
+      let resolvedTitle = title;
+      while (redirects.has(resolvedTitle)) resolvedTitle = redirects.get(resolvedTitle);
+      const detail = details.get(resolvedTitle) || details.get(title);
+      if (detail) metadata.set(title, detail);
+    }
+    for (const [title, detail] of details) metadata.set(title, detail);
   }
   return metadata;
 }
