@@ -603,9 +603,10 @@ async function fetchWikiOperatorLocalizations(operatorNames) {
     const batch = uniqueNames.slice(offset, offset + 40);
     const params = new URLSearchParams({
       action: 'query',
-      prop: 'revisions',
+      prop: 'revisions|images',
       rvprop: 'content',
       rvslots: 'main',
+      imlimit: '50',
       titles: batch.join('|'),
       format: 'json',
       formatversion: '2',
@@ -789,6 +790,7 @@ async function fetchWikiActivityMetadata(eventNames) {
           ko: readWikiInfoboxValue(content, 'krtitle'),
         },
         type: normalizeActivityType(readWikiInfoboxValue(content, 'type')),
+        image_file: selectWikiActivityImageFile(page.images),
       });
     }
   }
@@ -887,6 +889,45 @@ function findPrtsActivity(byTitle, title, referenceStartAt = '') {
   }, entries[0]);
 }
 
+function selectWikiActivityImageFile(images) {
+  const files = (images || [])
+    .map((image) => String(image?.title || '').replace(/^File:/i, '').trim())
+    .filter(Boolean);
+  const banners = files.filter((file) => /\bbanner\b/i.test(file));
+  return banners.find((file) => /^CN\b/i.test(file))
+    || banners.find((file) => /^EN\b/i.test(file))
+    || banners[0]
+    || '';
+}
+
+async function fetchWikiImageUrls(fileNames) {
+  const urls = new Map();
+  const uniqueNames = [...new Set(fileNames.filter(Boolean))];
+  for (let offset = 0; offset < uniqueNames.length; offset += 50) {
+    const titles = uniqueNames.slice(offset, offset + 50).map((name) => `File:${name}`);
+    const params = new URLSearchParams({
+      action: 'query',
+      titles: titles.join('|'),
+      prop: 'imageinfo',
+      iiprop: 'url',
+      format: 'json',
+      formatversion: '2',
+    });
+    const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
+      headers: { 'user-agent': 'ArknightMusicWeb/2.0 (activity image sync)' },
+      cf: { cacheTtl: 86400, cacheEverything: true },
+    });
+    if (!response.ok) throw new Error(`Arknights Wiki image API failed: ${response.status}`);
+    const payload = await response.json();
+    for (const page of payload.query?.pages || []) {
+      const fileName = String(page.title || '').replace(/^File:/i, '');
+      const url = page.imageinfo?.[0]?.url;
+      if (fileName && url) urls.set(fileName, url);
+    }
+  }
+  return urls;
+}
+
 function findPrtsActivityImage(byTitle, title, referenceStartAt = '') {
   const exactMatch = findPrtsActivity(byTitle, title, referenceStartAt);
   if (exactMatch?.image_url) return exactMatch;
@@ -917,6 +958,12 @@ async function syncActivities(env) {
   } catch (error) {
     console.warn('Activity metadata sync failed; using source titles:', error.message);
   }
+  let wikiImageUrls = new Map();
+  try {
+    wikiImageUrls = await fetchWikiImageUrls([...metadata.values()].map((detail) => detail.image_file));
+  } catch (error) {
+    console.warn('Wiki activity image sync failed; retaining PRTS images only:', error.message);
+  }
   let prtsActivities = [];
   try {
     prtsActivities = await fetchPrtsCnActivities();
@@ -944,7 +991,7 @@ async function syncActivities(env) {
       code,
       name_i18n: Object.fromEntries(Object.entries(detail?.name_i18n || { en: eventName }).filter(([, value]) => value)),
       type: prtsActivity?.type || detail?.type || 'other',
-      image_url: prtsActivity?.image_url || null,
+      image_url: prtsActivity?.image_url || wikiImageUrls.get(detail?.image_file) || null,
       source_url: prtsActivity?.source_url || `${ARKNIGHTS_WIKI_API.replace('/api.php', '/wiki/')}${encodeURIComponent(eventName).replace(/%20/g, '_')}`,
       updated_at: new Date().toISOString(),
     };
