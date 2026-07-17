@@ -39,6 +39,10 @@ const PRTS_WIKI_API = 'https://prts.wiki/api.php';
 const ARKNIGHTS_WIKI_OPERATOR_LIST = 'https://arknights.wiki.gg/wiki/Operator/List';
 const OPERATOR_RELEASE_SERVERS = new Set(['cn', 'global', 'tw']);
 const ACTIVITY_SERVERS = new Set(['cn', 'global', 'tw']);
+const ACTIVITY_IMAGE_OVERRIDES = {
+  'wiki-sui-s-garden-of-grotesqueries-mission-event': 'https://arknights.wiki.gg/images/EN_Sui%27s_Garden_of_Grotesqueries_Mission_Event_banner.png?d46d74',
+  'wiki-medjehtiqedti-bound': 'https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9',
+};
 const OPERATOR_RELEASE_UPSERT_BATCH_SIZE = 100;
 const ACTIVITY_SYNC_UPSERT_BATCH_SIZE = 100;
 const DEFAULT_SONG_DETAIL_PREWARM_LIMIT = 10;
@@ -1015,8 +1019,9 @@ async function syncActivities(env) {
     const detail = metadata.get(eventName);
     const prtsActivity = findPrtsActivityImage(prtsByTitle, detail?.name_i18n?.['zh-CN']);
     const wikiImageUrl = wikiImageUrls.get(detail?.image_file) || '';
-    const imageUrl = prtsActivity?.image_url || wikiImageUrl || null;
-    if (!prtsActivity?.image_url && wikiImageUrl) wikiImageFallbacks += 1;
+    const overrideImageUrl = ACTIVITY_IMAGE_OVERRIDES[code] || '';
+    const imageUrl = prtsActivity?.image_url || wikiImageUrl || overrideImageUrl || null;
+    if (!prtsActivity?.image_url && (wikiImageUrl || overrideImageUrl)) wikiImageFallbacks += 1;
     const row = {
       code,
       name_i18n: Object.fromEntries(Object.entries(detail?.name_i18n || { en: eventName }).filter(([, value]) => value)),
