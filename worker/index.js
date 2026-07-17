@@ -767,7 +767,7 @@ async function fetchWikiActivityMetadata(eventNames) {
       prop: 'revisions|images',
       rvprop: 'content',
       rvslots: 'main',
-      imlimit: '50',
+      imlimit: '500',
       redirects: '1',
       titles: titles.join('|'),
       format: 'json',
@@ -794,7 +794,7 @@ async function fetchWikiActivityMetadata(eventNames) {
           ko: readWikiInfoboxValue(content, 'krtitle'),
         },
         type: normalizeActivityType(readWikiInfoboxValue(content, 'type')),
-        image_file: selectWikiActivityImageFile(page.images),
+        image_file: selectWikiActivityImageFile(page.images, page.title),
       });
     }
     for (const title of titles) {
@@ -900,15 +900,20 @@ function findPrtsActivity(byTitle, title, referenceStartAt = '') {
   }, entries[0]);
 }
 
-function selectWikiActivityImageFile(images) {
+function selectWikiActivityImageFile(images, pageTitle = '') {
   const files = (images || [])
     .map((image) => String(image?.title || '').replace(/^File:/i, '').trim())
     .filter(Boolean);
   const banners = files.filter((file) => /\bbanner\b/i.test(file));
-  return banners.find((file) => /^CN\b/i.test(file))
-    || banners.find((file) => /^EN\b/i.test(file))
-    || banners[0]
-    || '';
+  const titleTerms = String(pageTitle).toLowerCase().match(/[a-z0-9]{3,}/g) || [];
+  return banners
+    .map((file) => ({
+      file,
+      score: titleTerms.filter((term) => file.toLowerCase().includes(term)).length,
+      localeRank: /^CN\b/i.test(file) ? 0 : /^EN\b/i.test(file) ? 1 : 2,
+    }))
+    .sort((left, right) => right.score - left.score || left.localeRank - right.localeRank)
+    .map(({ file }) => file)[0] || '';
 }
 
 async function fetchWikiImageUrls(fileNames) {
