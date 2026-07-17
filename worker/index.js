@@ -887,6 +887,20 @@ function findPrtsActivity(byTitle, title, referenceStartAt = '') {
   }, entries[0]);
 }
 
+function findPrtsActivityImage(byTitle, title, referenceStartAt = '') {
+  const exactMatch = findPrtsActivity(byTitle, title, referenceStartAt);
+  if (exactMatch?.image_url) return exactMatch;
+
+  // 復刻活動在 Wiki 與 PRTS 的名稱常只差在尾碼；僅移除明確復刻尾碼，避免模糊比對誤用其他活動圖片。
+  const originalTitle = String(title || '')
+    .replace(/\s*[·・:：-]?\s*(?:复刻|復刻|retrospection)\s*$/iu, '')
+    .trim();
+  if (!originalTitle || originalTitle === title) return exactMatch;
+
+  const fallbackMatch = findPrtsActivity(byTitle, originalTitle, referenceStartAt);
+  return fallbackMatch?.image_url ? fallbackMatch : exactMatch;
+}
+
 async function syncActivities(env) {
   if (!hasSupabaseConfig(env)) {
     return { synced: 0, skipped: true, reason: 'Supabase is not configured' };
@@ -925,7 +939,7 @@ async function syncActivities(env) {
     const code = normalizeActivityCode(eventName);
     if (!code || activitiesByCode.has(code)) continue;
     const detail = metadata.get(eventName);
-    const prtsActivity = findPrtsActivity(prtsByTitle, detail?.name_i18n?.['zh-CN']);
+    const prtsActivity = findPrtsActivityImage(prtsByTitle, detail?.name_i18n?.['zh-CN']);
     const row = {
       code,
       name_i18n: Object.fromEntries(Object.entries(detail?.name_i18n || { en: eventName }).filter(([, value]) => value)),
