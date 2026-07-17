@@ -794,7 +794,8 @@ async function fetchWikiActivityMetadata(eventNames) {
           ko: readWikiInfoboxValue(content, 'krtitle'),
         },
         type: normalizeActivityType(readWikiInfoboxValue(content, 'type')),
-        image_file: readWikiInfoboxValue(content, 'image') || selectWikiActivityImageFile(page.images, page.title),
+        image_file: normalizeWikiImageFileName(readWikiInfoboxValue(content, 'image'))
+          || selectWikiActivityImageFile(page.images, page.title),
       });
     }
     for (const title of titles) {
@@ -914,6 +915,14 @@ function selectWikiActivityImageFile(images, pageTitle = '') {
     }))
     .sort((left, right) => right.score - left.score || left.localeRank - right.localeRank)
     .map(({ file }) => file)[0] || '';
+}
+
+function normalizeWikiImageFileName(value) {
+  return String(value || '')
+    .trim()
+    .replace(/^File:/i, '')
+    .replace(/:(?:CN|EN|JP|KR|TW);?$/i, '')
+    .trim();
 }
 
 async function fetchWikiImageUrls(fileNames) {
