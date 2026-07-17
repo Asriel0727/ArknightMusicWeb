@@ -603,11 +603,9 @@ async function fetchWikiOperatorLocalizations(operatorNames) {
     const batch = uniqueNames.slice(offset, offset + 40);
     const params = new URLSearchParams({
       action: 'query',
-      prop: 'revisions|images',
+      prop: 'revisions',
       rvprop: 'content',
       rvslots: 'main',
-      imlimit: '50',
-      redirects: '1',
       titles: batch.join('|'),
       format: 'json',
       formatversion: '2',
@@ -766,9 +764,11 @@ async function fetchWikiActivityMetadata(eventNames) {
     const titles = uniqueNames.slice(offset, offset + 40);
     const params = new URLSearchParams({
       action: 'query',
-      prop: 'revisions',
+      prop: 'revisions|images',
       rvprop: 'content',
       rvslots: 'main',
+      imlimit: '50',
+      redirects: '1',
       titles: titles.join('|'),
       format: 'json',
       formatversion: '2',
