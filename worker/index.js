@@ -42,6 +42,15 @@ const ACTIVITY_SERVERS = new Set(['cn', 'global', 'tw']);
 const ACTIVITY_IMAGE_OVERRIDES = {
   'wiki-sui-s-garden-of-grotesqueries-mission-event': 'https://arknights.wiki.gg/images/EN_Sui%27s_Garden_of_Grotesqueries_Mission_Event_banner.png?d46d74',
   'wiki-medjehtiqedti-bound': 'https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9',
+  // PRTS uses campaign codenames for several events, so name matching alone cannot find these banners.
+  'wiki-contingency-contract-arclight': 'https://media.prts.wiki/0/0e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6%E6%B6%A4%E5%A2%A8%E4%BD%9C%E6%88%98_01.jpg',
+  'wiki-babel-event': 'https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg',
+  'wiki-babel-event-rerun': 'https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg',
+  'wiki-icebreaker-games-1': 'https://media.prts.wiki/5/55/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%BF%83%E8%9E%8D%E5%85%B1%E7%AB%9E01_01.jpg',
+  'wiki-stronghold-protocol-event': 'https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg',
+  'wiki-ending-a-grand-overture': 'https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg',
+  'wiki-vector-breakthrough': 'https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg',
+  'wiki-vector-breakthrough-event': 'https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg',
 };
 
 function getActivityImageOverride(code, eventName) {
@@ -1060,6 +1069,20 @@ async function syncActivities(env) {
   }
 
   const activityRows = [...activitiesByCode.values()];
+  // A transient Wiki/PRTS metadata failure must never erase an already verified image.
+  const existingActivities = await supabaseRestRequest(env, 'activities', {
+    query: '?select=code,image_url&limit=1000',
+  });
+  const existingImageUrls = new Map((existingActivities || [])
+    .filter((activity) => activity?.code && /^https:\/\//i.test(activity.image_url || ''))
+    .map((activity) => [activity.code, activity.image_url]));
+  let retainedImages = 0;
+  for (const row of activityRows) {
+    if (!row.image_url && existingImageUrls.has(row.code)) {
+      row.image_url = existingImageUrls.get(row.code);
+      retainedImages += 1;
+    }
+  }
   const activityIds = new Map();
   for (let offset = 0; offset < activityRows.length; offset += ACTIVITY_SYNC_UPSERT_BATCH_SIZE) {
     const batch = activityRows.slice(offset, offset + ACTIVITY_SYNC_UPSERT_BATCH_SIZE);
@@ -1121,7 +1144,7 @@ async function syncActivities(env) {
     activities: activityRows.length,
     windows: syncedWindows,
     servers: Object.fromEntries(windowsByServer.map(({ server, windows }) => [server, windows.length])),
-    images: { wikiCandidates: wikiImageUrls.size, wikiFallbacks: wikiImageFallbacks },
+    images: { wikiCandidates: wikiImageUrls.size, wikiFallbacks: wikiImageFallbacks, retained: retainedImages },
     source: { wiki: ARKNIGHTS_WIKI_API, prts: PRTS_WIKI_API },
   };
 }
