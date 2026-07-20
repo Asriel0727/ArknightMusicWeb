@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540" role="img" aria-label="瑪莉婭·臨光 復刻">
+  <defs><linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#162a46"/><stop offset="1" stop-color="#0b111b"/></linearGradient></defs>
+  <rect width="1200" height="540" fill="url(#bg)"/><path d="M0 420 380 160 620 540 900 230 1200 430V540H0Z" fill="#2766ad" opacity=".3"/>
+  <text x="72" y="88" fill="#69b7ff" font-family="system-ui, sans-serif" font-size="26" font-weight="700">ARKNIGHTS · ACTIVITY</text>
+  <text x="72" y="286" fill="#f3f7ff" font-family="system-ui, sans-serif" font-size="54" font-weight="700">瑪莉婭·臨光 復刻</text>
+  <text x="72" y="346" fill="#b7c8df" font-family="system-ui, sans-serif" font-size="28">CN · 2021-09-30</text>
+</svg>
