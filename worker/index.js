@@ -73,6 +73,8 @@ const MAX_ALBUM_DETAIL_PREWARM_LIMIT = 5;
 const DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT = 5;
 const MAX_LYRICS_TRANSLATION_PREWARM_LIMIT = 5;
 const DEFAULT_LYRICS_TRANSLATION_PREWARM_LOCALES = ['zh-TW', 'zh-CN', 'en', 'ja', 'ko'];
+const MUSIC_COLLECTION_MAX_AGE_MS = 60 * 60 * 1000;
+const MUSIC_ALBUM_DETAIL_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const MUSIC_SONG_DETAIL_MAX_AGE_MS = 10 * 60 * 1000;
 
 export default {
@@ -1538,9 +1540,10 @@ function normalizeMusicSongDetailRow(payload) {
   ];
 }
 
-async function getMusicJson(env, key, sourcePath) {
+async function getMusicJson(env, key, sourcePath, options = {}) {
   const cached = await readSupabaseCache(env, key);
-  if (cached?.data) {
+  const maxAgeMs = options.maxAgeMs ?? MUSIC_COLLECTION_MAX_AGE_MS;
+  if (cached?.data && isFreshSupabaseRow(cached, maxAgeMs)) {
     return {
       data: cached.data,
       source: 'supabase',
@@ -1548,15 +1551,28 @@ async function getMusicJson(env, key, sourcePath) {
     };
   }
 
-  const fetched = await fetchMusicJson(sourcePath);
-  await writeSupabaseCache(env, key, fetched.data, fetched.sourceUrl);
-  await upsertSupabaseRows(env, 'music_songs', normalizeMusicSongDetailRow(fetched.data));
+  try {
+    const fetched = await fetchMusicJson(sourcePath);
+    await writeSupabaseCache(env, key, fetched.data, fetched.sourceUrl);
+    await upsertSupabaseRows(env, 'music_songs', normalizeMusicSongDetailRow(fetched.data));
 
-  return {
-    data: fetched.data,
-    source: 'origin',
-    updatedAt: new Date().toISOString(),
-  };
+    return {
+      data: fetched.data,
+      source: cached?.data ? 'origin-refresh' : 'origin',
+      updatedAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    // Keep the site available during an upstream outage, without making stale data permanent.
+    if (cached?.data) {
+      console.warn('Music cache refresh failed; serving stale data:', key, error.message);
+      return {
+        data: cached.data,
+        source: 'supabase-stale',
+        updatedAt: cached.updated_at,
+      };
+    }
+    throw error;
+  }
 }
 
 async function getMusicSongJson(env, key, sourcePath) {
@@ -2170,17 +2186,19 @@ async function handleMusicApiRequest(request, env, url, ctx) {
       pattern: /^\/api\/albums$/,
       cacheKey: `${MUSIC_CACHE_PREFIX}albums`,
       sourcePath: '/api/albums',
+      maxAgeMs: MUSIC_COLLECTION_MAX_AGE_MS,
     },
     {
       pattern: /^\/api\/songs$/,
       cacheKey: `${MUSIC_CACHE_PREFIX}songs`,
       sourcePath: '/api/songs',
+      maxAgeMs: MUSIC_COLLECTION_MAX_AGE_MS,
     },
   ];
 
   for (const route of routes) {
     if (route.pattern.test(url.pathname)) {
-      const result = await getMusicJson(env, route.cacheKey, route.sourcePath);
+      const result = await getMusicJson(env, route.cacheKey, route.sourcePath, { maxAgeMs: route.maxAgeMs });
       return json(result.data, 200, 900, {
         'x-data-source': result.source,
         'x-cache-updated-at': result.updatedAt || '',
@@ -2209,7 +2227,8 @@ async function handleMusicApiRequest(request, env, url, ctx) {
     const result = await getMusicJson(
       env,
       `${MUSIC_CACHE_PREFIX}album:${albumId}`,
-      `/api/album/${encodeURIComponent(albumId)}/detail`
+      `/api/album/${encodeURIComponent(albumId)}/detail`,
+      { maxAgeMs: MUSIC_ALBUM_DETAIL_MAX_AGE_MS }
     );
     await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumDetailRow(result.data));
     await upsertSupabaseRows(env, 'music_songs', normalizeMusicAlbumSongRows(result.data));
@@ -2252,7 +2271,8 @@ async function getFullSongJson(request, env, songId) {
       const albumResult = await getMusicJson(
         env,
         `${MUSIC_CACHE_PREFIX}album:${song.albumCid}`,
-        `/api/album/${encodeURIComponent(song.albumCid)}/detail`
+        `/api/album/${encodeURIComponent(song.albumCid)}/detail`,
+        { maxAgeMs: MUSIC_ALBUM_DETAIL_MAX_AGE_MS }
       );
       album = albumResult.data?.data || null;
       albumSource = albumResult.source;
@@ -3214,7 +3234,13 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
 
   const cursorRow = await readSupabaseCache(env, MUSIC_ALBUM_DETAIL_CURSOR_KEY);
   const startIndex = normalizeCursorIndex(cursorRow?.data?.nextIndex, albums.length);
-  const candidates = buildCircularBatch(albums, startIndex, limit);
+  const rotatingCandidates = buildCircularBatch(albums, startIndex, limit);
+  // The source lists newest releases first. Refresh them on every cron run so a
+  // newly added track is picked up even before the full rotating sweep reaches it.
+  const recentCandidates = albums.slice(0, limit).map((item, index) => ({ item, index }));
+  const candidates = [...new Map([...recentCandidates, ...rotatingCandidates]
+    .filter((candidate) => candidate.item?.cid)
+    .map((candidate) => [String(candidate.item.cid), candidate])).values()];
   let stored = 0;
   let errors = 0;
 
@@ -3243,8 +3269,8 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
 
   const nextIndex = albums.length === 0
     ? 0
-    : (startIndex + candidates.length) % albums.length;
-  const wrapped = didCircularBatchWrap(startIndex, candidates.length, albums.length);
+    : (startIndex + rotatingCandidates.length) % albums.length;
+  const wrapped = didCircularBatchWrap(startIndex, rotatingCandidates.length, albums.length);
   await writeSupabaseCache(
     env,
     MUSIC_ALBUM_DETAIL_CURSOR_KEY,
@@ -3252,6 +3278,7 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
       nextIndex,
       total: albums.length,
       lastBatchSize: candidates.length,
+      lastRotatingBatchSize: rotatingCandidates.length,
       lastStored: stored,
       lastErrors: errors,
       lastWrapped: wrapped,
@@ -3268,6 +3295,7 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
     total: albums.length,
     startIndex,
     nextIndex,
+    recentAttempted: recentCandidates.length,
     wrapped,
     done: wrapped,
   };

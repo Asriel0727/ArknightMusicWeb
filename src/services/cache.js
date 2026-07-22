@@ -1,28 +1,49 @@
-/**
- * 使用 sessionStorage 進行快取的網路請求
- * @param {string} url - 請求的URL
- * @returns {Promise<any>} 返回解析後的JSON數據
- */
-export async function fetchWithCache(url) {
-  // 檢查 sessionStorage 中是否已經有這筆資料
-  const cachedData = sessionStorage.getItem(url);
-  if (cachedData) {
-    // 如果有，直接回傳快取中的資料
-    console.log(`[Cache] Hit for ${url}`);
-    return JSON.parse(cachedData);
+const DEFAULT_CACHE_TTL_MS = 10 * 60 * 1000;
+
+function readCacheEntry(key) {
+  try {
+    const entry = JSON.parse(sessionStorage.getItem(key) || 'null');
+    return Number.isFinite(entry?.savedAt) && Object.hasOwn(entry, 'payload') ? entry : null;
+  } catch {
+    return null;
   }
-
-  console.log(`[Cache] Miss for ${url}. Fetching from network...`);
-  // 如果沒有，才發起網路請求
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const data = await response.json();
-
-  // 將獲取的資料存入 sessionStorage，以便下次使用
-  sessionStorage.setItem(url, JSON.stringify(data));
-
-  return data;
 }
 
+function writeCacheEntry(key, payload) {
+  try {
+    sessionStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), payload }));
+  } catch (error) {
+    console.warn('[Cache] Write failed:', key, error);
+  }
+}
+
+/**
+ * 取得具有效期的 sessionStorage 快取；舊版未含 savedAt 的資料會自動失效。
+ * @param {string} url - 請求的 URL
+ * @param {{ maxAgeMs?: number }} options - 快取有效時間
+ * @returns {Promise<any>} 解析後的 JSON 資料
+ */
+export async function fetchWithCache(url, options = {}) {
+  const maxAgeMs = Number.isFinite(options.maxAgeMs) ? options.maxAgeMs : DEFAULT_CACHE_TTL_MS;
+  const entry = readCacheEntry(url);
+  if (entry && Date.now() - entry.savedAt <= maxAgeMs) {
+    console.log(`[Cache] Hit for ${url}`);
+    return entry.payload;
+  }
+
+  console.log(`[Cache] ${entry ? 'Expired' : 'Miss'} for ${url}. Fetching from network...`);
+  try {
+    const response = await fetch(url, { cache: 'no-cache' });
+    if (!response.ok) throw new Error('Network response was not ok');
+    const payload = await response.json();
+    writeCacheEntry(url, payload);
+    return payload;
+  } catch (error) {
+    // Keep the UI available during a temporary upstream outage.
+    if (entry) {
+      console.warn(`[Cache] Refresh failed; serving stale data for ${url}`, error);
+      return entry.payload;
+    }
+    throw error;
+  }
+}

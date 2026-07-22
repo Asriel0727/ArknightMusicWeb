@@ -47,6 +47,7 @@ const ACTIVITY_BROWSER_CACHE_PREFIX = 'activities:v1:';
 const RECRUIT_CALCULATOR_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const RECRUIT_RELEASE_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const ACTIVITY_CACHE_TTL_MS = 15 * 60 * 1000;
+const ALBUM_DETAIL_BROWSER_CACHE_TTL_MS = 10 * 60 * 1000;
 /** 圖片／歌詞 proxy 在網站根路徑（/api/proxy-* 會 404） */
 
 function readRecruitBrowserCache(key) {
@@ -169,7 +170,9 @@ export async function fetchAlbums() {
  * @returns {Promise<Object>} 專輯詳情
  */
 export async function fetchAlbumDetails(albumId) {
-  const { data } = await fetchWithCache(`${API_BASE}/album/${albumId}/detail`);
+  const { data } = await fetchWithCache(`${API_BASE}/album/${albumId}/detail`, {
+    maxAgeMs: ALBUM_DETAIL_BROWSER_CACHE_TTL_MS,
+  });
   return transformMusicApiPayload(data);
 }
 
