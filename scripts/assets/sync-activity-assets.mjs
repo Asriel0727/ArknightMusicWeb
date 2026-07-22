@@ -12,6 +12,11 @@ const MANIFEST_PATH = `${OUTPUT_DIR}/manifest.json`;
 const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
 const CONTENT_TYPE_EXTENSIONS = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
 const GENERATED_FALLBACK_SOURCE = 'generated:activity-fallback:v1';
+// Keep critical assets available while the Worker waits for its next scheduled database sync.
+const LOCAL_ACTIVITY_IMAGE_OVERRIDES = {
+  'wiki-contingency-contract-arclight': 'https://media.prts.wiki/0/0e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6%E6%B6%A4%E5%A2%A8%E4%BD%9C%E6%88%98_01.jpg',
+  'wiki-icebreaker-games-1': 'https://media.prts.wiki/5/55/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%BF%83%E8%9E%8D%E5%85%B1%E7%AB%9E01_01.jpg',
+};
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 function parseArgs(argv) {
@@ -92,7 +97,9 @@ async function main() {
     if (!activity?.code || sources.has(activity.code)) continue;
     sources.set(activity.code, {
       activity,
-      sourceUrl: /^https:\/\//i.test(activity.image_url || '') ? activity.image_url : '',
+      sourceUrl: /^https:\/\//i.test(activity.image_url || '')
+        ? activity.image_url
+        : (LOCAL_ACTIVITY_IMAGE_OVERRIDES[activity.code] || ''),
     });
   }
 
@@ -107,7 +114,7 @@ async function main() {
   const targets = options.limit > 0 ? candidates.slice(0, options.limit) : candidates;
   const result = { downloaded: 0, generatedFallbacks: 0, skipped: sources.size - candidates.length, failed: 0 };
   let manifestChanged = false;
-  console.log(`Activities with source images: ${sources.size}`);
+  console.log(`Activities requiring local assets: ${sources.size}`);
   console.log(`Will download: ${targets.length}${options.dryRun ? ' (dry run)' : ''}`);
 
   for (let index = 0; index < targets.length; index += 1) {

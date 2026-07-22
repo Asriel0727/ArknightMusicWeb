@@ -17,9 +17,9 @@
 
     <div v-if="loading" class="state"><span class="spinner"></span>{{ copy.loading }}</div>
     <div v-else-if="error" class="state error"><i class="fas fa-triangle-exclamation"></i>{{ error }}</div>
-    <div v-else-if="!activities.length" class="state"><i class="fas fa-calendar-xmark"></i>{{ copy.empty }}</div>
+    <div v-else-if="!displayedActivities.length" class="state"><i class="fas fa-calendar-xmark"></i>{{ copy.empty }}</div>
     <section v-else class="activity-list">
-      <article v-for="activity in activities" :key="activity.window.id" class="activity-card">
+      <article v-for="activity in displayedActivities" :key="activity.window.id" class="activity-card">
         <div class="activity-visual">
           <img v-if="hasImage(activity)" :src="activityImageUrl(activity)" :alt="localized(activity.name_i18n)" loading="lazy" @error="markImageFailed(activityImageUrl(activity))">
           <div v-else class="image-placeholder"><i class="fas fa-image"></i></div>
@@ -64,6 +64,16 @@ const TEXT = {
   en: { title: 'Activities', subtitle: 'Browse event windows and related banners by server.', server: 'Server', tw: 'Traditional Chinese', global: 'Global', cn: 'CN', loading: 'Loading activities…', empty: 'No activities available.', error: 'Could not load activities. Please try again later.', recruitmentPools: 'Related banners', stale: 'Showing the last successfully loaded cached data.', pools: { standard: 'Standard', kernel: 'Kernel', limited: 'Limited', event: 'Event banner' } },
 };
 const copy = computed(() => TEXT[locale.value] || TEXT.en);
+const displayedActivities = computed(() => {
+  const uniqueActivities = new Map();
+  for (const activity of activities.value) {
+    const startAt = activity?.window?.start_at || '';
+    const endAt = activity?.window?.end_at || '';
+    const key = `${startAt}|${endAt}|${activityFamilyKey(activity)}`;
+    if (!uniqueActivities.has(key)) uniqueActivities.set(key, activity);
+  }
+  return [...uniqueActivities.values()];
+});
 
 function localized(value) {
   if (typeof value === 'string') return value;
@@ -75,8 +85,29 @@ function localized(value) {
   return normalizeChineseMusicText(text, locale.value);
 }
 function poolTypeLabel(type) { return copy.value.pools[type] || type; }
-function activityImageUrl(activity) { return getLocalActivityImageUrl(activity?.code); }
-function hasImage(activity) { const url = activityImageUrl(activity); return Boolean(url) && !failedImageUrls.value.has(url); }
+function activityFamilyKey(activity) {
+  const names = activity?.name_i18n || {};
+  const name = names['zh-TW'] || names['zh-CN'] || names.en || Object.values(names).find(Boolean) || activity?.code || '';
+  return String(name)
+    .toLocaleLowerCase()
+    .replace(/(?:復刻|复刻|rerun|retrospection|re-run)/gu, '')
+    .replace(/20\d{2}/gu, '')
+    .replace(/[\s\p{P}\p{S}_]+/gu, '');
+}
+function escapeSvgText(value) {
+  return String(value || '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[character]);
+}
+function activityFallbackImageUrl(activity) {
+  const title = escapeSvgText(localized(activity?.name_i18n));
+  const serverName = escapeSvgText(copy.value[server.value] || server.value.toUpperCase());
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540"><defs><linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#162a46"/><stop offset="1" stop-color="#0b111b"/></linearGradient></defs><rect width="1200" height="540" fill="url(#bg)"/><path d="M0 420 380 160 620 540 900 230 1200 430V540H0Z" fill="#2766ad" opacity=".3"/><text x="72" y="88" fill="#69b7ff" font-family="system-ui,sans-serif" font-size="26" font-weight="700">ARKNIGHTS · ${serverName}</text><text x="72" y="286" fill="#f3f7ff" font-family="system-ui,sans-serif" font-size="54" font-weight="700">${title}</text><text x="72" y="346" fill="#b7c8df" font-family="system-ui,sans-serif" font-size="28">活動圖片同步中</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+function activityImageUrl(activity) {
+  const localUrl = getLocalActivityImageUrl(activity?.code);
+  return localUrl && !failedImageUrls.value.has(localUrl) ? localUrl : activityFallbackImageUrl(activity);
+}
+function hasImage() { return true; }
 function markImageFailed(url) { failedImageUrls.value = new Set([...failedImageUrls.value, url]); }
 function formatRange(start, end) {
   const formatter = new Intl.DateTimeFormat(locale.value, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
