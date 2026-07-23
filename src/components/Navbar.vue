@@ -172,7 +172,7 @@ onMounted(() => {
   margin-bottom: 18px;
   flex-wrap: nowrap;
   min-width: 0;
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 .navbar-left {
@@ -372,6 +372,7 @@ onMounted(() => {
 .nav-tab {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
   gap: 8px;
   padding: 10px 20px;
   background: transparent;
@@ -381,6 +382,7 @@ onMounted(() => {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.3s ease;
 }
 
@@ -416,7 +418,7 @@ onMounted(() => {
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .main-navbar {
     padding: 12px 15px;
     gap: 8px;
@@ -441,7 +443,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
   .main-navbar {
     display: flex;
     align-items: center;

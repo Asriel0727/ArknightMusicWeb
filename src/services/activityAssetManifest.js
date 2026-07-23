@@ -1,5 +1,10 @@
 const MANIFEST_PATH = 'images/activities/manifest.json';
 
+// Reruns can reuse a stable original banner without storing a second copy.
+const ACTIVITY_IMAGE_CODE_ALIASES = {
+  'wiki-babel-event-rerun': 'wiki-babel-event',
+};
+
 let manifestPromise = null;
 let activityAssetManifest = { assets: {} };
 
@@ -27,8 +32,24 @@ export async function loadActivityAssetManifest() {
   return manifestPromise;
 }
 
+function getActivityAssetEntry(activityCode) {
+  let resolvedCode = ACTIVITY_IMAGE_CODE_ALIASES[activityCode] || activityCode;
+  const visited = new Set();
+  while (resolvedCode && !visited.has(resolvedCode)) {
+    visited.add(resolvedCode);
+    const entry = activityAssetManifest.assets?.[resolvedCode];
+    if (!entry?.aliasOf) return entry;
+    resolvedCode = entry.aliasOf;
+  }
+  return null;
+}
+
 export function getLocalActivityImageUrl(activityCode) {
-  const entry = activityAssetManifest.assets?.[activityCode];
+  const entry = getActivityAssetEntry(activityCode);
   const assetPath = entry?.publicPath || '';
   return assetPath ? withAppBase(assetPath) : '';
+}
+
+export function getLocalActivityImageSource(activityCode) {
+  return getActivityAssetEntry(activityCode)?.sourceUrl || '';
 }
