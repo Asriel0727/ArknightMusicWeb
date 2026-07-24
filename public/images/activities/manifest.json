@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-22T00:47:21.166Z",
+  "generatedAt": "2026-07-24T08:52:36.918Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3234,13 +3234,13 @@
       "syncedAt": "2026-07-22T00:47:20.600Z"
     },
     "wiki-babel-event-rerun": {
-      "publicPath": "/images/activities/wiki-babel-event-rerun.svg",
-      "relativePath": "public/images/activities/wiki-babel-event-rerun.svg",
-      "sourceUrl": "generated:activity-fallback:v1",
-      "contentType": "image/svg+xml",
-      "size": 816,
-      "hash": "4bb5f9a23300ddcc3594bd718004ae24f2cc886f8b62f4f2e1cb306203d6a5d7",
-      "syncedAt": "2026-07-22T00:47:20.610Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-07-24T08:52:35.584Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
@@ -3252,31 +3252,31 @@
       "syncedAt": "2026-07-22T00:47:21.046Z"
     },
     "wiki-stronghold-protocol-event": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-event.svg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.svg",
-      "sourceUrl": "generated:activity-fallback:v1",
-      "contentType": "image/svg+xml",
-      "size": 798,
-      "hash": "24951ee5b402829fb868e9d577c426027f2644b769c4a37a9561039d2be29e2e",
-      "syncedAt": "2026-07-22T00:47:21.051Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 244822,
+      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
+      "syncedAt": "2026-07-24T08:52:35.973Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.svg",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.svg",
-      "sourceUrl": "generated:activity-fallback:v1",
-      "contentType": "image/svg+xml",
-      "size": 870,
-      "hash": "eeff6c3b87ab8e321432bd1e65f51d848e8296afb390f7dec019af24e6bfad7f",
-      "syncedAt": "2026-07-22T00:47:21.054Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
+      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 280529,
+      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
+      "syncedAt": "2026-07-24T08:52:36.531Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.svg",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.svg",
-      "sourceUrl": "generated:activity-fallback:v1",
-      "contentType": "image/svg+xml",
-      "size": 798,
-      "hash": "1de5863777e034949318ab0d679e18b424c8df0b0dc3fa7bc1f021d000bf2957",
-      "syncedAt": "2026-07-22T00:47:21.057Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 268285,
+      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
+      "syncedAt": "2026-07-24T08:52:36.918Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.svg",
