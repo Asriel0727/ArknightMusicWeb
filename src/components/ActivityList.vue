@@ -119,6 +119,12 @@ const failedImageUrls = ref(new Set());
 // spelling variants. Keep these explicit aliases narrow to avoid hiding
 // unrelated activities that merely share a banner or a release window.
 const ACTIVITY_DISPLAY_GROUP_OVERRIDES = {
+  'wiki-medjehtiqedti-bound': 'medjehtiqedti-bound-2026',
+  'prts-17xyioi': 'medjehtiqedti-bound-2026',
+  'wiki-sui-s-garden-of-grotesqueries-mission-event': 'sui-garden-mission-2026',
+  'prts-1gtn4va': 'sui-garden-mission-2026',
+  'wiki-such-is-the-joy-of-our-reunion-rerun': 'such-is-the-joy-rerun-2026',
+  'prts-hj2yk2': 'such-is-the-joy-rerun-2026',
   'prts-h3okge': 'act-or-die-2025',
   'wiki-act-or-die': 'act-or-die-2025',
   'prts-r2bmlv': 'integrated-lookback-back-to-castle-2025',
@@ -128,6 +134,15 @@ const ACTIVITY_DISPLAY_GROUP_OVERRIDES = {
   'prts-1fvqqe1': 'contingency-contract-2019',
   'wiki-contingency-contract-event': 'contingency-contract-2019',
 };
+// Keep the display correct while an already-synced API record waits for the
+// Worker to refresh its normalized type.
+const ACTIVITY_TYPE_OVERRIDES = {
+  'wiki-medjehtiqedti-bound': 'side_story',
+  'wiki-sui-s-garden-of-grotesqueries-mission-event': 'campaign',
+};
+const FUTURE_PREVIEW_ACTIVITY_CODES = new Set([
+  'wiki-sui-s-garden-of-grotesqueries-mission-event',
+]);
 
 const TEXT = {
   'zh-TW': { title: '活動', subtitle: '查看各伺服器的活動檔期與對應卡池。', server: '伺服器', scope: '顯示範圍', majorOnly: '大型活動', allActivities: '全部活動', showFuture: '顯示未來視', futureCount: '顯示筆數', futureTitle: '未來視（陸服參考）', futureSubtitle: '以下為陸服已公布、尚未在目前伺服器開始的活動。', futureBadge: '陸服未來活動', noFuture: '目前沒有可參考的未來活動。', search: '搜尋活動', searchPlaceholder: '例如：危機合約', tw: '繁中服', global: '國際服', cn: '陸服', loading: '正在載入活動資料…', empty: '目前沒有符合條件的活動。', error: '無法載入活動資料，請稍後再試。', recruitmentPools: '對應卡池', stale: '目前顯示上次成功取得的快取資料。', pools: { standard: '標準尋訪', kernel: '中堅尋訪', limited: '限定尋訪', event: '活動尋訪' } },
@@ -189,15 +204,23 @@ function toDisplayedActivities(items) {
 }
 
 function isMajorActivity(activity) {
-  if (MAJOR_ACTIVITY_TYPES.has(activity?.type)) return true;
+  if (MAJOR_ACTIVITY_TYPES.has(activityType(activity))) return true;
   const names = Object.values(activity?.name_i18n || {}).join(' ');
-  return activity?.type === 'other' && MAJOR_OTHER_ACTIVITY_PATTERN.test(names);
+  return activityType(activity) === 'other' && MAJOR_OTHER_ACTIVITY_PATTERN.test(names);
 }
 
 function isFuturePreviewActivity(activity) {
-  if (activity?.type !== 'campaign') return isMajorActivity(activity);
+  if (FUTURE_PREVIEW_ACTIVITY_CODES.has(activity?.code)) return true;
+  // Collaboration availability depends on regional licensing, so CN dates are
+  // not a reliable preview for TW or Global.
+  if (activityType(activity) === 'collaboration') return false;
+  if (activityType(activity) !== 'campaign') return isMajorActivity(activity);
   const names = Object.values(activity?.name_i18n || {}).join(' ');
-  return MAJOR_OTHER_ACTIVITY_PATTERN.test(names) || (activity?.recruitment_pools?.length || 0) > 0;
+  return MAJOR_OTHER_ACTIVITY_PATTERN.test(names);
+}
+
+function activityType(activity) {
+  return ACTIVITY_TYPE_OVERRIDES[activity?.code] || activity?.type || 'other';
 }
 
 function alreadyAvailableOnCurrentServer(activity, currentServerCodes) {
@@ -233,10 +256,15 @@ function localized(value) {
     : locale.value === 'zh-CN' ? ['zh-CN', 'zh_cn', 'cn', 'zh-TW', 'en']
       : [locale.value, 'en', 'zh-TW', 'zh-CN'];
   const text = keys.map((key) => value[key]).find(Boolean) || Object.values(value).find(Boolean) || '—';
-  return normalizeChineseMusicText(text, locale.value);
+  const localizedText = normalizeChineseMusicText(text, locale.value);
+  return ['zh-TW', 'zh-CN'].includes(locale.value)
+    ? localizedText.replace(/\s*\([^()]*[A-Za-z][^()]*\)\s*/gu, ' ').trim()
+    : localizedText;
 }
 function poolTypeLabel(type) { return copy.value.pools[type] || type; }
 function activityFamilyKey(activity) {
+  const overrideKey = ACTIVITY_DISPLAY_GROUP_OVERRIDES[activity?.code];
+  if (overrideKey) return `override:${overrideKey}`;
   const names = activity?.name_i18n || {};
   const name = names['zh-TW'] || names['zh-CN'] || names.en || Object.values(names).find(Boolean) || activity?.code || '';
   return String(name)

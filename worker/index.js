@@ -22,6 +22,16 @@ const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail
 const MUSIC_LYRICS_TRANSLATION_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-translation-cursor`;
 const MUSIC_LYRICS_KNOWN_SONGS_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-known-songs`;
 const LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:server:v1:';
+const SYNC_STATUS_KEY_PREFIX = 'sync-status:v1:';
+const SCHEDULED_SYNC_JOBS = [
+  'recruit-operators',
+  'operator-catalog',
+  'music-cache',
+  'operator-release-dates',
+  'activities-cn',
+  'activities-global',
+  'activities-tw',
+];
 const SONG_LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:song:v2:';
 const SONG_LYRICS_TRANSLATION_CACHE_TTL_SECONDS = 60 * 60 * 24 * 90;
 const SONG_LYRICS_TRANSLATION_SCHEMA_VERSION = 1;
@@ -200,6 +210,13 @@ export default {
       if (unauthorized) return unauthorized;
       const result = await syncActivities(env);
       return json({ ok: true, ...result, time: new Date().toISOString() });
+    }
+
+    if (url.pathname === '/api/admin/sync-status') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) return unauthorized;
+      const statuses = await Promise.all(SCHEDULED_SYNC_JOBS.map(async (job) => [job, await getSyncStatus(env, job)]));
+      return json({ ok: true, jobs: Object.fromEntries(statuses), time: new Date().toISOString() });
     }
 
     if (url.pathname === '/api/admin/prewarm-music-albums') {
@@ -451,36 +468,22 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
-    await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
-    ctx.waitUntil(
-      syncOperatorCatalog(env).catch((error) => {
-        console.warn('Operator catalog sync failed; retaining previous snapshot:', error.message);
-      })
-    );
-    if (hasSupabaseConfig(env)) {
-      ctx.waitUntil(
-        Promise.all([
-          syncMusicCache(env, {
-            songDetailLimit: 10,
-            albumDetailLimit: 5,
-          }).catch((error) => {
-            console.warn('Music cache sync failed:', error.message);
-          }),
-          syncOperatorReleaseDates(env).catch((error) => {
-            console.warn('Operator release sync failed:', error.message);
-          }),
-          syncActivities(env).catch((error) => {
-            console.warn('Activity sync failed:', error.message);
-          }),
-        ])
-      );
-    }
-    console.info({
-      message: 'Recruit operators synced by cron',
-      count: data.operators.length,
-      time: new Date().toISOString(),
+    scheduleSyncTask(ctx, env, 'recruit-operators', async () => {
+      const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
+      await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
+      return { count: data.operators.length };
     });
+    scheduleSyncTask(ctx, env, 'operator-catalog', () => syncOperatorCatalog(env));
+    if (hasSupabaseConfig(env)) {
+      scheduleSyncTask(ctx, env, 'music-cache', () => syncMusicCache(env, {
+        songDetailLimit: 10,
+        albumDetailLimit: 5,
+      }));
+      scheduleSyncTask(ctx, env, 'operator-release-dates', () => syncOperatorReleaseDates(env));
+      for (const server of ACTIVITY_SERVERS) {
+        scheduleSyncTask(ctx, env, `activities-${server}`, () => syncActivities(env, [server]));
+      }
+    }
   },
 };
 
@@ -730,7 +733,7 @@ function normalizeActivityCode(value) {
 
 function normalizeActivityType(value) {
   const type = String(value || '').trim().toLowerCase().replace(/[ _-]+/g, '_');
-  if (type === 'side_story') return 'side_story';
+  if (type === 'side_story' || type === 'sidestory') return 'side_story';
   if (type === 'intermezzi') return 'intermezzi';
   if (type === 'collaboration') return 'collaboration';
   if (type === 'campaign') return 'campaign';
@@ -761,6 +764,48 @@ function hasValidActivityWindow(startAt, endAt) {
   const start = Date.parse(startAt);
   const end = endAt ? Date.parse(endAt) : NaN;
   return Number.isFinite(start) && (!Number.isFinite(end) || end > start);
+}
+
+function getSyncStatusKey(job) {
+  return `${SYNC_STATUS_KEY_PREFIX}${job}`;
+}
+
+async function getSyncStatus(env, job) {
+  try {
+    return await env.ARKNIGHTS_DATA.get(getSyncStatusKey(job), 'json');
+  } catch (error) {
+    console.warn(`Unable to read sync status for ${job}:`, error.message);
+    return null;
+  }
+}
+
+async function writeSyncStatus(env, job, status) {
+  try {
+    await env.ARKNIGHTS_DATA.put(getSyncStatusKey(job), JSON.stringify({
+      job,
+      ...status,
+      updatedAt: new Date().toISOString(),
+    }));
+  } catch (error) {
+    // Status telemetry must never prevent the actual synchronization work.
+    console.warn(`Unable to write sync status for ${job}:`, error.message);
+  }
+}
+
+function scheduleSyncTask(ctx, env, job, task) {
+  ctx.waitUntil((async () => {
+    const startedAt = new Date().toISOString();
+    await writeSyncStatus(env, job, { state: 'running', startedAt, lastError: null });
+    try {
+      const result = await task();
+      await writeSyncStatus(env, job, { state: 'success', startedAt, completedAt: new Date().toISOString(), result, lastError: null });
+      console.info({ message: 'Scheduled sync completed', job, result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      await writeSyncStatus(env, job, { state: 'failed', startedAt, completedAt: new Date().toISOString(), lastError: message });
+      console.warn(`Scheduled sync failed for ${job}; retaining previous data:`, message);
+    }
+  })());
 }
 
 async function fetchWikiActivityWindows(server) {
@@ -995,12 +1040,17 @@ function findPrtsActivityImage(byTitle, title, referenceStartAt = '') {
   return fallbackMatch?.image_url ? fallbackMatch : exactMatch;
 }
 
-async function syncActivities(env) {
+async function syncActivities(env, servers = ACTIVITY_SERVERS) {
   if (!hasSupabaseConfig(env)) {
     return { synced: 0, skipped: true, reason: 'Supabase is not configured' };
   }
 
-  const windowsByServer = await Promise.all([...ACTIVITY_SERVERS].map(async (server) => ({
+  const requestedServers = [...new Set([...servers].map(normalizeActivityServer).filter(Boolean))];
+  if (requestedServers.length === 0) {
+    return { synced: 0, skipped: true, reason: 'No valid activity servers were requested' };
+  }
+
+  const windowsByServer = await Promise.all(requestedServers.map(async (server) => ({
     server,
     windows: await fetchWikiActivityWindows(server),
   })));
@@ -1018,19 +1068,21 @@ async function syncActivities(env) {
     console.warn('Wiki activity image sync failed; retaining PRTS images only:', error.message);
   }
   let prtsActivities = [];
-  try {
-    prtsActivities = await fetchPrtsCnActivities();
-  } catch (error) {
-    console.warn('PRTS CN activity sync failed; retaining Wiki CN windows:', error.message);
-  }
-  try {
-    const imageUrls = await fetchPrtsImageUrls(prtsActivities.map((activity) => activity.image_file));
-    prtsActivities = prtsActivities.map((activity) => ({
-      ...activity,
-      image_url: imageUrls.get(activity.image_file) || '',
-    }));
-  } catch (error) {
-    console.warn('PRTS activity image sync failed; retaining existing images:', error.message);
+  if (requestedServers.includes('cn')) {
+    try {
+      prtsActivities = await fetchPrtsCnActivities();
+    } catch (error) {
+      console.warn('PRTS CN activity sync failed; retaining Wiki CN windows:', error.message);
+    }
+    try {
+      const imageUrls = await fetchPrtsImageUrls(prtsActivities.map((activity) => activity.image_file));
+      prtsActivities = prtsActivities.map((activity) => ({
+        ...activity,
+        image_url: imageUrls.get(activity.image_file) || '',
+      }));
+    } catch (error) {
+      console.warn('PRTS activity image sync failed; retaining existing images:', error.message);
+    }
   }
   const prtsByTitle = buildPrtsActivitiesByTitle(prtsActivities);
 
