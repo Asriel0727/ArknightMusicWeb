@@ -1,3 +1,5 @@
+import { attachCuratedActivityRecruitmentPools } from '../data/activityCatalog.js';
+
 const DEFAULT_ACTIVITY_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const ACTIVITY_BROWSER_CACHE_PREFIX = 'activities:';
 
@@ -30,13 +32,19 @@ export async function fetchActivities(server) {
     const response = await fetch(`${getApiBase()}/api/activities?server=${encodeURIComponent(normalized)}`, { cache: 'no-store' });
     if (!response.ok) throw new Error(`Activity API failed: ${response.status}`);
     const data = await response.json();
-    const activities = Array.isArray(data.activities) ? data.activities : [];
+    const activities = attachCuratedActivityRecruitmentPools(
+      Array.isArray(data.activities) ? data.activities : [],
+      normalized,
+    );
     writeCache(cacheKey, { savedAt: Date.now(), activities });
     return { activities, source: 'network', stale: false };
   } catch (error) {
     console.warn('Activity API unavailable:', error);
     return {
-      activities: Array.isArray(cached?.activities) ? cached.activities : [],
+      activities: attachCuratedActivityRecruitmentPools(
+        Array.isArray(cached?.activities) ? cached.activities : [],
+        normalized,
+      ),
       source: cached?.activities ? 'browser-cache' : 'unavailable',
       stale: Boolean(cached?.activities),
     };
