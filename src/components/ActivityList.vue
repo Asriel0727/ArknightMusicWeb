@@ -211,6 +211,7 @@ const activityDetailCopy = computed(() => ACTIVITY_DETAIL_TEXT[locale.value] || 
 // 危機合約、登入活動、試煉與其他短期玩法仍可在「全部活動」查看。
 const MAJOR_ACTIVITY_TYPES = new Set(['side_story', 'intermezzi']);
 const visibleActivities = computed(() => activities.value
+  .filter((activity) => !hasYearInActivityName(activity))
   .filter(hasActivityArtwork)
   .filter(matchesSearch)
   .filter((activity) => activityScope.value === 'all' || isMajorActivity(activity)));
@@ -219,6 +220,7 @@ const displayedFutureActivities = computed(() => {
   if (!showFuture.value || server.value === 'cn') return [];
   const cnActivitiesByCode = new Map(futureActivities.value.map((activity) => [activity.code, activity]));
   const currentProgress = [...activities.value]
+    .filter((activity) => !hasYearInActivityName(activity))
     .filter(hasActivityArtwork)
     .filter((activity) => activityScope.value === 'all' || isMajorActivity(activity))
     .sort((left, right) => Date.parse(right?.window?.start_at || '') - Date.parse(left?.window?.start_at || ''))
@@ -227,6 +229,7 @@ const displayedFutureActivities = computed(() => {
   const currentServerCodes = new Set(activities.value.map((activity) => activity.code));
   if (!currentProgress) return [];
   const candidates = futureActivities.value
+    .filter((activity) => !hasYearInActivityName(activity))
     .filter(hasActivityArtwork)
     .filter(matchesSearch)
     .filter((activity) => activityScope.value === 'all' || isFuturePreviewActivity(activity))
@@ -289,6 +292,10 @@ function alreadyAvailableOnCurrentServer(activity, currentServerCodes) {
 function hasActivityArtwork(activity) {
   const source = getLocalActivityImageSource(activity?.code);
   return Boolean(source) && !source.startsWith('generated:');
+}
+
+function hasYearInActivityName(activity) {
+  return Object.values(activity?.name_i18n || {}).some((name) => /20\d{2}/u.test(String(name || '')));
 }
 
 function searchKey(value) {

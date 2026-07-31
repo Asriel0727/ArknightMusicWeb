@@ -1,5 +1,3 @@
-import generatedActivityPools from './generatedActivityPools.js';
-
 function story(recruitmentPools = [], options = {}) {
   return { classification: 'story', recruitmentPools, expectsRecruitmentPool: options.expectsRecruitmentPool !== false };
 }
@@ -193,6 +191,44 @@ const ACTIVITY_CATALOG = {
       source_url: 'https://arknights.wiki.gg/wiki/Code_of_Brawl',
     },
   ]),
+  // Vignettes are story activities even when the upstream API does not label
+  // them as side stories or intermezzi.
+  'wiki-bolivar-diagnosed': story([
+    {
+      slug: 'deterministic-chaos',
+      kind: 'standard',
+      name_i18n: {
+        'zh-TW': '確定性混沌',
+        'zh-CN': '确定性混沌',
+        en: 'Deterministic Chaos',
+      },
+      image_url: 'https://web.hycdn.cn/upload/image/20260702/bcf1014142df03beba247b134ef14921.png',
+      operators: [
+        { id: 'char_4229_aphris', rarity: 6, featured: 'primary', name_i18n: { 'zh-TW': '謬因', 'zh-CN': '谬因', en: 'Miuin' } },
+        { id: 'char_4234_pedro', rarity: 5, featured: 'primary', name_i18n: { 'zh-TW': '佩德洛', 'zh-CN': '佩德洛', en: 'Pedro' } },
+        { id: 'char_4171_wulfen', rarity: 5, featured: 'primary', name_i18n: { 'zh-TW': '鉬鉛', 'zh-CN': '钼铅', en: 'Wulfenite' } },
+      ],
+      source_url: 'https://ak.hypergryph.com/news/9686',
+    },
+  ]),
+  'wiki-the-rides-to-lake-silberneherze': story([
+    {
+      slug: 'the-sojourner-rerun',
+      kind: 'standard',
+      name_i18n: {
+        'zh-TW': '遊邦者',
+        'zh-CN': '游邦者',
+        en: 'The Sojourner Rerun',
+      },
+      image_url: 'https://prts.wiki/w/Special:Redirect/file/%E5%8D%A1%E6%B1%A0%E5%9B%BE%E6%A0%87_%E6%B8%B8%E9%82%A6%E8%80%85%E5%A4%8D%E5%88%BB.png',
+      operators: [
+        { id: 'char_4116_blkkgt', rarity: 6, featured: 'primary', name_i18n: { 'zh-TW': '鐧', 'zh-CN': '锏', en: 'Degenbrecher' } },
+        { id: 'char_194_leto', rarity: 5, featured: 'primary', name_i18n: { 'zh-TW': '烈夏', 'zh-CN': '烈夏', en: 'Leto' } },
+        { id: 'char_4122_grabds', rarity: 5, featured: 'primary', name_i18n: { 'zh-TW': '小滿', 'zh-CN': '小满', en: 'Grain Buds' } },
+      ],
+      source_url: 'https://prts.wiki/w/%E9%93%B6%E5%BF%83%E6%B9%96%E5%88%97%E8%BD%A62024/%E6%B4%BB%E5%8A%A8%E5%85%AC%E5%91%8A',
+    },
+  ]),
 
   // Story-stage collaborations share this classification across every server.
   'wiki-a-flurry-to-the-flame': story(),
@@ -280,13 +316,9 @@ const NO_RECRUITMENT_POOL_CODES = new Set([
   'prts-11o91xl',
   'prts-18otgzb',
   'prts-1eibk3p',
+  'prts-1kcd030',
+  'prts-v8thu5',
 ]);
-
-const GENERATED_POOL_CODE_ALIASES = {
-  'prts-j976m1': 'wiki-when-elegies-are-ashes-rerun',
-  'prts-fyig8v': 'wiki-the-great-chief-returns-rerun',
-  'prts-1kcd030': 'wiki-twilight-of-wolumonde',
-};
 
 export function getActivityClassification(activity) {
   return ACTIVITY_CATALOG[activity?.code]?.classification || null;
@@ -331,31 +363,6 @@ function mergePool(apiPool, curatedPool) {
   };
 }
 
-function enrichManualPools(manualPools, generatedPools) {
-  return manualPools.map((manualPool, index) => {
-    const generatedPool = generatedPools.find((pool) => poolsMatch(manualPool, pool))
-      || (manualPools.length === generatedPools.length ? generatedPools[index] : null);
-    if (!generatedPool) return manualPool;
-    const generatedOperators = new Map(
-      (generatedPool.operators || []).map((operator) => [operator.id, operator]),
-    );
-    return {
-      ...generatedPool,
-      ...manualPool,
-      name_i18n: { ...generatedPool.name_i18n, ...manualPool.name_i18n },
-      image_urls: manualPool.image_urls || generatedPool.image_urls,
-      operators: (manualPool.operators || []).map((operator) => ({
-        ...generatedOperators.get(operator.id),
-        ...operator,
-        name_i18n: {
-          ...generatedOperators.get(operator.id)?.name_i18n,
-          ...operator.name_i18n,
-        },
-      })),
-    };
-  });
-}
-
 export function attachCuratedActivityRecruitmentPools(activities, server) {
   return (activities || []).map((activity) => {
     if (!activityExpectsRecruitmentPool(activity)) {
@@ -368,20 +375,10 @@ export function attachCuratedActivityRecruitmentPools(activities, server) {
     const apiPools = Array.isArray(activity?.recruitment_pools)
       ? activity.recruitment_pools
       : [];
-    const generatedCode = GENERATED_POOL_CODE_ALIASES[activity?.code] || activity?.code;
-    let generatedPools = generatedActivityPools[generatedCode]?.[server]
-      || generatedActivityPools[generatedCode]?.global
-      || generatedActivityPools[generatedCode]?.cn
-      || [];
-    if (activity?.code === 'prts-j976m1') {
-      generatedPools = curatedPoolsFor({ code: 'wiki-when-elegies-are-ashes-rerun' });
-    }
-    const manualPools = enrichManualPools(curatedPoolsFor(activity), generatedPools);
-    // Hand-verified entries are authoritative. Generated Wiki rows are the
-    // fallback for activities that do not have an explicit catalog override.
-    const unmatchedCuratedPools = manualPools.length
-      ? [...manualPools]
-      : [...generatedPools];
+    // A date- and operator-based guess can associate an unrelated concurrent
+    // banner with an activity. Only API data and catalog entries reviewed by
+    // hand may be displayed as activity recruitment pools.
+    const unmatchedCuratedPools = [...curatedPoolsFor(activity)];
     const mergedApiPools = apiPools.map((apiPool) => {
       const curatedIndex = unmatchedCuratedPools.findIndex((pool) => poolsMatch(apiPool, pool));
       if (curatedIndex < 0) return apiPool;
