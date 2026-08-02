@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-01T19:38:11.953Z",
+  "generatedAt": "2026-08-02T19:38:55.856Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -22,8 +22,8 @@
     "operators": 425,
     "avatars": {
       "total": 425,
-      "existing": 421,
-      "missing": 4
+      "existing": 425,
+      "missing": 0
     },
     "factions": {
       "total": 44,
@@ -36,9 +36,9 @@
       "missing": 0
     },
     "portraits": {
-      "total": 1323,
-      "existing": 1314,
-      "missing": 9
+      "total": 1327,
+      "existing": 1322,
+      "missing": 5
     },
     "items": {
       "total": 86,
@@ -47,8 +47,8 @@
     },
     "skills": {
       "total": 882,
-      "existing": 874,
-      "missing": 8
+      "existing": 882,
+      "missing": 0
     },
     "modules": {
       "total": 495,
@@ -57,36 +57,18 @@
     }
   },
   "missing": {
-    "avatars": [
-      "public/images/operators/avatars/char_1015_aglna2.png",
-      "public/images/operators/avatars/char_4235_thumpy.png",
-      "public/images/operators/avatars/char_4237_jcinta.png",
-      "public/images/operators/avatars/char_4236_tmslot.png"
-    ],
+    "avatars": [],
     "factions": [],
     "classes": [],
     "portraits": [
-      "public/images/operators/portraits/char_1015_aglna2_1.png",
-      "public/images/operators/portraits/char_1015_aglna2_2.png",
-      "public/images/operators/portraits/char_4235_thumpy_1.png",
-      "public/images/operators/portraits/char_4235_thumpy_2.png",
-      "public/images/operators/portraits/char_4237_jcinta_1.png",
-      "public/images/operators/portraits/char_4237_jcinta_2.png",
-      "public/images/operators/portraits/char_4236_tmslot_1.png",
-      "public/images/operators/portraits/char_4236_tmslot_2.png",
+      "public/images/operators/portraits/char_1044_hsgma2_whirlwind_11-c85ac3bd.png",
+      "public/images/operators/portraits/char_1016_agoat2_epoque_57-fa89a5e2.png",
+      "public/images/operators/portraits/char_478_kirara_epoque_57-a6a6a737.png",
+      "public/images/operators/portraits/char_4191_tippi_epoque_57-902f6c9a.png",
       "public/images/operators/portraits/char_445_wscoot_epoque_49-a40747e5.png"
     ],
     "items": [],
-    "skills": [
-      "public/images/skills/skchr_aglna2_1.png",
-      "public/images/skills/skchr_aglna2_2.png",
-      "public/images/skills/skchr_aglna2_3.png",
-      "public/images/skills/skchr_jcinta_2.png",
-      "public/images/skills/skchr_thumpy_1.png",
-      "public/images/skills/skchr_thumpy_2.png",
-      "public/images/skills/skchr_thumpy_3.png",
-      "public/images/skills/skchr_tmslot_2.png"
-    ],
+    "skills": [],
     "modules": [
       "public/images/modules/uniequip_002_veen.png",
       "public/images/modules/uniequip_002_tanya.png",
@@ -214,9 +196,8 @@
         "label": "予愿安洁莉娜",
         "publicPath": "/images/operators/avatars/char_1015_aglna2.png",
         "relativePath": "public/images/operators/avatars/char_1015_aglna2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/c/c0/%E5%A4%B4%E5%83%8F_%E4%BA%88%E6%84%BF%E5%AE%89%E6%B4%81%E8%8E%89%E5%A8%9C.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_1015_aglna2.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_1015_aglna2.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_1015_aglna2.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_1015_aglna2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_1015_aglna2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_1015_aglna2.png",
@@ -1963,9 +1944,8 @@
         "label": "珊比",
         "publicPath": "/images/operators/avatars/char_4235_thumpy.png",
         "relativePath": "public/images/operators/avatars/char_4235_thumpy.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/0/0c/%E5%A4%B4%E5%83%8F_%E7%8F%8A%E6%AF%94.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4235_thumpy.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4235_thumpy.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4235_thumpy.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4235_thumpy.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4235_thumpy.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4235_thumpy.png",
@@ -3942,9 +3922,8 @@
         "label": "嘉辛塔",
         "publicPath": "/images/operators/avatars/char_4237_jcinta.png",
         "relativePath": "public/images/operators/avatars/char_4237_jcinta.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/8/8b/%E5%A4%B4%E5%83%8F_%E5%98%89%E8%BE%9B%E5%A1%94.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4237_jcinta.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4237_jcinta.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4237_jcinta.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4237_jcinta.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4237_jcinta.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4237_jcinta.png",
@@ -4932,9 +4911,8 @@
         "label": "时隙",
         "publicPath": "/images/operators/avatars/char_4236_tmslot.png",
         "relativePath": "public/images/operators/avatars/char_4236_tmslot.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/3/36/%E5%A4%B4%E5%83%8F_%E6%97%B6%E9%9A%99.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4236_tmslot.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4236_tmslot.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4236_tmslot.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4236_tmslot.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4236_tmslot.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4236_tmslot.png",
@@ -11119,7 +11097,7 @@
         "label": "予愿安洁莉娜 - 予愿安洁莉娜 Elite 1",
         "publicPath": "/images/operators/portraits/char_1015_aglna2_1.png",
         "relativePath": "public/images/operators/portraits/char_1015_aglna2_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1015_aglna2_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1015_aglna2_1.png",
@@ -11164,7 +11142,7 @@
         "label": "予愿安洁莉娜 - 予愿安洁莉娜 Elite 2",
         "publicPath": "/images/operators/portraits/char_1015_aglna2_2.png",
         "relativePath": "public/images/operators/portraits/char_1015_aglna2_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1015_aglna2_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1015_aglna2_2.png",
@@ -16035,6 +16013,31 @@
       },
       {
         "type": "portrait",
+        "id": "char_1044_hsgma2_whirlwind#11",
+        "label": "斩业星熊 - 斩业星熊 - 一闪极意",
+        "publicPath": "/images/operators/portraits/char_1044_hsgma2_whirlwind_11-c85ac3bd.png",
+        "relativePath": "public/images/operators/portraits/char_1044_hsgma2_whirlwind_11-c85ac3bd.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1044_hsgma2_whirlwind%2311.png",
+          "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1044_hsgma2_whirlwind%2311.png",
+          "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/characters/char_1044_hsgma2_whirlwind%2311.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charportraits/char_1044_hsgma2_whirlwind%2311.png",
+          "https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main/portraits/char_1044_hsgma2_whirlwind%2311.png",
+          "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main/characters/char_1044_hsgma2_whirlwind%2311.png",
+          "https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/char_1044_hsgma2_whirlwind%2311.png",
+          "https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/char_1044_hsgma2_whirlwind%2311.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/char_1044_hsgma2_whirlwind%2311.png",
+          "https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/char_1044_hsgma2_whirlwind%2311.png"
+        ],
+        "operatorId": "char_1044_hsgma2",
+        "skinId": "char_1044_hsgma2@whirlwind#11",
+        "portraitId": "char_1044_hsgma2_whirlwind#11",
+        "category": "skin",
+        "phase": null
+      },
+      {
+        "type": "portrait",
         "id": "char_263_skadi_1",
         "label": "斯卡蒂 - 斯卡蒂 Elite 1",
         "publicPath": "/images/operators/portraits/char_263_skadi_1.png",
@@ -19289,7 +19292,7 @@
         "label": "珊比 - 珊比 Elite 1",
         "publicPath": "/images/operators/portraits/char_4235_thumpy_1.png",
         "relativePath": "public/images/operators/portraits/char_4235_thumpy_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4235_thumpy_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4235_thumpy_1.png",
@@ -19334,7 +19337,7 @@
         "label": "珊比 - 珊比 Elite 2",
         "publicPath": "/images/operators/portraits/char_4235_thumpy_2.png",
         "relativePath": "public/images/operators/portraits/char_4235_thumpy_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4235_thumpy_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4235_thumpy_2.png",
@@ -20280,6 +20283,31 @@
         "operatorId": "char_1016_agoat2",
         "skinId": "char_1016_agoat2@epoque#34",
         "portraitId": "char_1016_agoat2_epoque#34",
+        "category": "skin",
+        "phase": null
+      },
+      {
+        "type": "portrait",
+        "id": "char_1016_agoat2_epoque#57",
+        "label": "纯烬艾雅法拉 - 纯烬艾雅法拉 - 后来的故事",
+        "publicPath": "/images/operators/portraits/char_1016_agoat2_epoque_57-fa89a5e2.png",
+        "relativePath": "public/images/operators/portraits/char_1016_agoat2_epoque_57-fa89a5e2.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1016_agoat2_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1016_agoat2_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/characters/char_1016_agoat2_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charportraits/char_1016_agoat2_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main/portraits/char_1016_agoat2_epoque%2357.png",
+          "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main/characters/char_1016_agoat2_epoque%2357.png",
+          "https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/char_1016_agoat2_epoque%2357.png",
+          "https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/char_1016_agoat2_epoque%2357.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/char_1016_agoat2_epoque%2357.png",
+          "https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/char_1016_agoat2_epoque%2357.png"
+        ],
+        "operatorId": "char_1016_agoat2",
+        "skinId": "char_1016_agoat2@epoque#57",
+        "portraitId": "char_1016_agoat2_epoque#57",
         "category": "skin",
         "phase": null
       },
@@ -27909,7 +27937,7 @@
         "label": "嘉辛塔 - 嘉辛塔 Elite 1",
         "publicPath": "/images/operators/portraits/char_4237_jcinta_1.png",
         "relativePath": "public/images/operators/portraits/char_4237_jcinta_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4237_jcinta_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4237_jcinta_1.png",
@@ -27954,7 +27982,7 @@
         "label": "嘉辛塔 - 嘉辛塔 Elite 2",
         "publicPath": "/images/operators/portraits/char_4237_jcinta_2.png",
         "relativePath": "public/images/operators/portraits/char_4237_jcinta_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4237_jcinta_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4237_jcinta_2.png",
@@ -31994,7 +32022,7 @@
         "label": "时隙 - 时隙 Elite 1",
         "publicPath": "/images/operators/portraits/char_4236_tmslot_1.png",
         "relativePath": "public/images/operators/portraits/char_4236_tmslot_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4236_tmslot_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4236_tmslot_1.png",
@@ -32039,7 +32067,7 @@
         "label": "时隙 - 时隙 Elite 2",
         "publicPath": "/images/operators/portraits/char_4236_tmslot_2.png",
         "relativePath": "public/images/operators/portraits/char_4236_tmslot_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4236_tmslot_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4236_tmslot_2.png",
@@ -38030,6 +38058,31 @@
       },
       {
         "type": "portrait",
+        "id": "char_478_kirara_epoque#57",
+        "label": "绮良 - 绮良 - 轻闲快照",
+        "publicPath": "/images/operators/portraits/char_478_kirara_epoque_57-a6a6a737.png",
+        "relativePath": "public/images/operators/portraits/char_478_kirara_epoque_57-a6a6a737.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_478_kirara_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_478_kirara_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/characters/char_478_kirara_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charportraits/char_478_kirara_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main/portraits/char_478_kirara_epoque%2357.png",
+          "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main/characters/char_478_kirara_epoque%2357.png",
+          "https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/char_478_kirara_epoque%2357.png",
+          "https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/char_478_kirara_epoque%2357.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/char_478_kirara_epoque%2357.png",
+          "https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/char_478_kirara_epoque%2357.png"
+        ],
+        "operatorId": "char_478_kirara",
+        "skinId": "char_478_kirara@epoque#57",
+        "portraitId": "char_478_kirara_epoque#57",
+        "category": "skin",
+        "phase": null
+      },
+      {
+        "type": "portrait",
         "id": "char_478_kirara_game#2",
         "label": "绮良 - 绮良 - 前沿玩家",
         "publicPath": "/images/operators/portraits/char_478_kirara_game_2-8d91524c.png",
@@ -39452,6 +39505,31 @@
         "portraitId": "char_4191_tippi_2",
         "category": "elite",
         "phase": 2
+      },
+      {
+        "type": "portrait",
+        "id": "char_4191_tippi_epoque#57",
+        "label": "蒂比 - 蒂比 - 清新布景",
+        "publicPath": "/images/operators/portraits/char_4191_tippi_epoque_57-902f6c9a.png",
+        "relativePath": "public/images/operators/portraits/char_4191_tippi_epoque_57-902f6c9a.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4191_tippi_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4191_tippi_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/characters/char_4191_tippi_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charportraits/char_4191_tippi_epoque%2357.png",
+          "https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main/portraits/char_4191_tippi_epoque%2357.png",
+          "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main/characters/char_4191_tippi_epoque%2357.png",
+          "https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/char_4191_tippi_epoque%2357.png",
+          "https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/char_4191_tippi_epoque%2357.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/char_4191_tippi_epoque%2357.png",
+          "https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/char_4191_tippi_epoque%2357.png"
+        ],
+        "operatorId": "char_4191_tippi",
+        "skinId": "char_4191_tippi@epoque#57",
+        "portraitId": "char_4191_tippi_epoque#57",
+        "category": "skin",
+        "phase": null
       },
       {
         "type": "portrait",
@@ -53684,7 +53762,7 @@
         "label": "极速送达",
         "publicPath": "/images/skills/skchr_aglna2_1.png",
         "relativePath": "public/images/skills/skchr_aglna2_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_aglna2_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_aglna2_1.png",
@@ -53716,7 +53794,7 @@
         "label": "重力自定义",
         "publicPath": "/images/skills/skchr_aglna2_2.png",
         "relativePath": "public/images/skills/skchr_aglna2_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_aglna2_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_aglna2_2.png",
@@ -53748,7 +53826,7 @@
         "label": "酸橙的心事",
         "publicPath": "/images/skills/skchr_aglna2_3.png",
         "relativePath": "public/images/skills/skchr_aglna2_3.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_aglna2_3.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_aglna2_3.png",
@@ -65428,7 +65506,7 @@
         "label": "伞下乘荫",
         "publicPath": "/images/skills/skchr_jcinta_2.png",
         "relativePath": "public/images/skills/skchr_jcinta_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_jcinta_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_jcinta_2.png",
@@ -77428,7 +77506,7 @@
         "label": "“还不走？”",
         "publicPath": "/images/skills/skchr_thumpy_1.png",
         "relativePath": "public/images/skills/skchr_thumpy_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_thumpy_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_thumpy_1.png",
@@ -77460,7 +77538,7 @@
         "label": "“慢慢走~”",
         "publicPath": "/images/skills/skchr_thumpy_2.png",
         "relativePath": "public/images/skills/skchr_thumpy_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_thumpy_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_thumpy_2.png",
@@ -77492,7 +77570,7 @@
         "label": "“不准走！”",
         "publicPath": "/images/skills/skchr_thumpy_3.png",
         "relativePath": "public/images/skills/skchr_thumpy_3.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_thumpy_3.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_thumpy_3.png",
@@ -77940,7 +78018,7 @@
         "label": "科技与传统仪式",
         "publicPath": "/images/skills/skchr_tmslot_2.png",
         "relativePath": "public/images/skills/skchr_tmslot_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_tmslot_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_tmslot_2.png",
