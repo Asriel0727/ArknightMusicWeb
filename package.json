@@ -12,7 +12,9 @@
     "worker:deploy": "wrangler deploy",
     "assets:audit": "node scripts/assets/audit-operator-assets.mjs",
     "assets:sync": "node scripts/assets/sync-operator-assets.mjs",
-    "activities:sync-assets": "node scripts/assets/sync-activity-assets.mjs"
+    "activities:sync-assets": "node scripts/assets/sync-activity-assets.mjs",
+    "activities:sync-pools": "node scripts/generate-activity-pool-catalog.mjs",
+    "activities:audit-pools": "node scripts/audit-activity-pools.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",

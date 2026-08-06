@@ -28,7 +28,8 @@
     </template>
 
     <template v-else-if="currentPage === 'activities'">
-      <ActivityList />
+      <ActivityList @view-character="handleViewCharacter" />
+      <Modal @close="handleModalClose" />
     </template>
 
     <template v-else-if="currentPage === 'library'">

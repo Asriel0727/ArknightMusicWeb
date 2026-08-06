@@ -311,6 +311,13 @@
   </main>
 </template>
 
+<script>
+let songCatalogCache = null;
+let songCatalogPromise = null;
+let characterCatalogCache = null;
+let characterCatalogPromise = null;
+</script>
+
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -387,6 +394,14 @@ const selectedCharacterList = computed(() => {
 const selectedCharacterItems = computed(() => {
   return (selectedCharacterList.value?.items || []).filter((item) => item.character_id);
 });
+
+const hasSavedSongs = () => {
+  return favorites.value.length > 0 || playlists.value.some((playlist) => getPlaylistSongIds(playlist).length > 0);
+};
+
+const hasSavedCharacters = () => {
+  return characterLists.value.some((list) => (list.items || []).some((item) => item.character_id));
+};
 
 const setActionMessage = (message) => {
   actionMessage.value = message;
@@ -546,52 +561,63 @@ const handleCharacterAvatarError = (event, characterId) => {
 };
 
 const loadSongCatalog = async () => {
-  const [songs, albums] = await Promise.all([
-    fetchSongs(),
-    fetchAlbums(),
-  ]);
-
-  albumCatalog.value = albums.reduce((nextCatalog, album) => {
-    if (album?.cid) {
-      nextCatalog[album.cid] = album;
-    }
-    return nextCatalog;
-  }, {});
-  songCatalog.value = songs.reduce((nextCatalog, song) => {
-    if (song?.cid) {
-      nextCatalog[song.cid] = song;
-    }
-    return nextCatalog;
-  }, {});
-
-  try {
-    const characters = await fetchRecruitCharacters();
-    characterCatalog.value = characters.reduce((nextCatalog, character) => {
-      if (character?.id) {
-        nextCatalog[character.id] = character;
-      }
-      return nextCatalog;
-    }, {});
-    characterAvatarIndexMap.value.clear();
-  } catch (error) {
-    console.warn('角色清單 catalog 載入失敗，將保留角色 ID fallback:', error);
-    characterCatalog.value = {};
+  if (!songCatalogPromise) {
+    songCatalogPromise = Promise.all([fetchSongs(), fetchAlbums()])
+      .then(([songs, albums]) => {
+        songCatalogCache = {
+          albums: albums.reduce((nextCatalog, album) => {
+            if (album?.cid) nextCatalog[album.cid] = album;
+            return nextCatalog;
+          }, {}),
+          songs: songs.reduce((nextCatalog, song) => {
+            if (song?.cid) nextCatalog[song.cid] = song;
+            return nextCatalog;
+          }, {}),
+        };
+        return songCatalogCache;
+      })
+      .catch((error) => {
+        songCatalogPromise = null;
+        throw error;
+      });
   }
+
+  const catalog = songCatalogCache || await songCatalogPromise;
+  albumCatalog.value = catalog.albums;
+  songCatalog.value = catalog.songs;
 };
 
 const loadCharacterCatalog = async () => {
-  try {
-    const characters = await fetchRecruitCharacters();
-    characterCatalog.value = characters.reduce((nextCatalog, character) => {
-    if (character?.id) {
-      nextCatalog[character.id] = character;
-    }
-    return nextCatalog;
-  }, {});
-    characterAvatarIndexMap.value.clear();
-  } catch (error) {
-    console.warn('角色清單 catalog 載入失敗，將保留角色 ID fallback:', error);
-    characterCatalog.value = {};
+  if (!characterCatalogPromise) {
+    characterCatalogPromise = fetchRecruitCharacters()
+      .then((characters) => {
+        characterCatalogCache = characters.reduce((nextCatalog, character) => {
+          if (character?.id) nextCatalog[character.id] = character;
+          return nextCatalog;
+        }, {});
+        return characterCatalogCache;
+      })
+      .catch((error) => {
+        characterCatalogPromise = null;
+        throw error;
+      });
+  }
+
+  characterCatalog.value = characterCatalogCache || await characterCatalogPromise;
+  characterAvatarIndexMap.value.clear();
+};
+
+const ensureActiveTabCatalog = () => {
+  if ((activeTab.value === 'favorites' || activeTab.value === 'playlists') && hasSavedSongs()) {
+    loadSongCatalog().catch((error) => {
+      console.warn('歌曲 catalog 載入失敗，將保留歌曲 ID fallback:', error);
+    });
+  }
+
+  if (activeTab.value === 'characters' && hasSavedCharacters()) {
+    loadCharacterCatalog().catch((error) => {
+      console.warn('角色 catalog 載入失敗，將保留角色 ID fallback:', error);
+    });
   }
 };
 
@@ -611,7 +637,6 @@ const loadLibrary = async () => {
       fetchFavoriteSongs(),
       fetchPlaylists(),
       fetchCharacterLists(),
-      loadSongCatalog(),
     ]);
     favorites.value = nextFavorites || [];
     playlists.value = nextPlaylists || [];
@@ -625,6 +650,7 @@ const loadLibrary = async () => {
     if (!selectedCharacterListId.value && characterLists.value.length > 0) {
       selectedCharacterListId.value = characterLists.value[0].id;
     }
+    ensureActiveTabCatalog();
   } catch (error) {
     loadError.value = error?.message || t('userLibrary.loadFailed');
   } finally {
@@ -659,6 +685,7 @@ const getLibraryPlaybackContext = () => {
 };
 
 const playSongCollection = async (songCids, startIndex = 0) => {
+  await loadSongCatalog();
   const queue = [...new Set(songCids)].map(normalizeSongForPlayback);
   if (queue.length === 0) return;
 
@@ -855,6 +882,10 @@ const submitCreateCharacterList = async () => {
 
 watch(() => authState.user, () => {
   loadLibrary().catch(() => {});
+});
+
+watch(activeTab, () => {
+  ensureActiveTabCatalog();
 });
 
 onMounted(() => {
