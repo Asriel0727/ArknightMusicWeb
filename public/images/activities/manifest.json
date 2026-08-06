@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-23T00:59:43.324Z",
+  "generatedAt": "2026-08-06T01:16:19.358Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3234,9 +3234,13 @@
       "syncedAt": "2026-07-22T00:47:20.600Z"
     },
     "wiki-babel-event-rerun": {
-      "aliasOf": "wiki-babel-event",
-      "sourceUrl": "alias:wiki-babel-event",
-      "syncedAt": "2026-07-22T09:30:20.224Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-08-06T01:16:18.207Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
@@ -3250,29 +3254,29 @@
     "wiki-stronghold-protocol-event": {
       "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
       "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/thumb/0/03/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82024_30.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82024_30.jpg?v=c09mq70w6h84rmwv7v89ixoqitlr9vy",
+      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
       "contentType": "image/jpeg",
-      "size": 26848,
-      "hash": "b2c651441f9439ed581c1e3eb1f779d361678d5f30a4767d81a50264c7362255",
-      "syncedAt": "2026-07-23T00:56:16.751Z"
+      "size": 244822,
+      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
+      "syncedAt": "2026-08-06T01:16:18.621Z"
     },
     "wiki-ending-a-grand-overture": {
       "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
       "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
-      "sourceUrl": "https://media.prts.wiki/thumb/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg?v=05z6g4glyxucrdn3y23829zom4emenr",
+      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
       "contentType": "image/jpeg",
-      "size": 31773,
-      "hash": "bdd746c5c2b4ec645af48f7154f544530b2d157d91c5ae535c655525762d71e2",
-      "syncedAt": "2026-07-23T00:56:16.886Z"
+      "size": 280529,
+      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
+      "syncedAt": "2026-08-06T01:16:18.965Z"
     },
     "wiki-vector-breakthrough-event": {
       "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
       "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/thumb/9/9b/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B4_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B4_01.jpg?v=9fj9dim5jwgjlaex9b27io6xjdrebft",
+      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
       "contentType": "image/jpeg",
-      "size": 35545,
-      "hash": "8f0131ec1961c79f504ae59dcf69937b447d048df811b03b4bd149cf1720ae4e",
-      "syncedAt": "2026-07-23T00:59:43.065Z"
+      "size": 268285,
+      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
+      "syncedAt": "2026-08-06T01:16:19.358Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.jpg",
