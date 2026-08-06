@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-06T09:20:10.382Z",
+  "generatedAt": "2026-08-06T14:42:24.911Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3434,13 +3434,13 @@
       "syncedAt": "2026-08-06T03:47:58.435Z"
     },
     "wiki-contingency-contract-pyrite": {
-      "publicPath": "/images/activities/wiki-contingency-contract-pyrite.jpg",
-      "relativePath": "public/images/activities/wiki-contingency-contract-pyrite.jpg",
-      "sourceUrl": "https://media.prts.wiki/thumb/6/67/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%BB%84%E9%93%81%E8%A1%8C%E5%8A%A8_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%BB%84%E9%93%81%E8%A1%8C%E5%8A%A8_01.jpg?v=li5gvzku9ohqyuzl3tkp0ywguckz4s2",
-      "contentType": "image/jpeg",
-      "size": 62096,
-      "hash": "67826c86d0bce5af9bbca4b2099ace2a8d54ed7ad505c84ff23b7a1ef14fe0d0",
-      "syncedAt": "2026-08-06T09:20:09.812Z"
+      "publicPath": "/images/activities/wiki-contingency-contract-pyrite.svg",
+      "relativePath": "public/images/activities/wiki-contingency-contract-pyrite.svg",
+      "sourceUrl": "generated:activity-fallback:v1",
+      "contentType": "image/svg+xml",
+      "size": 840,
+      "hash": "f67c3bbdb842a1dcdc31db214d54967f4cd70904915c4bb204a167d3ba04be7c",
+      "syncedAt": "2026-08-06T14:42:24.911Z"
     },
     "wiki-1st-anniversary-celebration": {
       "publicPath": "/images/activities/wiki-1st-anniversary-celebration.svg",
@@ -3452,13 +3452,13 @@
       "syncedAt": "2026-07-22T00:47:21.130Z"
     },
     "wiki-contingency-contract-event": {
-      "publicPath": "/images/activities/wiki-contingency-contract-event.jpg",
-      "relativePath": "public/images/activities/wiki-contingency-contract-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/thumb/a/ad/%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6-%E9%99%90%E6%97%B6%E6%B4%BB%E5%8A%A8.jpg/650px-%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6-%E9%99%90%E6%97%B6%E6%B4%BB%E5%8A%A8.jpg?v=qx6v251br0d0uaatsibw2lg4d2019dz",
-      "contentType": "image/jpeg",
-      "size": 101446,
-      "hash": "aa36de0c8d2940c50d5db06aa9a08da7c8b43a044df615a38effefa18ef71df0",
-      "syncedAt": "2026-08-06T09:20:10.381Z"
+      "publicPath": "/images/activities/wiki-contingency-contract-event.svg",
+      "relativePath": "public/images/activities/wiki-contingency-contract-event.svg",
+      "sourceUrl": "generated:activity-fallback:v1",
+      "contentType": "image/svg+xml",
+      "size": 834,
+      "hash": "c58f78eedd6bd0da0f1403aa88aee60a35e077165b84e2e1ed9dd6836973e31f",
+      "syncedAt": "2026-08-06T14:42:24.911Z"
     },
     "wiki-heart-of-surging-flame-part-1": {
       "publicPath": "/images/activities/wiki-heart-of-surging-flame-part-1.svg",
