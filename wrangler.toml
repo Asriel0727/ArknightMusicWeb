@@ -11,4 +11,14 @@ binding = "ARKNIGHTS_DATA"
 id = "1f16c51e50154624856b1feb4f67ea2e"
 
 [triggers]
-crons = ["0 */6 * * *"]
+# Keep heavyweight sync jobs in separate Worker invocations. Subrequests from
+# concurrent waitUntil tasks share one invocation's quota.
+crons = [
+  "0 */6 * * *",
+  "5 */6 * * *",
+  "10 */6 * * *",
+  "15 */6 * * *",
+  "20 */6 * * *",
+  "25 */6 * * *",
+  "30 */6 * * *",
+]

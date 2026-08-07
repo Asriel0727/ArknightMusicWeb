@@ -49,6 +49,16 @@ const PRTS_WIKI_API = 'https://prts.wiki/api.php';
 const ARKNIGHTS_WIKI_OPERATOR_LIST = 'https://arknights.wiki.gg/wiki/Operator/List';
 const OPERATOR_RELEASE_SERVERS = new Set(['cn', 'global', 'tw']);
 const ACTIVITY_SERVERS = new Set(['cn', 'global', 'tw']);
+const ACTIVITY_SYNC_SOURCE_LIMIT = 80;
+const SCHEDULED_SYNC_CRONS = {
+  '0 */6 * * *': 'activities-cn',
+  '5 */6 * * *': 'activities-global',
+  '10 */6 * * *': 'activities-tw',
+  '15 */6 * * *': 'recruit-operators',
+  '20 */6 * * *': 'operator-catalog',
+  '25 */6 * * *': 'operator-release-dates',
+  '30 */6 * * *': 'music-cache',
+};
 const ACTIVITY_IMAGE_OVERRIDES = {
   'wiki-sui-s-garden-of-grotesqueries-mission-event': 'https://arknights.wiki.gg/images/EN_Sui%27s_Garden_of_Grotesqueries_Mission_Event_banner.png?d46d74',
   'wiki-medjehtiqedti-bound': 'https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9',
@@ -208,7 +218,11 @@ export default {
     if (url.pathname === '/api/admin/sync-activities') {
       const unauthorized = requireAdminToken(request, env);
       if (unauthorized) return unauthorized;
-      const result = await syncActivities(env);
+      const server = normalizeActivityServer(url.searchParams.get('server'));
+      if (!server) {
+        return json({ ok: false, error: 'A valid server query is required: cn, global, or tw' }, 400);
+      }
+      const result = await syncActivities(env, [server]);
       return json({ ok: true, ...result, time: new Date().toISOString() });
     }
 
@@ -468,22 +482,46 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    scheduleSyncTask(ctx, env, 'recruit-operators', async () => {
-      const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
-      await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
-      return { count: data.operators.length };
-    });
-    scheduleSyncTask(ctx, env, 'operator-catalog', () => syncOperatorCatalog(env));
-    if (hasSupabaseConfig(env)) {
-      scheduleSyncTask(ctx, env, 'music-cache', () => syncMusicCache(env, {
+    const job = SCHEDULED_SYNC_CRONS[event.cron];
+    if (!job) {
+      console.warn('Ignoring unrecognized scheduled cron:', event.cron);
+      return;
+    }
+
+    if (job === 'recruit-operators') {
+      scheduleSyncTask(ctx, env, job, async () => {
+        const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
+        await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
+        return { count: data.operators.length };
+      });
+      return;
+    }
+
+    if (!hasSupabaseConfig(env)) {
+      console.warn(`Skipping ${job}; Supabase is not configured.`);
+      return;
+    }
+
+    if (job === 'operator-catalog') {
+      scheduleSyncTask(ctx, env, job, () => syncOperatorCatalog(env));
+      return;
+    }
+
+    if (job === 'operator-release-dates') {
+      scheduleSyncTask(ctx, env, job, () => syncOperatorReleaseDates(env));
+      return;
+    }
+
+    if (job === 'music-cache') {
+      scheduleSyncTask(ctx, env, job, () => syncMusicCache(env, {
         songDetailLimit: 10,
         albumDetailLimit: 5,
       }));
-      scheduleSyncTask(ctx, env, 'operator-release-dates', () => syncOperatorReleaseDates(env));
-      for (const server of ACTIVITY_SERVERS) {
-        scheduleSyncTask(ctx, env, `activities-${server}`, () => syncActivities(env, [server]));
-      }
+      return;
     }
+
+    const server = job.replace('activities-', '');
+    scheduleSyncTask(ctx, env, job, () => syncActivities(env, [server]));
   },
 };
 
@@ -808,14 +846,14 @@ function scheduleSyncTask(ctx, env, job, task) {
   })());
 }
 
-async function fetchWikiActivityWindows(server) {
+async function fetchWikiActivityWindows(server, limit = ACTIVITY_SYNC_SOURCE_LIMIT) {
   const params = new URLSearchParams({
     action: 'cargoquery',
     tables: 'EventServerDetails=ES',
     fields: 'ES.event=event_name,ES.server=server,ES.startTime=start_at,ES.endTime=end_at',
     where: `ES.server="${server}"`,
     order_by: 'ES.startTime DESC',
-    limit: '500',
+    limit: String(Math.min(ACTIVITY_SYNC_SOURCE_LIMIT, Math.max(1, limit))),
     format: 'json',
   });
   const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
@@ -881,11 +919,12 @@ async function fetchWikiActivityMetadata(eventNames) {
   return metadata;
 }
 
-async function fetchPrtsCnActivities() {
+async function fetchPrtsCnActivities(limit = ACTIVITY_SYNC_SOURCE_LIMIT) {
   const activities = [];
   let offset = 0;
   do {
-    const query = '[[分类:有活动信息的页面]]|?活动开始时间#ISO|?活动结束时间#ISO|?标题图文件名|?分类|sort=活动开始时间|order=desc|limit=500';
+    const remaining = Math.max(1, limit - activities.length);
+    const query = `[[分类:有活动信息的页面]]|?活动开始时间#ISO|?活动结束时间#ISO|?标题图文件名|?分类|sort=活动开始时间|order=desc|limit=${Math.min(50, remaining)}`;
     const params = new URLSearchParams({
       action: 'ask',
       query,
@@ -914,10 +953,11 @@ async function fetchPrtsCnActivities() {
       };
       if (hasValidActivityWindow(activity.start_at, activity.end_at)) {
         activities.push(activity);
+        if (activities.length >= limit) break;
       }
     }
     offset = Number(payload['query-continue-offset'] || 0);
-  } while (offset > 0);
+  } while (offset > 0 && activities.length < limit);
   return activities;
 }
 
@@ -1199,6 +1239,7 @@ async function syncActivities(env, servers = ACTIVITY_SERVERS) {
     windows: syncedWindows,
     servers: Object.fromEntries(windowsByServer.map(({ server, windows }) => [server, windows.length])),
     images: { wikiCandidates: wikiImageUrls.size, wikiFallbacks: wikiImageFallbacks, retained: retainedImages },
+    sourceLimit: ACTIVITY_SYNC_SOURCE_LIMIT,
     source: { wiki: ARKNIGHTS_WIKI_API, prts: PRTS_WIKI_API },
   };
 }
