@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-07T00:21:33.129Z",
+  "generatedAt": "2026-08-07T06:26:20.178Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -543,13 +543,13 @@
       "syncedAt": "2026-07-17T03:50:07.563Z"
     },
     "wiki-ato": {
-      "publicPath": "/images/activities/wiki-ato.jpg",
-      "relativePath": "public/images/activities/wiki-ato.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/29/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2025_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 209971,
-      "hash": "2e92e1b817adc1bbe3aeda62b2ddcf673295ac83d2945663fe73dc53bbf77af3",
-      "syncedAt": "2026-07-17T03:50:07.790Z"
+      "publicPath": "/images/activities/wiki-ato.webp",
+      "relativePath": "public/images/activities/wiki-ato.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ato_banner.png?76b18a",
+      "contentType": "image/webp",
+      "size": 942126,
+      "hash": "371b789b9e2b76841196851d7bcc90d65a7bf0d011e0d2b2cde4339137e7e674",
+      "syncedAt": "2026-08-07T06:26:16.598Z"
     },
     "prts-13cylmq": {
       "publicPath": "/images/activities/prts-13cylmq.jpg",
@@ -561,13 +561,13 @@
       "syncedAt": "2026-07-17T03:50:08.044Z"
     },
     "wiki-gyoko-kichion": {
-      "publicPath": "/images/activities/wiki-gyoko-kichion.jpg",
-      "relativePath": "public/images/activities/wiki-gyoko-kichion.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f8/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%AA%E9%BC%93%E4%B9%8B%E8%BE%BE%E4%BA%BA%E8%81%94%E5%8A%A8_04.jpg",
-      "contentType": "image/jpeg",
-      "size": 262195,
-      "hash": "fd9aab51e48281e6694f10f0624529fa05342bcca5890c49190d276b40237764",
-      "syncedAt": "2026-07-17T03:50:08.276Z"
+      "publicPath": "/images/activities/wiki-gyoko-kichion.png",
+      "relativePath": "public/images/activities/wiki-gyoko-kichion.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Gyoko_Kichion_banner.png?6d5027",
+      "contentType": "image/png",
+      "size": 929386,
+      "hash": "20dce7743c3d8ba11fd8585d45ca26863c411653049d4a77c15f13405dcbf6ce",
+      "syncedAt": "2026-08-07T06:26:16.869Z"
     },
     "prts-1tcrw9m": {
       "publicPath": "/images/activities/prts-1tcrw9m.png",
@@ -579,13 +579,13 @@
       "syncedAt": "2026-07-17T03:50:08.963Z"
     },
     "wiki-fantasy-in-the-mirage": {
-      "publicPath": "/images/activities/wiki-fantasy-in-the-mirage.jpg",
-      "relativePath": "public/images/activities/wiki-fantasy-in-the-mirage.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/fe/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%95%9C%E4%B8%AD%E9%9B%86_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 472931,
-      "hash": "e59d5a4cecc77374168920c756d28ce4d3066bd61cb2cbcfaadcb07145c216e1",
-      "syncedAt": "2026-07-17T03:50:09.229Z"
+      "publicPath": "/images/activities/wiki-fantasy-in-the-mirage.webp",
+      "relativePath": "public/images/activities/wiki-fantasy-in-the-mirage.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Fantasy_in_the_Mirage_banner.png?548371",
+      "contentType": "image/webp",
+      "size": 439790,
+      "hash": "a8bbcd2938d08ea4a4d43fc688c5ee976a4c500091c4c7dfb7f965b6a54c8e92",
+      "syncedAt": "2026-08-07T06:26:17.010Z"
     },
     "prts-qk7pva": {
       "publicPath": "/images/activities/prts-qk7pva.jpg",
@@ -723,22 +723,22 @@
       "syncedAt": "2026-07-17T03:50:13.118Z"
     },
     "wiki-integrated-lookback-another-tides": {
-      "publicPath": "/images/activities/wiki-integrated-lookback-another-tides.jpg",
-      "relativePath": "public/images/activities/wiki-integrated-lookback-another-tides.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%88%91%E4%BB%AC%E6%98%8E%E6%97%A5%E8%A7%81_08.jpg",
-      "contentType": "image/jpeg",
-      "size": 136228,
-      "hash": "cc74b1d9972a7b375a4c977109a8342bee6d805bd8883e2781e197c7fa8e054a",
-      "syncedAt": "2026-07-17T03:50:13.334Z"
+      "publicPath": "/images/activities/wiki-integrated-lookback-another-tides.png",
+      "relativePath": "public/images/activities/wiki-integrated-lookback-another-tides.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Integrated_Lookback_Another_Tides_banner.png?3f7134",
+      "contentType": "image/png",
+      "size": 854899,
+      "hash": "f4d71948312bcdb5a7dda6016c6e16d651bc04aaf13386b0c706a19162876573",
+      "syncedAt": "2026-08-07T06:26:17.768Z"
     },
     "wiki-see-you-soon": {
-      "publicPath": "/images/activities/wiki-see-you-soon.jpg",
-      "relativePath": "public/images/activities/wiki-see-you-soon.jpg",
-      "sourceUrl": "https://media.prts.wiki/4/46/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%88%91%E4%BB%AC%E6%98%8E%E6%97%A5%E8%A7%81_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 377627,
-      "hash": "14d9b2407e0185e901c89483a8752efaf58b3850158328f50d976d68226f8a0a",
-      "syncedAt": "2026-07-17T03:50:13.587Z"
+      "publicPath": "/images/activities/wiki-see-you-soon.webp",
+      "relativePath": "public/images/activities/wiki-see-you-soon.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_See_You_Soon_banner.png?1d9667",
+      "contentType": "image/webp",
+      "size": 925276,
+      "hash": "18b63d2684a428c285e61294eb6e861d262f12ee0422b466b64a523ce4439003",
+      "syncedAt": "2026-08-07T06:26:17.901Z"
     },
     "prts-a5ioer": {
       "publicPath": "/images/activities/prts-a5ioer.jpg",
@@ -759,13 +759,13 @@
       "syncedAt": "2026-07-17T03:50:14.903Z"
     },
     "wiki-such-is-the-joy-of-our-reunion": {
-      "publicPath": "/images/activities/wiki-such-is-the-joy-of-our-reunion.jpg",
-      "relativePath": "public/images/activities/wiki-such-is-the-joy-of-our-reunion.jpg",
-      "sourceUrl": "https://media.prts.wiki/5/54/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9B%B8%E8%A7%81%E6%AC%A2_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 490558,
-      "hash": "92e605cc6ba7276c5ef32acc4f2bdb129d1bf7a342733153327098c9fa04cd50",
-      "syncedAt": "2026-07-17T03:50:15.178Z"
+      "publicPath": "/images/activities/wiki-such-is-the-joy-of-our-reunion.webp",
+      "relativePath": "public/images/activities/wiki-such-is-the-joy-of-our-reunion.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Such_is_the_Joy_of_Our_Reunion_banner.png?517c1b",
+      "contentType": "image/webp",
+      "size": 1091446,
+      "hash": "4f5988f019b4f62a2f5a42e22a4fba0179be19e7283901ec657e94d4946da550",
+      "syncedAt": "2026-08-07T06:26:17.945Z"
     },
     "prts-8vv5p8": {
       "publicPath": "/images/activities/prts-8vv5p8.jpg",
@@ -786,13 +786,13 @@
       "syncedAt": "2026-07-17T03:50:15.657Z"
     },
     "wiki-poly-vision-museum": {
-      "publicPath": "/images/activities/wiki-poly-vision-museum.jpg",
-      "relativePath": "public/images/activities/wiki-poly-vision-museum.jpg",
-      "sourceUrl": "https://media.prts.wiki/5/5e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%A7%86%E7%9B%B8%E5%8D%9A%E7%89%A9%E9%A6%86_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 375972,
-      "hash": "e5de20682489690e315ba841e6f87733bed167ec42cf40e631973c85a726977e",
-      "syncedAt": "2026-07-17T03:50:15.901Z"
+      "publicPath": "/images/activities/wiki-poly-vision-museum.png",
+      "relativePath": "public/images/activities/wiki-poly-vision-museum.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Poly_Vision_Museum_banner.png?4e0f40",
+      "contentType": "image/png",
+      "size": 870413,
+      "hash": "11e22dff19b1b9e88b574d32addd98aed921523eb53ad3be452cd257dda7d8b7",
+      "syncedAt": "2026-08-07T06:26:18.331Z"
     },
     "wiki-a-gift-of-time": {
       "publicPath": "/images/activities/wiki-a-gift-of-time.jpg",
@@ -813,13 +813,13 @@
       "syncedAt": "2026-07-17T03:50:16.385Z"
     },
     "wiki-an-accolade-to-a-rejuvenation": {
-      "publicPath": "/images/activities/wiki-an-accolade-to-a-rejuvenation.jpg",
-      "relativePath": "public/images/activities/wiki-an-accolade-to-a-rejuvenation.jpg",
-      "sourceUrl": "https://media.prts.wiki/a/ab/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%95%99%E5%BD%B1%E7%83%81%E4%BB%8A_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 239546,
-      "hash": "3a52b10aa87fc7f4ba56deefb32e03ff2e0d3f9a4065ede8809845b3575790db",
-      "syncedAt": "2026-07-17T03:50:16.631Z"
+      "publicPath": "/images/activities/wiki-an-accolade-to-a-rejuvenation.webp",
+      "relativePath": "public/images/activities/wiki-an-accolade-to-a-rejuvenation.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_An_Accolade_to_a_Rejuvenation_banner.png?d3a187",
+      "contentType": "image/webp",
+      "size": 501860,
+      "hash": "a9a672440bfe768b25cd0c9f84f9d15f59380ef8165dd221ff8fe792907983ac",
+      "syncedAt": "2026-08-07T06:26:18.387Z"
     },
     "wiki-exodus-from-the-pale-sea": {
       "publicPath": "/images/activities/wiki-exodus-from-the-pale-sea.jpg",
@@ -930,13 +930,13 @@
       "syncedAt": "2026-07-17T03:50:19.900Z"
     },
     "wiki-delicious-on-terra": {
-      "publicPath": "/images/activities/wiki-delicious-on-terra.jpg",
-      "relativePath": "public/images/activities/wiki-delicious-on-terra.jpg",
-      "sourceUrl": "https://media.prts.wiki/8/83/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%B3%B0%E6%8B%89%E9%A5%AD_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 282251,
-      "hash": "c4cdd910f48028134bf69048c98f9b0a5b847beb307419380a693762d20d5e3f",
-      "syncedAt": "2026-07-17T03:50:20.130Z"
+      "publicPath": "/images/activities/wiki-delicious-on-terra.webp",
+      "relativePath": "public/images/activities/wiki-delicious-on-terra.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Delicious_On_Terra_banner.png?9122f4",
+      "contentType": "image/webp",
+      "size": 1014748,
+      "hash": "d78094224b231806ea2d7b1cc39d7e404d359b3d95fa2166cb29f5fbfb04282b",
+      "syncedAt": "2026-08-07T06:26:18.673Z"
     },
     "prts-19yqo3o": {
       "publicPath": "/images/activities/prts-19yqo3o.jpg",
@@ -966,13 +966,13 @@
       "syncedAt": "2026-07-17T03:50:21.242Z"
     },
     "wiki-adventure-that-cannot-wait-for-the-sun": {
-      "publicPath": "/images/activities/wiki-adventure-that-cannot-wait-for-the-sun.png",
-      "relativePath": "public/images/activities/wiki-adventure-that-cannot-wait-for-the-sun.png",
-      "sourceUrl": "https://media.prts.wiki/0/0d/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2024_02.png",
-      "contentType": "image/png",
-      "size": 1424315,
-      "hash": "63c44c94d218f52a36f1f16c1cb93c6a5f95b63a8f03eb957cc8f67e4c441738",
-      "syncedAt": "2026-07-17T03:50:22.100Z"
+      "publicPath": "/images/activities/wiki-adventure-that-cannot-wait-for-the-sun.webp",
+      "relativePath": "public/images/activities/wiki-adventure-that-cannot-wait-for-the-sun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Adventure_That_Cannot_Wait_for_the_Sun_banner.png?1f355e",
+      "contentType": "image/webp",
+      "size": 1123466,
+      "hash": "bc2fbbc3e8b7d7232f5aea61f551a3d0453718d27d94bdf6e15b0435d544baee",
+      "syncedAt": "2026-08-07T06:26:19.269Z"
     },
     "prts-1suezar": {
       "publicPath": "/images/activities/prts-1suezar.jpg",
@@ -1011,13 +1011,13 @@
       "syncedAt": "2026-07-17T03:50:23.551Z"
     },
     "wiki-sweetness-overload": {
-      "publicPath": "/images/activities/wiki-sweetness-overload.jpg",
-      "relativePath": "public/images/activities/wiki-sweetness-overload.jpg",
-      "sourceUrl": "https://media.prts.wiki/a/a0/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%99%B9%E5%BD%A9%E8%8C%B6%E4%BC%9A_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 243032,
-      "hash": "722856042baee6d5c4ba56c22887ed043e43338f7a8e5f390cb7811cb793e489",
-      "syncedAt": "2026-07-17T03:50:23.784Z"
+      "publicPath": "/images/activities/wiki-sweetness-overload.webp",
+      "relativePath": "public/images/activities/wiki-sweetness-overload.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Sweetness_Overload_banner.png?8cd6cb",
+      "contentType": "image/webp",
+      "size": 618128,
+      "hash": "f16284a3e76da384723d96d485fb00aa03fb71fe231639a7006c77bbc6af4f3b",
+      "syncedAt": "2026-08-07T06:26:19.587Z"
     },
     "prts-yjnwti": {
       "publicPath": "/images/activities/prts-yjnwti.jpg",
@@ -1029,13 +1029,13 @@
       "syncedAt": "2026-07-17T03:50:24.014Z"
     },
     "wiki-path-of-life": {
-      "publicPath": "/images/activities/wiki-path-of-life.jpg",
-      "relativePath": "public/images/activities/wiki-path-of-life.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/2e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%94%9F%E8%B7%AF_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 183499,
-      "hash": "c82db3f7a2d23d3a37df7c9cd69331badb2aee32d1722d4e72e8833a489fc6c7",
-      "syncedAt": "2026-07-17T03:50:24.239Z"
+      "publicPath": "/images/activities/wiki-path-of-life.webp",
+      "relativePath": "public/images/activities/wiki-path-of-life.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Path_of_Life_banner.png?e075d1",
+      "contentType": "image/webp",
+      "size": 680562,
+      "hash": "7618b8654448f1292f9670c438d921f147cc13dff699f73bcfd9ef1fb36045be",
+      "syncedAt": "2026-08-07T06:26:19.642Z"
     },
     "prts-2u3jvs": {
       "publicPath": "/images/activities/prts-2u3jvs.jpg",
@@ -1047,13 +1047,13 @@
       "syncedAt": "2026-07-17T03:50:24.678Z"
     },
     "wiki-rhodes-island-icebreaker-games": {
-      "publicPath": "/images/activities/wiki-rhodes-island-icebreaker-games.jpg",
-      "relativePath": "public/images/activities/wiki-rhodes-island-icebreaker-games.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/2e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%BA%94%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_35.jpg",
-      "contentType": "image/jpeg",
-      "size": 132044,
-      "hash": "bfc84b94448e17cdf958b0905ddda38a246dc51aa04d459ffe84f847755ac3d1",
-      "syncedAt": "2026-07-17T03:50:24.895Z"
+      "publicPath": "/images/activities/wiki-rhodes-island-icebreaker-games.png",
+      "relativePath": "public/images/activities/wiki-rhodes-island-icebreaker-games.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Rhodes_Island_Icebreaker_Games_banner.png?49e53e",
+      "contentType": "image/png",
+      "size": 608006,
+      "hash": "8f975ff0c33504831062d146193b24d153962174d7b50da5de87c91d7364e1f0",
+      "syncedAt": "2026-08-07T06:26:20.178Z"
     },
     "wiki-absolved-will-be-the-seekers": {
       "publicPath": "/images/activities/wiki-absolved-will-be-the-seekers.jpg",
@@ -2523,40 +2523,40 @@
       "syncedAt": "2026-07-17T03:51:26.269Z"
     },
     "wiki-act-or-die-rerun": {
-      "publicPath": "/images/activities/wiki-act-or-die-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-act-or-die-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/b/b4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%BA%A2%E4%B8%9D%E7%BB%92_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 294882,
-      "hash": "44dd82a68d8851a6759fd1e250a8cba8e2ead6a4313d6300ae004010404cfe80",
-      "syncedAt": "2026-07-17T08:58:12.617Z"
+      "publicPath": "/images/activities/wiki-act-or-die-rerun.webp",
+      "relativePath": "public/images/activities/wiki-act-or-die-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Act_or_Die_Rerun_banner.png?fc2dc2",
+      "contentType": "image/webp",
+      "size": 907268,
+      "hash": "2be1c6cf762921325803594bb549ac86f7de1950bf770c412cc2201759060047",
+      "syncedAt": "2026-08-07T06:26:16.184Z"
     },
     "wiki-a-flurry-to-the-flame-rerun": {
-      "publicPath": "/images/activities/wiki-a-flurry-to-the-flame-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-a-flurry-to-the-flame-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/1/16/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%90%BD%E5%8F%B6%E9%80%90%E7%81%AB_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 345338,
-      "hash": "fd2e6ce13927f209971afea5ee87ccff57731404e7cc15310635410733d0b901",
-      "syncedAt": "2026-07-17T08:58:13.947Z"
+      "publicPath": "/images/activities/wiki-a-flurry-to-the-flame-rerun.webp",
+      "relativePath": "public/images/activities/wiki-a-flurry-to-the-flame-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_A_Flurry_to_the_Flame_Rerun_banner.png?793f67",
+      "contentType": "image/webp",
+      "size": 885270,
+      "hash": "fad3917f5e214fd06336662938fb0d1f1d2135149a5731c8a77fdddbc17431a3",
+      "syncedAt": "2026-08-07T06:26:16.233Z"
     },
     "wiki-the-masses-travels-rerun": {
-      "publicPath": "/images/activities/wiki-the-masses-travels-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-the-masses-travels-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/2e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%85%AD%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 439130,
-      "hash": "54e0b475f7f9d33bf7346d81987dfd76ce6ff6c42632bdb84f0558acd3210e54",
-      "syncedAt": "2026-07-17T08:58:15.155Z"
+      "publicPath": "/images/activities/wiki-the-masses-travels-rerun.webp",
+      "relativePath": "public/images/activities/wiki-the-masses-travels-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_The_Masses%27_Travels_Rerun_banner.png?100811",
+      "contentType": "image/webp",
+      "size": 965076,
+      "hash": "586e47302cabef4a5400451851305795325e3edad2e6f7c04315a29d5d4ea4d1",
+      "syncedAt": "2026-08-07T06:26:16.280Z"
     },
     "wiki-when-elegies-are-ashes-rerun": {
-      "publicPath": "/images/activities/wiki-when-elegies-are-ashes-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-when-elegies-are-ashes-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/d/d4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%8C%BD%E6%AD%8C%E7%87%83%E7%83%A7%E6%AE%86%E5%B0%BD_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 686527,
-      "hash": "3140c724bb1a9b52ad2eb9c3f6a3cc711dfb41693277da41fd1b69749d12f7f1",
-      "syncedAt": "2026-07-17T08:58:16.575Z"
+      "publicPath": "/images/activities/wiki-when-elegies-are-ashes-rerun.webp",
+      "relativePath": "public/images/activities/wiki-when-elegies-are-ashes-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_When_Elegies_Are_Ashes_Rerun_banner.png?931e47",
+      "contentType": "image/webp",
+      "size": 946846,
+      "hash": "8570f4d1cc5e8ebbede54956c8426346d83ae6eefa0dbef03b3665c5b71d34ae",
+      "syncedAt": "2026-08-07T06:26:16.335Z"
     },
     "wiki-such-is-the-joy-of-our-reunion-rerun": {
       "publicPath": "/images/activities/wiki-such-is-the-joy-of-our-reunion-rerun.jpg",
@@ -2604,22 +2604,22 @@
       "syncedAt": "2026-07-17T08:58:19.889Z"
     },
     "wiki-path-of-life-rerun": {
-      "publicPath": "/images/activities/wiki-path-of-life-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-path-of-life-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/2e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%94%9F%E8%B7%AF_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 183499,
-      "hash": "c82db3f7a2d23d3a37df7c9cd69331badb2aee32d1722d4e72e8833a489fc6c7",
-      "syncedAt": "2026-07-17T08:58:20.259Z"
+      "publicPath": "/images/activities/wiki-path-of-life-rerun.webp",
+      "relativePath": "public/images/activities/wiki-path-of-life-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Path_of_Life_Rerun_banner.png?e55de5",
+      "contentType": "image/webp",
+      "size": 456616,
+      "hash": "165441a6c8504bad41d40b55cadfa9a613e59344f6b44af3cb36eb2a1909f9ef",
+      "syncedAt": "2026-08-07T06:26:17.127Z"
     },
     "wiki-here-a-people-sows-rerun": {
       "publicPath": "/images/activities/wiki-here-a-people-sows-rerun.png",
       "relativePath": "public/images/activities/wiki-here-a-people-sows-rerun.png",
-      "sourceUrl": "https://media.prts.wiki/8/87/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%80%80%E9%BB%8D%E7%A6%BB_01.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Here_A_People_Sows_Rerun_banner.png?aa689c",
       "contentType": "image/png",
-      "size": 1775712,
-      "hash": "f229a1d125e7b395a17ac98d70e60575c6359daeb4da31f77c2d866ffc7c25a3",
-      "syncedAt": "2026-07-17T08:58:21.709Z"
+      "size": 1643042,
+      "hash": "c35bc8f69d72c0ce98f5dc9d1acfad10cbcd3a2c825198571a438bbda668afce",
+      "syncedAt": "2026-08-07T06:26:17.427Z"
     },
     "wiki-the-rides-to-lake-silberneherze-rerun": {
       "publicPath": "/images/activities/wiki-the-rides-to-lake-silberneherze-rerun.jpg",
@@ -2631,13 +2631,13 @@
       "syncedAt": "2026-07-17T08:58:22.144Z"
     },
     "wiki-zwillingsturme-im-herbst-rerun": {
-      "publicPath": "/images/activities/wiki-zwillingsturme-im-herbst-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-zwillingsturme-im-herbst-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f8/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82023_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 268482,
-      "hash": "e402a81b5cce2493639c06b7c6ab03c0dde6e8ba144dc3aae4ca01630ed34a34",
-      "syncedAt": "2026-07-17T08:58:22.558Z"
+      "publicPath": "/images/activities/wiki-zwillingsturme-im-herbst-rerun.webp",
+      "relativePath": "public/images/activities/wiki-zwillingsturme-im-herbst-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Zwillingst%C3%BCrme_im_Herbst_Rerun_banner.png?75ac51",
+      "contentType": "image/webp",
+      "size": 836622,
+      "hash": "2a53a7bdc5c242adbd718e39a62822b7688648c5f30a50c2c832827d369ebce7",
+      "syncedAt": "2026-08-07T06:26:18.481Z"
     },
     "wiki-come-catastrophes-or-wakes-of-vultures-rerun": {
       "publicPath": "/images/activities/wiki-come-catastrophes-or-wakes-of-vultures-rerun.jpg",
@@ -2649,31 +2649,31 @@
       "syncedAt": "2026-07-17T08:58:22.954Z"
     },
     "wiki-so-long-adele-rerun": {
-      "publicPath": "/images/activities/wiki-so-long-adele-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-so-long-adele-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/1/1c/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2023_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 212999,
-      "hash": "168b05bf0c6c35707f275b42dd531db6000acf10352631cd003b15a9fa11d4fc",
-      "syncedAt": "2026-07-17T08:58:23.252Z"
+      "publicPath": "/images/activities/wiki-so-long-adele-rerun.png",
+      "relativePath": "public/images/activities/wiki-so-long-adele-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_So_Long%2C_Adele_Rerun_banner.png?917e42",
+      "contentType": "image/png",
+      "size": 1246974,
+      "hash": "7000db19c681f6b57f8210a9ed70bd99c34d6407e19da07e0d07f0bcd4a504f4",
+      "syncedAt": "2026-08-07T06:26:19.111Z"
     },
     "wiki-hortus-de-escapismo-rerun": {
-      "publicPath": "/images/activities/wiki-hortus-de-escapismo-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-hortus-de-escapismo-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%A9%BA%E6%83%B3%E8%8A%B1%E5%BA%AD_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 247398,
-      "hash": "a2bb35c80d42ba59437d81fbd1b3509f0e8bca2bc5a7c2d8732a61b18408ccc4",
-      "syncedAt": "2026-07-17T08:58:24.526Z"
+      "publicPath": "/images/activities/wiki-hortus-de-escapismo-rerun.webp",
+      "relativePath": "public/images/activities/wiki-hortus-de-escapismo-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Hortus_de_Escapismo_Rerun_banner.png?a39d3b",
+      "contentType": "image/webp",
+      "size": 605978,
+      "hash": "7535c673778c1f144a8b6b6ba552e82cbff84ffdef9b80218749cdf70a4b9720",
+      "syncedAt": "2026-08-07T06:26:19.404Z"
     },
     "wiki-lone-trail-rerun": {
-      "publicPath": "/images/activities/wiki-lone-trail-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-lone-trail-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/25/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%9B%9B%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 1086587,
-      "hash": "7b24c773f5e55ab773e75a79313f687b5ab0d8da0c192e643f6c144e9dc087bd",
-      "syncedAt": "2026-07-17T08:58:25.457Z"
+      "publicPath": "/images/activities/wiki-lone-trail-rerun.png",
+      "relativePath": "public/images/activities/wiki-lone-trail-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Lone_Trail_Rerun_banner.png?1491b0",
+      "contentType": "image/png",
+      "size": 1460813,
+      "hash": "001f7de4aa0447d9fb7f1368c45f50ef260de9d5ee94426591744976171dc939",
+      "syncedAt": "2026-08-07T06:26:19.910Z"
     },
     "wiki-operation-originium-dust-rerun": {
       "publicPath": "/images/activities/wiki-operation-originium-dust-rerun.jpg",
@@ -3534,6 +3534,42 @@
       "size": 818,
       "hash": "cfb694841bc698e26504d3735b702bd68ebdfef1333c728ed609ec5f49d296f4",
       "syncedAt": "2026-07-22T00:47:21.166Z"
+    },
+    "prts-146798b": {
+      "publicPath": "/images/activities/prts-146798b.jpg",
+      "relativePath": "public/images/activities/prts-146798b.jpg",
+      "sourceUrl": "https://media.prts.wiki/6/65/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2026_23.jpg",
+      "contentType": "image/jpeg",
+      "size": 197023,
+      "hash": "5f17c4f86132a66fd9b79dc9256b6cc3ec636c2dcd4f7893d279988537a08e06",
+      "syncedAt": "2026-08-07T06:26:15.067Z"
+    },
+    "wiki-till-the-lands-become-an-orange": {
+      "publicPath": "/images/activities/wiki-till-the-lands-become-an-orange.jpg",
+      "relativePath": "public/images/activities/wiki-till-the-lands-become-an-orange.jpg",
+      "sourceUrl": "https://media.prts.wiki/d/dc/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2026_02.jpg",
+      "contentType": "image/jpeg",
+      "size": 425729,
+      "hash": "461001915ae35f0ec823bfd894f610d4f0a39a697356b1e79e12f335025eeecd",
+      "syncedAt": "2026-08-07T06:26:15.689Z"
+    },
+    "prts-s9wqxn": {
+      "publicPath": "/images/activities/prts-s9wqxn.jpg",
+      "relativePath": "public/images/activities/prts-s9wqxn.jpg",
+      "sourceUrl": "https://media.prts.wiki/e/e0/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2026_11.jpg",
+      "contentType": "image/jpeg",
+      "size": 306031,
+      "hash": "3dde1a5f75454980cc334cbc43a919099bf3295186b5c257f508ece87d0c159a",
+      "syncedAt": "2026-08-07T06:26:15.989Z"
+    },
+    "wiki-vector-breakthrough-trial-from-misery": {
+      "publicPath": "/images/activities/wiki-vector-breakthrough-trial-from-misery.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-trial-from-misery.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg?v=1ncjrzlhhifhfzo59thvyz7ekciq7y3",
+      "contentType": "image/jpeg",
+      "size": 37150,
+      "hash": "87171981eb020a0445ba2b2d555e4ea326ef0545c9ee45df24831bbf4a20ff6f",
+      "syncedAt": "2026-08-07T06:26:16.548Z"
     }
   }
 }
