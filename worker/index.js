@@ -51,13 +51,11 @@ const OPERATOR_RELEASE_SERVERS = new Set(['cn', 'global', 'tw']);
 const ACTIVITY_SERVERS = new Set(['cn', 'global', 'tw']);
 const ACTIVITY_SYNC_SOURCE_LIMIT = 80;
 const SCHEDULED_SYNC_CRONS = {
-  '0 */6 * * *': 'activities-cn',
-  '5 */6 * * *': 'activities-global',
-  '10 */6 * * *': 'activities-tw',
-  '15 */6 * * *': 'recruit-operators',
-  '20 */6 * * *': 'operator-catalog',
-  '25 */6 * * *': 'operator-release-dates',
-  '30 */6 * * *': 'music-cache',
+  '0 */6 * * *': ['activities-cn'],
+  '5 */6 * * *': ['activities-global', 'activities-tw'],
+  '10 */6 * * *': ['recruit-operators', 'operator-release-dates'],
+  '15 */6 * * *': ['operator-catalog'],
+  '20 */6 * * *': ['music-cache'],
 };
 const ACTIVITY_IMAGE_OVERRIDES = {
   'wiki-sui-s-garden-of-grotesqueries-mission-event': 'https://arknights.wiki.gg/images/EN_Sui%27s_Garden_of_Grotesqueries_Mission_Event_banner.png?d46d74',
@@ -482,46 +480,13 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    const job = SCHEDULED_SYNC_CRONS[event.cron];
-    if (!job) {
+    const jobs = SCHEDULED_SYNC_CRONS[event.cron];
+    if (!jobs) {
       console.warn('Ignoring unrecognized scheduled cron:', event.cron);
       return;
     }
 
-    if (job === 'recruit-operators') {
-      scheduleSyncTask(ctx, env, job, async () => {
-        const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
-        await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
-        return { count: data.operators.length };
-      });
-      return;
-    }
-
-    if (!hasSupabaseConfig(env)) {
-      console.warn(`Skipping ${job}; Supabase is not configured.`);
-      return;
-    }
-
-    if (job === 'operator-catalog') {
-      scheduleSyncTask(ctx, env, job, () => syncOperatorCatalog(env));
-      return;
-    }
-
-    if (job === 'operator-release-dates') {
-      scheduleSyncTask(ctx, env, job, () => syncOperatorReleaseDates(env));
-      return;
-    }
-
-    if (job === 'music-cache') {
-      scheduleSyncTask(ctx, env, job, () => syncMusicCache(env, {
-        songDetailLimit: 10,
-        albumDetailLimit: 5,
-      }));
-      return;
-    }
-
-    const server = job.replace('activities-', '');
-    scheduleSyncTask(ctx, env, job, () => syncActivities(env, [server]));
+    for (const job of jobs) scheduleConfiguredSyncJob(ctx, env, job);
   },
 };
 
@@ -844,6 +809,43 @@ function scheduleSyncTask(ctx, env, job, task) {
       console.warn(`Scheduled sync failed for ${job}; retaining previous data:`, message);
     }
   })());
+}
+
+function scheduleConfiguredSyncJob(ctx, env, job) {
+  if (job === 'recruit-operators') {
+    scheduleSyncTask(ctx, env, job, async () => {
+      const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
+      await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
+      return { count: data.operators.length };
+    });
+    return;
+  }
+
+  if (!hasSupabaseConfig(env)) {
+    console.warn(`Skipping ${job}; Supabase is not configured.`);
+    return;
+  }
+
+  if (job === 'operator-catalog') {
+    scheduleSyncTask(ctx, env, job, () => syncOperatorCatalog(env));
+    return;
+  }
+
+  if (job === 'operator-release-dates') {
+    scheduleSyncTask(ctx, env, job, () => syncOperatorReleaseDates(env));
+    return;
+  }
+
+  if (job === 'music-cache') {
+    scheduleSyncTask(ctx, env, job, () => syncMusicCache(env, {
+      songDetailLimit: 10,
+      albumDetailLimit: 5,
+    }));
+    return;
+  }
+
+  const server = job.replace('activities-', '');
+  scheduleSyncTask(ctx, env, job, () => syncActivities(env, [server]));
 }
 
 async function fetchWikiActivityWindows(server, limit = ACTIVITY_SYNC_SOURCE_LIMIT) {
