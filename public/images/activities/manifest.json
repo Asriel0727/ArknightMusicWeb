@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-08T02:27:26.396Z",
+  "generatedAt": "2026-08-08T07:27:14.981Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -363,13 +363,13 @@
       "syncedAt": "2026-07-17T03:50:02.478Z"
     },
     "wiki-stronghold-protocol-alliance": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "sourceUrl": "https://media.prts.wiki/e/e7/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_29.jpg",
-      "contentType": "image/jpeg",
-      "size": 290757,
-      "hash": "cf1449fc689ffda9ab47b9aedb44c90cc51ee8c3c2ecf48e6beee6335f7286a3",
-      "syncedAt": "2026-07-17T03:50:02.716Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.png",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_Alliance_banner.png?effa5d",
+      "contentType": "image/png",
+      "size": 1002329,
+      "hash": "e6a093670f0d9c99a17db7555c7821c35af363f6fd22be6b4675314dc9883a31",
+      "syncedAt": "2026-08-08T07:27:07.091Z"
     },
     "prts-8669y1": {
       "publicPath": "/images/activities/prts-8669y1.jpg",
@@ -381,13 +381,13 @@
       "syncedAt": "2026-07-17T03:50:02.948Z"
     },
     "wiki-retracing-our-steps": {
-      "publicPath": "/images/activities/wiki-retracing-our-steps.jpg",
-      "relativePath": "public/images/activities/wiki-retracing-our-steps.jpg",
-      "sourceUrl": "https://media.prts.wiki/8/8e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 480283,
-      "hash": "44e22a52a3b168c1a17d2c4f92c6cbbf10a76e3e275d18d0aa27988380c320ac",
-      "syncedAt": "2026-07-17T03:50:03.206Z"
+      "publicPath": "/images/activities/wiki-retracing-our-steps.webp",
+      "relativePath": "public/images/activities/wiki-retracing-our-steps.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Retracing_Our_Steps_banner.png?b9ad3c",
+      "contentType": "image/webp",
+      "size": 1256218,
+      "hash": "8ac8a284ad3b252cdd26e23203cfdda6f358cbb514a2d1bce8d49332c4431803",
+      "syncedAt": "2026-08-08T07:27:07.115Z"
     },
     "prts-18lchyx": {
       "publicPath": "/images/activities/prts-18lchyx.jpg",
@@ -408,13 +408,13 @@
       "syncedAt": "2026-07-17T03:50:03.694Z"
     },
     "wiki-tender-moments": {
-      "publicPath": "/images/activities/wiki-tender-moments.png",
-      "relativePath": "public/images/activities/wiki-tender-moments.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Tender_Moments_banner.png?4fa609",
-      "contentType": "image/png",
-      "size": 709621,
-      "hash": "406703540350ef7e6cbd0efd16f329f713d22e631ebfc9766a7259fe6e28e3e3",
-      "syncedAt": "2026-08-07T13:45:30.946Z"
+      "publicPath": "/images/activities/wiki-tender-moments.jpg",
+      "relativePath": "public/images/activities/wiki-tender-moments.jpg",
+      "sourceUrl": "https://media.prts.wiki/5/5b/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%B8%A9%E6%83%85%E6%97%B6%E5%85%89_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 247649,
+      "hash": "ca589d12587962c1e001fe74f23cc7dfcbb680e20f93397e7f75abca1912ae59",
+      "syncedAt": "2026-08-08T07:27:11.228Z"
     },
     "prts-yu93fl": {
       "publicPath": "/images/activities/prts-yu93fl.jpg",
@@ -1083,13 +1083,13 @@
       "syncedAt": "2026-07-17T03:50:25.804Z"
     },
     "wiki-babel-event": {
-      "publicPath": "/images/activities/wiki-babel-event.webp",
-      "relativePath": "public/images/activities/wiki-babel-event.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_banner.png?633a64",
-      "contentType": "image/webp",
-      "size": 834100,
-      "hash": "761383b404cad188fff132bcd1f7722b03b26b6310071f077f0f018e64576280",
-      "syncedAt": "2026-08-07T13:45:33.289Z"
+      "publicPath": "/images/activities/wiki-babel-event.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-08-08T07:27:14.096Z"
     },
     "prts-6rbm0p": {
       "publicPath": "/images/activities/prts-6rbm0p.jpg",
@@ -1182,13 +1182,13 @@
       "syncedAt": "2026-07-17T03:50:30.410Z"
     },
     "wiki-to-the-grinning-valley": {
-      "publicPath": "/images/activities/wiki-to-the-grinning-valley.jpg",
-      "relativePath": "public/images/activities/wiki-to-the-grinning-valley.jpg",
-      "sourceUrl": "https://media.prts.wiki/a/a3/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8E%BB%E5%92%A7%E5%98%B4%E8%B0%B7_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 366343,
-      "hash": "5355b766665f54010c2a57fec24a36983ee8e1f01e10cd4e2f1f58b7540689d7",
-      "syncedAt": "2026-07-17T03:50:30.651Z"
+      "publicPath": "/images/activities/wiki-to-the-grinning-valley.png",
+      "relativePath": "public/images/activities/wiki-to-the-grinning-valley.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_To_the_Grinning_Valley_banner.png?323b07",
+      "contentType": "image/png",
+      "size": 1401036,
+      "hash": "b743cb06216cda1a434de4276be666df2b999920221d8b2fac650ef62281e157",
+      "syncedAt": "2026-08-08T07:27:14.670Z"
     },
     "prts-13lj9w8": {
       "publicPath": "/images/activities/prts-13lj9w8.jpg",
@@ -1209,13 +1209,13 @@
       "syncedAt": "2026-07-17T03:50:31.128Z"
     },
     "wiki-the-rides-to-lake-silberneherze": {
-      "publicPath": "/images/activities/wiki-the-rides-to-lake-silberneherze.jpg",
-      "relativePath": "public/images/activities/wiki-the-rides-to-lake-silberneherze.jpg",
-      "sourceUrl": "https://media.prts.wiki/b/bf/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%93%B6%E5%BF%83%E6%B9%96%E5%88%97%E8%BD%A6_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 300034,
-      "hash": "b55c27fbdde10b17b1d41c7b63acba659db1e6dc1a4cac3be744c52828873586",
-      "syncedAt": "2026-07-17T03:50:31.378Z"
+      "publicPath": "/images/activities/wiki-the-rides-to-lake-silberneherze.png",
+      "relativePath": "public/images/activities/wiki-the-rides-to-lake-silberneherze.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_The_Rides_to_Lake_Silberneherze_banner.png?21e6a3",
+      "contentType": "image/png",
+      "size": 1362303,
+      "hash": "9243660960e43d4db3d024a153cc3e9a354801bd24fcd3717ced15a66d159674",
+      "syncedAt": "2026-08-08T07:27:14.981Z"
     },
     "prts-1hoh6ku": {
       "publicPath": "/images/activities/prts-1hoh6ku.jpg",
@@ -2622,13 +2622,13 @@
       "syncedAt": "2026-08-07T06:26:17.427Z"
     },
     "wiki-the-rides-to-lake-silberneherze-rerun": {
-      "publicPath": "/images/activities/wiki-the-rides-to-lake-silberneherze-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-the-rides-to-lake-silberneherze-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/b/bf/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%93%B6%E5%BF%83%E6%B9%96%E5%88%97%E8%BD%A6_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 300034,
-      "hash": "b55c27fbdde10b17b1d41c7b63acba659db1e6dc1a4cac3be744c52828873586",
-      "syncedAt": "2026-07-17T08:58:22.144Z"
+      "publicPath": "/images/activities/wiki-the-rides-to-lake-silberneherze-rerun.png",
+      "relativePath": "public/images/activities/wiki-the-rides-to-lake-silberneherze-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_The_Rides_to_Lake_Silberneherze_Rerun_banner.png?2be585",
+      "contentType": "image/png",
+      "size": 1201327,
+      "hash": "12619dffcaed84fad59e2d5dbc540e97c7547a96a45446febf3345efef95f546",
+      "syncedAt": "2026-08-08T07:27:12.342Z"
     },
     "wiki-zwillingsturme-im-herbst-rerun": {
       "publicPath": "/images/activities/wiki-zwillingsturme-im-herbst-rerun.webp",
@@ -2676,31 +2676,31 @@
       "syncedAt": "2026-08-07T06:26:19.910Z"
     },
     "wiki-operation-originium-dust-rerun": {
-      "publicPath": "/images/activities/wiki-operation-originium-dust-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-operation-originium-dust-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/0/0a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%BA%90%E7%9F%B3%E5%B0%98%E8%A1%8C%E5%8A%A8_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 286489,
-      "hash": "6798b2bc26fb411bcd5271ea60d501d44d147f33c34685426c1325857e294745",
-      "syncedAt": "2026-07-17T08:58:25.841Z"
+      "publicPath": "/images/activities/wiki-operation-originium-dust-rerun.png",
+      "relativePath": "public/images/activities/wiki-operation-originium-dust-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Operation_Originium_Dust_Rerun_banner.png?bdbc76",
+      "contentType": "image/png",
+      "size": 1425303,
+      "hash": "744f521245e5963bfaa45ca76916905e8b731b39031722b6e1e16700f46f9244",
+      "syncedAt": "2026-08-08T07:27:14.299Z"
     },
     "wiki-where-vernal-winds-will-never-blow-rerun": {
       "publicPath": "/images/activities/wiki-where-vernal-winds-will-never-blow-rerun.png",
       "relativePath": "public/images/activities/wiki-where-vernal-winds-will-never-blow-rerun.png",
-      "sourceUrl": "https://media.prts.wiki/1/11/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%99%BB%E4%B8%B4%E6%84%8F_01.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Where_Vernal_Winds_Will_Never_Blow_Rerun_banner.png?c08b43",
       "contentType": "image/png",
-      "size": 1494121,
-      "hash": "ec785e893e4f1ef88d954410da665306387ac1bd798a414557ae872dcc0fee26",
-      "syncedAt": "2026-07-17T08:58:27.537Z"
+      "size": 1680665,
+      "hash": "668044a9aa8a2b0bbae7465ebb7b0dbef9b5a3b407d8120c9d7aa6821adf3dd9",
+      "syncedAt": "2026-08-08T07:27:14.486Z"
     },
     "wiki-what-the-firelight-casts-rerun": {
-      "publicPath": "/images/activities/wiki-what-the-firelight-casts-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-what-the-firelight-casts-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/b/b3/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%85%A7%E6%88%91%E4%BB%A5%E7%81%AB_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 115195,
-      "hash": "b460e234890823f9481645a3fecf5b5bf6614ae5601f243911d25db923e2b615",
-      "syncedAt": "2026-07-17T08:58:27.897Z"
+      "publicPath": "/images/activities/wiki-what-the-firelight-casts-rerun.png",
+      "relativePath": "public/images/activities/wiki-what-the-firelight-casts-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_What_the_Firelight_Casts_Rerun_banner.png?8bbeac",
+      "contentType": "image/png",
+      "size": 843347,
+      "hash": "fba8996235891f4f92f22f751bc04feab1c3374699d86b520197982eb30a6d16",
+      "syncedAt": "2026-08-08T07:27:14.838Z"
     },
     "wiki-il-siracusano-rerun": {
       "publicPath": "/images/activities/wiki-il-siracusano-rerun.png",
@@ -3234,13 +3234,13 @@
       "syncedAt": "2026-07-22T00:47:20.600Z"
     },
     "wiki-babel-event-rerun": {
-      "publicPath": "/images/activities/wiki-babel-event-rerun.png",
-      "relativePath": "public/images/activities/wiki-babel-event-rerun.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_Rerun_banner.png?b0dc17",
-      "contentType": "image/png",
-      "size": 1101120,
-      "hash": "10f4219a4968923762faddf0a6d8dae3ebb25da18c57b5da4cc42f99a53f05d6",
-      "syncedAt": "2026-08-07T13:45:32.195Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-08-08T07:27:12.119Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
@@ -3252,31 +3252,31 @@
       "syncedAt": "2026-07-22T00:47:21.046Z"
     },
     "wiki-stronghold-protocol-event": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-event.png",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_banner.png?a4b4e2",
-      "contentType": "image/png",
-      "size": 844107,
-      "hash": "c139cc4c1ad6c9cd96f31de612221913b5cd946467b87fb6afed8c30badcf8ce",
-      "syncedAt": "2026-08-07T13:45:32.470Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 244822,
+      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
+      "syncedAt": "2026-08-08T07:27:12.739Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.png",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ending_a_Grand_Overture_banner.png?e80c0c",
-      "contentType": "image/png",
-      "size": 1160360,
-      "hash": "6763499241dca134fad4b4e05a1ff7e53060033c9779ecf684c3740dd5c50a73",
-      "syncedAt": "2026-08-07T13:45:33.010Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
+      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 280529,
+      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
+      "syncedAt": "2026-08-08T07:27:13.279Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.webp",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
-      "contentType": "image/webp",
-      "size": 704954,
-      "hash": "d4f64bc65b796d6e53f800a1feafb3434dc356a274df765273d8b40923415f4c",
-      "syncedAt": "2026-08-07T13:45:33.126Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 268285,
+      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
+      "syncedAt": "2026-08-08T07:27:13.719Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.jpg",
