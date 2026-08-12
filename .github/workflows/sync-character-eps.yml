@@ -20,8 +20,8 @@ jobs:
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      BILIBILI_EP_SOURCE_UID: ${{ vars.BILIBILI_EP_SOURCE_UID }}
-      BILIBILI_SESSDATA: ${{ secrets.BILIBILI_SESSDATA }}
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      YOUTUBE_EP_SOURCE_HANDLE: rivervworkshop
     steps:
       # 角色 EP 同步不需要 repository 中的大型圖片資產；只取執行腳本與套件鎖檔，避免 checkout 卡住。
       - uses: actions/checkout@v4
@@ -36,13 +36,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Cache Playwright browser
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-      - name: Sync Bilibili Character EP videos
+      - name: Sync YouTube Character EP videos
         run: npm run character-eps:sync

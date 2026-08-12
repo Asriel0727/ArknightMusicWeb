@@ -187,7 +187,7 @@ Run this schema in Supabase before deploying the Character EP feature:
 ```sql
 create table if not exists public.music_character_ep_videos (
   id text primary key,
-  bvid text not null unique,
+  bvid text not null unique, -- historical column name; stores the platform video ID
   song_id text references public.music_songs(id) on delete set null,
   title text not null,
   cover_url text,
@@ -206,36 +206,27 @@ create index if not exists music_character_ep_videos_song_id_idx
   where is_visible = true;
 ```
 
-The Worker makes a best-effort check of the configured Bilibili uploader every normal music-sync
-run, stores only metadata and a BVID, then exposes only confidently matched videos to the
-frontend. Bilibili may return a `412` anti-abuse response to datacenter IPs; that failure is
-recorded in the sync result and does not interrupt the normal music sync or remove previously
-stored videos. The video is played by Bilibili's own iframe; this project does not download or
-proxy any video stream.
-
-`BILIBILI_EP_SOURCE_UID` is optional and defaults to the official Arknights uploader (`161775300`).
-Set it as a Worker variable if you want to monitor a different official uploader. The manual sync
-endpoint is `GET /api/admin/sync-character-eps` and uses the same `SYNC_TOKEN` authorization.
+The table stores only public metadata and a platform video ID. The frontend embeds the platform's
+own player; this project does not download or proxy any video stream.
 
 ## GitHub Action Character EP sync
 
 [`sync-character-eps.yml`](../.github/workflows/sync-character-eps.yml) runs every day at
-02:40 Asia/Taipei and can also be started from the **Actions** tab with **Run workflow**. It uses
-Playwright to load the uploader's Bilibili video page, so it does not depend on the Worker calling
-Bilibili's blocked catalog API directly.
+02:40 Asia/Taipei and can also be started from the **Actions** tab with **Run workflow**. It reads
+the configured YouTube channel using the YouTube Data API, avoiding Bilibili's `412` datacenter
+anti-abuse responses.
 
 Add these repository secrets before running it:
 
 ```txt
 SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY
+YOUTUBE_API_KEY
 ```
 
-`BILIBILI_SESSDATA` is optional but recommended. Set it as a repository secret containing the
-`SESSDATA` cookie value from a Bilibili browser session you own; it is never committed or logged.
-Without it, Bilibili can still return a 412 anti-abuse page to GitHub-hosted runners. To monitor a
-different official uploader, add a repository variable named `BILIBILI_EP_SOURCE_UID`; the default
-is `161775300`.
+Create `YOUTUBE_API_KEY` in Google Cloud Console with **YouTube Data API v3** enabled, then add it
+as a GitHub repository secret. The default source is `@rivervworkshop`; change the
+`YOUTUBE_EP_SOURCE_HANDLE` value in the workflow if you later use a different channel.
 
 `music_cache` keeps the original API payload for fallback. `music_albums` and `music_songs`
 store queryable, normalized data for your own database.

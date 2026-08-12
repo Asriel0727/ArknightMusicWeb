@@ -106,7 +106,7 @@
             <span>{{ t('player.epPaused') }}</span>
           </div>
           <a class="character-ep-link" :href="characterEp.sourceUrl" target="_blank" rel="noopener noreferrer">
-            <i class="fas fa-up-right-from-square"></i> {{ t('player.openBilibili') }}
+            <i class="fas fa-up-right-from-square"></i> {{ t('player.openVideo') }}
           </a>
         </div>
       </div>
@@ -450,15 +450,28 @@ const progressPercent = computed(() => {
 });
 
 const characterEpIframeSrc = computed(() => {
-  const bvid = characterEp.value?.bvid;
-  if (!bvid) return '';
+  const videoId = characterEp.value?.bvid;
+  if (!videoId) return '';
+
+  const currentTime = String(Math.max(0, Math.floor(playerState.currentTime || 0)));
+  const isYoutube = /(?:youtube\.com|youtu\.be)/i.test(characterEp.value?.sourceUrl || '');
+  if (isYoutube) {
+    const params = new URLSearchParams({
+      autoplay: '1',
+      mute: '1',
+      start: currentTime,
+      playsinline: '1',
+      rel: '0',
+    });
+    return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
+  }
 
   const params = new URLSearchParams({
-    bvid,
+    bvid: videoId,
     autoplay: '1',
     muted: '1',
     danmaku: '0',
-    t: String(Math.max(0, Math.floor(playerState.currentTime || 0))),
+    t: currentTime,
   });
   return `https://player.bilibili.com/player.html?${params.toString()}`;
 });
