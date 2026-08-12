@@ -204,6 +204,20 @@ export async function fetchSongDetails(songId) {
   return transformMusicApiPayload(JSON.parse(JSON.stringify(data)));
 }
 
+/** 取得已確認關聯至歌曲的 B 站角色 EP。 */
+export async function fetchCharacterEp(songId) {
+  if (!songId) return null;
+
+  const response = await fetch(`${API_BASE}/song/${encodeURIComponent(songId)}/character-ep`);
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error(`Character EP request failed: ${response.status}`);
+  }
+
+  const { data } = await response.json();
+  return data || null;
+}
+
 export async function fetchFullSongDetails(songId) {
   const response = await fetch(`${API_BASE}/song/${encodeURIComponent(songId)}/full`);
   if (!response.ok) throw new Error('Network response was not ok');

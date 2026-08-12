@@ -62,6 +62,7 @@ GET /api/albums
 GET /api/album/:albumId/detail
 GET /api/songs
 GET /api/song/:songId
+GET /api/song/:songId/character-ep
 GET /proxy-image?url=...
 GET /proxy-lyrics?url=...
 GET /proxy-audio?url=...
@@ -92,6 +93,7 @@ Admin:
 ```txt
 GET /api/admin/sync
 GET /api/admin/sync-music
+GET /api/admin/sync-character-eps
 GET /api/admin/music-cache-status
 GET /api/admin/prewarm-music-albums?limit=5
 GET /api/admin/prewarm-details?offset=0&limit=40
@@ -177,6 +179,63 @@ create table if not exists public.music_songs (
 create index if not exists music_songs_album_id_idx
   on public.music_songs(album_id);
 ```
+
+### Character EP videos
+
+Run this schema in Supabase before deploying the Character EP feature:
+
+```sql
+create table if not exists public.music_character_ep_videos (
+  id text primary key,
+  bvid text not null unique,
+  song_id text references public.music_songs(id) on delete set null,
+  title text not null,
+  cover_url text,
+  duration_seconds integer,
+  published_at timestamptz,
+  author_mid text,
+  source_url text not null,
+  is_visible boolean not null default false,
+  match_score integer not null default 0,
+  raw jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists music_character_ep_videos_song_id_idx
+  on public.music_character_ep_videos(song_id)
+  where is_visible = true;
+```
+
+The Worker makes a best-effort check of the configured Bilibili uploader every normal music-sync
+run, stores only metadata and a BVID, then exposes only confidently matched videos to the
+frontend. Bilibili may return a `412` anti-abuse response to datacenter IPs; that failure is
+recorded in the sync result and does not interrupt the normal music sync or remove previously
+stored videos. The video is played by Bilibili's own iframe; this project does not download or
+proxy any video stream.
+
+`BILIBILI_EP_SOURCE_UID` is optional and defaults to the official Arknights uploader (`18718735`).
+Set it as a Worker variable if you want to monitor a different official uploader. The manual sync
+endpoint is `GET /api/admin/sync-character-eps` and uses the same `SYNC_TOKEN` authorization.
+
+## GitHub Action Character EP sync
+
+[`sync-character-eps.yml`](../.github/workflows/sync-character-eps.yml) runs every day at
+02:40 Asia/Taipei and can also be started from the **Actions** tab with **Run workflow**. It uses
+Playwright to load the uploader's Bilibili video page, so it does not depend on the Worker calling
+Bilibili's blocked catalog API directly.
+
+Add these repository secrets before running it:
+
+```txt
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+`BILIBILI_SESSDATA` is optional but recommended. Set it as a repository secret containing the
+`SESSDATA` cookie value from a Bilibili browser session you own; it is never committed or logged.
+Without it, Bilibili can still return a 412 anti-abuse page to GitHub-hosted runners. To monitor a
+different official uploader, add a repository variable named `BILIBILI_EP_SOURCE_UID`; the default
+is `18718735`.
 
 `music_cache` keeps the original API payload for fallback. `music_albums` and `music_songs`
 store queryable, normalized data for your own database.

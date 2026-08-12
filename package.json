@@ -16,7 +16,8 @@
     "activities:sync-pools": "node scripts/generate-activity-pool-catalog.mjs",
     "activities:push-pools": "node scripts/push-activity-pools-to-supabase.mjs",
     "activities:sync": "npm run activities:sync-pools && npm run activities:push-pools",
-    "activities:audit-pools": "node scripts/audit-activity-pools.mjs"
+    "activities:audit-pools": "node scripts/audit-activity-pools.mjs",
+    "character-eps:sync": "node scripts/sync-character-eps.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
+    "playwright": "^1.62.1",
     "vite": "^5.0.0",
     "wrangler": "^4.111.0"
   }

@@ -1,0 +1,35 @@
+name: Sync Character EP videos
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 每日 02:40（Asia/Taipei）
+    - cron: '40 18 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-character-eps
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      BILIBILI_EP_SOURCE_UID: ${{ vars.BILIBILI_EP_SOURCE_UID }}
+      BILIBILI_SESSDATA: ${{ secrets.BILIBILI_SESSDATA }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Sync Bilibili Character EP videos
+        run: npm run character-eps:sync

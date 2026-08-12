@@ -82,10 +82,34 @@
       </div>
     </div>
     <div class="player-view-right">
-      <img v-if="playerState.currentSong && playerState.currentSong.coverDeUrl"
-        :src="proxyImageUrl(playerState.currentSong.coverDeUrl)" :alt="playerState.currentSong.name"
-        class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
-        @error="handleImageError">
+      <div v-if="playerState.currentSong" class="player-visual-panel">
+        <div class="player-visual-switch" role="group" :aria-label="t('player.visualMode')">
+          <button type="button" :class="{ active: visualMode === 'cover' }" @click="visualMode = 'cover'">
+            <i class="fas fa-image"></i> {{ t('player.coverVisual') }}
+          </button>
+          <button type="button" :class="{ active: visualMode === 'ep' }" :disabled="!characterEp"
+            :title="characterEp ? t('player.characterEp') : t('player.noCharacterEp')" @click="showCharacterEp">
+            <i class="fas fa-film"></i> {{ t('player.characterEp') }}
+          </button>
+        </div>
+        <img v-if="visualMode === 'cover' || !characterEp" v-show="playerState.currentSong?.coverDeUrl"
+          :src="proxyImageUrl(playerState.currentSong?.coverDeUrl)" :alt="playerState.currentSong?.name"
+          class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
+          @error="handleImageError">
+        <div v-else class="character-ep-visual">
+          <iframe v-if="playerState.isPlaying" :key="epIframeKey" class="character-ep-frame"
+            :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
+            allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <div v-else class="character-ep-paused">
+            <img v-if="characterEp.coverUrl" :src="characterEp.coverUrl" :alt="characterEp.title || t('player.characterEp')">
+            <i v-else class="fas fa-film" aria-hidden="true"></i>
+            <span>{{ t('player.epPaused') }}</span>
+          </div>
+          <a class="character-ep-link" :href="characterEp.sourceUrl" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-up-right-from-square"></i> {{ t('player.openBilibili') }}
+          </a>
+        </div>
+      </div>
       <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-toolbar">
         <span class="lyrics-toolbar-title"><i class="fas fa-align-left"></i> {{ t('player.lyrics') }}</span>
         <label class="lyrics-translation-toggle">
@@ -179,7 +203,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations, togglePlayMode } from '../stores/player.js';
-import { createSongShareUrl as createSongSharePageUrl, getProxyImageUrl } from '../services/api.js';
+import { createSongShareUrl as createSongSharePageUrl, fetchCharacterEp, getProxyImageUrl } from '../services/api.js';
 import { authState } from '../services/auth.js';
 import { addFavoriteSong, addSongToPlaylist, createPlaylist, fetchFavoriteSongs, fetchPlaylists, removeFavoriteSong, removeSongFromPlaylist } from '../services/userLibrary.js';
 import { formatTime } from '../utils/time.js';
@@ -201,6 +225,9 @@ const playlistMembershipPendingIds = ref(new Set());
 const isCreatePlaylistDialogOpen = ref(false);
 const newPlaylistName = ref('');
 const isAddingToPlaylist = ref(false);
+const characterEp = ref(null);
+const visualMode = ref('cover');
+const epIframeKey = ref(0);
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
@@ -422,6 +449,20 @@ const progressPercent = computed(() => {
   return (playerState.currentTime / playerState.duration) * 100;
 });
 
+const characterEpIframeSrc = computed(() => {
+  const bvid = characterEp.value?.bvid;
+  if (!bvid) return '';
+
+  const params = new URLSearchParams({
+    bvid,
+    autoplay: '1',
+    muted: '1',
+    danmaku: '0',
+    t: String(Math.max(0, Math.floor(playerState.currentTime || 0))),
+  });
+  return `https://player.bilibili.com/player.html?${params.toString()}`;
+});
+
 const volumeIcon = computed(() => {
   if (playerState.isMuted || playerState.volume === 0) {
     return 'fas fa-volume-mute';
@@ -488,6 +529,20 @@ const handleSeek = (event) => {
   const rect = progressContainer.getBoundingClientRect();
   const seekPosition = (event.clientX - rect.left) / rect.width;
   seek(seekPosition);
+  restartCharacterEpAfterSeek();
+};
+
+const showCharacterEp = () => {
+  if (!characterEp.value) return;
+  visualMode.value = 'ep';
+  epIframeKey.value += 1;
+};
+
+const restartCharacterEpAfterSeek = () => {
+  if (visualMode.value !== 'ep' || !characterEp.value) return;
+  requestAnimationFrame(() => {
+    epIframeKey.value += 1;
+  });
 };
 
 const handleVolumeChange = (event) => {
@@ -635,9 +690,13 @@ watch(() => playerState.isPlaying, (isPlaying) => {
   } else {
     stopLyricsSync();
   }
+  if (visualMode.value === 'ep' && characterEp.value) {
+    // B 站 UGC iframe 沒有公開的暫停／seek API；恢復時以音樂目前秒數重新建立。
+    epIframeKey.value += 1;
+  }
 }, { immediate: true });
 
-watch(() => playerState.currentSong, (newSong) => {
+watch(() => playerState.currentSong, async (newSong) => {
   activeLyricIndex.value = -1;
   clearLibraryActionStatus();
   closePlaylistManager();
@@ -645,6 +704,17 @@ watch(() => playerState.currentSong, (newSong) => {
   loadUserPlaylists().catch(() => { });
   if (lyricsContainerRef.value) {
     lyricsContainerRef.value.scrollTop = 0;
+  }
+  characterEp.value = null;
+  visualMode.value = 'cover';
+  const requestedSongId = newSong?.cid;
+  if (!requestedSongId) return;
+  try {
+    const ep = await fetchCharacterEp(requestedSongId);
+    if (playerState.currentSong?.cid !== requestedSongId) return;
+    characterEp.value = ep;
+  } catch (error) {
+    console.warn('Character EP lookup failed:', error.message);
   }
 });
 
@@ -1010,6 +1080,90 @@ onUnmounted(() => {
   border-radius: 8px;
   display: block;
   margin: 0 auto 15px auto;
+}
+
+.player-visual-panel {
+  width: min(100%, 360px);
+  margin: 0 auto;
+}
+
+.player-visual-switch {
+  display: inline-flex;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(92, 178, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(5, 9, 14, 0.72);
+}
+
+.player-visual-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 7px 11px;
+  font-size: 0.78rem;
+}
+
+.player-visual-switch button.active {
+  background: rgba(88, 166, 255, 0.2);
+  color: var(--primary-color);
+}
+
+.player-visual-switch button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.character-ep-visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(92, 178, 255, 0.32);
+  border-radius: 8px;
+  background: #06090d;
+}
+
+.character-ep-frame,
+.character-ep-paused {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.character-ep-paused {
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  background: #10151c;
+}
+
+.character-ep-paused img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+}
+
+.character-ep-paused span {
+  position: absolute;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(5, 9, 14, 0.8);
+  font-size: 0.8rem;
+}
+
+.character-ep-link {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: rgba(5, 9, 14, 0.78);
+  color: #fff;
+  font-size: 0.75rem;
+  text-decoration: none;
 }
 
 .player-view-grid.single-panel {
