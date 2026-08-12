@@ -13,6 +13,33 @@ const OPERATOR_ID_ALIASES = new Map([
   ['vetochki', 'char_4207_branch'],
 ].map(([name, id]) => [identity(name), id]));
 
+// Newly released banners can reach the official game data before Wiki's banner
+// archive exposes a parseable row. Keep such exceptions narrow and sourced
+// from the live CN gacha table; they are overwritten only when this entry is
+// deliberately removed after the automatic matcher catches up.
+const MANUAL_POOL_OVERRIDES = {
+  'wiki-till-the-lands-become-an-orange': {
+    cn: [{
+      slug: 'wheels-and-wind-homecoming',
+      kind: 'limited',
+      name_i18n: {
+        'zh-CN': '车辙与风的归所',
+        'zh-TW': '車轍與風的歸所',
+      },
+      // The Wiki banner file was not published when this mapping was added.
+      // The push script uses the linked activity artwork until it becomes
+      // available, so the card never renders as a broken image.
+      image_url: '',
+      operators: [
+        { id: 'char_1015_aglna2', rarity: 6, featured: 'primary', limited: true, name_i18n: { 'zh-CN': '予愿安洁莉娜', 'zh-TW': '予願安潔莉娜', en: 'Angelina the Mellow Wish' } },
+        { id: 'char_4235_thumpy', rarity: 6, featured: 'primary', name_i18n: { 'zh-CN': '珊比', 'zh-TW': '珊比', en: 'Thumpy' } },
+        { id: 'char_4237_jcinta', rarity: 5, featured: 'primary', name_i18n: { 'zh-CN': '嘉辛塔', 'zh-TW': '嘉辛塔', en: 'Jacinta' } },
+      ],
+      source_url: `${CN_EXCEL_BASE}/gacha_table.json`,
+    }],
+  },
+};
+
 function decodeHtml(value) {
   return String(value || '')
     .replace(/&#91;/g, '[')
@@ -204,9 +231,15 @@ for (const [code, serverPools] of Object.entries(generated)) {
   }
 }
 
+for (const [code, poolsByServer] of Object.entries(MANUAL_POOL_OVERRIDES)) {
+  generated[code] ||= {};
+  for (const [server, pools] of Object.entries(poolsByServer)) generated[code][server] = pools;
+}
+
 const generatedPools = Object.values(generated).flatMap((servers) => Object.values(servers).flat());
 const availableLocalizedFiles = await localizedWikiFiles();
 for (const pool of generatedPools) {
+  if (!pool.image_url) continue;
   const englishFile = decodeURIComponent(pool.image_url.split('/').at(-1));
   const variants = availableLocalizedFiles.get(localizedImageIdentity(englishFile)) || {};
   const cnUrl = variants.CN

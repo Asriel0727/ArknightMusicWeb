@@ -1,5 +1,7 @@
 const EXCEL_BASE =
   'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel';
+const EN_EXCEL_BASE =
+  'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel';
 
 const IMAGE_BASE =
   'https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main';
@@ -50,6 +52,29 @@ const ARKNIGHTS_WIKI_OPERATOR_LIST = 'https://arknights.wiki.gg/wiki/Operator/Li
 const OPERATOR_RELEASE_SERVERS = new Set(['cn', 'global', 'tw']);
 const ACTIVITY_SERVERS = new Set(['cn', 'global', 'tw']);
 const ACTIVITY_SYNC_SOURCE_LIMIT = 80;
+const ACTIVITY_POOL_SYNC_BATCH_SIZE = 50;
+const ACTIVITY_POOL_OPERATOR_ID_ALIASES = new Map([
+  ['leto', 'char_194_leto'],
+  ['rosa', 'char_197_poca'],
+  ['pozëmka', 'char_4055_bgsnow'],
+  ['snegurochka', 'char_4208_wintim'],
+  ['vetochki', 'char_4207_branch'],
+]);
+const ACTIVITY_POOL_MANUAL_OVERRIDES = {
+  'wiki-till-the-lands-become-an-orange': {
+    cn: [{
+      slug: 'wheels-and-wind-homecoming',
+      kind: 'limited',
+      name_i18n: { 'zh-CN': '车辙与风的归所', 'zh-TW': '車轍與風的歸所' },
+      operators: [
+        { id: 'char_1015_aglna2', rarity: 6, featured: 'primary', limited: true, name_i18n: { 'zh-CN': '予愿安洁莉娜', 'zh-TW': '予願安潔莉娜', en: 'Angelina the Mellow Wish' } },
+        { id: 'char_4235_thumpy', rarity: 6, featured: 'primary', name_i18n: { 'zh-CN': '珊比', 'zh-TW': '珊比', en: 'Thumpy' } },
+        { id: 'char_4237_jcinta', rarity: 5, featured: 'primary', name_i18n: { 'zh-CN': '嘉辛塔', 'zh-TW': '嘉辛塔', en: 'Jacinta' } },
+      ],
+      source_url: `${EXCEL_BASE}/gacha_table.json`,
+    }],
+  },
+};
 const SCHEDULED_SYNC_CRONS = {
   '0 */6 * * *': ['activities-cn'],
   '5 */6 * * *': ['activities-global', 'activities-tw'],
@@ -224,6 +249,17 @@ export default {
       return json({ ok: true, ...result, time: new Date().toISOString() });
     }
 
+    if (url.pathname === '/api/admin/sync-activity-pools') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) return unauthorized;
+      const server = normalizeActivityServer(url.searchParams.get('server'));
+      if (!server) {
+        return json({ ok: false, error: 'A valid server query is required: cn, global, or tw' }, 400);
+      }
+      const result = await syncActivityRecruitmentPools(env, server);
+      return json({ ok: true, ...result, time: new Date().toISOString() });
+    }
+
     if (url.pathname === '/api/admin/sync-status') {
       const unauthorized = requireAdminToken(request, env);
       if (unauthorized) return unauthorized;
@@ -359,7 +395,7 @@ export default {
           query: `?server=eq.${server}&select=id,activity_id,server,start_at,end_at,activities(id,code,name_i18n,type,image_url,source_url)&order=start_at.desc`,
         }),
         supabaseRestRequest(env, 'recruitment_pools', {
-          query: `?server=eq.${server}&select=id,activity_id,kind,name_i18n,start_at,end_at,source_url&order=start_at.desc`,
+          query: `?server=eq.${server}&select=id,activity_id,slug,kind,name_i18n,image_url,start_at,end_at,source_url,recruitment_pool_operators(operator_id,identity,operator_data)&order=start_at.desc`,
         }),
         supabaseRestRequest(env, 'operator_acquisition_records', {
           query: `?server=eq.${server}&select=id,activity_id,operator_id,operator_name_i18n,acquisition_type,source_url&order=created_at.desc`,
@@ -384,7 +420,15 @@ export default {
       }
       for (const pool of pools || []) {
         if (pool.activity_id && activities.has(pool.activity_id)) {
-          activities.get(pool.activity_id).recruitment_pools.push(pool);
+          const operators = (pool.recruitment_pool_operators || []).map((entry) => ({
+            id: entry.operator_id,
+            ...(entry.operator_data || {}),
+            featured: entry.operator_data?.featured
+              || (entry.identity === 'off_banner' ? 'secondary' : 'primary'),
+            limited: Boolean(entry.operator_data?.limited || entry.identity === 'limited'),
+          }));
+          const { recruitment_pool_operators: ignored, ...poolData } = pool;
+          activities.get(pool.activity_id).recruitment_pools.push({ ...poolData, operators });
         }
       }
       for (const record of acquisitionRecords || []) {
@@ -845,7 +889,11 @@ function scheduleConfiguredSyncJob(ctx, env, job) {
   }
 
   const server = job.replace('activities-', '');
-  scheduleSyncTask(ctx, env, job, () => syncActivities(env, [server]));
+  scheduleSyncTask(ctx, env, job, async () => {
+    const activities = await syncActivities(env, [server]);
+    const pools = await syncActivityRecruitmentPools(env, server);
+    return { activities, pools };
+  });
 }
 
 async function fetchWikiActivityWindows(server, limit = ACTIVITY_SYNC_SOURCE_LIMIT) {
@@ -1244,6 +1292,181 @@ async function syncActivities(env, servers = ACTIVITY_SERVERS) {
     sourceLimit: ACTIVITY_SYNC_SOURCE_LIMIT,
     source: { wiki: ARKNIGHTS_WIKI_API, prts: PRTS_WIKI_API },
   };
+}
+
+function activityPoolIdentity(value) {
+  return String(value || '').toLowerCase().replace(/[\s\p{P}\p{S}_]+/gu, '');
+}
+
+function decodeBannerHtml(value) {
+  return String(value || '')
+    .replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&#32;/g, ' ')
+    .replace(/&#8211;/g, '–').replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+    .replace(/&#39;|&#x27;/g, "'").replace(/<[^>]+>/g, '').trim();
+}
+
+function parseWikiBannerRows(html) {
+  return [...String(html || '').matchAll(/<tr>([\s\S]*?)<\/tr>/g)]
+    .map((match) => match[1])
+    .filter((row) => row.includes('class="banner"') && row.includes('character-tooltip'))
+    .map((row) => {
+      const title = decodeBannerHtml(row.match(/<div[^>]*text-align:center[^>]*><b>([\s\S]*?)<\/b>/)?.[1]);
+      const imageFile = decodeBannerHtml(row.match(/<img alt="([^"]+(?:banner|Banner)[^"]*\.png)"/)?.[1]);
+      const dates = {};
+      for (const match of row.matchAll(/<b>(CN|Global|TW) date:<\/b>\s*(\d{4})\/(\d{2})\/(\d{2})/g)) {
+        dates[match[1] === 'CN' ? 'cn' : match[1].toLowerCase()] = `${match[2]}-${match[3]}-${match[4]}`;
+      }
+      const operators = [...row.matchAll(/class="character-tooltip"[^>]*data-star="(\d)"[^>]*data-name="([^"]+)"/g)]
+        .map((operator) => ({ rarity: Number(operator[1]), name: decodeBannerHtml(operator[2]) }));
+      return { title, imageFile, dates, operators };
+    })
+    .filter((banner) => banner.title && banner.imageFile && banner.operators.length);
+}
+
+function activityPoolLocalDate(timestamp, server) {
+  const date = new Date(timestamp);
+  const offsetHours = server === 'global' ? -7 : 8;
+  return new Date(date.getTime() + offsetHours * 3_600_000).toISOString().slice(0, 10);
+}
+
+function activityPoolDateDistance(left, right) {
+  return Math.abs(Date.parse(`${left}T00:00:00Z`) - Date.parse(`${right}T00:00:00Z`)) / 86_400_000;
+}
+
+function activityPoolBannerScore(activity, banner, server) {
+  const bannerDate = banner.dates[server] || (server === 'tw' ? banner.dates.global : null);
+  if (!bannerDate) return -Infinity;
+  const distance = activityPoolDateDistance(activityPoolLocalDate(activity.start_at, server), bannerDate);
+  if (distance > 1) return -Infinity;
+  const activityText = `${activity.code} ${Object.values(activity.name_i18n || {}).join(' ')}`.toLowerCase();
+  const bannerText = banner.title.toLowerCase();
+  let score = 100 - distance * 20;
+  if (activityText.includes('rerun') || /復刻|复刻/u.test(activityText)) {
+    if (!/rerun|復刻|复刻/u.test(bannerText) && activity.code !== 'wiki-heart-of-surging-flame-rerun') return -Infinity;
+    score += /rerun|復刻|复刻/u.test(bannerText) ? 30 : -30;
+  }
+  if (/standard pool|kernel|joint operation|celebrate & recollect|orienteering/i.test(bannerText)) score -= 100;
+  if (/limited-time|limited|crossover/i.test(bannerText)) score += 10;
+  return score;
+}
+
+function activityPoolBannerKind(title) {
+  if (/crossover|limited headhunting/i.test(title)) return 'limited';
+  if (/limited-time/i.test(title)) return 'event';
+  if (/kernel/i.test(title)) return 'kernel';
+  return 'standard';
+}
+
+async function fetchWikiBanners() {
+  const currentYear = new Date().getUTCFullYear();
+  const pages = await Promise.all(Array.from({ length: currentYear - 2018 }, async (_, index) => {
+    const year = 2019 + index;
+    const params = new URLSearchParams({
+      action: 'parse', page: `Headhunting/Banners/${year}`, prop: 'text', format: 'json',
+    });
+    const response = await fetch(`${ARKNIGHTS_WIKI_API}?${params.toString()}`, {
+      headers: { 'user-agent': 'ArknightMusicWeb/2.0 (activity pool sync)' },
+      cf: { cacheTtl: 3600, cacheEverything: true },
+    });
+    if (!response.ok) throw new Error(`Arknights Wiki banner page failed: ${response.status} (${year})`);
+    const payload = await response.json();
+    return parseWikiBannerRows(payload.parse?.text?.['*'] || '');
+  }));
+  return pages.flat();
+}
+
+async function fetchActivityPoolOperatorNames() {
+  const [enCharacters, cnCharacters] = await Promise.all([
+    fetchJson(`${EN_EXCEL_BASE}/character_table.json`),
+    fetchJson(`${EXCEL_BASE}/character_table.json`),
+  ]);
+  const operators = new Map();
+  for (const [id, character] of Object.entries(enCharacters || {})) {
+    if (!id.startsWith('char_') || !character?.name) continue;
+    const cnCharacter = cnCharacters?.[id];
+    for (const name of [character.name, character.appellation]) {
+      if (name) operators.set(activityPoolIdentity(name), {
+        id,
+        cnName: cnCharacter?.name || '',
+        rarity: Number(cnCharacter?.rarity ?? character.rarity ?? 0) + 1,
+      });
+    }
+  }
+  return operators;
+}
+
+async function syncActivityRecruitmentPools(env, server) {
+  if (!hasSupabaseConfig(env)) return { synced: 0, skipped: true, reason: 'Supabase is not configured' };
+  const [windows, banners, operatorsByName] = await Promise.all([
+    supabaseRestRequest(env, 'activity_windows', {
+      query: `?server=eq.${encodeURIComponent(server)}&select=activity_id,server,start_at,end_at,activities!inner(code,name_i18n,type,image_url)&order=start_at.desc&limit=500`,
+    }),
+    fetchWikiBanners(),
+    fetchActivityPoolOperatorNames(),
+  ]);
+  const pools = [];
+  for (const window of windows || []) {
+    const activity = window.activities;
+    if (!activity || !['side_story', 'intermezzi', 'collaboration'].includes(activity.type)) continue;
+    const match = banners
+      .map((banner) => ({ banner, score: activityPoolBannerScore({ ...activity, start_at: window.start_at }, banner, server) }))
+      .filter((candidate) => Number.isFinite(candidate.score))
+      .sort((left, right) => right.score - left.score)[0];
+    if (!match || match.score < 20) continue;
+    pools.push({
+      activity_id: window.activity_id,
+      server,
+      start_at: window.start_at,
+      end_at: window.end_at || null,
+      slug: activityPoolIdentity(match.banner.title),
+      kind: activityPoolBannerKind(match.banner.title),
+      name_i18n: { en: match.banner.title.replace(/^\[[^\]]+\]\s*/u, '') },
+      image_url: `https://arknights.wiki.gg/wiki/Special:Redirect/file/${match.banner.imageFile.replace(/ /g, '_')}`,
+      source_url: 'https://arknights.wiki.gg/wiki/Headhunting/Banners',
+      operators: match.banner.operators.map((operator) => {
+        const resolved = operatorsByName.get(activityPoolIdentity(operator.name));
+        const id = resolved?.id || ACTIVITY_POOL_OPERATOR_ID_ALIASES.get(activityPoolIdentity(operator.name)) || '';
+        return {
+          id, rarity: operator.rarity, featured: 'primary',
+          name_i18n: { en: operator.name, ...(resolved?.cnName ? { 'zh-CN': resolved.cnName } : {}) },
+        };
+      }).filter((operator) => operator.id),
+    });
+  }
+  for (const window of windows || []) {
+    const overrides = ACTIVITY_POOL_MANUAL_OVERRIDES[window.activities?.code]?.[server] || [];
+    for (const pool of overrides) pools.push({
+      ...pool, activity_id: window.activity_id, server, start_at: window.start_at, end_at: window.end_at || null,
+      image_url: pool.image_url || window.activities?.image_url || null,
+    });
+  }
+  const deduped = [...new Map(pools.map((pool) => [`${pool.activity_id}:${pool.server}:${pool.slug}`, pool])).values()];
+  const saved = [];
+  for (let offset = 0; offset < deduped.length; offset += ACTIVITY_POOL_SYNC_BATCH_SIZE) {
+    const rows = deduped.slice(offset, offset + ACTIVITY_POOL_SYNC_BATCH_SIZE);
+    const result = await supabaseRestRequest(env, 'recruitment_pools', {
+      method: 'POST', query: '?on_conflict=activity_id,server,slug', prefer: 'resolution=merge-duplicates,return=representation',
+      body: rows.map(({ operators: ignored, ...pool }) => ({ ...pool, updated_at: new Date().toISOString() })),
+    });
+    saved.push(...(result || []));
+  }
+  const ids = new Map(saved.map((pool) => [`${pool.activity_id}:${pool.server}:${pool.slug}`, pool.id]));
+  const operatorRows = deduped.flatMap((pool) => (pool.operators || []).flatMap((operator) => {
+    const poolId = ids.get(`${pool.activity_id}:${pool.server}:${pool.slug}`);
+    if (!poolId || !operator.id) return [];
+    const identity = operator.limited ? 'limited' : operator.featured === 'secondary' ? 'off_banner' : 'featured';
+    return [{
+      recruitment_pool_id: poolId, operator_id: operator.id, identity,
+      operator_data: { rarity: operator.rarity, featured: operator.featured || 'primary', limited: Boolean(operator.limited), name_i18n: operator.name_i18n || {} },
+    }];
+  }));
+  for (let offset = 0; offset < operatorRows.length; offset += ACTIVITY_POOL_SYNC_BATCH_SIZE) {
+    await supabaseRestRequest(env, 'recruitment_pool_operators', {
+      method: 'POST', query: '?on_conflict=recruitment_pool_id,operator_id,identity', prefer: 'resolution=merge-duplicates,return=minimal',
+      body: operatorRows.slice(offset, offset + ACTIVITY_POOL_SYNC_BATCH_SIZE),
+    });
+  }
+  return { synced: deduped.length, operators: operatorRows.length, server, source: 'wiki-banners' };
 }
 
 function getSupabaseAuthKey(env) {

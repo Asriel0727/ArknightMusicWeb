@@ -17,6 +17,27 @@ Worker 語法檢查：
 node --check worker/index.js
 ```
 
+活動卡池同步（既有資料庫請先於 Supabase 執行
+`docs/activity-recruitment-pool-sync-migration.sql`；全新資料庫才執行
+`docs/activity-recruitment-schema.sql`，並在本機設定 `SUPABASE_SERVICE_ROLE_KEY`）：
+
+```powershell
+$env:SUPABASE_SERVICE_ROLE_KEY = "<Supabase service role key>"
+npm run activities:sync
+npm run activities:audit-pools
+```
+
+`activities:sync` 先從 Wiki／遊戲資料產生經過日期與角色交集比對的活動卡池，接著以
+`activity code + server + pool slug` 寫入 Supabase。它不會刪除既有資料；可先使用
+`npm run activities:push-pools -- --dry-run` 檢視預計寫入的筆數。
+
+## 自動卡池同步
+
+卡池同步由 Cloudflare Worker 的既有六小時 cron 執行：每個伺服器完成活動資料同步後，會立即
+比對 Wiki 招募 banner 並寫入 Supabase。它使用 Worker 已有的 `SUPABASE_SERVICE_ROLE_KEY` secret，
+不需要 GitHub Actions 或額外 GitHub Secret。本機的 `npm run activities:sync` 僅保留給需要立即
+回補資料時使用。
+
 ## 主要資料夾
 
 - `src/components/`：Vue UI 元件。

@@ -1,6 +1,16 @@
 <template>
   <div class="character-page" :key="locale">
     <h1 class="page-title">{{ t('character.pageTitle') }}</h1>
+    <section class="server-progress-panel" :aria-label="t('character.serverProgress')">
+      <span>{{ t('character.serverProgress') }}</span>
+      <div class="operator-server-segments" role="group" :aria-label="t('character.serverProgress')">
+        <button v-for="option in serverOptions" :key="option.value" type="button"
+          :class="{ active: releaseServer === option.value }" :aria-pressed="releaseServer === option.value"
+          @click="releaseServer = option.value">
+          {{ option.label }}
+        </button>
+      </div>
+    </section>
     <!-- 篩選區域 -->
     <div class="filter-section">
       <div class="filter-group">
@@ -89,7 +99,7 @@
     <div class="character-list-toolbar">
       <div class="character-count">{{ t('character.count', { n: filteredCharacters.length }) }}</div>
       <div class="character-list-controls">
-        <div v-if="!isCnServer" class="operator-view-segments" role="group" :aria-label="t('character.serverProgress')">
+        <div class="operator-view-segments" role="group" :aria-label="t('character.serverProgress')">
           <button type="button" data-state="all" :class="{ active: operatorView === 'all' }"
             :aria-pressed="operatorView === 'all'" @click="operatorView = 'all'">
             <i class="fas fa-layer-group"></i>
@@ -195,7 +205,7 @@ const assetManifestVersion = ref(0);
 const selectedFactions = ref([]);
 const sortNewestFirst = ref(false);
 const operatorView = ref('released');
-const isCnServer = computed(() => locale.value === 'zh-CN');
+const releaseServer = ref(locale.value === 'zh-TW' ? 'tw' : locale.value === 'zh-CN' ? 'cn' : 'global');
 const detailLoadMessage = ref('');
 const characterDetailPromiseMap = new Map();
 let detailLoadMessageTimer = null;
@@ -229,6 +239,12 @@ const professions = computed(() => [
   { value: 'MEDIC', label: t('profession.MEDIC') },
   { value: 'SUPPORT', label: t('profession.SUPPORT') },
   { value: 'SPECIAL', label: t('profession.SPECIAL') },
+]);
+
+const serverOptions = computed(() => [
+  { value: 'global', label: t('character.serverGlobal') },
+  { value: 'cn', label: t('character.serverCn') },
+  { value: 'tw', label: t('character.serverTw') },
 ]);
 
 const getProfessionName = (profession) => {
@@ -291,10 +307,8 @@ const formatReleaseDate = (value) => {
 
 const filteredCharacters = computed(() => {
   const filtered = characters.value.filter(char => {
-    if (!isCnServer.value) {
-      if (operatorView.value === 'released' && char.isReleased === false) return false;
-      if (operatorView.value === 'upcoming' && char.isReleased !== false) return false;
-    }
+    if (operatorView.value === 'released' && char.isReleased === false) return false;
+    if (operatorView.value === 'upcoming' && char.isReleased !== false) return false;
     // 搜尋篩選
     if (searchQuery.value) {
       const query = searchQuery.value.toLowerCase();
@@ -446,7 +460,7 @@ const loadCharacters = async () => {
   error.value = null;
   
   try {
-    const loadedChars = await fetchRecruitCharacters();
+    const loadedChars = await fetchRecruitCharacters(releaseServer.value);
     characters.value = loadedChars;
     // 重置所有角色的圖片索引
     avatarIndexMap.value.clear();
@@ -480,7 +494,6 @@ onUnmounted(() => {
 });
 
 watch(locale, async () => {
-  operatorView.value = isCnServer.value ? 'all' : 'released';
   await syncFactionI18nMessages(i18n);
   await loadCharacters();
   if (
@@ -496,6 +509,11 @@ watch(locale, async () => {
       console.error(e);
     }
   }
+});
+
+watch(releaseServer, () => {
+  operatorView.value = 'released';
+  loadCharacters();
 });
 </script>
 
@@ -640,6 +658,14 @@ watch(locale, async () => {
   gap: 12px;
   flex-wrap: wrap;
 }
+
+.server-progress-panel { margin: 0 0 14px; padding: 12px 14px; border: 1px solid rgba(88, 166, 255, .24); border-radius: 10px; background: rgba(22, 27, 34, .74); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.server-progress-panel > span { color: var(--text-secondary); font-size: .85rem; font-weight: 600; white-space: nowrap; }
+.operator-server-segments { display: grid; grid-template-columns: repeat(3, minmax(82px, 1fr)); border: 1px solid rgba(88, 166, 255, .28); border-radius: 8px; overflow: hidden; background: rgba(13, 17, 23, .56); }
+.operator-server-segments button { border: 0; border-right: 1px solid rgba(88, 166, 255, .18); background: transparent; color: var(--text-secondary); min-height: 40px; padding: 0 11px; cursor: pointer; font-size: .8rem; display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: color 160ms ease, background 160ms ease; }
+.operator-server-segments button:last-child { border-right: 0; }
+.operator-server-segments button:hover { color: var(--text-color); background: rgba(88,166,255,.08); }
+.operator-server-segments button.active { color: #f0f6fc; background: rgba(88,166,255,.2); font-weight: 700; box-shadow: inset 0 -2px var(--primary-color); }
 
 .character-list-toolbar .character-count { margin: 0; }
 
@@ -906,6 +932,16 @@ watch(locale, async () => {
   .filter-buttons button {
     padding: 5px 10px;
     font-size: 0.8rem;
+  }
+
+  .server-progress-panel {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .operator-server-segments {
+    width: 100%;
   }
 
   .character-list-toolbar,

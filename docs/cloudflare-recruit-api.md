@@ -30,8 +30,9 @@ The Worker has a cron trigger:
 ```
 
 This syncs the recruit operator list every 6 hours. When Supabase is configured,
-the same cron also refreshes the music album/song lists and prewarms a small batch
-of song details and album details.
+the same cron also refreshes activity windows and their associated recruitment pools,
+refreshes the music album/song lists, and prewarms a small batch of song details and
+album details.
 
 ## KV Keys In Use
 

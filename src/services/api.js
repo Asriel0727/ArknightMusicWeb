@@ -573,7 +573,7 @@ function shouldUseRecruitWorkerApi() {
   return locale === 'zh-TW' || locale === 'zh-CN';
 }
 
-export async function fetchRecruitCharacters() {
+export async function fetchRecruitCharacters(releaseServer = null) {
   let operators;
   try {
     if (shouldUseRecruitWorkerApi()) {
@@ -625,12 +625,13 @@ export async function fetchRecruitCharacters() {
 
   try {
     const locale = getCurrentUiLocale();
-    const server = locale === 'zh-TW' ? 'tw' : locale === 'zh-CN' ? 'cn' : 'global';
+    const server = ['cn', 'tw', 'global'].includes(releaseServer)
+      ? releaseServer
+      : (locale === 'zh-TW' ? 'tw' : locale === 'zh-CN' ? 'cn' : 'global');
     const releaseResults = await Promise.allSettled([
       fetchRecruitApiJson(`/api/recruit/releases?server=${server}`),
       server === 'cn' ? Promise.resolve(null) : fetchRecruitApiJson('/api/recruit/releases?server=cn'),
       fetchRecruitApiJson('/api/recruit/operators'),
-      fetchRecruitApiJson('/api/recruit/operator-catalog'),
     ]);
     const releaseData = releaseResults[0].status === 'fulfilled'
       ? releaseResults[0].value
@@ -641,9 +642,6 @@ export async function fetchRecruitCharacters() {
     const cnData = releaseResults[2].status === 'fulfilled'
       ? releaseResults[2].value
       : { operators: [] };
-    const catalogData = releaseResults[3].status === 'fulfilled'
-      ? releaseResults[3].value
-      : { operators: [] };
     releaseResults.forEach((result, index) => {
       if (result.status === 'rejected') {
         console.warn('Recruit release request failed:', index, result.reason);
@@ -653,9 +651,6 @@ export async function fetchRecruitCharacters() {
     const cnReleaseRows = cnReleaseData?.releases || releaseRows;
     const releaseMap = buildOperatorReleaseMap(releaseRows);
     const cnReleaseMap = buildOperatorReleaseMap(cnReleaseRows);
-    const catalogMap = new Map((catalogData.operators || []).map((row) => [
-      normalizeReleaseLookupName(row.operator_name), row,
-    ]));
     const now = Date.now();
     const activeServerRelease = releaseRows
       .filter((row) => Number.isFinite(Date.parse(row.release_at)) && Date.parse(row.release_at) <= now)
@@ -664,7 +659,6 @@ export async function fetchRecruitCharacters() {
     const progressCutoffCn = cnReleaseRows
       .filter((row) => row.event_name === progressEventName)
       .reduce((latest, row) => Math.max(latest, Date.parse(row.release_at) || 0), 0);
-    const localizedIds = new Set(operators.map((operator) => operator.id));
     const existingIds = new Set(operators.map((operator) => operator.id));
     for (const rawOperator of cnData.operators || []) {
       if (existingIds.has(rawOperator.id)) continue;
@@ -684,17 +678,10 @@ export async function fetchRecruitCharacters() {
       const cnRelease = findOperatorRelease(cnReleaseMap, operator);
       const timestamp = release?.release_at ? Date.parse(release.release_at) : NaN;
       const cnTimestamp = cnRelease?.release_at ? Date.parse(cnRelease.release_at) : NaN;
-      const catalogEntry = catalogMap.get(normalizeReleaseLookupName(operator.appellation))
-        || catalogMap.get(normalizeReleaseLookupName(operator.name));
       const releasedByActivityProgress = server !== 'cn'
         && progressCutoffCn > 0
         && Number.isFinite(cnTimestamp)
         && cnTimestamp <= progressCutoffCn;
-      const releasedByLocalizedGameData = server === 'global' && localizedIds.has(operator.id);
-      const releasedByCatalog = server !== 'cn'
-        && !cnRelease
-        && catalogEntry
-        && catalogEntry.is_cn !== '1';
       return {
         ...operator,
         releaseAt: release?.release_at || null,
@@ -703,9 +690,7 @@ export async function fetchRecruitCharacters() {
         progressEventName,
         isReleased: server === 'cn'
           || releasedByActivityProgress
-          || (Number.isFinite(timestamp) && timestamp <= now)
-          || releasedByLocalizedGameData
-          || releasedByCatalog,
+          || (Number.isFinite(timestamp) && timestamp <= now),
       };
     });
   } catch (error) {

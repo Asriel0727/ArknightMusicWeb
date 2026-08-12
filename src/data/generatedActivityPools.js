@@ -765,98 +765,6 @@ export default {
       }
     ]
   },
-  "wiki-immemorial-bright": {
-    "tw": [
-      {
-        "slug": "limitedtimeclankliberty",
-        "kind": "event",
-        "name_i18n": {
-          "en": "Clank Liberty"
-        },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Clank_Liberty_banner.png",
-        "operators": [
-          {
-            "id": "char_4105_almond",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Almond",
-              "zh-CN": "杏仁"
-            }
-          },
-          {
-            "id": "char_346_aosta",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Aosta",
-              "zh-CN": "奥斯塔"
-            }
-          },
-          {
-            "id": "char_1034_jesca2",
-            "rarity": 6,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Jessica the Liberated",
-              "zh-CN": "涤火杰西卡"
-            }
-          }
-        ],
-        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
-        "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Clank_Liberty_banner.png",
-          "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Clank_Liberty_banner.png",
-          "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Clank_Liberty_banner.png"
-        }
-      }
-    ],
-    "global": [
-      {
-        "slug": "limitedtimeclankliberty",
-        "kind": "event",
-        "name_i18n": {
-          "en": "Clank Liberty"
-        },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Clank_Liberty_banner.png",
-        "operators": [
-          {
-            "id": "char_4105_almond",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Almond",
-              "zh-CN": "杏仁"
-            }
-          },
-          {
-            "id": "char_346_aosta",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Aosta",
-              "zh-CN": "奥斯塔"
-            }
-          },
-          {
-            "id": "char_1034_jesca2",
-            "rarity": 6,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Jessica the Liberated",
-              "zh-CN": "涤火杰西卡"
-            }
-          }
-        ],
-        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
-        "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Clank_Liberty_banner.png",
-          "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Clank_Liberty_banner.png",
-          "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Clank_Liberty_banner.png"
-        }
-      }
-    ]
-  },
   "wiki-come-catastrophes-or-wakes-of-vultures": {
     "tw": [
       {
@@ -1817,8 +1725,8 @@ export default {
   "wiki-a-flurry-to-the-flame": {
     "tw": [
       {
-        "slug": "crossoversharpenedbyflame",
-        "kind": "limited",
+        "slug": "triumphanthuntsharpenedbyflame",
+        "kind": "standard",
         "name_i18n": {
           "en": "Sharpened by Flame"
         },
@@ -1853,8 +1761,8 @@ export default {
     ],
     "global": [
       {
-        "slug": "crossoversharpenedbyflame",
-        "kind": "limited",
+        "slug": "triumphanthuntsharpenedbyflame",
+        "kind": "standard",
         "name_i18n": {
           "en": "Sharpened by Flame"
         },
@@ -1889,8 +1797,8 @@ export default {
     ],
     "cn": [
       {
-        "slug": "crossoversharpenedbyflame",
-        "kind": "limited",
+        "slug": "triumphanthuntsharpenedbyflame",
+        "kind": "standard",
         "name_i18n": {
           "en": "Sharpened by Flame"
         },
@@ -4874,12 +4782,12 @@ export default {
   "wiki-operation-originium-dust": {
     "tw": [
       {
-        "slug": "crossoverattackdefencetacticalcollide",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollide",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide"
         },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
         "operators": [
           {
             "id": "char_456_ash",
@@ -4911,7 +4819,7 @@ export default {
         ],
         "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
         "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
           "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png",
           "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png"
         }
@@ -4919,12 +4827,12 @@ export default {
     ],
     "global": [
       {
-        "slug": "crossoverattackdefencetacticalcollide",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollide",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide"
         },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
         "operators": [
           {
             "id": "char_456_ash",
@@ -4956,7 +4864,7 @@ export default {
         ],
         "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
         "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
           "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png",
           "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png"
         }
@@ -4964,12 +4872,12 @@ export default {
     ],
     "cn": [
       {
-        "slug": "crossoverattackdefencetacticalcollide",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollide",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide"
         },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
         "operators": [
           {
             "id": "char_456_ash",
@@ -5001,7 +4909,7 @@ export default {
         ],
         "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
         "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
           "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png",
           "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png"
         }
@@ -5011,12 +4919,12 @@ export default {
   "wiki-multivariate-cooperation-defence-protocols": {
     "tw": [
       {
-        "slug": "crossoverattackdefencetacticalcollide",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollide",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide"
         },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
         "operators": [
           {
             "id": "char_456_ash",
@@ -5048,7 +4956,7 @@ export default {
         ],
         "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
         "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
           "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png",
           "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png"
         }
@@ -5056,12 +4964,12 @@ export default {
     ],
     "global": [
       {
-        "slug": "crossoverattackdefencetacticalcollide",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollide",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide"
         },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
         "operators": [
           {
             "id": "char_456_ash",
@@ -5093,7 +5001,7 @@ export default {
         ],
         "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
         "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
           "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png",
           "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png"
         }
@@ -5101,12 +5009,12 @@ export default {
     ],
     "cn": [
       {
-        "slug": "crossoverattackdefencetacticalcollide",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollide",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide"
         },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
         "operators": [
           {
             "id": "char_456_ash",
@@ -5138,7 +5046,7 @@ export default {
         ],
         "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
         "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack_Defence_Tactical_Collide_banner.png",
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Attack,_Defence,_Tactical_Collide_banner.png",
           "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png",
           "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Attack_Defence_Tactical_Collide_banner.png"
         }
@@ -6468,6 +6376,94 @@ export default {
       }
     ]
   },
+  "wiki-medjehtiqedti-bound": {
+    "global": [
+      {
+        "slug": "limitedtimequesterinfrozenmoments",
+        "kind": "event",
+        "name_i18n": {
+          "en": "Quester in Frozen Moments"
+        },
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Quester_in_Frozen_Moments_banner.png",
+        "operators": [
+          {
+            "id": "char_1022_flwr2",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Perfumer the Distilled",
+              "zh-CN": "撷英调香师"
+            }
+          },
+          {
+            "id": "char_4015_spuria",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Spuria",
+              "zh-CN": "空构"
+            }
+          },
+          {
+            "id": "char_4056_titi",
+            "rarity": 6,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Titi",
+              "zh-CN": "缇缇"
+            }
+          }
+        ],
+        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
+        "image_urls": {
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Quester_in_Frozen_Moments_banner.png"
+        }
+      }
+    ],
+    "cn": [
+      {
+        "slug": "limitedtimequesterinfrozenmoments",
+        "kind": "event",
+        "name_i18n": {
+          "en": "Quester in Frozen Moments"
+        },
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Quester_in_Frozen_Moments_banner.png",
+        "operators": [
+          {
+            "id": "char_1022_flwr2",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Perfumer the Distilled",
+              "zh-CN": "撷英调香师"
+            }
+          },
+          {
+            "id": "char_4015_spuria",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Spuria",
+              "zh-CN": "空构"
+            }
+          },
+          {
+            "id": "char_4056_titi",
+            "rarity": 6,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Titi",
+              "zh-CN": "缇缇"
+            }
+          }
+        ],
+        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
+        "image_urls": {
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Quester_in_Frozen_Moments_banner.png"
+        }
+      }
+    ]
+  },
   "wiki-exodus-from-the-pale-sea-rerun": {
     "global": [
       {
@@ -6786,99 +6782,11 @@ export default {
       }
     ]
   },
-  "wiki-ending-a-grand-overture-rerun": {
-    "global": [
-      {
-        "slug": "limitedtimenevergildedrerun",
-        "kind": "event",
-        "name_i18n": {
-          "en": "Never Gilded Rerun"
-        },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Never_Gilded_Rerun_banner.png",
-        "operators": [
-          {
-            "id": "char_487_bobb",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Bobbing",
-              "zh-CN": "波卜"
-            }
-          },
-          {
-            "id": "char_1024_hbisc2",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Hibiscus the Purifier",
-              "zh-CN": "濯尘芙蓉"
-            }
-          },
-          {
-            "id": "char_1019_siege2",
-            "rarity": 6,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Vina Victoria",
-              "zh-CN": "维娜·维多利亚"
-            }
-          }
-        ],
-        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
-        "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Never_Gilded_Rerun_banner.png"
-        }
-      }
-    ],
-    "cn": [
-      {
-        "slug": "limitedtimenevergildedrerun",
-        "kind": "event",
-        "name_i18n": {
-          "en": "Never Gilded Rerun"
-        },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Never_Gilded_Rerun_banner.png",
-        "operators": [
-          {
-            "id": "char_487_bobb",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Bobbing",
-              "zh-CN": "波卜"
-            }
-          },
-          {
-            "id": "char_1024_hbisc2",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Hibiscus the Purifier",
-              "zh-CN": "濯尘芙蓉"
-            }
-          },
-          {
-            "id": "char_1019_siege2",
-            "rarity": 6,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Vina Victoria",
-              "zh-CN": "维娜·维多利亚"
-            }
-          }
-        ],
-        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
-        "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Never_Gilded_Rerun_banner.png"
-        }
-      }
-    ]
-  },
   "wiki-somniloquium-serenum": {
     "global": [
       {
-        "slug": "crossovercantilenapuppae",
-        "kind": "limited",
+        "slug": "thedreamballofmarionettescantilenapuppae",
+        "kind": "standard",
         "name_i18n": {
           "en": "Cantilena Puppae"
         },
@@ -6920,8 +6828,8 @@ export default {
     ],
     "cn": [
       {
-        "slug": "crossovercantilenapuppae",
-        "kind": "limited",
+        "slug": "thedreamballofmarionettescantilenapuppae",
+        "kind": "standard",
         "name_i18n": {
           "en": "Cantilena Puppae"
         },
@@ -7188,6 +7096,94 @@ export default {
         "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
         "image_urls": {
           "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Anchor_In_The_Deep_Rerun_banner.png"
+        }
+      }
+    ]
+  },
+  "wiki-act-or-die": {
+    "global": [
+      {
+        "slug": "limitedtimedithyrambunending",
+        "kind": "event",
+        "name_i18n": {
+          "en": "Dithyramb Unending"
+        },
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Dithyramb_Unending_banner.png",
+        "operators": [
+          {
+            "id": "char_4040_rockr",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Rockrock",
+              "zh-CN": "洛洛"
+            }
+          },
+          {
+            "id": "char_4191_tippi",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Tippi",
+              "zh-CN": "蒂比"
+            }
+          },
+          {
+            "id": "char_1042_phatm2",
+            "rarity": 6,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Tragodia",
+              "zh-CN": "酒神"
+            }
+          }
+        ],
+        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
+        "image_urls": {
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Dithyramb_Unending_banner.png"
+        }
+      }
+    ],
+    "cn": [
+      {
+        "slug": "limitedtimedithyrambunending",
+        "kind": "event",
+        "name_i18n": {
+          "en": "Dithyramb Unending"
+        },
+        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Dithyramb_Unending_banner.png",
+        "operators": [
+          {
+            "id": "char_4040_rockr",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Rockrock",
+              "zh-CN": "洛洛"
+            }
+          },
+          {
+            "id": "char_4191_tippi",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Tippi",
+              "zh-CN": "蒂比"
+            }
+          },
+          {
+            "id": "char_1042_phatm2",
+            "rarity": 6,
+            "featured": "primary",
+            "name_i18n": {
+              "en": "Tragodia",
+              "zh-CN": "酒神"
+            }
+          }
+        ],
+        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
+        "image_urls": {
+          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Dithyramb_Unending_banner.png"
         }
       }
     ]
@@ -7617,8 +7613,8 @@ export default {
   "wiki-delicious-on-terra": {
     "global": [
       {
-        "slug": "crossoverterranfoodahterranfood",
-        "kind": "limited",
+        "slug": "dungeonadventureterranfoodahterranfood",
+        "kind": "standard",
         "name_i18n": {
           "en": "Terran Food, Ah, Terran Food"
         },
@@ -7662,8 +7658,8 @@ export default {
     ],
     "cn": [
       {
-        "slug": "crossoverterranfoodahterranfood",
-        "kind": "limited",
+        "slug": "dungeonadventureterranfoodahterranfood",
+        "kind": "standard",
         "name_i18n": {
           "en": "Terran Food, Ah, Terran Food"
         },
@@ -7982,121 +7978,11 @@ export default {
       }
     ]
   },
-  "wiki-babel-event": {
-    "global": [
-      {
-        "slug": "limitedtimelikeendinglikedeath",
-        "kind": "event",
-        "name_i18n": {
-          "en": "Like Ending Like Death"
-        },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Like_Ending_Like_Death_banner.png",
-        "operators": [
-          {
-            "id": "char_365_aprl",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "April",
-              "zh-CN": "四月"
-            }
-          },
-          {
-            "id": "char_446_aroma",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Aroma",
-              "zh-CN": "阿罗玛"
-            }
-          },
-          {
-            "id": "char_4132_ascln",
-            "rarity": 6,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Ascalon",
-              "zh-CN": "阿斯卡纶"
-            }
-          },
-          {
-            "id": "char_4130_luton",
-            "rarity": 4,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Lutonada",
-              "zh-CN": "露托"
-            }
-          }
-        ],
-        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
-        "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Like_Ending_Like_Death_banner.png",
-          "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Like_Ending_Like_Death_banner.png",
-          "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Like_Ending_Like_Death_banner.png"
-        }
-      }
-    ],
-    "cn": [
-      {
-        "slug": "limitedtimelikeendinglikedeath",
-        "kind": "event",
-        "name_i18n": {
-          "en": "Like Ending Like Death"
-        },
-        "image_url": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Like_Ending_Like_Death_banner.png",
-        "operators": [
-          {
-            "id": "char_365_aprl",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "April",
-              "zh-CN": "四月"
-            }
-          },
-          {
-            "id": "char_446_aroma",
-            "rarity": 5,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Aroma",
-              "zh-CN": "阿罗玛"
-            }
-          },
-          {
-            "id": "char_4132_ascln",
-            "rarity": 6,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Ascalon",
-              "zh-CN": "阿斯卡纶"
-            }
-          },
-          {
-            "id": "char_4130_luton",
-            "rarity": 4,
-            "featured": "primary",
-            "name_i18n": {
-              "en": "Lutonada",
-              "zh-CN": "露托"
-            }
-          }
-        ],
-        "source_url": "https://arknights.wiki.gg/wiki/Headhunting/Banners",
-        "image_urls": {
-          "en": "https://arknights.wiki.gg/wiki/Special:Redirect/file/EN_Like_Ending_Like_Death_banner.png",
-          "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Like_Ending_Like_Death_banner.png",
-          "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Like_Ending_Like_Death_banner.png"
-        }
-      }
-    ]
-  },
   "wiki-operation-originium-dust-rerun": {
     "global": [
       {
-        "slug": "crossoverattackdefencetacticalcollidererun",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollidererun",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide Rerun"
         },
@@ -8140,8 +8026,8 @@ export default {
     ],
     "cn": [
       {
-        "slug": "crossoverattackdefencetacticalcollidererun",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollidererun",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide Rerun"
         },
@@ -8187,8 +8073,8 @@ export default {
   "wiki-operation-lucent-arrowhead": {
     "global": [
       {
-        "slug": "crossoverstormreinforcemissionscycle",
-        "kind": "limited",
+        "slug": "specialopsstormreinforcemissionscycle",
+        "kind": "standard",
         "name_i18n": {
           "en": "Storm, Reinforce, Missions Cycle"
         },
@@ -8232,8 +8118,8 @@ export default {
     ],
     "cn": [
       {
-        "slug": "crossoverstormreinforcemissionscycle",
-        "kind": "limited",
+        "slug": "specialopsstormreinforcemissionscycle",
+        "kind": "standard",
         "name_i18n": {
           "en": "Storm, Reinforce, Missions Cycle"
         },
@@ -9409,8 +9295,8 @@ export default {
   "prts-kqoacs": {
     "cn": [
       {
-        "slug": "crossoverattackdefencetacticalcollidererun",
-        "kind": "limited",
+        "slug": "elitetacticalattackdefencetacticalcollidererun",
+        "kind": "standard",
         "name_i18n": {
           "en": "Attack, Defence, Tactical Collide Rerun"
         },
@@ -10615,6 +10501,53 @@ export default {
           "zh-CN": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Unbound_Reflux_banner.png",
           "zh-TW": "https://arknights.wiki.gg/wiki/Special:Redirect/file/CN_Unbound_Reflux_banner.png"
         }
+      }
+    ]
+  },
+  "wiki-till-the-lands-become-an-orange": {
+    "cn": [
+      {
+        "slug": "wheels-and-wind-homecoming",
+        "kind": "limited",
+        "name_i18n": {
+          "zh-CN": "车辙与风的归所",
+          "zh-TW": "車轍與風的歸所"
+        },
+        "image_url": "",
+        "operators": [
+          {
+            "id": "char_1015_aglna2",
+            "rarity": 6,
+            "featured": "primary",
+            "limited": true,
+            "name_i18n": {
+              "zh-CN": "予愿安洁莉娜",
+              "zh-TW": "予願安潔莉娜",
+              "en": "Angelina the Mellow Wish"
+            }
+          },
+          {
+            "id": "char_4235_thumpy",
+            "rarity": 6,
+            "featured": "primary",
+            "name_i18n": {
+              "zh-CN": "珊比",
+              "zh-TW": "珊比",
+              "en": "Thumpy"
+            }
+          },
+          {
+            "id": "char_4237_jcinta",
+            "rarity": 5,
+            "featured": "primary",
+            "name_i18n": {
+              "zh-CN": "嘉辛塔",
+              "zh-TW": "嘉辛塔",
+              "en": "Jacinta"
+            }
+          }
+        ],
+        "source_url": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/gacha_table.json"
       }
     ]
   }
