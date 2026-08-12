@@ -13,7 +13,8 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  # 多個資產同步可能接連推送；只保留最新部署，避免舊版覆蓋新版或長時間排隊。
+  cancel-in-progress: true
 
 jobs:
   build:

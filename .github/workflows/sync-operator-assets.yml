@@ -69,6 +69,10 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
+    concurrency:
+      # 必須與 deploy.yml 及活動資產同步共用同一群組，否則會同時部署。
+      group: pages
+      cancel-in-progress: true
     permissions:
       pages: write
       id-token: write

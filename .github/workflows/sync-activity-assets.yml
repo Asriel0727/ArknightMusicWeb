@@ -79,7 +79,8 @@ jobs:
       name: github-pages
     concurrency:
       group: pages
-      cancel-in-progress: false
+      # 與一般 Pages 部署共用群組，最新產物優先。
+      cancel-in-progress: true
     permissions:
       pages: write
       id-token: write

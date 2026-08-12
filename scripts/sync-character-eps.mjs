@@ -14,7 +14,7 @@ function normalizeMatchText(value) {
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/角色ep|characterep|明日方舟|arknights|塞壬唱片|monstersiren|rivervworkshop|official|musicvideo|fullversion|完整版|官方|音樂錄影帶|歌曲|主題曲/g, '')
+    .replace(/角色ep|characterep|明日方舟|arknights|塞壬唱片|monstersiren|rivervworkshop|official|musicvideo|fullversion|instrumental|inst|version|ver|完整版|官方|音樂錄影帶|歌曲|主題曲|純音樂|伴奏/g, '')
     .replace(/[^\p{L}\p{N}]/gu, '');
 }
 
@@ -53,7 +53,7 @@ function findSongMatch(title, songs) {
   const titleVariants = getTitleVariants(title);
   if (!titleVariants.length) return null;
 
-  const candidates = [];
+  const candidatesByName = new Map();
   for (const song of songs) {
     const normalizedSong = normalizeMatchText(song.name);
     if (normalizedSong.length < 2) continue;
@@ -61,12 +61,19 @@ function findSongMatch(title, songs) {
       if (variant.includes(normalizedSong) || normalizedSong.includes(variant)) return 1;
       return diceSimilarity(variant, normalizedSong);
     }));
-    candidates.push({ songId: String(song.id), score: Math.round(similarity * 100), songName: song.name });
+    const candidate = { songId: String(song.id), score: Math.round(similarity * 100), songName: song.name };
+    const previous = candidatesByName.get(normalizedSong);
+    if (!previous || candidate.score > previous.score) candidatesByName.set(normalizedSong, candidate);
   }
+  const candidates = [...candidatesByName.values()];
   candidates.sort((left, right) => right.score - left.score);
   const [best, runnerUp] = candidates;
   // 只有非常接近、且明顯勝過第二名時才自動公開，避免錯連到相似歌曲。
-  if (!best || best.score < 82 || (runnerUp && best.score - runnerUp.score < 8)) return null;
+  if (!best || best.score < 82 || (best.score < 94 && runnerUp && best.score - runnerUp.score < 8)) {
+    const suggestions = candidates.slice(0, 3).map((candidate) => `${candidate.songName} (${candidate.score}%)`).join(', ');
+    console.warn(`No confident song match for "${title}". Candidates: ${suggestions || 'none'}`);
+    return null;
+  }
   return best;
 }
 
