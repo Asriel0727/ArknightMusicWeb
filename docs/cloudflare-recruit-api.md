@@ -213,7 +213,7 @@ recorded in the sync result and does not interrupt the normal music sync or remo
 stored videos. The video is played by Bilibili's own iframe; this project does not download or
 proxy any video stream.
 
-`BILIBILI_EP_SOURCE_UID` is optional and defaults to the official Arknights uploader (`18718735`).
+`BILIBILI_EP_SOURCE_UID` is optional and defaults to the official Arknights uploader (`161775300`).
 Set it as a Worker variable if you want to monitor a different official uploader. The manual sync
 endpoint is `GET /api/admin/sync-character-eps` and uses the same `SYNC_TOKEN` authorization.
 
@@ -235,7 +235,7 @@ SUPABASE_SERVICE_ROLE_KEY
 `SESSDATA` cookie value from a Bilibili browser session you own; it is never committed or logged.
 Without it, Bilibili can still return a 412 anti-abuse page to GitHub-hosted runners. To monitor a
 different official uploader, add a repository variable named `BILIBILI_EP_SOURCE_UID`; the default
-is `18718735`.
+is `161775300`.
 
 `music_cache` keeps the original API payload for fallback. `music_albums` and `music_songs`
 store queryable, normalized data for your own database.

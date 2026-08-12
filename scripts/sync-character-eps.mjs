@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const sourceUid = String(process.env.BILIBILI_EP_SOURCE_UID || '18718735').trim();
+const sourceUid = String(process.env.BILIBILI_EP_SOURCE_UID || '161775300').trim();
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '');
 const sessdata = String(process.env.BILIBILI_SESSDATA || '');
@@ -89,20 +89,24 @@ try {
     for (const link of links) {
       const href = link.getAttribute('href') || '';
       const bvid = href.match(/BV[\w]+/i)?.[0];
-      if (!bvid || unique.has(bvid)) continue;
+      if (!bvid) continue;
       const card = link.closest('article, li, div') || link.parentElement;
       const image = card?.querySelector('img');
       const title = link.getAttribute('title') || link.textContent?.trim() || '';
-      unique.set(bvid, {
-        bvid,
-        title,
-        coverUrl: image?.getAttribute('src') || image?.getAttribute('data-src') || '',
-      });
+      const existing = unique.get(bvid);
+      // B 站同一張影片卡有「時長」與「標題」兩個連結；保留較長的文字才能拿到標題。
+      if (!existing || title.length > existing.title.length) {
+        unique.set(bvid, {
+          bvid,
+          title,
+          coverUrl: image?.getAttribute('src') || image?.getAttribute('data-src') || existing?.coverUrl || '',
+        });
+      }
     }
     return [...unique.values()];
   });
 
-  const characterEps = videos.filter((video) => /角色\s*EP|character\s*EP/i.test(video.title));
+  const characterEps = videos.filter((video) => /角色\s*EP|character\s*EP|《?明日方舟》?\s*EP|arknights\s*EP/i.test(video.title));
   const [songs, existingVideos] = await Promise.all([
     getSupabaseRows('music_songs', 'select=id,name&limit=2000'),
     getSupabaseRows('music_character_ep_videos', 'select=bvid,song_id,is_visible,match_score&limit=2000'),
@@ -129,7 +133,8 @@ try {
     };
   });
   await upsertVideos(rows);
-  console.log(`Character EP sync complete: found=${characterEps.length}, stored=${rows.length}`);
+  const matched = rows.filter((row) => row.is_visible).length;
+  console.log(`Character EP sync complete: scanned=${videos.length}, found=${characterEps.length}, matched=${matched}, stored=${rows.length}`);
 } finally {
   await browser.close();
 }

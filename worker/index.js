@@ -14,7 +14,7 @@ const IMAGE_MIRROR_DYNAMIC =
 
 const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
 const BILIBILI_API_ORIGIN = 'https://api.bilibili.com';
-const DEFAULT_BILIBILI_EP_SOURCE_UID = '18718735';
+const DEFAULT_BILIBILI_EP_SOURCE_UID = '161775300';
 const BILIBILI_EP_PAGE_SIZE = 50;
 const BILIBILI_EP_MAX_PAGES = 3;
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
@@ -3239,7 +3239,10 @@ function getBilibiliEpSourceUid(env) {
 
 function isCharacterEpVideoTitle(title) {
   const normalized = String(title || '').replace(/\s+/g, '').toLowerCase();
-  return normalized.includes('角色ep') || normalized.includes('characterep');
+  return normalized.includes('角色ep')
+    || normalized.includes('characterep')
+    || normalized.includes('明日方舟》ep')
+    || normalized.includes('arknights') && normalized.includes('ep');
 }
 
 function normalizeEpMatchText(value) {
