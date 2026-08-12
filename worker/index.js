@@ -2549,7 +2549,8 @@ async function handleMusicApiRequest(request, env, url, ctx) {
   if (characterEpMatch) {
     const songId = decodeURIComponent(characterEpMatch[1]);
     const ep = await getCharacterEpForSong(env, songId);
-    return json({ data: ep }, 200, 900);
+    // 角色 EP 是由外部排程剛寫入 Supabase 的資料；不能快取「尚未找到」的舊結果。
+    return json({ data: ep });
   }
 
   if (url.pathname === '/api/search') {

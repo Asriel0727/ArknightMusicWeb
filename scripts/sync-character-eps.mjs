@@ -49,7 +49,7 @@ function getTitleVariants(title) {
   return [...variants].filter((variant) => variant.length >= 2);
 }
 
-function findSongMatch(title, songs) {
+function findSongMatch(title, songs, { report = false } = {}) {
   const titleVariants = getTitleVariants(title);
   if (!titleVariants.length) return null;
 
@@ -71,7 +71,7 @@ function findSongMatch(title, songs) {
   // 只有非常接近、且明顯勝過第二名時才自動公開，避免錯連到相似歌曲。
   if (!best || best.score < 82 || (best.score < 94 && runnerUp && best.score - runnerUp.score < 8)) {
     const suggestions = candidates.slice(0, 3).map((candidate) => `${candidate.songName} (${candidate.score}%)`).join(', ');
-    console.warn(`No confident song match for "${title}". Candidates: ${suggestions || 'none'}`);
+    if (report) console.warn(`No confident song match for "${title}". Candidates: ${suggestions || 'none'}`);
     return null;
   }
   return best;
@@ -134,23 +134,30 @@ async function getYoutubeVideos() {
       });
     }
     pageToken = page.nextPageToken || '';
-  } while (pageToken && videos.length < 500);
+  } while (pageToken);
   return videos;
 }
 
-const videos = await getYoutubeVideos();
-const characterEps = videos.filter((video) => /角色\s*EP|character\s*EP|《?明日方舟》?\s*EP|arknights\s*EP/i.test(video.title));
 const [songs, existingVideos] = await Promise.all([
   getSupabaseRows('music_songs', 'select=id,name&limit=2000'),
   getSupabaseRows('music_character_ep_videos', 'select=bvid,song_id,is_visible,match_score&limit=2000'),
 ]);
+const videos = await getYoutubeVideos();
+const explicitEpPattern = /角色\s*EP|character\s*EP|《?明日方舟》?\s*EP|arknights\s*EP/i;
+const characterEps = videos.map((video) => ({
+  ...video,
+  autoMatch: findSongMatch(video.title, songs),
+})).filter((video) => {
+  // 標題沒有 EP 的搬運影片也常是角色 EP；若歌名能高信心對上，就一併收錄。
+  return explicitEpPattern.test(video.title) || Boolean(video.autoMatch);
+});
 const existingByVideoId = new Map(existingVideos.map((video) => [video.bvid, video]));
 const updatedAt = new Date().toISOString();
 const rows = characterEps.map((video) => {
   const existing = existingByVideoId.get(video.videoId);
   const match = existing?.song_id
     ? { songId: existing.song_id, score: existing.match_score || 100, visible: existing.is_visible }
-    : findSongMatch(video.title, songs);
+    : video.autoMatch || findSongMatch(video.title, songs, { report: true });
   return {
     id: video.videoId,
     // Keep the existing column name for backward compatibility; it now stores the platform video ID.

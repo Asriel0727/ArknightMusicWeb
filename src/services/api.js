@@ -208,7 +208,9 @@ export async function fetchSongDetails(songId) {
 export async function fetchCharacterEp(songId) {
   if (!songId) return null;
 
-  const response = await fetch(`${API_BASE}/song/${encodeURIComponent(songId)}/character-ep`);
+  const response = await fetch(`${API_BASE}/song/${encodeURIComponent(songId)}/character-ep`, {
+    cache: 'no-store',
+  });
   if (!response.ok) {
     if (response.status === 404) return null;
     throw new Error(`Character EP request failed: ${response.status}`);
