@@ -52,6 +52,7 @@
             </span>
             <span class="activity-content">
               <strong class="activity-title">{{ localized(activity.name_i18n) }}</strong>
+              <span v-if="activityClassification(activity)" class="activity-type-badge" :class="`activity-type-${activityClassification(activity)}`">{{ activityClassificationLabel(activity) }}</span>
               <span class="future-badge"><i class="fas fa-eye"></i>{{ copy.futureBadge }}</span>
               <span class="date-range"><i class="fas fa-calendar-days"></i>{{ formatRange(activity.window.start_at, activity.window.end_at) }}</span>
               <span class="activity-more">{{ activityDetailCopy.openActivity }} <i class="fas fa-arrow-right"></i></span>
@@ -71,9 +72,10 @@
             <img v-if="hasImage(activity)" :src="activityImageUrl(activity)" :alt="localized(activity.name_i18n)" loading="lazy" @error="markImageFailed(activityImageUrl(activity))">
             <span v-else class="image-placeholder"><i class="fas fa-image"></i></span>
           </span>
-          <span class="activity-content">
-            <strong class="activity-title">{{ localized(activity.name_i18n) }}</strong>
-            <span class="date-range"><i class="fas fa-calendar-days"></i>{{ formatRange(activity.window.start_at, activity.window.end_at) }}</span>
+            <span class="activity-content">
+              <strong class="activity-title">{{ localized(activity.name_i18n) }}</strong>
+              <span v-if="activityClassification(activity)" class="activity-type-badge" :class="`activity-type-${activityClassification(activity)}`">{{ activityClassificationLabel(activity) }}</span>
+              <span class="date-range"><i class="fas fa-calendar-days"></i>{{ formatRange(activity.window.start_at, activity.window.end_at) }}</span>
             <span class="activity-more">{{ activityDetailCopy.openActivity }} <i class="fas fa-arrow-right"></i></span>
           </span>
         </button>
@@ -102,9 +104,12 @@
                   <p class="pool-kind">{{ poolTypeLabel(pool.kind) }}</p>
                   <h2>{{ localizedPoolName(pool) }}</h2>
                   <h3>{{ poolDetailCopy.rateUpOperators }}</h3>
-                  <div v-if="pool.operators?.length" class="pool-operators">
+                  <template v-if="pool.operators?.length">
+                    <section v-for="group in poolOperatorGroups(pool)" :key="group.key" class="pool-operator-group">
+                      <h4 v-if="group.key !== 'all'">{{ poolOperatorGroupLabel(group.key) }}</h4>
+                      <div class="pool-operators">
                     <button
-                      v-for="operator in pool.operators"
+                      v-for="operator in group.operators"
                       :key="operator.id"
                       class="pool-operator"
                       type="button"
@@ -121,7 +126,9 @@
                       </span>
                       <i class="fas fa-chevron-right"></i>
                     </button>
-                  </div>
+                      </div>
+                    </section>
+                  </template>
                   <p v-else class="pool-operator-empty">{{ poolDetailCopy.noOperatorData }}</p>
                 </div>
               </article>
@@ -201,6 +208,17 @@ const POOL_DETAIL_TEXT = {
   en: { openPool: 'View banner', close: 'Close banner details', rateUpOperators: 'Rate-up Operators', primaryRateUp: 'Primary rate-up', secondaryRateUp: 'Secondary rate-up', limited: 'Limited', noOperatorData: 'No Operator data is available for this banner.' },
 };
 const poolDetailCopy = computed(() => POOL_DETAIL_TEXT[locale.value] || POOL_DETAIL_TEXT.en);
+const POOL_GROUP_TEXT = {
+  'zh-TW': { current: '當期限定', legacy: '過往限定復刻', other: '其他 UP 幹員' },
+  'zh-CN': { current: '当期限定', legacy: '过往限定复刻', other: '其他 UP 干员' },
+  en: { current: 'Current limited', legacy: 'Previous limited reruns', other: 'Other rate-up Operators' },
+};
+const poolGroupCopy = computed(() => POOL_GROUP_TEXT[locale.value] || POOL_GROUP_TEXT.en);
+const ACTIVITY_TYPE_TEXT = {
+  'zh-TW': { main_story: '主線', story: '故事活動' },
+  'zh-CN': { main_story: '主线', story: '故事活动' },
+  en: { main_story: 'Main story', story: 'Story event' },
+};
 const ACTIVITY_DETAIL_TEXT = {
   'zh-TW': { activity: '活動詳情', openActivity: '查看活動內容', close: '關閉活動詳情', noPoolData: '這個活動目前沒有對應卡池資料。', noPoolForActivity: '本次活動沒有開啟對應卡池。' },
   'zh-CN': { activity: '活动详情', openActivity: '查看活动内容', close: '关闭活动详情', noPoolData: '这个活动目前没有对应卡池资料。', noPoolForActivity: '本次活动没有开启对应卡池。' },
@@ -265,9 +283,19 @@ function toDisplayedActivities(items) {
 }
 
 function isMajorActivity(activity) {
-  const catalogClassification = getActivityClassification(activity);
-  if (catalogClassification) return catalogClassification === 'story';
+  const catalogClassification = activityClassification(activity);
+  if (catalogClassification) return ['story', 'main_story'].includes(catalogClassification);
   return MAJOR_ACTIVITY_TYPES.has(activityType(activity));
+}
+
+function activityClassification(activity) {
+  return getActivityClassification(activity)
+    || (MAJOR_ACTIVITY_TYPES.has(activityType(activity)) ? 'story' : '');
+}
+
+function activityClassificationLabel(activity) {
+  const classification = activityClassification(activity);
+  return ACTIVITY_TYPE_TEXT[locale.value]?.[classification] || '';
 }
 
 function isFuturePreviewActivity(activity) {
@@ -324,6 +352,21 @@ function localized(value) {
     : localizedText;
 }
 function poolTypeLabel(type) { return copy.value.pools[type] || type; }
+function poolOperatorGroups(pool) {
+  const operators = pool?.operators || [];
+  const current = operators.filter((operator) => operator.limitedRole === 'current');
+  const legacy = operators.filter((operator) => operator.limitedRole === 'legacy');
+  if (!current.length && !legacy.length) return [{ key: 'all', operators }];
+
+  const markedOperatorIds = new Set([...current, ...legacy].map((operator) => operator.id));
+  const other = operators.filter((operator) => !markedOperatorIds.has(operator.id));
+  return [
+    ...(current.length ? [{ key: 'current', operators: current }] : []),
+    ...(other.length ? [{ key: 'other', operators: other }] : []),
+    ...(legacy.length ? [{ key: 'legacy', operators: legacy }] : []),
+  ];
+}
+function poolOperatorGroupLabel(key) { return poolGroupCopy.value[key] || ''; }
 function localizedPoolName(pool) {
   const names = pool?.name_i18n || {};
   if (locale.value === 'zh-TW' && !names['zh-TW'] && !names['zh-CN']) {
@@ -545,4 +588,6 @@ onMounted(loadActivities);
 .activity-header{position:static;z-index:auto;box-sizing:border-box;width:auto;padding:0;margin:0 0 28px;text-align:left;background:transparent;backdrop-filter:none;box-shadow:none;display:flex;flex-direction:row;justify-content:space-between;align-items:end;gap:24px}
 .activity-header h1{margin:0 0 7px;font-size:2rem}.activity-header p{margin:0;color:var(--text-secondary)}.activity-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.server-control,.scope-control{display:grid;gap:6px;min-width:150px;color:var(--text-secondary);font-size:.78rem}.server-control{min-width:190px}.server-control select,.scope-control select{height:42px;border:1px solid var(--border-color);border-radius:6px;background:#0d1117;color:var(--text-color);padding:0 10px}.future-toggle{display:flex;align-items:center;gap:8px;height:42px;color:var(--text-color);font-size:.86rem;white-space:nowrap}.future-toggle input{accent-color:var(--primary-color)}.search-control{display:grid;gap:6px;max-width:420px;margin:0 0 22px;color:var(--text-secondary);font-size:.78rem}.search-control input{height:42px;border:1px solid var(--border-color);border-radius:6px;background:#0d1117;color:var(--text-color);padding:0 12px;font:inherit}.future-section{margin:0 0 36px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,.12)}.future-header{margin:0 0 16px}.future-header h2{margin:0 0 6px;font-size:1.35rem}.future-header p{margin:0;color:var(--text-secondary);font-size:.9rem}.future-empty{display:flex;align-items:center;gap:9px;min-height:72px;margin:0;border:1px dashed var(--border-color);border-radius:10px;color:var(--text-secondary);padding:0 16px}.future-badge{display:flex;align-items:center;gap:7px;margin:9px 0 0;color:#d4b65c;font-size:.77rem}.activity-card.future-card{border-color:rgba(212,182,92,.3)}.activity-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:16px}.activity-card{overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:#161b22;box-shadow:0 8px 22px rgba(0,0,0,.18);transition:transform .2s ease,border-color .2s ease}.activity-card:hover{transform:translateY(-3px);border-color:rgba(88,166,255,.52)}.activity-visual{height:min(32vw,136px);min-height:104px;background:linear-gradient(135deg,#182436,#10151d);overflow:hidden}.activity-visual img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}.image-placeholder{height:100%;display:grid;place-items:center;color:rgba(255,255,255,.2);font-size:2rem}.activity-content{padding:14px 16px 16px}.activity-card h2{margin:0;font-size:1.05rem;line-height:1.35}.date-range{display:flex;align-items:flex-start;gap:8px;margin:9px 0 0;color:#b1bac4;font-size:.82rem;line-height:1.45}.date-range i{margin-top:2px;color:var(--primary-color)}.pool-section{margin-top:15px;padding-top:13px;border-top:1px solid rgba(255,255,255,.08)}.pool-section h3{margin:0 0 8px;color:#8b949e;font-size:.73rem;font-weight:600}.pool-section ul{display:grid;gap:9px;margin:0;padding:0;list-style:none}.pool-trigger{width:100%;overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:#0d1117;color:var(--text-color);padding:0;text-align:left;cursor:pointer;transition:border-color .2s,transform .2s}.pool-trigger:hover,.pool-trigger:focus-visible{border-color:var(--primary-color);transform:translateY(-1px)}.pool-trigger>img{display:block;width:100%;aspect-ratio:1200/655;object-fit:cover}.pool-trigger-copy{display:grid;gap:3px;padding:8px 10px}.pool-trigger-copy strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem}.pool-trigger-copy small{color:var(--primary-color);font-size:.7rem}.pool-dialog-backdrop{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.76);backdrop-filter:blur(5px)}.pool-dialog{position:relative;width:min(760px,100%);max-height:min(90vh,820px);overflow:auto;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:#161b22;box-shadow:0 24px 70px rgba(0,0,0,.55)}.pool-dialog-close{position:absolute;z-index:2;top:12px;right:12px;display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(13,17,23,.84);color:#fff;cursor:pointer}.pool-dialog-banner{display:block;width:100%;aspect-ratio:1200/655;object-fit:cover;background:#0d1117}.pool-dialog-content{padding:20px}.pool-dialog-content h2{margin:3px 0 22px;font-size:1.5rem}.pool-dialog-content h3{margin:0 0 10px;color:var(--text-secondary);font-size:.8rem}.pool-kind{margin:0;color:var(--primary-color);font-size:.75rem}.pool-operators{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.pool-operator{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:11px;min-width:0;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:#0d1117;color:var(--text-color);padding:8px;text-align:left;cursor:pointer}.pool-operator:hover,.pool-operator:focus-visible{border-color:var(--primary-color)}.pool-operator>img{width:52px;height:52px;border-radius:7px;object-fit:cover;background:#202938}.pool-operator-copy{display:grid;min-width:0;gap:4px}.pool-operator-copy strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.86rem}.pool-operator-copy small{color:#d4b65c;font-size:.68rem;line-height:1.35}.pool-operator>i{color:var(--text-secondary);font-size:.72rem}.pool-operator-empty{margin:0;color:var(--text-secondary)}.state{min-height:220px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px dashed var(--border-color);color:var(--text-secondary)}.state.error{color:#ff7b72}.spinner{width:20px;height:20px;border:2px solid var(--border-color);border-top-color:var(--primary-color);border-radius:50%;animation:spin .8s linear infinite}.stale-note{margin:14px 0 0;color:#d4b65c;font-size:.8rem}.stale-note i{margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:700px){.activity-page{width:calc(100% - 24px);padding-top:18px}.activity-header{align-items:stretch;flex-direction:column}.activity-controls{width:100%;flex-direction:column;align-items:stretch}.server-control,.scope-control,.search-control{width:100%;max-width:none}.future-toggle{height:auto;min-height:42px}.activity-list{grid-template-columns:1fr}.activity-visual{height:min(32vw,136px)}.pool-dialog-backdrop{padding:10px}.pool-operators{grid-template-columns:1fr}.pool-dialog-content{padding:16px}}
 .activity-open{display:block;width:100%;border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer}.activity-open:focus-visible{outline:2px solid var(--primary-color);outline-offset:-2px}.activity-open .activity-visual,.activity-open .activity-content{display:block}.activity-title{display:block;font-size:1.05rem;line-height:1.35}.activity-more{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:11px;border-top:1px solid rgba(255,255,255,.08);color:var(--primary-color);font-size:.76rem}.activity-dialog{width:min(920px,100%)}.activity-dialog-banner{display:block;width:100%;height:min(32vw,300px);min-height:190px;object-fit:cover;background:#0d1117}.activity-dialog-content{padding:24px}.activity-dialog-header{padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.1)}.activity-dialog-header>p{margin:0;color:var(--primary-color);font-size:.76rem}.activity-dialog-header h2{margin:5px 0 0;font-size:1.8rem}.activity-dialog-header .date-range{margin-top:10px}.activity-pools{margin-top:24px}.activity-pools>h3{margin:0 0 12px;color:var(--text-secondary);font-size:.82rem}.activity-pool-list{display:grid;gap:20px}.activity-pool-detail{overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#10151d}.activity-pool-detail .pool-dialog-banner{max-height:360px}.activity-pool-detail .pool-dialog-content h2{margin-bottom:18px}@media(max-width:700px){.activity-dialog-banner{height:190px}.activity-dialog-content{padding:16px}.activity-dialog-header h2{font-size:1.4rem}}
+.activity-type-badge{display:inline-flex;width:max-content;margin-top:8px;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:3px 7px;color:#b1bac4;font-size:.68rem;line-height:1}.activity-type-main_story{border-color:rgba(88,166,255,.55);color:#79c0ff;background:rgba(56,139,253,.12)}.activity-type-story{border-color:rgba(212,182,92,.5);color:#d4b65c;background:rgba(212,182,92,.1)}
+.pool-operator-group+.pool-operator-group{margin-top:16px}.pool-operator-group h4{margin:0 0 8px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);color:var(--text-secondary);font-size:.74rem;font-weight:600}.pool-operator-group:first-of-type h4{color:var(--primary-color)}
 </style>

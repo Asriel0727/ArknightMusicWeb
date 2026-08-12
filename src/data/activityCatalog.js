@@ -2,9 +2,65 @@ function story(recruitmentPools = [], options = {}) {
   return { classification: 'story', recruitmentPools, expectsRecruitmentPool: options.expectsRecruitmentPool !== false };
 }
 
+function mainStory(recruitmentPools = [], options = {}) {
+  return { classification: 'main_story', recruitmentPools, expectsRecruitmentPool: options.expectsRecruitmentPool !== false };
+}
+
 function mini() {
   return { classification: 'mini', recruitmentPools: [] };
 }
+
+// The activity API classifies main-theme chapter releases as "campaign", a
+// bucket which also contains modes and login campaigns. Keep only confirmed
+// chapter releases here instead of treating every campaign as main story.
+const MAIN_STORY_ACTIVITY_CATALOG = {
+  'wiki-stormwatch': mainStory(),
+  'wiki-shatterpoint': mainStory(),
+  'wiki-return-to-mist': mainStory(),
+  'wiki-all-quiet-under-the-thunder': mainStory(),
+  'wiki-critical-phase-transition': mainStory([
+    {
+      slug: 'limited-promise',
+      kind: 'limited',
+      name_i18n: {
+        'zh-TW': '承諾',
+        'zh-CN': '承诺',
+        en: 'Promise',
+      },
+      operators: [
+        {
+          id: 'char_1052_kalts2',
+          rarity: 6,
+          featured: 'primary',
+          limited: true,
+          name_i18n: { 'zh-TW': '凱爾希・思衡托', 'zh-CN': '凯尔希·思衡托', en: "Kal'tsit·Esperanta" },
+        },
+        {
+          id: 'char_4228_closur',
+          rarity: 6,
+          featured: 'primary',
+          limited: true,
+          name_i18n: { 'zh-TW': '可露希爾', 'zh-CN': '可露希尔', en: 'Closure' },
+        },
+      ],
+    },
+  ]),
+};
+
+// The activity API only exposes a broad limited flag. These confirmed entries
+// preserve whether a limited operator is new for the banner or returns from a
+// previous limited banner.
+const LIMITED_OPERATOR_ROLES = {
+  'wiki-critical-phase-transition': {
+    char_1052_kalts2: 'current',
+  },
+  'wiki-retracing-our-steps': {
+    char_1045_svash2: 'current',
+    char_1038_whitw2: 'legacy',
+    char_1035_wisdel: 'legacy',
+    char_245_cello: 'legacy',
+  },
+};
 
 // Shared by TW, Global, and CN. Server selection controls release windows only;
 // an activity's classification and banner identity always come from this table.
@@ -321,16 +377,21 @@ const NO_RECRUITMENT_POOL_CODES = new Set([
 ]);
 
 export function getActivityClassification(activity) {
-  return ACTIVITY_CATALOG[activity?.code]?.classification || null;
+  return catalogEntry(activity)?.classification || null;
 }
 
 export function activityExpectsRecruitmentPool(activity) {
-  return ACTIVITY_CATALOG[activity?.code]?.expectsRecruitmentPool !== false
+  return catalogEntry(activity)?.expectsRecruitmentPool !== false
     && !NO_RECRUITMENT_POOL_CODES.has(activity?.code);
 }
 
 function curatedPoolsFor(activity) {
-  return ACTIVITY_CATALOG[activity?.code]?.recruitmentPools || [];
+  return catalogEntry(activity)?.recruitmentPools || [];
+}
+
+function catalogEntry(activity) {
+  const code = activity?.code;
+  return ACTIVITY_CATALOG[code] || MAIN_STORY_ACTIVITY_CATALOG[code] || null;
 }
 
 function normalizedIdentity(value) {
@@ -361,6 +422,18 @@ function mergePool(apiPool, curatedPool) {
     image_url: apiPool.image_url || curatedPool.image_url,
     operators: apiPool.operators?.length ? apiPool.operators : curatedPool.operators,
   };
+}
+
+function attachLimitedOperatorRoles(activity, pools) {
+  const roles = LIMITED_OPERATOR_ROLES[activity?.code];
+  if (!roles) return pools;
+  return pools.map((pool) => ({
+    ...pool,
+    operators: (pool.operators || []).map((operator) => {
+      const limitedRole = roles[operator.id];
+      return limitedRole ? { ...operator, limited: true, limitedRole } : operator;
+    }),
+  }));
 }
 
 export function attachCuratedActivityRecruitmentPools(activities, server) {
@@ -396,7 +469,7 @@ export function attachCuratedActivityRecruitmentPools(activities, server) {
 
     return {
       ...activity,
-      recruitment_pools: [...mergedApiPools, ...curatedPools],
+      recruitment_pools: attachLimitedOperatorRoles(activity, [...mergedApiPools, ...curatedPools]),
       expects_recruitment_pool: activityExpectsRecruitmentPool(activity),
     };
   });

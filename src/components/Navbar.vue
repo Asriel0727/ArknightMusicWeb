@@ -418,7 +418,9 @@ onMounted(() => {
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 1024px) {
+/* Keep the tab strip from painting underneath the account and locale controls
+   at laptop widths where the desktop labels no longer fit side by side. */
+@media (max-width: 1200px) {
   .main-navbar {
     padding: 12px 15px;
     gap: 8px;
@@ -443,7 +445,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .main-navbar {
     display: flex;
     align-items: center;
