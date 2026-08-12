@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import { createHash } from 'node:crypto';
 
 const sourceUid = String(process.env.BILIBILI_EP_SOURCE_UID || '161775300').trim();
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
@@ -62,6 +63,56 @@ async function upsertVideos(rows) {
   if (!response.ok) throw new Error(`Supabase character EP upsert failed: ${response.status} ${await response.text()}`);
 }
 
+// B 站個人空間的 HTML 是前端動態載入，而且在 GitHub Runner 常常不會渲染影片卡。
+// 改用同一個公開頁面使用的 WBI API，避免把「頁面沒有卡片」誤判為「沒有影片」。
+const mixinKeyEncTab = [
+  46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35,
+  27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13,
+  37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4,
+  22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52,
+];
+
+function getMixinKey(imageKey, subKey) {
+  const source = `${imageKey}${subKey}`;
+  return mixinKeyEncTab.map((index) => source[index]).join('').slice(0, 32);
+}
+
+async function getBilibiliVideos(page) {
+  const navResponse = await page.request.get('https://api.bilibili.com/x/web-interface/nav');
+  if (!navResponse.ok()) throw new Error(`Bilibili nav API failed: ${navResponse.status()}`);
+  const nav = await navResponse.json();
+  const imageUrl = nav?.data?.wbi_img?.img_url || '';
+  const subUrl = nav?.data?.wbi_img?.sub_url || '';
+  const imageKey = imageUrl.split('/').pop()?.split('.')[0] || '';
+  const subKey = subUrl.split('/').pop()?.split('.')[0] || '';
+  if (!imageKey || !subKey) throw new Error('Bilibili nav API did not provide WBI signing keys.');
+
+  const params = new URLSearchParams({
+    mid: sourceUid,
+    ps: '100',
+    pn: '1',
+    order: 'pubdate',
+    platform: 'web',
+    web_location: '1550101',
+    wts: String(Math.floor(Date.now() / 1000)),
+  });
+  const query = [...params.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value.replace(/[!'()*]/g, ''))}`)
+    .join('&');
+  params.set('w_rid', createHash('md5').update(`${query}${getMixinKey(imageKey, subKey)}`).digest('hex'));
+
+  const response = await page.request.get(`https://api.bilibili.com/x/space/wbi/arc/search?${params}`);
+  if (!response.ok()) throw new Error(`Bilibili video API failed: ${response.status()}`);
+  const payload = await response.json();
+  if (payload?.code !== 0) throw new Error(`Bilibili video API returned code ${payload?.code}: ${payload?.message || 'unknown error'}`);
+  return (payload?.data?.list?.vlist || []).map((video) => ({
+    bvid: video.bvid,
+    title: video.title || '',
+    coverUrl: video.pic || '',
+  })).filter((video) => video.bvid);
+}
+
 const browser = await chromium.launch({ headless: true });
 try {
   const context = await browser.newContext({
@@ -84,27 +135,7 @@ try {
     throw new Error('Bilibili returned an anti-abuse response. Set the BILIBILI_SESSDATA secret and retry.');
   }
 
-  const videos = await page.locator('a[href*="/video/BV"]').evaluateAll((links) => {
-    const unique = new Map();
-    for (const link of links) {
-      const href = link.getAttribute('href') || '';
-      const bvid = href.match(/BV[\w]+/i)?.[0];
-      if (!bvid) continue;
-      const card = link.closest('article, li, div') || link.parentElement;
-      const image = card?.querySelector('img');
-      const title = link.getAttribute('title') || link.textContent?.trim() || '';
-      const existing = unique.get(bvid);
-      // B 站同一張影片卡有「時長」與「標題」兩個連結；保留較長的文字才能拿到標題。
-      if (!existing || title.length > existing.title.length) {
-        unique.set(bvid, {
-          bvid,
-          title,
-          coverUrl: image?.getAttribute('src') || image?.getAttribute('data-src') || existing?.coverUrl || '',
-        });
-      }
-    }
-    return [...unique.values()];
-  });
+  const videos = await getBilibiliVideos(page);
 
   const characterEps = videos.filter((video) => /角色\s*EP|character\s*EP|《?明日方舟》?\s*EP|arknights\s*EP/i.test(video.title));
   const [songs, existingVideos] = await Promise.all([
