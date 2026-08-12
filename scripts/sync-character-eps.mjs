@@ -14,25 +14,60 @@ function normalizeMatchText(value) {
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/角色ep|characterep|明日方舟|arknights|塞壬唱片|monstersiren/g, '')
+    .replace(/角色ep|characterep|明日方舟|arknights|塞壬唱片|monstersiren|rivervworkshop|official|musicvideo|fullversion|完整版|官方|音樂錄影帶|歌曲|主題曲/g, '')
     .replace(/[^\p{L}\p{N}]/gu, '');
 }
 
-function findSongMatch(title, songs) {
-  const normalizedTitle = normalizeMatchText(title);
-  if (!normalizedTitle) return null;
+function diceSimilarity(left, right) {
+  if (left === right) return 1;
+  if (left.length < 2 || right.length < 2) return 0;
+  const pairs = new Map();
+  for (let index = 0; index < left.length - 1; index += 1) {
+    const pair = left.slice(index, index + 2);
+    pairs.set(pair, (pairs.get(pair) || 0) + 1);
+  }
+  let shared = 0;
+  for (let index = 0; index < right.length - 1; index += 1) {
+    const pair = right.slice(index, index + 2);
+    const count = pairs.get(pair) || 0;
+    if (count) {
+      shared += 1;
+      pairs.set(pair, count - 1);
+    }
+  }
+  return (2 * shared) / (left.length + right.length - 2);
+}
 
-  let match = null;
+function getTitleVariants(title) {
+  const source = String(title || '');
+  const variants = new Set([normalizeMatchText(source)]);
+  // 常見格式："Arknights EP - Song Name [Full Version]"。
+  for (const part of source.split(/[-–—|｜:：]/)) variants.add(normalizeMatchText(part));
+  for (const quoted of source.matchAll(/[《「『\"'【\[]([^》」』\"'】\]]+)[》」』\"'】\]]/g)) {
+    variants.add(normalizeMatchText(quoted[1]));
+  }
+  return [...variants].filter((variant) => variant.length >= 2);
+}
+
+function findSongMatch(title, songs) {
+  const titleVariants = getTitleVariants(title);
+  if (!titleVariants.length) return null;
+
+  const candidates = [];
   for (const song of songs) {
     const normalizedSong = normalizeMatchText(song.name);
     if (normalizedSong.length < 2) continue;
-    if (normalizedTitle.includes(normalizedSong) || normalizedSong.includes(normalizedTitle)) {
-      if (!match || normalizedSong.length > match.score) {
-        match = { songId: String(song.id), score: normalizedSong.length };
-      }
-    }
+    const similarity = Math.max(...titleVariants.map((variant) => {
+      if (variant.includes(normalizedSong) || normalizedSong.includes(variant)) return 1;
+      return diceSimilarity(variant, normalizedSong);
+    }));
+    candidates.push({ songId: String(song.id), score: Math.round(similarity * 100), songName: song.name });
   }
-  return match;
+  candidates.sort((left, right) => right.score - left.score);
+  const [best, runnerUp] = candidates;
+  // 只有非常接近、且明顯勝過第二名時才自動公開，避免錯連到相似歌曲。
+  if (!best || best.score < 82 || (runnerUp && best.score - runnerUp.score < 8)) return null;
+  return best;
 }
 
 async function getJson(url, label) {
@@ -128,3 +163,7 @@ const rows = characterEps.map((video) => {
 await upsertVideos(rows);
 const matched = rows.filter((row) => row.is_visible).length;
 console.log(`Character EP sync complete (YouTube): scanned=${videos.length}, found=${characterEps.length}, matched=${matched}, stored=${rows.length}`);
+const unmatchedTitles = rows.filter((row) => !row.is_visible).map((row) => row.title);
+if (unmatchedTitles.length) {
+  console.warn(`Character EP titles needing review: ${unmatchedTitles.join(' | ')}`);
+}

@@ -729,7 +729,7 @@ watch(() => playerState.currentSong, async (newSong) => {
   } catch (error) {
     console.warn('Character EP lookup failed:', error.message);
   }
-});
+}, { immediate: true });
 
 watch(() => playerState.lyrics, (newLyrics) => {
   // 歌�??�新?��?置�?亮索�?
