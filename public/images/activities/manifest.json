@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-15T07:04:22.124Z",
+  "generatedAt": "2026-08-15T13:04:57.023Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -408,13 +408,13 @@
       "syncedAt": "2026-07-17T03:50:03.694Z"
     },
     "wiki-tender-moments": {
-      "publicPath": "/images/activities/wiki-tender-moments.jpg",
-      "relativePath": "public/images/activities/wiki-tender-moments.jpg",
-      "sourceUrl": "https://media.prts.wiki/5/5b/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%B8%A9%E6%83%85%E6%97%B6%E5%85%89_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 247649,
-      "hash": "ca589d12587962c1e001fe74f23cc7dfcbb680e20f93397e7f75abca1912ae59",
-      "syncedAt": "2026-08-15T07:04:13.203Z"
+      "publicPath": "/images/activities/wiki-tender-moments.png",
+      "relativePath": "public/images/activities/wiki-tender-moments.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Tender_Moments_banner.png?4fa609",
+      "contentType": "image/png",
+      "size": 709621,
+      "hash": "406703540350ef7e6cbd0efd16f329f713d22e631ebfc9766a7259fe6e28e3e3",
+      "syncedAt": "2026-08-15T13:04:57.023Z"
     },
     "prts-yu93fl": {
       "publicPath": "/images/activities/prts-yu93fl.jpg",
