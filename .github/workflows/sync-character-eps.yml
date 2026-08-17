@@ -31,6 +31,7 @@ jobs:
             package.json
             package-lock.json
             scripts/sync-character-eps.mjs
+            scripts/character-ep-matching.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: 22

@@ -154,6 +154,17 @@ const characterEps = videos.map((video) => ({
   return explicitEpPattern.test(video.title) || Boolean(video.autoMatch);
 });
 const existingByVideoId = new Map(existingVideos.map((video) => [video.bvid, video]));
+const existingMatchConflicts = characterEps.map((video) => {
+  const existing = existingByVideoId.get(video.videoId);
+  if (!existing?.song_id || !video.autoMatch || String(existing.song_id) === video.autoMatch.songId) return null;
+  return {
+    videoId: video.videoId,
+    title: video.title,
+    existingSongId: String(existing.song_id),
+    suggestedSongId: video.autoMatch.songId,
+    suggestedSongName: video.autoMatch.songName,
+  };
+}).filter(Boolean);
 const updatedAt = new Date().toISOString();
 const rows = characterEps.map((video) => {
   const existing = existingByVideoId.get(video.videoId);
@@ -190,6 +201,15 @@ if (unmatchedVideos.length) {
   console.warn(
     `Character EP videos needing title review (${unmatchedVideos.length}):\n`
     + unmatchedVideos.map((video) => `[${video.bvid}] ${video.title}`).join('\n'),
+  );
+}
+if (existingMatchConflicts.length) {
+  console.warn(
+    `Character EP existing-match conflicts (${existingMatchConflicts.length}):\n`
+    + existingMatchConflicts.map((conflict) => (
+      `[${conflict.videoId}] ${conflict.title} | existing=${conflict.existingSongId} `
+      + `suggested=${conflict.suggestedSongId} (${conflict.suggestedSongName})`
+    )).join('\n'),
   );
 }
 if (songsWithoutCharacterEp.length) {
