@@ -228,6 +228,7 @@ const isAddingToPlaylist = ref(false);
 const characterEp = ref(null);
 const visualMode = ref('cover');
 const epIframeKey = ref(0);
+const epStartTime = ref(0);
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
@@ -453,13 +454,13 @@ const characterEpIframeSrc = computed(() => {
   const videoId = characterEp.value?.bvid;
   if (!videoId) return '';
 
-  const currentTime = String(Math.max(0, Math.floor(playerState.currentTime || 0)));
+  const startTime = String(Math.max(0, Math.floor(epStartTime.value || 0)));
   const isYoutube = /(?:youtube\.com|youtu\.be)/i.test(characterEp.value?.sourceUrl || '');
   if (isYoutube) {
     const params = new URLSearchParams({
       autoplay: '1',
       mute: '1',
-      start: currentTime,
+      start: startTime,
       playsinline: '1',
       rel: '0',
     });
@@ -471,7 +472,7 @@ const characterEpIframeSrc = computed(() => {
     autoplay: '1',
     muted: '1',
     danmaku: '0',
-    t: currentTime,
+    t: startTime,
   });
   return `https://player.bilibili.com/player.html?${params.toString()}`;
 });
@@ -545,16 +546,21 @@ const handleSeek = (event) => {
   restartCharacterEpAfterSeek();
 };
 
+const restartCharacterEp = () => {
+  epStartTime.value = playerState.audioPlayer?.currentTime ?? playerState.currentTime;
+  epIframeKey.value += 1;
+};
+
 const showCharacterEp = () => {
   if (!characterEp.value) return;
   visualMode.value = 'ep';
-  epIframeKey.value += 1;
+  restartCharacterEp();
 };
 
 const restartCharacterEpAfterSeek = () => {
   if (visualMode.value !== 'ep' || !characterEp.value) return;
   requestAnimationFrame(() => {
-    epIframeKey.value += 1;
+    restartCharacterEp();
   });
 };
 
@@ -705,7 +711,7 @@ watch(() => playerState.isPlaying, (isPlaying) => {
   }
   if (visualMode.value === 'ep' && characterEp.value) {
     // B 站 UGC iframe 沒有公開的暫停／seek API；恢復時以音樂目前秒數重新建立。
-    epIframeKey.value += 1;
+    restartCharacterEp();
   }
 }, { immediate: true });
 
@@ -720,6 +726,7 @@ watch(() => playerState.currentSong, async (newSong) => {
   }
   characterEp.value = null;
   visualMode.value = 'cover';
+  epStartTime.value = 0;
   const requestedSongId = newSong?.cid;
   if (!requestedSongId) return;
   try {
