@@ -5,7 +5,7 @@
 | 工作流 | 觸發方式 | 產物 / 行為 | 所需設定 |
 | --- | --- | --- | --- |
 | `deploy.yml` | 推送 `main` 或手動執行 | 建置並部署 GitHub Pages；上傳 portable artifact | `VITE_MUSIC_API_ORIGIN` 已在 workflow 設定 |
-| `sync-character-eps.yml` | 每日排程或手動執行 | 以 Playwright 收集角色 EP metadata 並寫入 Supabase | `SUPABASE_URL`、`SUPABASE_SERVICE_ROLE_KEY`；`BILIBILI_SESSDATA` 選用 |
+| `sync-character-eps.yml` | 每日排程或手動執行 | 以 YouTube Data API 收集角色 EP metadata 並寫入 Supabase | `SUPABASE_URL`、`SUPABASE_SERVICE_ROLE_KEY`、`YOUTUBE_API_KEY` |
 | Worker cron | 每 6 小時 | 同步 / 預熱角色、活動與音樂相關資料 | Worker KV、Supabase secret、cron 設定 |
 
 ## 部署順序

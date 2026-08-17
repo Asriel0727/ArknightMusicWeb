@@ -1,3 +1,5 @@
+import { findSongMatch as findSongMatchForVideo } from './character-ep-matching.mjs';
+
 const sourceHandle = String(process.env.YOUTUBE_EP_SOURCE_HANDLE || 'rivervworkshop').trim().replace(/^@/, '');
 const youtubeApiKey = String(process.env.YOUTUBE_API_KEY || '');
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
@@ -146,7 +148,7 @@ const videos = await getYoutubeVideos();
 const explicitEpPattern = /角色\s*EP|character\s*EP|《?明日方舟》?\s*EP|arknights\s*EP/i;
 const characterEps = videos.map((video) => ({
   ...video,
-  autoMatch: findSongMatch(video.title, songs),
+  autoMatch: findSongMatchForVideo(video.title, songs),
 })).filter((video) => {
   // 標題沒有 EP 的搬運影片也常是角色 EP；若歌名能高信心對上，就一併收錄。
   return explicitEpPattern.test(video.title) || Boolean(video.autoMatch);
@@ -157,7 +159,7 @@ const rows = characterEps.map((video) => {
   const existing = existingByVideoId.get(video.videoId);
   const match = existing?.song_id
     ? { songId: existing.song_id, score: existing.match_score || 100, visible: existing.is_visible }
-    : video.autoMatch || findSongMatch(video.title, songs, { report: true });
+    : video.autoMatch || findSongMatchForVideo(video.title, songs, { report: true });
   return {
     id: video.videoId,
     // Keep the existing column name for backward compatibility; it now stores the platform video ID.

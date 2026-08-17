@@ -13,10 +13,6 @@ const IMAGE_MIRROR_DYNAMIC =
   'https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts';
 
 const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
-const BILIBILI_API_ORIGIN = 'https://api.bilibili.com';
-const DEFAULT_BILIBILI_EP_SOURCE_UID = '161775300';
-const BILIBILI_EP_PAGE_SIZE = 50;
-const BILIBILI_EP_MAX_PAGES = 3;
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const RECRUIT_OPERATORS_KEY = 'recruit:operators:v3';
 const RECRUIT_CALCULATOR_KEY_PREFIX = 'recruit:calculator:v3:';
@@ -250,13 +246,6 @@ export default {
         return json({ ok: false, error: 'A valid server query is required: cn, global, or tw' }, 400);
       }
       const result = await syncActivities(env, [server]);
-      return json({ ok: true, ...result, time: new Date().toISOString() });
-    }
-
-    if (url.pathname === '/api/admin/sync-character-eps') {
-      const unauthorized = requireAdminToken(request, env);
-      if (unauthorized) return unauthorized;
-      const result = await syncCharacterEpVideos(env);
       return json({ ok: true, ...result, time: new Date().toISOString() });
     }
 
@@ -3219,124 +3208,10 @@ async function syncMusicCache(env, options = {}) {
     ...lyricTranslations,
   });
 
-  try {
-    synced.push({ table: 'music_character_ep_videos', ...await syncCharacterEpVideos(env) });
-  } catch (error) {
-    // B 站短暫反爬或來源異常不應阻斷既有的音樂同步。
-    console.warn('Character EP sync failed:', error.message);
-    synced.push({ table: 'music_character_ep_videos', ok: false, error: error.message });
-  }
-
   return {
     synced,
     supabaseConfigured: true,
   };
-}
-
-function getBilibiliEpSourceUid(env) {
-  const value = String(env.BILIBILI_EP_SOURCE_UID || DEFAULT_BILIBILI_EP_SOURCE_UID).trim();
-  return /^\d+$/.test(value) ? value : DEFAULT_BILIBILI_EP_SOURCE_UID;
-}
-
-function isCharacterEpVideoTitle(title) {
-  const normalized = String(title || '').replace(/\s+/g, '').toLowerCase();
-  return normalized.includes('角色ep')
-    || normalized.includes('characterep')
-    || normalized.includes('明日方舟》ep')
-    || normalized.includes('arknights') && normalized.includes('ep');
-}
-
-function normalizeEpMatchText(value) {
-  return String(value || '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/角色ep|characterep|明日方舟|arknights|塞壬唱片|monstersiren/g, '')
-    .replace(/[^\p{L}\p{N}]/gu, '');
-}
-
-function findCharacterEpSongMatch(title, songs) {
-  const normalizedTitle = normalizeEpMatchText(title);
-  if (!normalizedTitle) return null;
-
-  let match = null;
-  for (const song of songs) {
-    const normalizedSong = normalizeEpMatchText(song.name);
-    if (normalizedSong.length < 2) continue;
-    if (normalizedTitle.includes(normalizedSong) || normalizedSong.includes(normalizedTitle)) {
-      if (!match || normalizedSong.length > match.score) {
-        match = { songId: String(song.id), score: normalizedSong.length };
-      }
-    }
-  }
-  return match;
-}
-
-async function fetchBilibiliCharacterEpVideos(env) {
-  const sourceUid = getBilibiliEpSourceUid(env);
-  const videos = [];
-
-  for (let page = 1; page <= BILIBILI_EP_MAX_PAGES; page += 1) {
-    const params = new URLSearchParams({
-      mid: sourceUid,
-      pn: String(page),
-      ps: String(BILIBILI_EP_PAGE_SIZE),
-      order: 'pubdate',
-      platform: 'web',
-    });
-    const response = await fetch(`${BILIBILI_API_ORIGIN}/x/space/wbi/arc/search?${params}`, {
-      headers: {
-        'user-agent': 'ArknightMusicWeb/2.0 (character EP catalog)',
-        accept: 'application/json',
-      },
-      cf: { cacheTtl: 60 * 30, cacheEverything: true },
-    });
-    if (!response.ok) throw new Error(`Bilibili catalog failed: ${response.status}`);
-    const payload = await response.json();
-    if (payload?.code !== 0) throw new Error(`Bilibili catalog rejected: ${payload?.code || 'unknown'}`);
-    const pageVideos = payload?.data?.list?.vlist || [];
-    videos.push(...pageVideos.filter((video) => isCharacterEpVideoTitle(video.title)));
-    if (pageVideos.length < BILIBILI_EP_PAGE_SIZE) break;
-  }
-
-  return { sourceUid, videos };
-}
-
-async function syncCharacterEpVideos(env) {
-  if (!hasSupabaseConfig(env)) {
-    return { ok: false, count: 0, skipped: true, reason: 'Supabase is not configured' };
-  }
-
-  const [{ sourceUid, videos }, songs] = await Promise.all([
-    fetchBilibiliCharacterEpVideos(env),
-    supabaseRestRequest(env, 'music_songs', { query: '?select=id,name&limit=2000' }),
-  ]);
-  const updatedAt = new Date().toISOString();
-  const rows = videos
-    .filter((video) => video?.bvid)
-    .map((video) => {
-      const match = findCharacterEpSongMatch(video.title, songs || []);
-      const publishedAt = Number.isFinite(Number(video.created))
-        ? new Date(Number(video.created) * 1000).toISOString()
-        : null;
-      return {
-        id: String(video.bvid),
-        bvid: String(video.bvid),
-        song_id: match?.songId || null,
-        title: String(video.title || ''),
-        cover_url: String(video.pic || ''),
-        duration_seconds: Number(video.length?.split(':').reduce((total, part) => total * 60 + Number(part || 0), 0)) || null,
-        published_at: publishedAt,
-        author_mid: sourceUid,
-        source_url: `https://www.bilibili.com/video/${video.bvid}/`,
-        is_visible: Boolean(match),
-        match_score: match?.score || 0,
-        raw: video,
-        updated_at: updatedAt,
-      };
-    });
-  const result = await upsertSupabaseRows(env, 'music_character_ep_videos', rows);
-  return { ...result, fetched: videos.length, sourceUid };
 }
 
 async function getCharacterEpForSong(env, songId) {

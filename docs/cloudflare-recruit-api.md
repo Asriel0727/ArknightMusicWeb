@@ -93,7 +93,6 @@ Admin:
 ```txt
 GET /api/admin/sync
 GET /api/admin/sync-music
-GET /api/admin/sync-character-eps
 GET /api/admin/music-cache-status
 GET /api/admin/prewarm-music-albums?limit=5
 GET /api/admin/prewarm-details?offset=0&limit=40

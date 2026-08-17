@@ -17,7 +17,8 @@
     "activities:push-pools": "node scripts/push-activity-pools-to-supabase.mjs",
     "activities:sync": "npm run activities:sync-pools && npm run activities:push-pools",
     "activities:audit-pools": "node scripts/audit-activity-pools.mjs",
-    "character-eps:sync": "node scripts/sync-character-eps.mjs"
+    "character-eps:sync": "node scripts/sync-character-eps.mjs",
+    "test:character-eps": "node --test test/character-ep-matching.test.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
