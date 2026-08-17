@@ -179,12 +179,22 @@ const rows = characterEps.map((video) => {
 await upsertVideos(rows);
 const matched = rows.filter((row) => row.is_visible).length;
 const matchedSongIds = new Set(rows.filter((row) => row.is_visible).map((row) => row.song_id));
+const songsWithoutCharacterEp = songs.filter((song) => !matchedSongIds.has(String(song.id)));
 const songCoverage = songs.length ? ((matchedSongIds.size / songs.length) * 100).toFixed(1) : '0.0';
 console.log(
   `Character EP sync complete (YouTube): scannedVideos=${videos.length}, epCandidates=${characterEps.length}, `
   + `matchedVideos=${matched}, matchedSongs=${matchedSongIds.size}/${songs.length} (${songCoverage}%), storedVideos=${rows.length}`,
 );
-const unmatchedTitles = rows.filter((row) => !row.is_visible).map((row) => row.title);
-if (unmatchedTitles.length) {
-  console.warn(`Character EP titles needing review: ${unmatchedTitles.join(' | ')}`);
+const unmatchedVideos = rows.filter((row) => !row.is_visible);
+if (unmatchedVideos.length) {
+  console.warn(
+    `Character EP videos needing title review (${unmatchedVideos.length}):\n`
+    + unmatchedVideos.map((video) => `[${video.bvid}] ${video.title}`).join('\n'),
+  );
+}
+if (songsWithoutCharacterEp.length) {
+  console.warn(
+    `Songs without a matched YouTube Character EP (${songsWithoutCharacterEp.length}):\n`
+    + songsWithoutCharacterEp.map((song) => `[${song.id}] ${song.name}`).join('\n'),
+  );
 }
