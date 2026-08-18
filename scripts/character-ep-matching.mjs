@@ -42,16 +42,27 @@ function isShortLatinTitle(value) {
   return /^[a-z0-9]+$/i.test(value) && value.length < 4;
 }
 
-function getTitleVariants(title) {
+function getTitleVariants(title, { loose = false } = {}) {
   const songTitle = extractEpSongTitle(title);
-  return [...new Set([
+  const variants = new Set([
     normalizeMatchText(songTitle),
     normalizeMatchText(String(songTitle).replace(/\[[^\]]*\]/g, '')),
-  ])].filter((variant) => variant.length >= 2);
+  ]);
+  if (loose) {
+    for (const part of String(title || '').split(/[|｜:：\-–—]/)) {
+      variants.add(normalizeMatchText(part));
+    }
+  }
+  return [...variants].filter((variant) => variant.length >= 2);
 }
 
-export function findSongMatch(title, songs, { report = false } = {}) {
-  const titleVariants = getTitleVariants(title);
+export function findSongMatch(title, songs, {
+  report = false,
+  loose = false,
+  minimumScore = 90,
+  minimumGap = 10,
+} = {}) {
+  const titleVariants = getTitleVariants(title, { loose });
   if (!titleVariants.length) return null;
 
   const candidates = songs.map((song) => {
@@ -70,7 +81,7 @@ export function findSongMatch(title, songs, { report = false } = {}) {
   candidates.sort((left, right) => right.score - left.score);
   const [best, runnerUp] = candidates;
   const isExact = best?.score === 100;
-  const isConfidentFuzzy = best?.score >= 90 && (!runnerUp || best.score - runnerUp.score >= 10);
+  const isConfidentFuzzy = best?.score >= minimumScore && (!runnerUp || best.score - runnerUp.score >= minimumGap);
   if (!best || (!isExact && !isConfidentFuzzy)) {
     const suggestions = candidates.slice(0, 3).map((candidate) => `${candidate.songName} (${candidate.score}%)`).join(', ');
     if (report) console.warn(`No confident song match for "${title}". Candidates: ${suggestions || 'none'}`);

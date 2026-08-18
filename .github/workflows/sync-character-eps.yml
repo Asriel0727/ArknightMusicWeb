@@ -2,6 +2,15 @@ name: Sync Character EP videos
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run only reads; apply writes approved automatic corrections'
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - apply
   schedule:
     # 每日 02:40（Asia/Taipei）
     - cron: '40 18 * * *'
@@ -37,5 +46,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Dry-run YouTube Character EP matching
-        run: npm run character-eps:dry-run
+      - name: Reconcile YouTube Character EP matching
+        run: |
+          if [ "${{ inputs.mode || 'dry-run' }}" = "apply" ]; then
+            npm run character-eps:apply
+          else
+            npm run character-eps:dry-run
+          fi
