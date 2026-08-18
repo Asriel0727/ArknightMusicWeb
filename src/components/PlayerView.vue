@@ -101,7 +101,9 @@
           class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
           @error="handleImageError">
         <div v-else class="character-ep-visual">
-          <div v-if="isYoutubeCharacterEp && playerState.isPlaying" ref="youtubePlayerContainer" class="character-ep-frame"></div>
+          <div v-if="isYoutubeCharacterEp && playerState.isPlaying" class="character-ep-frame">
+            <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
+          </div>
           <iframe v-else-if="playerState.isPlaying" :key="epIframeKey" class="character-ep-frame"
             :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
             allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -244,6 +246,7 @@ const youtubePlayerContainer = ref(null);
 let youtubePlayer = null;
 let youtubePlayerPromise = null;
 let youtubeDriftTimer = null;
+let youtubePlayerGeneration = 0;
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
@@ -516,6 +519,7 @@ const loadYoutubePlayerApi = () => {
 };
 
 const clearYoutubePlayer = () => {
+  youtubePlayerGeneration += 1;
   if (youtubeDriftTimer) clearInterval(youtubeDriftTimer);
   youtubeDriftTimer = null;
   youtubePlayer?.destroy?.();
@@ -534,9 +538,15 @@ const createYoutubePlayer = async () => {
   const videoId = characterEp.value?.bvid;
   if (!videoId) return;
   clearYoutubePlayer();
+  const generation = youtubePlayerGeneration;
   try {
     const YT = await loadYoutubePlayerApi();
-    if (!youtubePlayerContainer.value || !playerState.isPlaying || characterEp.value?.bvid !== videoId) return;
+    if (
+      generation !== youtubePlayerGeneration ||
+      !youtubePlayerContainer.value ||
+      !playerState.isPlaying ||
+      characterEp.value?.bvid !== videoId
+    ) return;
     youtubePlayer = new YT.Player(youtubePlayerContainer.value, {
       videoId,
       playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3, origin: window.location.origin, start: Math.max(0, Math.floor(playerState.audioPlayer?.currentTime || 0)) },
@@ -805,7 +815,7 @@ watch(() => playerState.isPlaying, (isPlaying) => {
 watch([visualMode, characterEp], () => {
   if (visualMode.value === 'ep' && isYoutubeCharacterEp.value && playerState.isPlaying) {
     nextTick(createYoutubePlayer);
-  } else if (!isYoutubeCharacterEp.value) {
+  } else {
     clearYoutubePlayer();
   }
 });
@@ -1267,6 +1277,13 @@ onUnmounted(() => {
 
 .character-ep-frame,
 .character-ep-paused {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.youtube-player-host,
+.character-ep-frame iframe {
   width: 100%;
   height: 100%;
   border: 0;

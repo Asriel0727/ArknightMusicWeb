@@ -241,7 +241,10 @@ export async function playSong(song, coverUrl, coverDeUrl) {
       artistes: song.artistes || songDetails.artistes || [unknownArtistLabel()],
       coverUrl: coverUrl || song.coverUrl || songDetails.coverUrl,
       coverDeUrl: coverDeUrl || song.coverDeUrl || songDetails.coverDeUrl,
-      audioUrl: getProxyAudioUrl(songDetails.sourceUrl || ''),
+      // hycdn accepts browser playback directly, while its access to Cloudflare
+      // Worker egress is unreliable. Keep the proxy as a fallback only.
+      audioUrl: songDetails.sourceUrl || '',
+      fallbackAudioUrl: getProxyAudioUrl(songDetails.sourceUrl || ''),
       albumCid: song.albumCid || songDetails.albumCid
     };
 
@@ -293,10 +296,28 @@ export async function playSong(song, coverUrl, coverDeUrl) {
         });
     }
 
+    // Metadata is ready here. Audio buffering must not keep the whole player blocked.
+    playerState.isLoadingSong = false;
+
     if (playerState.audioPlayer && fullSong.audioUrl) {
       playerState.audioPlayer.src = fullSong.audioUrl;
       playerState.audioPlayer.load();
-      await playerState.audioPlayer.play();
+      try {
+        await playerState.audioPlayer.play();
+      } catch (error) {
+        const canUseProxyFallback = error?.name === 'NotSupportedError'
+          && fullSong.fallbackAudioUrl
+          && fullSong.fallbackAudioUrl !== fullSong.audioUrl;
+        if (!canUseProxyFallback) {
+          throw error;
+        }
+
+        console.warn('Direct audio playback failed; retrying via proxy:', fullSong.cid);
+        fullSong.isUsingAudioFallback = true;
+        playerState.audioPlayer.src = fullSong.fallbackAudioUrl;
+        playerState.audioPlayer.load();
+        await playerState.audioPlayer.play();
+      }
     }
 
     // 預熱下一首詳情（不打斷播放，方便連續切歌）

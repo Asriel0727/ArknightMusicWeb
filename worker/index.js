@@ -2777,11 +2777,15 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
     targetLocale
   )).length;
   const translatedCount = translations.filter(Boolean).length;
+  const untranslatedCount = translatableCount - translatedLines.filter((line) => (
+    !shouldSkipServerTranslation(line.text, line.sourceLocale, targetLocale)
+    && Boolean(String(line.translation || '').trim())
+  )).length;
   const diagnostics = translatedLines.translationDiagnostics || { failedBatchCount: 0 };
-  const translationFailed = translatableCount > 0 && translatedCount === 0;
+  const translationFailed = untranslatedCount > 0;
 
   if (translationFailed) {
-    console.warn({ message: 'Lyric translation returned no translated lines', songId, targetLocale, translatableCount, failedBatchCount: diagnostics.failedBatchCount });
+    console.warn({ message: 'Lyric translation returned incomplete result', songId, targetLocale, translatableCount, translatedCount, untranslatedCount, failedBatchCount: diagnostics.failedBatchCount });
   } else {
     console.info({ message: 'Lyric translation completed', songId, targetLocale, translatableCount, translatedCount, failedBatchCount: diagnostics.failedBatchCount });
   }
@@ -2812,8 +2816,9 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
     translations,
     translatableCount,
     translatedCount,
+    untranslatedCount,
     failedBatchCount: diagnostics.failedBatchCount,
-    error: translationFailed ? 'Translation provider returned no translated lines' : undefined,
+    error: translationFailed ? 'Translation provider returned an incomplete result' : undefined,
     translation: translations[0] || '',
     source: songId ? 'translated' : 'line-cache',
   }, 200, 3600);
@@ -2848,11 +2853,11 @@ function getSongLyricsTranslationCacheKey(songId, lyricsHash, targetLocale) {
 
 function isValidSongTranslationRecord(record, lyricsHash, targetLocale, lines) {
   const translations = record?.translations;
-  const hasTranslatableLine = lines.some((line) => {
+  const hasCompleteTranslations = Array.isArray(translations) && lines.every((line, index) => {
     const sourceLocale = detectTranslationSourceLocale(line.text, targetLocale);
-    return !shouldSkipServerTranslation(line.text, sourceLocale, targetLocale);
+    return shouldSkipServerTranslation(line.text, sourceLocale, targetLocale)
+      || Boolean(String(translations[index] || '').trim());
   });
-  const hasTranslation = Array.isArray(translations) && translations.some(Boolean);
 
   return Boolean(
     record &&
@@ -2860,7 +2865,7 @@ function isValidSongTranslationRecord(record, lyricsHash, targetLocale, lines) {
     record.targetLocale === targetLocale &&
     Array.isArray(translations) &&
     translations.length === lines.length &&
-    (!hasTranslatableLine || hasTranslation)
+    hasCompleteTranslations
   );
 }
 
@@ -3025,6 +3030,34 @@ async function translateServerLines(env, lines, targetLocale, options = {}) {
     }
   }
 
+  // Google may occasionally reject or reformat a multi-line request. Retry only
+  // unresolved lines individually so a single bad batch never leaves silent blanks.
+  for (const line of result) {
+    if (shouldSkipServerTranslation(line.text, line.sourceLocale, targetLocale) || line.translation) {
+      continue;
+    }
+
+    try {
+      const translatedParts = await translateServerBatch([line], targetLocale);
+      const translation = translatedParts[0] || '';
+      if (translatedParts.length !== 1 || isInvalidServerTranslation(
+        line.text,
+        translation,
+        line.sourceLocale,
+        targetLocale
+      )) {
+        throw new Error('Single-line translation response was empty or invalid');
+      }
+      line.translation = translation;
+      if (useLineCache) {
+        await writeServerTranslationCache(env, line.text, line.sourceLocale, targetLocale, translation);
+      }
+    } catch (error) {
+      failedBatchCount += 1;
+      console.warn('Server lyric translation fallback failed:', error.message);
+    }
+  }
+
   Object.defineProperty(result, 'translationDiagnostics', {
     value: { failedBatchCount },
     enumerable: false,
@@ -3072,9 +3105,14 @@ async function translateServerBatch(batch, targetLocale) {
     dt: 't',
     q: text,
   });
-  const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?${params.toString()}`);
+  const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?${params.toString()}`, {
+    headers: {
+      accept: 'application/json',
+      referer: DEFAULT_APP_ORIGIN,
+    },
+  });
   if (!response.ok) {
-    throw new Error(`Translate request failed: ${response.status}`);
+    throw new Error(`Translate request failed: ${response.status} (${response.statusText})`);
   }
 
   const data = await response.json();
@@ -4338,8 +4376,13 @@ async function proxyMusicAsset(request, type) {
   if (range) {
     upstreamHeaders.set('range', range);
   }
+  if (type === 'audio') {
+    upstreamHeaders.set('referer', 'https://monster-siren.hypergryph.com/');
+    upstreamHeaders.set('origin', 'https://monster-siren.hypergryph.com');
+    upstreamHeaders.set('accept', 'audio/*,*/*;q=0.8');
+  }
 
-  const upstream = await fetch(rawUrl, {
+  let upstream = await fetch(rawUrl, {
     headers: upstreamHeaders,
     cf: {
       cacheTtl,
@@ -4347,12 +4390,30 @@ async function proxyMusicAsset(request, type) {
     },
   });
 
+  // hycdn occasionally rejects edge-origin requests without an application referer.
+  // Retry only known transient access failures; the URL allow-list remains unchanged.
+  if (type === 'audio' && (upstream.status === 403 || upstream.status === 429)) {
+    const retryHeaders = new Headers(upstreamHeaders);
+    retryHeaders.set('referer', 'https://monster-siren.hypergryph.com/');
+    upstream = await fetch(rawUrl, {
+      headers: retryHeaders,
+      cf: { cacheTtl, cacheEverything: true },
+    });
+  }
+
   if (!upstream.ok) {
+    console.warn({
+      message: 'Music asset proxy upstream request failed',
+      type,
+      host: new URL(rawUrl).hostname,
+      status: upstream.status,
+    });
     return new Response('Asset not found', {
       status: upstream.status,
       headers: {
         'access-control-allow-origin': '*',
-        'cache-control': 'public, max-age=300',
+        // Never make an intermittent upstream rejection look like a persistent playback failure.
+        'cache-control': 'no-store',
       },
     });
   }
