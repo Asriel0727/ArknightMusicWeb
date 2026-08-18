@@ -49,8 +49,12 @@
       </div>
 
       <div id="modal-body">
+        <div v-if="modalState.currentView === 'album' && albumState.isLoading" class="modal-loading" role="status">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+          <span>{{ $t('common.loading') }}</span>
+        </div>
         <AlbumDetails
-          v-if="modalState.currentView === 'album' && albumState.currentAlbumDetails"
+          v-else-if="modalState.currentView === 'album' && albumState.currentAlbumDetails"
           :key="(albumState.currentAlbumDetails?.cid || 'album') + '-' + locale"
           :album="albumState.currentAlbumDetails"
           @play-song="handlePlaySong"
@@ -262,6 +266,15 @@ watch(() => playerState.currentSong, (newSong) => {
 
 .modal-content.character-share-modal {
   max-width: 1180px;
+}
+
+.modal-loading {
+  min-height: 300px;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--text-secondary);
 }
 
 .modal-action-bar {

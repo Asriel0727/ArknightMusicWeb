@@ -32,7 +32,13 @@ function requestLyricTranslations(lines, targetLocale, songId) {
     }));
     const request = translateLyricsOnServer(sourceLines, targetLocale, songId)
       .then((data) => {
+        if (data?.ok === false) {
+          throw new Error(data.error || 'Translation service unavailable');
+        }
         const translations = Array.isArray(data.translations) ? data.translations : [];
+        if (data?.translatableCount > 0 && data?.translatedCount === 0) {
+          throw new Error(data.error || 'Translation service returned no translated lines');
+        }
         if (!translations.some((translation) => String(translation || '').trim())) {
           lyricTranslationPromiseCache.delete(cacheKey);
         }

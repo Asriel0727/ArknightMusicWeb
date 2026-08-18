@@ -1,5 +1,9 @@
 <template>
   <div class="player-view-grid" :class="{ 'single-panel': !hasRightPanel }">
+    <div v-if="playerState.isLoadingSong" class="player-loading-overlay" role="status">
+      <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>{{ t('common.loading') }}</span>
+    </div>
     <div class="player-view-left">
       <div class="player-container">
         <div class="player-header">
@@ -97,7 +101,8 @@
           class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
           @error="handleImageError">
         <div v-else class="character-ep-visual">
-          <iframe v-if="playerState.isPlaying" :key="epIframeKey" class="character-ep-frame"
+          <div v-if="isYoutubeCharacterEp && playerState.isPlaying" ref="youtubePlayerContainer" class="character-ep-frame"></div>
+          <iframe v-else-if="playerState.isPlaying" :key="epIframeKey" class="character-ep-frame"
             :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
             allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
           <div v-else class="character-ep-paused">
@@ -117,7 +122,13 @@
           <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
           <span class="toggle-label">{{ t('player.translationToggle') }}</span>
         </label>
+        <span v-if="playerState.isTranslatingLyrics" class="lyrics-translation-status" role="status">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> {{ t('common.loading') }}
+        </span>
       </div>
+      <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationError" class="lyrics-translation-error" role="alert">
+        {{ playerState.lyricTranslationError }}
+      </p>
       <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-container" ref="lyricsContainerRef"
         @scroll="handleLyricsScroll">
         <div v-for="(line, index) in playerState.lyrics" :key="index" class="lyrics-line"
@@ -200,7 +211,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations, togglePlayMode } from '../stores/player.js';
 import { createSongShareUrl as createSongSharePageUrl, fetchCharacterEp, getProxyImageUrl } from '../services/api.js';
@@ -229,6 +240,10 @@ const characterEp = ref(null);
 const visualMode = ref('cover');
 const epIframeKey = ref(0);
 const epStartTime = ref(0);
+const youtubePlayerContainer = ref(null);
+let youtubePlayer = null;
+let youtubePlayerPromise = null;
+let youtubeDriftTimer = null;
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
@@ -463,6 +478,12 @@ const characterEpIframeSrc = computed(() => {
       start: startTime,
       playsinline: '1',
       rel: '0',
+      controls: '0',
+      disablekb: '1',
+      fs: '0',
+      iv_load_policy: '3',
+      enablejsapi: '1',
+      origin: window.location.origin,
     });
     return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
   }
@@ -476,6 +497,59 @@ const characterEpIframeSrc = computed(() => {
   });
   return `https://player.bilibili.com/player.html?${params.toString()}`;
 });
+
+const isYoutubeCharacterEp = computed(() => /(?:youtube\.com|youtu\.be)/i.test(characterEp.value?.sourceUrl || ''));
+
+const loadYoutubePlayerApi = () => {
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+  if (youtubePlayerPromise) return youtubePlayerPromise;
+  youtubePlayerPromise = new Promise((resolve, reject) => {
+    const previousReady = window.onYouTubeIframeAPIReady;
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    script.async = true;
+    script.onerror = () => reject(new Error('YouTube Player API failed to load'));
+    window.onYouTubeIframeAPIReady = () => { previousReady?.(); resolve(window.YT); };
+    document.head.appendChild(script);
+  });
+  return youtubePlayerPromise;
+};
+
+const clearYoutubePlayer = () => {
+  if (youtubeDriftTimer) clearInterval(youtubeDriftTimer);
+  youtubeDriftTimer = null;
+  youtubePlayer?.destroy?.();
+  youtubePlayer = null;
+};
+
+const syncYoutubeToAudio = () => {
+  if (!youtubePlayer || !playerState.audioPlayer || !playerState.isPlaying) return;
+  const audioTime = playerState.audioPlayer.currentTime || 0;
+  const videoTime = youtubePlayer.getCurrentTime?.() || 0;
+  if (Math.abs(videoTime - audioTime) > 2) youtubePlayer.seekTo(audioTime, true);
+};
+
+const createYoutubePlayer = async () => {
+  if (!isYoutubeCharacterEp.value || !playerState.isPlaying || !youtubePlayerContainer.value) return;
+  const videoId = characterEp.value?.bvid;
+  if (!videoId) return;
+  clearYoutubePlayer();
+  try {
+    const YT = await loadYoutubePlayerApi();
+    if (!youtubePlayerContainer.value || !playerState.isPlaying || characterEp.value?.bvid !== videoId) return;
+    youtubePlayer = new YT.Player(youtubePlayerContainer.value, {
+      videoId,
+      playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3, origin: window.location.origin, start: Math.max(0, Math.floor(playerState.audioPlayer?.currentTime || 0)) },
+      events: {
+        onReady: (event) => { event.target.mute(); event.target.playVideo(); },
+        onStateChange: (event) => { if (event.data === YT.PlayerState.PLAYING) syncYoutubeToAudio(); },
+      },
+    });
+    youtubeDriftTimer = window.setInterval(syncYoutubeToAudio, 5000);
+  } catch (error) {
+    console.warn('YouTube Player API initialization failed:', error.message);
+  }
+};
 
 const volumeIcon = computed(() => {
   if (playerState.isMuted || playerState.volume === 0) {
@@ -547,6 +621,10 @@ const handleSeek = (event) => {
 };
 
 const restartCharacterEp = () => {
+  if (isYoutubeCharacterEp.value) {
+    syncYoutubeToAudio();
+    return;
+  }
   epStartTime.value = playerState.audioPlayer?.currentTime ?? playerState.currentTime;
   epIframeKey.value += 1;
 };
@@ -715,6 +793,23 @@ watch(() => playerState.isPlaying, (isPlaying) => {
   }
 }, { immediate: true });
 
+watch(() => playerState.isPlaying, (isPlaying) => {
+  if (!isYoutubeCharacterEp.value || visualMode.value !== 'ep') return;
+  if (isPlaying) {
+    nextTick(createYoutubePlayer);
+  } else {
+    youtubePlayer?.pauseVideo?.();
+  }
+});
+
+watch([visualMode, characterEp], () => {
+  if (visualMode.value === 'ep' && isYoutubeCharacterEp.value && playerState.isPlaying) {
+    nextTick(createYoutubePlayer);
+  } else if (!isYoutubeCharacterEp.value) {
+    clearYoutubePlayer();
+  }
+});
+
 watch(() => playerState.currentSong, async (newSong) => {
   activeLyricIndex.value = -1;
   clearLibraryActionStatus();
@@ -760,6 +855,7 @@ onMounted(() => {
 
 // 組件?��??��??��??�循?��?超�?
 onUnmounted(() => {
+  clearYoutubePlayer();
   stopLyricsSync();
   if (userScrollTimeout) {
     clearTimeout(userScrollTimeout);
@@ -775,11 +871,24 @@ onUnmounted(() => {
 
 <style scoped>
 .player-view-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 520px));
   justify-content: center;
   gap: clamp(24px, 4vw, 48px);
   align-items: center;
+}
+
+.player-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  color: var(--text-color);
+  background: rgba(13, 17, 23, 0.78);
+  border-radius: 10px;
 }
 
 .player-view-left,
@@ -1046,6 +1155,17 @@ onUnmounted(() => {
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+}
+
+.lyrics-translation-status,
+.lyrics-translation-error {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.lyrics-translation-error {
+  margin: -8px 0 0;
+  color: #ff9b9b;
 }
 
 .lyrics-translation-toggle input {

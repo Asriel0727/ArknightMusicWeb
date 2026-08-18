@@ -108,12 +108,16 @@ const handleSearch = (query) => {
 };
 
 const handleViewAlbum = async (albumId) => {
+  albumState.currentAlbumDetails = null;
+  albumState.isLoading = true;
+  modalState.currentView = 'album';
+  modalState.isOpen = true;
   try {
     albumState.currentAlbumDetails = await fetchAlbumDetails(albumId);
-    modalState.currentView = 'album';
-    modalState.isOpen = true;
   } catch (error) {
     console.error('Error fetching album details:', error);
+  } finally {
+    albumState.isLoading = false;
   }
 };
 
@@ -164,9 +168,9 @@ const handleSharedSongLink = async () => {
     return;
   }
 
-  await playSongFromMasterList({ cid: songId });
   modalState.currentView = 'player';
   modalState.isOpen = true;
+  await playSongFromMasterList({ cid: songId });
 };
 
 const handleSharedCharacterLink = async () => {

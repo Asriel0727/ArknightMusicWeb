@@ -235,8 +235,8 @@ const changePage = (direction) => {
 };
 
 const handlePlaySong = async (index) => {
-  await playSongFromAlbum(index, props.album.cid);
   emit('play-song');
+  await playSongFromAlbum(index, props.album.cid);
 };
 
 const refreshIntroTranslation = async () => {

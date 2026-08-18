@@ -1893,7 +1893,7 @@ async function getMusicJson(env, key, sourcePath, options = {}) {
   }
 }
 
-async function getMusicSongJson(env, key, sourcePath) {
+async function getMusicSongJson(env, key, sourcePath, ctx = null) {
   const cached = await readSupabaseCache(env, key);
   if (cached?.data && isFreshSupabaseRow(cached, MUSIC_SONG_DETAIL_MAX_AGE_MS)) {
     return {
@@ -1903,8 +1903,24 @@ async function getMusicSongJson(env, key, sourcePath) {
     };
   }
 
-  const fetched = await fetchMusicJson(sourcePath);
-  await writeSupabaseCache(env, key, fetched.data, fetched.sourceUrl);
+  const refresh = async () => {
+    const fetched = await fetchMusicJson(sourcePath);
+    await writeSupabaseCache(env, key, fetched.data, fetched.sourceUrl);
+    return fetched;
+  };
+
+  if (cached?.data && ctx) {
+    ctx.waitUntil(refresh().catch((error) => {
+      console.warn('Music song cache refresh failed:', key, error.message);
+    }));
+    return {
+      data: cached.data,
+      source: 'supabase-stale-revalidate',
+      updatedAt: cached.updated_at,
+    };
+  }
+
+  const fetched = await refresh();
 
   return {
     data: fetched.data,
@@ -2527,7 +2543,7 @@ async function handleMusicApiRequest(request, env, url, ctx) {
   const fullSongMatch = url.pathname.match(/^\/api\/song\/([^/]+)\/full$/);
   if (fullSongMatch) {
     const songId = decodeURIComponent(fullSongMatch[1]);
-    const result = await getFullSongJson(request, env, songId);
+    const result = await getFullSongJson(request, env, songId, ctx);
     return json(result.data, 200, 900, {
       'x-data-source': result.source,
       'x-cache-updated-at': result.updatedAt || '',
@@ -2570,7 +2586,8 @@ async function handleMusicApiRequest(request, env, url, ctx) {
     const result = await getMusicSongJson(
       env,
       `${MUSIC_CACHE_PREFIX}song:${songId}`,
-      `/api/song/${encodeURIComponent(songId)}`
+      `/api/song/${encodeURIComponent(songId)}`,
+      ctx
     );
     return json(result.data, 200, 900, {
       'x-data-source': result.source,
@@ -2581,12 +2598,13 @@ async function handleMusicApiRequest(request, env, url, ctx) {
   return null;
 }
 
-async function getFullSongJson(request, env, songId) {
+async function getFullSongJson(request, env, songId, ctx = null) {
   const publicApiBase = getPublicApiBase(request, env);
   const songResult = await getMusicSongJson(
     env,
     `${MUSIC_CACHE_PREFIX}song:${songId}`,
-    `/api/song/${encodeURIComponent(songId)}`
+    `/api/song/${encodeURIComponent(songId)}`,
+    ctx
   );
   const song = songResult.data?.data || {};
   let album = null;
@@ -2753,8 +2771,22 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
     useLineCache: !songId,
   });
   const translations = translatedLines.map((line) => line.translation || '');
+  const translatableCount = translatedLines.filter((line) => !shouldSkipServerTranslation(
+    line.text,
+    line.sourceLocale,
+    targetLocale
+  )).length;
+  const translatedCount = translations.filter(Boolean).length;
+  const diagnostics = translatedLines.translationDiagnostics || { failedBatchCount: 0 };
+  const translationFailed = translatableCount > 0 && translatedCount === 0;
 
-  if (songId) {
+  if (translationFailed) {
+    console.warn({ message: 'Lyric translation returned no translated lines', songId, targetLocale, translatableCount, failedBatchCount: diagnostics.failedBatchCount });
+  } else {
+    console.info({ message: 'Lyric translation completed', songId, targetLocale, translatableCount, translatedCount, failedBatchCount: diagnostics.failedBatchCount });
+  }
+
+  if (songId && !translationFailed) {
     const persistTranslation = writeSongLyricsTranslation(env, {
       songId,
       lyricsHash,
@@ -2773,11 +2805,15 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
   }
 
   return json({
-    ok: true,
+    ok: !translationFailed,
     songId: songId || null,
     lyricsHash: lyricsHash || null,
     targetLocale,
     translations,
+    translatableCount,
+    translatedCount,
+    failedBatchCount: diagnostics.failedBatchCount,
+    error: translationFailed ? 'Translation provider returned no translated lines' : undefined,
     translation: translations[0] || '',
     source: songId ? 'translated' : 'line-cache',
   }, 200, 3600);
@@ -2946,6 +2982,7 @@ async function translateServerLines(env, lines, targetLocale, options = {}) {
     translation: '',
   }));
   const translatableLines = [];
+  let failedBatchCount = 0;
 
   for (const line of result) {
     if (shouldSkipServerTranslation(line.text, line.sourceLocale, targetLocale)) {
@@ -2966,6 +3003,9 @@ async function translateServerLines(env, lines, targetLocale, options = {}) {
   for (const batch of createServerTranslationBatches(translatableLines)) {
     try {
       const translatedParts = await translateServerBatch(batch, targetLocale);
+      if (translatedParts.length !== batch.length) {
+        throw new Error(`Translate response line count mismatch: expected ${batch.length}, got ${translatedParts.length}`);
+      }
       for (let index = 0; index < batch.length; index += 1) {
         const line = batch[index];
         const translation = translatedParts[index] || '';
@@ -2980,10 +3020,15 @@ async function translateServerLines(env, lines, targetLocale, options = {}) {
         }
       }
     } catch (error) {
+      failedBatchCount += 1;
       console.warn('Server lyric translation batch failed:', error.message);
     }
   }
 
+  Object.defineProperty(result, 'translationDiagnostics', {
+    value: { failedBatchCount },
+    enumerable: false,
+  });
   return result;
 }
 

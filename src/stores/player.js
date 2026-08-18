@@ -138,6 +138,8 @@ export const playerState = reactive({
   lyrics: [],
   showLyricTranslation: false,
   isTranslatingLyrics: false,
+  lyricTranslationError: '',
+  isLoadingSong: false,
   playMode: 'repeat-all',
 });
 
@@ -221,6 +223,8 @@ export function initAudioPlayer(audioElement) {
 
 // 播放歌曲（音訊優先：不等待歌詞；已有 sourceUrl 時不重複請求詳情）
 export async function playSong(song, coverUrl, coverDeUrl) {
+  playerState.isLoadingSong = true;
+  playerState.lyricTranslationError = '';
   try {
     resetPlaybackProgress();
     playerState.showLyricTranslation = false;
@@ -306,6 +310,8 @@ export async function playSong(song, coverUrl, coverDeUrl) {
   } catch (error) {
     console.error('播放歌曲時出錯:', error);
     throw error;
+  } finally {
+    playerState.isLoadingSong = false;
   }
 }
 
@@ -319,6 +325,7 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
   }
 
   const translationToken = ++lyricTranslationToken;
+  playerState.lyricTranslationError = '';
   playerState.lyrics = playerState.lyrics.map((line) => ({
     ...line,
     translation: '',
@@ -341,6 +348,11 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
     }
 
     playerState.lyrics = translatedLyrics;
+  } catch (error) {
+    if (translationToken === lyricTranslationToken) {
+      playerState.lyricTranslationError = error?.message || 'Translation unavailable';
+    }
+    console.warn('Lyric translation failed:', error);
   } finally {
     if (translationToken === lyricTranslationToken) {
       playerState.isTranslatingLyrics = false;
@@ -350,6 +362,7 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
 
 // 從專輯播放歌曲
 export async function playSongFromAlbum(index, albumId) {
+  playerState.isLoadingSong = true;
   try {
     if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== albumId) {
       albumState.currentAlbumDetails = await fetchAlbumDetails(albumId);
@@ -377,6 +390,7 @@ export async function playSongFromAlbum(index, albumId) {
 
 // 從主列表播放歌曲
 export async function playSongFromMasterList(song) {
+  playerState.isLoadingSong = true;
   try {
     const songDetails = await fetchMasterSongDetails(song.cid);
     const albumDetailsFromFull = songDetails.album || null;
