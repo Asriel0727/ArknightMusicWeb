@@ -218,6 +218,18 @@ export function initAudioPlayer(audioElement) {
     audioElement.addEventListener('ended', () => {
       playNextSong();
     });
+
+    audioElement.addEventListener('error', () => {
+      const mediaError = audioElement.error;
+      console.error('音源載入失敗', {
+        cid: playerState.currentSong?.cid || '',
+        source: audioElement.currentSrc || audioElement.src || '',
+        code: mediaError?.code || 0,
+        message: mediaError?.message || 'Unknown media error',
+        networkState: audioElement.networkState,
+        readyState: audioElement.readyState,
+      });
+    });
   }
 }
 

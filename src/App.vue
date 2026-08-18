@@ -37,7 +37,7 @@
       <Modal @close="handleModalClose" />
     </template>
 
-    <audio ref="audioPlayerRef" :preload="audioPreloadMode" style="display:none;"></audio>
+    <audio ref="audioPlayerRef" crossorigin="anonymous" :preload="audioPreloadMode" style="display:none;"></audio>
     <footer>
       <p>{{ $t('footer.credit') }}</p>
     </footer>
