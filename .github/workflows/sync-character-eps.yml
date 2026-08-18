@@ -30,12 +30,12 @@ jobs:
           sparse-checkout: |
             package.json
             package-lock.json
-            scripts/sync-character-eps.mjs
+            scripts/character-ep-dry-run.mjs
             scripts/character-ep-matching.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Sync YouTube Character EP videos
-        run: npm run character-eps:sync
+      - name: Dry-run YouTube Character EP matching
+        run: npm run character-eps:dry-run

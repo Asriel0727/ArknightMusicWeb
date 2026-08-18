@@ -1,7 +1,7 @@
 <template>
   <div class="player-view-grid" :class="{ 'single-panel': !hasRightPanel }">
     <div v-if="playerState.isLoadingSong" class="player-loading-overlay" role="status">
-      <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+      <span class="player-loading-dots" aria-hidden="true"><i></i><i></i><i></i></span>
       <span>{{ t('common.loading') }}</span>
     </div>
     <div class="player-view-left">
@@ -87,12 +87,11 @@
     </div>
     <div class="player-view-right">
       <div v-if="playerState.currentSong" class="player-visual-panel">
-        <div class="player-visual-switch" role="group" :aria-label="t('player.visualMode')">
+        <div v-if="characterEp" class="player-visual-switch" role="group" :aria-label="t('player.visualMode')">
           <button type="button" :class="{ active: visualMode === 'cover' }" @click="visualMode = 'cover'">
             <i class="fas fa-image"></i> {{ t('player.coverVisual') }}
           </button>
-          <button type="button" :class="{ active: visualMode === 'ep' }" :disabled="!characterEp"
-            :title="characterEp ? t('player.characterEp') : t('player.noCharacterEp')" @click="showCharacterEp">
+          <button type="button" :class="{ active: visualMode === 'ep' }" :title="t('player.characterEp')" @click="showCharacterEp">
             <i class="fas fa-film"></i> {{ t('player.characterEp') }}
           </button>
         </div>
@@ -101,7 +100,7 @@
           class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
           @error="handleImageError">
         <div v-else class="character-ep-visual">
-          <div v-if="isYoutubeCharacterEp && playerState.isPlaying" class="character-ep-frame">
+          <div v-if="isYoutubeCharacterEp && playerState.isPlaying" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
           </div>
           <iframe v-else-if="playerState.isPlaying" :key="epIframeKey" class="character-ep-frame"
@@ -526,11 +525,11 @@ const clearYoutubePlayer = () => {
   youtubePlayer = null;
 };
 
-const syncYoutubeToAudio = () => {
+const syncYoutubeToAudio = (force = false) => {
   if (!youtubePlayer || !playerState.audioPlayer || !playerState.isPlaying) return;
   const audioTime = playerState.audioPlayer.currentTime || 0;
   const videoTime = youtubePlayer.getCurrentTime?.() || 0;
-  if (Math.abs(videoTime - audioTime) > 2) youtubePlayer.seekTo(audioTime, true);
+  if (force || Math.abs(videoTime - audioTime) > 2.5) youtubePlayer.seekTo(audioTime, true);
 };
 
 const createYoutubePlayer = async () => {
@@ -551,11 +550,11 @@ const createYoutubePlayer = async () => {
       videoId,
       playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3, origin: window.location.origin, start: Math.max(0, Math.floor(playerState.audioPlayer?.currentTime || 0)) },
       events: {
-        onReady: (event) => { event.target.mute(); event.target.playVideo(); },
+        onReady: (event) => { event.target.mute(); syncYoutubeToAudio(true); event.target.playVideo(); },
         onStateChange: (event) => { if (event.data === YT.PlayerState.PLAYING) syncYoutubeToAudio(); },
       },
     });
-    youtubeDriftTimer = window.setInterval(syncYoutubeToAudio, 5000);
+    youtubeDriftTimer = window.setInterval(syncYoutubeToAudio, 10000);
   } catch (error) {
     console.warn('YouTube Player API initialization failed:', error.message);
   }
@@ -632,7 +631,7 @@ const handleSeek = (event) => {
 
 const restartCharacterEp = () => {
   if (isYoutubeCharacterEp.value) {
-    syncYoutubeToAudio();
+    syncYoutubeToAudio(true);
     return;
   }
   epStartTime.value = playerState.audioPlayer?.currentTime ?? playerState.currentTime;
@@ -899,6 +898,28 @@ onUnmounted(() => {
   color: var(--text-color);
   background: rgba(13, 17, 23, 0.78);
   border-radius: 10px;
+}
+
+.player-loading-dots {
+  display: inline-flex;
+  justify-content: center;
+  gap: 7px;
+}
+
+.player-loading-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  animation: player-loading-dot 0.9s ease-in-out infinite;
+}
+
+.player-loading-dots i:nth-child(2) { animation-delay: 0.12s; }
+.player-loading-dots i:nth-child(3) { animation-delay: 0.24s; }
+
+@keyframes player-loading-dot {
+  0%, 80%, 100% { transform: scale(0.65); opacity: 0.42; }
+  40% { transform: scale(1); opacity: 1; }
 }
 
 .player-view-left,
@@ -1282,10 +1303,20 @@ onUnmounted(() => {
   border: 0;
 }
 
+.character-ep-youtube-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
 .youtube-player-host,
-.character-ep-frame iframe {
+.character-ep-youtube-frame :deep(iframe) {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  max-width: none;
+  max-height: none;
   border: 0;
 }
 

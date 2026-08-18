@@ -18,6 +18,7 @@
     "activities:sync": "npm run activities:sync-pools && npm run activities:push-pools",
     "activities:audit-pools": "node scripts/audit-activity-pools.mjs",
     "character-eps:sync": "node scripts/sync-character-eps.mjs",
+    "character-eps:dry-run": "node scripts/character-ep-dry-run.mjs",
     "test:character-eps": "node --test test/character-ep-matching.test.mjs",
     "music:audit-audio": "node scripts/audit-music-audio.mjs"
   },
