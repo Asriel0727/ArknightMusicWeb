@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-18T19:00:32.450Z",
+  "generatedAt": "2026-08-20T19:07:20.270Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -37,8 +37,8 @@
     },
     "portraits": {
       "total": 1330,
-      "existing": 1327,
-      "missing": 3
+      "existing": 1329,
+      "missing": 1
     },
     "items": {
       "total": 86,
@@ -61,8 +61,6 @@
     "factions": [],
     "classes": [],
     "portraits": [
-      "public/images/operators/portraits/char_4199_makiri_sale_19-3490dc75.png",
-      "public/images/operators/portraits/char_4165_ctrail_yun_11-98b8f955.png",
       "public/images/operators/portraits/char_445_wscoot_epoque_49-a40747e5.png"
     ],
     "items": [],
@@ -33285,7 +33283,7 @@
         "label": "松桐 - 松桐 - 暮时宝光",
         "publicPath": "/images/operators/portraits/char_4199_makiri_sale_19-3490dc75.png",
         "relativePath": "public/images/operators/portraits/char_4199_makiri_sale_19-3490dc75.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4199_makiri_sale%2319.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4199_makiri_sale%2319.png",
@@ -44080,7 +44078,7 @@
         "label": "云迹 - 云迹 - 渡澄空",
         "publicPath": "/images/operators/portraits/char_4165_ctrail_yun_11-98b8f955.png",
         "relativePath": "public/images/operators/portraits/char_4165_ctrail_yun_11-98b8f955.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4165_ctrail_yun%2311.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4165_ctrail_yun%2311.png",
