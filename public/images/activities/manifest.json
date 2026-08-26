@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-26T02:03:58.694Z",
+  "generatedAt": "2026-08-26T07:15:36.161Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -32,20 +32,20 @@
     "wiki-bolivar-diagnosed": {
       "publicPath": "/images/activities/wiki-bolivar-diagnosed.png",
       "relativePath": "public/images/activities/wiki-bolivar-diagnosed.png",
-      "sourceUrl": "https://media.prts.wiki/0/0d/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%B8%9B%E6%9E%97%E7%97%87%E7%BB%93_01.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Bol%C3%ADvar_Diagnosed_banner.png?2601f6",
       "contentType": "image/png",
       "size": 395044,
       "hash": "655590d90c922cec1477a4ea80cadb8a62a10853cc3cc03febc03b19b25fb724",
-      "syncedAt": "2026-08-25T01:58:10.765Z"
+      "syncedAt": "2026-08-26T07:15:15.030Z"
     },
     "wiki-magic-and-friendship": {
-      "publicPath": "/images/activities/wiki-magic-and-friendship.png",
-      "relativePath": "public/images/activities/wiki-magic-and-friendship.png",
-      "sourceUrl": "https://media.prts.wiki/2/28/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%AD%94%E6%B3%95%E4%B8%8E%E5%8F%8B%E8%B0%8A_01.png",
-      "contentType": "image/png",
-      "size": 351032,
-      "hash": "47caf3a1a1e6e26345ef50f19a4cc0e81aa4b2ab19fae80acab6025cc99cc08e",
-      "syncedAt": "2026-08-25T01:58:11.151Z"
+      "publicPath": "/images/activities/wiki-magic-and-friendship.webp",
+      "relativePath": "public/images/activities/wiki-magic-and-friendship.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Magic_and_Friendship_banner.png?d6babc",
+      "contentType": "image/webp",
+      "size": 231786,
+      "hash": "545b0c96213e620dc8443f76627e5996933874487ecfbb3fbd23e8f38fd692db",
+      "syncedAt": "2026-08-26T07:15:15.050Z"
     },
     "prts-13nxmnx": {
       "publicPath": "/images/activities/prts-13nxmnx.jpg",
@@ -75,22 +75,22 @@
       "syncedAt": "2026-07-17T03:49:53.081Z"
     },
     "wiki-positional-football-championship": {
-      "publicPath": "/images/activities/wiki-positional-football-championship.jpg",
-      "relativePath": "public/images/activities/wiki-positional-football-championship.jpg",
-      "sourceUrl": "https://media.prts.wiki/5/56/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%B3%A1%E5%BD%B1%E8%8B%8D%E9%9C%86_20.jpg",
-      "contentType": "image/jpeg",
-      "size": 274199,
-      "hash": "562cef184f6b19cd2d7b7ea3ad3016ff7805060a63938b0e605c9c3434644324",
-      "syncedAt": "2026-08-25T01:58:11.728Z"
+      "publicPath": "/images/activities/wiki-positional-football-championship.webp",
+      "relativePath": "public/images/activities/wiki-positional-football-championship.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Positional_Football_Championship_banner.png?96e9c6",
+      "contentType": "image/webp",
+      "size": 648878,
+      "hash": "15383d43f86199481396bd05fbe8d9f6df3cfc18e750d1e7729fc5f43199037f",
+      "syncedAt": "2026-08-26T07:15:15.074Z"
     },
     "wiki-thunder-in-the-azure-dream": {
-      "publicPath": "/images/activities/wiki-thunder-in-the-azure-dream.jpg",
-      "relativePath": "public/images/activities/wiki-thunder-in-the-azure-dream.jpg",
-      "sourceUrl": "https://media.prts.wiki/4/4b/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%B3%A1%E5%BD%B1%E8%8B%8D%E9%9C%86_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 347529,
-      "hash": "1d0294f2bb7ccee9503da09c092bc4cfccd47e8e999a1109034de39de684bc9a",
-      "syncedAt": "2026-08-25T01:58:12.157Z"
+      "publicPath": "/images/activities/wiki-thunder-in-the-azure-dream.webp",
+      "relativePath": "public/images/activities/wiki-thunder-in-the-azure-dream.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Thunder_in_the_Azure_Dream_banner.png?37c120",
+      "contentType": "image/webp",
+      "size": 975730,
+      "hash": "e415137fd24431f445443ba9a95846b949c942059b3ce82773089a80a79f8f57",
+      "syncedAt": "2026-08-26T07:15:15.101Z"
     },
     "prts-syri4j": {
       "publicPath": "/images/activities/prts-syri4j.jpg",
@@ -147,13 +147,13 @@
       "syncedAt": "2026-07-17T03:49:55.849Z"
     },
     "wiki-duel-channel-ivy-vine": {
-      "publicPath": "/images/activities/wiki-duel-channel-ivy-vine.jpg",
-      "relativePath": "public/images/activities/wiki-duel-channel-ivy-vine.jpg",
-      "sourceUrl": "https://media.prts.wiki/9/99/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%B8%83%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_13.jpg",
-      "contentType": "image/jpeg",
-      "size": 426691,
-      "hash": "0b2677546a761e1132c981ede6749ca269c5bba12b74db2196c54401fb4ac599",
-      "syncedAt": "2026-08-25T01:58:13.780Z"
+      "publicPath": "/images/activities/wiki-duel-channel-ivy-vine.webp",
+      "relativePath": "public/images/activities/wiki-duel-channel-ivy-vine.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Duel_Channel_Ivy_Vine_banner.png?ec762f",
+      "contentType": "image/webp",
+      "size": 255826,
+      "hash": "f15b310feed9ce0c2692e236bafa8e12a9696562df0885d3e71a170bb3776d5d",
+      "syncedAt": "2026-08-26T07:15:15.122Z"
     },
     "prts-1jw493z": {
       "publicPath": "/images/activities/prts-1jw493z.jpg",
@@ -363,13 +363,13 @@
       "syncedAt": "2026-07-17T03:50:02.478Z"
     },
     "wiki-stronghold-protocol-alliance": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "sourceUrl": "https://media.prts.wiki/e/e7/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_29.jpg",
-      "contentType": "image/jpeg",
-      "size": 290757,
-      "hash": "cf1449fc689ffda9ab47b9aedb44c90cc51ee8c3c2ecf48e6beee6335f7286a3",
-      "syncedAt": "2026-08-25T01:58:14.301Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.webp",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_Alliance_banner.png?effa5d",
+      "contentType": "image/webp",
+      "size": 746486,
+      "hash": "851dc9dd47c446a5f2a8134f0e1e197a0b20c2e630c4b167cc7263772fd82703",
+      "syncedAt": "2026-08-26T07:15:15.172Z"
     },
     "prts-8669y1": {
       "publicPath": "/images/activities/prts-8669y1.jpg",
@@ -381,13 +381,13 @@
       "syncedAt": "2026-07-17T03:50:02.948Z"
     },
     "wiki-retracing-our-steps": {
-      "publicPath": "/images/activities/wiki-retracing-our-steps.jpg",
-      "relativePath": "public/images/activities/wiki-retracing-our-steps.jpg",
-      "sourceUrl": "https://media.prts.wiki/8/8e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 480283,
-      "hash": "44e22a52a3b168c1a17d2c4f92c6cbbf10a76e3e275d18d0aa27988380c320ac",
-      "syncedAt": "2026-08-25T01:58:14.702Z"
+      "publicPath": "/images/activities/wiki-retracing-our-steps.webp",
+      "relativePath": "public/images/activities/wiki-retracing-our-steps.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Retracing_Our_Steps_banner.png?b9ad3c",
+      "contentType": "image/webp",
+      "size": 1256218,
+      "hash": "8ac8a284ad3b252cdd26e23203cfdda6f358cbb514a2d1bce8d49332c4431803",
+      "syncedAt": "2026-08-26T07:15:15.199Z"
     },
     "prts-18lchyx": {
       "publicPath": "/images/activities/prts-18lchyx.jpg",
@@ -2894,11 +2894,11 @@
     "wiki-medjehtiqedti-bound": {
       "publicPath": "/images/activities/wiki-medjehtiqedti-bound.webp",
       "relativePath": "public/images/activities/wiki-medjehtiqedti-bound.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Medjehtiqedti_Bound_banner.png?7edb09",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9",
       "contentType": "image/webp",
-      "size": 820454,
-      "hash": "f4bfbd8959f044238e6741d8c7135e610b0c83669cbae72d3eed12b3eded4d4f",
-      "syncedAt": "2026-08-26T02:03:44.929Z"
+      "size": 937618,
+      "hash": "976f271280b33315706608a217db8cc5144ce5a28f99752c525657a164a323fb",
+      "syncedAt": "2026-08-26T07:15:15.147Z"
     },
     "wiki-trials-for-navigator-6": {
       "publicPath": "/images/activities/wiki-trials-for-navigator-6.png",
@@ -3234,13 +3234,13 @@
       "syncedAt": "2026-08-26T02:03:45.075Z"
     },
     "wiki-babel-event-rerun": {
-      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 330324,
-      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
-      "syncedAt": "2026-08-26T02:03:53.396Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.webp",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_Rerun_banner.png?b0dc17",
+      "contentType": "image/webp",
+      "size": 793802,
+      "hash": "78c21c9cbd263d4b46c34b6e40b0c3a570491b19e5b5b7ade70c3cb6f537e06a",
+      "syncedAt": "2026-08-26T07:15:25.410Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.png",
@@ -3252,31 +3252,31 @@
       "syncedAt": "2026-08-26T02:03:53.610Z"
     },
     "wiki-stronghold-protocol-event": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 244822,
-      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
-      "syncedAt": "2026-08-26T02:03:55.723Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-event.webp",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_banner.png?a4b4e2",
+      "contentType": "image/webp",
+      "size": 552298,
+      "hash": "f3211da4446c2beaf1e9cc607aa14e79e9c3baf3c76078c34b7736877cc6fbaf",
+      "syncedAt": "2026-08-26T07:15:35.892Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
-      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 280529,
-      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
-      "syncedAt": "2026-08-26T02:03:57.325Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.png",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ending_a_Grand_Overture_banner.png?e80c0c",
+      "contentType": "image/png",
+      "size": 1160360,
+      "hash": "6763499241dca134fad4b4e05a1ff7e53060033c9779ecf684c3740dd5c50a73",
+      "syncedAt": "2026-08-26T07:15:36.132Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 268285,
-      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
-      "syncedAt": "2026-08-26T02:03:58.694Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.webp",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
+      "contentType": "image/webp",
+      "size": 704954,
+      "hash": "d4f64bc65b796d6e53f800a1feafb3434dc356a274df765273d8b40923415f4c",
+      "syncedAt": "2026-08-26T07:15:36.161Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
@@ -3545,13 +3545,13 @@
       "syncedAt": "2026-08-07T06:26:15.067Z"
     },
     "wiki-till-the-lands-become-an-orange": {
-      "publicPath": "/images/activities/wiki-till-the-lands-become-an-orange.jpg",
-      "relativePath": "public/images/activities/wiki-till-the-lands-become-an-orange.jpg",
-      "sourceUrl": "https://media.prts.wiki/d/dc/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2026_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 425729,
-      "hash": "461001915ae35f0ec823bfd894f610d4f0a39a697356b1e79e12f335025eeecd",
-      "syncedAt": "2026-08-25T01:58:10.148Z"
+      "publicPath": "/images/activities/wiki-till-the-lands-become-an-orange.webp",
+      "relativePath": "public/images/activities/wiki-till-the-lands-become-an-orange.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Till_the_Lands_Become_an_Orange_banner.png?c39c28",
+      "contentType": "image/webp",
+      "size": 1025456,
+      "hash": "5f3e01a27db2b978bda94b796ba95f3fc5af0571458ff96afdd00506457022b6",
+      "syncedAt": "2026-08-26T07:15:15.002Z"
     },
     "prts-s9wqxn": {
       "publicPath": "/images/activities/prts-s9wqxn.jpg",
@@ -3572,13 +3572,13 @@
       "syncedAt": "2026-08-24T02:03:30.575Z"
     },
     "wiki-interactive-exhibition": {
-      "publicPath": "/images/activities/wiki-interactive-exhibition.jpg",
-      "relativePath": "public/images/activities/wiki-interactive-exhibition.jpg",
-      "sourceUrl": "https://media.prts.wiki/6/65/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A4%8F%E6%B4%BB2026_23.jpg",
-      "contentType": "image/jpeg",
-      "size": 197023,
-      "hash": "5f17c4f86132a66fd9b79dc9256b6cc3ec636c2dcd4f7893d279988537a08e06",
-      "syncedAt": "2026-08-25T01:58:09.370Z"
+      "publicPath": "/images/activities/wiki-interactive-exhibition.webp",
+      "relativePath": "public/images/activities/wiki-interactive-exhibition.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Interactive_Exhibition_banner.png?be4dfb",
+      "contentType": "image/webp",
+      "size": 430570,
+      "hash": "814da4fa0dab41b37409e4ebb56446c67d28c75043151b9a0fc43b319398edfd",
+      "syncedAt": "2026-08-26T07:15:14.963Z"
     },
     "prts-1en990k": {
       "publicPath": "/images/activities/prts-1en990k.jpg",
