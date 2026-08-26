@@ -3,7 +3,7 @@ export function normalizeMatchText(value) {
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/\b(?:character\s*)?ep\b|\barknights\b|\bmonstersiren\b|\briverv\s*workshop\b|\bofficial\b|\bmusic\s*video\b|\bfull\s*version\b|\bversion\b|\bver\b/gi, '')
+    .replace(/\b(?:character\s*)?ep\b|\barknights\b|\bmonstersiren\b|\briverv\s*workshop\b|\bofficial\b|\bmusic\s*video\b|\bmv\b|\bost\b|\bfull\s*version\b|\bversion\b|\bver\b|音樂錄影帶|音乐录影带|音樂|音乐|歌曲|主題曲|主题曲/gi, '')
     .replace(/[^\p{L}\p{N}]/gu, '');
 }
 

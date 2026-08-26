@@ -93,6 +93,13 @@ function isManualMatch(video) {
   return video?.raw?.matchSource === 'manual';
 }
 
+function isRelaxedArknightsMusicCandidate(title, match) {
+  const source = String(title || '');
+  if (!/(?:\barknights\b|明日方舟|アークナイツ)/i.test(source)) return false;
+  if (/\b(?:endfield|reverse\s*:?\s*1999)\b/i.test(source)) return false;
+  return match?.score === 100;
+}
+
 const [songs, existingVideos, videos] = await Promise.all([
   getSupabaseRows('music_songs', 'select=id,name&limit=2000'),
   getSupabaseRows('music_character_ep_videos', 'select=bvid,song_id,is_visible,match_score,author_mid,raw&limit=2000'),
@@ -110,7 +117,10 @@ const epVideos = videos.map((video) => {
     autoMatch,
     matchKind: explicitEp ? 'explicit-ep' : 'title-match',
   };
-}).filter((video) => video.matchKind === 'explicit-ep' || Boolean(video.autoMatch));
+}).filter((video) => (
+  video.matchKind === 'explicit-ep'
+  || isRelaxedArknightsMusicCandidate(video.title, video.autoMatch)
+));
 const corrections = [];
 const reactivations = [];
 const manualProtected = [];

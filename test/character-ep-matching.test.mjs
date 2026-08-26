@@ -37,6 +37,14 @@ test('loosely matches a Chinese song title from a non-EP video title segment', (
   assert.equal(match?.score, 100);
 });
 
+test('normalizes Chinese music labels in a non-EP title', () => {
+  const match = findSongMatch('明日方舟 音樂錄影帶 - 夏日來信 | 官方頻道', [
+    { id: 'summer-letter', name: '夏日來信' },
+  ], { loose: true, minimumScore: 88, minimumGap: 6 });
+
+  assert.equal(match?.score, 100);
+});
+
 test('does not match a short song title from a larger word', () => {
   const match = findSongMatch('Weedy New Skin | Arknights', [
     { id: 'we', name: 'WE' },
