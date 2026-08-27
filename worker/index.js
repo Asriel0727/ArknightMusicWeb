@@ -3313,6 +3313,10 @@ async function getCharacterEpForSong(env, songId) {
     select: 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url',
     song_id: `eq.${songId}`,
     is_visible: 'eq.true',
+    // Character EP playback is intentionally pinned to Bilibili. Historical
+    // YouTube rows remain in the table for audit purposes but must not win the
+    // latest-published ordering below.
+    source_url: 'like.https://www.bilibili.com/%',
     order: 'published_at.desc',
     limit: '1',
   });
