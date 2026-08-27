@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-27T06:31:00.067Z",
+  "generatedAt": "2026-08-27T10:01:38.599Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3243,13 +3243,13 @@
       "syncedAt": "2026-08-26T20:15:09.570Z"
     },
     "wiki-icebreaker-games-1": {
-      "publicPath": "/images/activities/wiki-icebreaker-games-1.png",
-      "relativePath": "public/images/activities/wiki-icebreaker-games-1.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Icebreaker_Games_1_banner.png?bc023f",
-      "contentType": "image/png",
-      "size": 913153,
-      "hash": "7132c2b19a41b6902eaf03f80b4305ce4cbdb432133900bf36b583ea6f898073",
-      "syncedAt": "2026-08-26T02:03:53.610Z"
+      "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
+      "relativePath": "public/images/activities/wiki-icebreaker-games-1.jpg",
+      "sourceUrl": "https://media.prts.wiki/5/55/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%BF%83%E8%9E%8D%E5%85%B1%E7%AB%9E01_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 435015,
+      "hash": "7b69a78f87da359df5b2bf0d3d700872580ba3564c7644ce82487187914ee244",
+      "syncedAt": "2026-08-27T10:01:38.118Z"
     },
     "wiki-stronghold-protocol-event": {
       "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
@@ -3288,13 +3288,13 @@
       "syncedAt": "2026-08-10T08:11:20.109Z"
     },
     "prts-1khulg4": {
-      "publicPath": "/images/activities/prts-1khulg4.svg",
-      "relativePath": "public/images/activities/prts-1khulg4.svg",
-      "sourceUrl": "generated:activity-fallback:v1",
-      "contentType": "image/svg+xml",
-      "size": 822,
-      "hash": "dd24107c90bdb88fdb5a537862c4163fde572a4d8ae8bd70a377db5bbadcffe7",
-      "syncedAt": "2026-08-26T20:15:10.990Z"
+      "publicPath": "/images/activities/prts-1khulg4.jpg",
+      "relativePath": "public/images/activities/prts-1khulg4.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/0/03/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%86%94%E7%82%89%E2%80%9C%E8%BF%98%E9%AD%82%E2%80%9D%E8%AE%B0_12.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%86%94%E7%82%89%E2%80%9C%E8%BF%98%E9%AD%82%E2%80%9D%E8%AE%B0_12.jpg?v=lveqzdbhbuqwyma7v4tlnqb0irhk020",
+      "contentType": "image/jpeg",
+      "size": 28887,
+      "hash": "4a20bef2bcfb4c7c3649f151989f1608de5ef8654cf991a2c4b00b142b669b1a",
+      "syncedAt": "2026-08-27T10:01:38.358Z"
     },
     "wiki-contingency-contract-underdawn": {
       "publicPath": "/images/activities/wiki-contingency-contract-underdawn.webp",
@@ -3324,13 +3324,13 @@
       "syncedAt": "2026-08-07T13:45:34.031Z"
     },
     "wiki-pinch-out-experimental-operation": {
-      "publicPath": "/images/activities/wiki-pinch-out-experimental-operation.svg",
-      "relativePath": "public/images/activities/wiki-pinch-out-experimental-operation.svg",
-      "sourceUrl": "generated:activity-fallback:v1",
-      "contentType": "image/svg+xml",
-      "size": 846,
-      "hash": "31f7614142b1e6370cb42aab1282b3534eb3a4a04f844237d08c9779e4d1d5f4",
-      "syncedAt": "2026-08-26T20:15:10.990Z"
+      "publicPath": "/images/activities/wiki-pinch-out-experimental-operation.jpg",
+      "relativePath": "public/images/activities/wiki-pinch-out-experimental-operation.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/f/fb/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%9B%9B%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_29.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%9B%9B%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_29.jpg?v=p1x0oeayb8qg41508ayuy9j1v8odt2i",
+      "contentType": "image/jpeg",
+      "size": 36432,
+      "hash": "93f32765107d9eb191bc678e68b886e31d7ec3ff755f3a22ce2a6ed9c257d3e7",
+      "syncedAt": "2026-08-27T10:01:38.599Z"
     },
     "wiki-tactical-support-1": {
       "publicPath": "/images/activities/wiki-tactical-support-1.jpg",
@@ -3563,9 +3563,13 @@
       "syncedAt": "2026-08-07T06:26:15.989Z"
     },
     "wiki-vector-breakthrough-trial-from-misery": {
-      "aliasOf": "wiki-vector-breakthrough-night-of-witchcraft",
-      "sourceUrl": "alias:wiki-vector-breakthrough-night-of-witchcraft",
-      "syncedAt": "2026-08-26T20:15:07.969Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-trial-from-misery.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-trial-from-misery.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg?v=1ncjrzlhhifhfzo59thvyz7ekciq7y3",
+      "contentType": "image/jpeg",
+      "size": 37150,
+      "hash": "87171981eb020a0445ba2b2d555e4ea326ef0545c9ee45df24831bbf4a20ff6f",
+      "syncedAt": "2026-08-27T10:01:36.366Z"
     },
     "wiki-interactive-exhibition": {
       "publicPath": "/images/activities/wiki-interactive-exhibition.jpg",
@@ -3586,9 +3590,22 @@
       "syncedAt": "2026-08-17T13:12:52.580Z"
     },
     "wiki-stronghold-protocol-alliance-part-2": {
-      "aliasOf": "wiki-stronghold-protocol-alliance-2nd-half",
-      "sourceUrl": "alias:wiki-stronghold-protocol-alliance-2nd-half",
-      "syncedAt": "2026-08-26T20:15:07.969Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance-part-2.jpg",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance-part-2.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg?v=t7tdfvs7j0xpzphw620i2iqi4qoh34v",
+      "contentType": "image/jpeg",
+      "size": 29705,
+      "hash": "5221355115c689c96b602f4207a87e3628657becc62c71f788a22356b9443242",
+      "syncedAt": "2026-08-27T10:01:36.023Z"
+    },
+    "prts-f6tcdg": {
+      "publicPath": "/images/activities/prts-f6tcdg.jpg",
+      "relativePath": "public/images/activities/prts-f6tcdg.jpg",
+      "sourceUrl": "https://media.prts.wiki/d/d4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BE%9E%E5%B2%81%E8%A1%8C_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 432667,
+      "hash": "121524b8cb3c3aab55cfd041ce5ecc002389f0f67307440eee0206e5b66480c7",
+      "syncedAt": "2026-08-27T10:01:37.498Z"
     }
   }
 }
