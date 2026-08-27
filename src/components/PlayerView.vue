@@ -95,11 +95,11 @@
             <i class="fas fa-film"></i> {{ t('player.characterEp') }}
           </button>
         </div>
-        <img v-if="visualMode === 'cover' || !characterEp" v-show="playerState.currentSong?.coverDeUrl"
+        <img v-if="(visualMode === 'cover' || !characterEp) && playerState.currentSong?.coverDeUrl"
           :src="proxyImageUrl(playerState.currentSong?.coverDeUrl)" :alt="playerState.currentSong?.name"
           class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
           @error="handleImageError">
-        <div v-else class="character-ep-visual">
+        <div v-else-if="visualMode === 'ep' && characterEp" class="character-ep-visual">
           <div v-if="isYoutubeCharacterEp && playerState.isPlaying" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
           </div>
@@ -618,7 +618,7 @@ const handleImageLoad = (event) => {
 };
 
 const handleImageError = (event) => {
-  console.error('?��??��?失�?:', event.target.src);
+  console.warn('播放器圖片載入失敗:', event.target.currentSrc || event.target.src);
 };
 
 const handleSeek = (event) => {

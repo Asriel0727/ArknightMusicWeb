@@ -70,9 +70,13 @@ function writeRecruitBrowserCache(key, value) {
   }
 }
 
-/** 歌曲詳情記憶體快取（切歌／重播會重複請求同一 cid） */
-const SONG_DETAILS_CACHE_TTL_MS = 45 * 60 * 1000;
+/**
+ * 歌曲詳情記憶體快取。sourceUrl 是官方 API 產生的短期簽名 URL，不能像
+ * 一般歌曲 metadata 一樣長時間保存；保留 1 分鐘只用來合併短時間內的重複請求。
+ */
+const SONG_DETAILS_CACHE_TTL_MS = 60 * 1000;
 const songDetailsCache = new Map();
+const songDetailsRequests = new Map();
 
 /** 歌詞快取鍵版本（路徑修正後需重取，避免舊的「proxy 404 → 空歌詞」快取） */
 const LYRICS_CACHE_KEY_PREFIX = 'v2:';
@@ -193,14 +197,31 @@ export async function fetchSongs() {
  * @returns {Promise<Object>} 歌曲詳情
  */
 export async function fetchSongDetails(songId) {
-  const hit = songDetailsCache.get(songId);
+  const cacheKey = String(songId || '');
+  if (!cacheKey) throw new Error('Song ID is required');
+
+  const hit = songDetailsCache.get(cacheKey);
   if (hit && Date.now() - hit.t < SONG_DETAILS_CACHE_TTL_MS) {
     return transformMusicApiPayload(JSON.parse(JSON.stringify(hit.data)));
   }
-  const response = await fetch(`${API_BASE}/song/${songId}`);
-  if (!response.ok) throw new Error('Network response was not ok');
-  const { data } = await response.json();
-  songDetailsCache.set(songId, { data, t: Date.now() });
+
+  let request = songDetailsRequests.get(cacheKey);
+  if (!request) {
+    request = (async () => {
+      const response = await fetch(`${API_BASE}/song/${encodeURIComponent(cacheKey)}`, {
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error('Network response was not ok');
+      const { data } = await response.json();
+      songDetailsCache.set(cacheKey, { data, t: Date.now() });
+      return data;
+    })().finally(() => {
+      songDetailsRequests.delete(cacheKey);
+    });
+    songDetailsRequests.set(cacheKey, request);
+  }
+
+  const data = await request;
   return transformMusicApiPayload(JSON.parse(JSON.stringify(data)));
 }
 

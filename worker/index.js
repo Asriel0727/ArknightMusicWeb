@@ -12,13 +12,18 @@ const IMAGE_MIRROR_RESOURCE =
 const IMAGE_MIRROR_DYNAMIC =
   'https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts';
 
-const MUSIC_API_ORIGIN = 'https://monstersiren-web-api.vercel.app';
+// Use Monster Siren's official API directly. The old Vercel mirror returned
+// independently signed source URLs that could become stale or be rejected by
+// hycdn even while the official endpoint was issuing a fresh URL.
+const MUSIC_API_ORIGIN = 'https://monster-siren.hypergryph.com';
 const DEFAULT_PUBLIC_API_BASE = 'https://arknights-recruit-api.molly27molly.workers.dev';
 const RECRUIT_OPERATORS_KEY = 'recruit:operators:v3';
 const RECRUIT_CALCULATOR_KEY_PREFIX = 'recruit:calculator:v3:';
 const RECRUIT_OPERATOR_DETAIL_KEY_PREFIX = 'recruit:operator:v4:';
 const RECRUIT_OPERATOR_CATALOG_KEY = 'recruit:operator-catalog:v1';
-const MUSIC_CACHE_PREFIX = 'music:api:v1:';
+// Bump the namespace so stale records created from the third-party mirror are
+// never read after switching to the official API.
+const MUSIC_CACHE_PREFIX = 'music:api:v2:';
 const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-cursor`;
 const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
 const MUSIC_LYRICS_TRANSLATION_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-translation-cursor`;
@@ -118,7 +123,7 @@ const MAX_LYRICS_TRANSLATION_PREWARM_LIMIT = 5;
 const DEFAULT_LYRICS_TRANSLATION_PREWARM_LOCALES = ['zh-TW', 'zh-CN', 'en', 'ja', 'ko'];
 const MUSIC_COLLECTION_MAX_AGE_MS = 60 * 60 * 1000;
 const MUSIC_ALBUM_DETAIL_MAX_AGE_MS = 6 * 60 * 60 * 1000;
-const MUSIC_SONG_DETAIL_MAX_AGE_MS = 10 * 60 * 1000;
+const MUSIC_SONG_DETAIL_MAX_AGE_MS = 60 * 1000;
 
 export default {
   async fetch(request, env, ctx) {
@@ -1745,12 +1750,18 @@ function parseContentRangeTotal(contentRange) {
 
 async function fetchMusicJson(sourcePath) {
   const sourceUrl = `${MUSIC_API_ORIGIN}${sourcePath}`;
-  const response = await fetch(sourceUrl, {
-    cf: {
-      cacheTtl: 900,
-      cacheEverything: true,
-    },
-  });
+  const isSongDetail = /^\/api\/song\//.test(sourcePath);
+  const response = await fetch(
+    sourceUrl,
+    isSongDetail
+      ? { cache: 'no-store' }
+      : {
+        cf: {
+          cacheTtl: 900,
+          cacheEverything: true,
+        },
+      }
+  );
 
   if (!response.ok) {
     throw new Error(`Music API failed: ${response.status} ${sourceUrl}`);
@@ -1893,7 +1904,7 @@ async function getMusicJson(env, key, sourcePath, options = {}) {
   }
 }
 
-async function getMusicSongJson(env, key, sourcePath, ctx = null) {
+async function getMusicSongJson(env, key, sourcePath) {
   const cached = await readSupabaseCache(env, key);
   if (cached?.data && isFreshSupabaseRow(cached, MUSIC_SONG_DETAIL_MAX_AGE_MS)) {
     return {
@@ -1909,24 +1920,25 @@ async function getMusicSongJson(env, key, sourcePath, ctx = null) {
     return fetched;
   };
 
-  if (cached?.data && ctx) {
-    ctx.waitUntil(refresh().catch((error) => {
-      console.warn('Music song cache refresh failed:', key, error.message);
-    }));
+  try {
+    const fetched = await refresh();
+
     return {
-      data: cached.data,
-      source: 'supabase-stale-revalidate',
-      updatedAt: cached.updated_at,
+      data: fetched.data,
+      source: cached?.data ? 'origin-refresh' : 'origin',
+      updatedAt: new Date().toISOString(),
     };
+  } catch (error) {
+    if (cached?.data) {
+      console.warn('Music song cache refresh failed; serving stale metadata:', key, error.message);
+      return {
+        data: cached.data,
+        source: 'supabase-stale',
+        updatedAt: cached.updated_at,
+      };
+    }
+    throw error;
   }
-
-  const fetched = await refresh();
-
-  return {
-    data: fetched.data,
-    source: cached?.data ? 'origin-refresh' : 'origin',
-    updatedAt: new Date().toISOString(),
-  };
 }
 
 function isFreshSupabaseRow(row, maxAgeMs) {
@@ -2543,8 +2555,8 @@ async function handleMusicApiRequest(request, env, url, ctx) {
   const fullSongMatch = url.pathname.match(/^\/api\/song\/([^/]+)\/full$/);
   if (fullSongMatch) {
     const songId = decodeURIComponent(fullSongMatch[1]);
-    const result = await getFullSongJson(request, env, songId, ctx);
-    return json(result.data, 200, 900, {
+    const result = await getFullSongJson(request, env, songId);
+    return json(result.data, 200, 60, {
       'x-data-source': result.source,
       'x-cache-updated-at': result.updatedAt || '',
     });
@@ -2586,10 +2598,9 @@ async function handleMusicApiRequest(request, env, url, ctx) {
     const result = await getMusicSongJson(
       env,
       `${MUSIC_CACHE_PREFIX}song:${songId}`,
-      `/api/song/${encodeURIComponent(songId)}`,
-      ctx
+      `/api/song/${encodeURIComponent(songId)}`
     );
-    return json(result.data, 200, 900, {
+    return json(result.data, 200, 60, {
       'x-data-source': result.source,
       'x-cache-updated-at': result.updatedAt || '',
     });
@@ -2598,13 +2609,12 @@ async function handleMusicApiRequest(request, env, url, ctx) {
   return null;
 }
 
-async function getFullSongJson(request, env, songId, ctx = null) {
+async function getFullSongJson(request, env, songId) {
   const publicApiBase = getPublicApiBase(request, env);
   const songResult = await getMusicSongJson(
     env,
     `${MUSIC_CACHE_PREFIX}song:${songId}`,
-    `/api/song/${encodeURIComponent(songId)}`,
-    ctx
+    `/api/song/${encodeURIComponent(songId)}`
   );
   const song = songResult.data?.data || {};
   let album = null;
@@ -4382,13 +4392,19 @@ async function proxyMusicAsset(request, type) {
     upstreamHeaders.set('accept', 'audio/*,*/*;q=0.8');
   }
 
-  let upstream = await fetch(rawUrl, {
-    headers: upstreamHeaders,
-    cf: {
-      cacheTtl,
-      cacheEverything: true,
-    },
-  });
+  // Do not cache audio subrequests at Cloudflare. hycdn can return a temporary
+  // 403 for a single edge; the old forced six-hour cache then replayed that
+  // rejection to every fallback request from the same edge.
+  const upstreamOptions = type === 'audio'
+    ? { headers: upstreamHeaders, cache: 'no-store' }
+    : {
+      headers: upstreamHeaders,
+      cf: {
+        cacheTtl,
+        cacheEverything: true,
+      },
+    };
+  let upstream = await fetch(rawUrl, upstreamOptions);
 
   // hycdn occasionally rejects edge-origin requests without an application referer.
   // Retry only known transient access failures; the URL allow-list remains unchanged.
@@ -4396,8 +4412,8 @@ async function proxyMusicAsset(request, type) {
     const retryHeaders = new Headers(upstreamHeaders);
     retryHeaders.set('referer', 'https://monster-siren.hypergryph.com/');
     upstream = await fetch(rawUrl, {
+      ...upstreamOptions,
       headers: retryHeaders,
-      cf: { cacheTtl, cacheEverything: true },
     });
   }
 

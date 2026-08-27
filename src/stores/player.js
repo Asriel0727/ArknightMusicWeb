@@ -2,7 +2,6 @@ import { reactive } from 'vue';
 import { i18n } from '../i18n/index.js';
 import {
   fetchAlbumDetails,
-  fetchFullSongDetails,
   fetchLyrics,
   fetchSongDetails,
   getProxyAudioUrl,
@@ -19,8 +18,8 @@ function getCurrentLocale() {
 
 let lyricLoadToken = 0;
 let lyricTranslationToken = 0;
+let audioLoadToken = 0;
 let lyricsTranslationPluginPromise = null;
-const masterSongDetailsPromises = new Map();
 const PLAY_MODES = ['repeat-all', 'repeat-one', 'shuffle'];
 const PLAYER_VOLUME_STORAGE_KEY = 'arknight-music-player-volume';
 
@@ -39,25 +38,6 @@ function persistVolume(volume) {
   } catch {
     // Storage can be unavailable in private or restricted browser contexts.
   }
-}
-
-async function fetchMasterSongDetails(songId) {
-  if (!masterSongDetailsPromises.has(songId)) {
-    const promise = fetchFullSongDetails(songId)
-      .then((fullSong) => ({
-        ...fullSong.song,
-        album: fullSong.album,
-        preloadedLyrics: fullSong.lyrics,
-        assets: fullSong.assets,
-      }))
-      .catch(() => fetchSongDetails(songId))
-      .finally(() => {
-        masterSongDetailsPromises.delete(songId);
-      });
-    masterSongDetailsPromises.set(songId, promise);
-  }
-
-  return masterSongDetailsPromises.get(songId);
 }
 
 async function loadLyricsTranslationPlugin() {
@@ -95,6 +75,72 @@ function resetPlaybackProgress() {
 
   playerState.audioPlayer.pause();
   playerState.audioPlayer.currentTime = 0;
+}
+
+function hydrateCurrentSongAlbum(songId, albumCid) {
+  if (!songId || !albumCid) {
+    return;
+  }
+
+  fetchAlbumDetails(albumCid)
+    .then((albumDetails) => {
+      const currentSong = playerState.currentSong;
+      if (!currentSong || currentSong.cid !== songId) {
+        return;
+      }
+
+      const coverPatch = {
+        album: albumDetails,
+        artistes: currentSong.artistes || albumDetails.artistes || [unknownArtistLabel()],
+        coverUrl: currentSong.coverUrl || albumDetails.coverUrl,
+        coverDeUrl: currentSong.coverDeUrl || albumDetails.coverDeUrl,
+        albumCid,
+      };
+      Object.assign(currentSong, coverPatch);
+
+      const playlistSong = playerState.currentPlaylist[playerState.currentSongIndex];
+      if (playlistSong?.cid === songId) {
+        Object.assign(playlistSong, coverPatch);
+      }
+    })
+    .catch((error) => {
+      console.warn(`Album ${albumCid} hydration failed:`, error);
+    });
+}
+
+async function playOfficialAudio(audioElement, song, expectedAudioLoadToken) {
+  const attempts = [
+    { source: 'official', url: song.audioUrl },
+    { source: 'proxy', url: song.fallbackAudioUrl },
+  ].filter((attempt, index, list) => attempt.url && list.findIndex((item) => item.url === attempt.url) === index);
+
+  let lastError = null;
+  for (const attempt of attempts) {
+    if (expectedAudioLoadToken !== audioLoadToken) {
+      return;
+    }
+
+    try {
+      audioElement.src = attempt.url;
+      audioElement.load();
+      await audioElement.play();
+      song.isUsingAudioFallback = attempt.source.startsWith('proxy');
+      return;
+    } catch (error) {
+      lastError = error;
+      console.warn('Audio playback attempt failed', {
+        cid: song.cid,
+        source: attempt.source,
+        error: error?.name || 'UnknownError',
+      });
+      audioElement.pause();
+      audioElement.removeAttribute('src');
+      audioElement.load();
+      playerState.isPlaying = false;
+    }
+  }
+
+  throw lastError || new Error('No playable audio source');
 }
 
 function getRandomSongIndex() {
@@ -221,6 +267,7 @@ export function initAudioPlayer(audioElement) {
 
     audioElement.addEventListener('error', () => {
       const mediaError = audioElement.error;
+      playerState.isPlaying = false;
       console.error('音源載入失敗', {
         cid: playerState.currentSong?.cid || '',
         source: audioElement.currentSrc || audioElement.src || '',
@@ -233,8 +280,9 @@ export function initAudioPlayer(audioElement) {
   }
 }
 
-// 播放歌曲（音訊優先：不等待歌詞；已有 sourceUrl 時不重複請求詳情）
+// 播放歌曲（音訊優先：不等待歌詞；播放前重新取得短效簽名音源）
 export async function playSong(song, coverUrl, coverDeUrl) {
+  const currentAudioLoadToken = ++audioLoadToken;
   playerState.isLoadingSong = true;
   playerState.lyricTranslationError = '';
   try {
@@ -244,8 +292,20 @@ export async function playSong(song, coverUrl, coverDeUrl) {
     lyricTranslationToken += 1;
 
     let songDetails = song;
-    if (!song.sourceUrl) {
-      songDetails = await fetchSongDetails(song.cid);
+    if (song?.cid) {
+      try {
+        // Album detail 可能來自 sessionStorage，裡面的 sourceUrl 會在一段時間後過期。
+        // fetchSongDetails 只有 1 分鐘記憶體快取，因此不會重複打近期請求，
+        // 但能確保真正播放時使用官方最新簽名 URL。
+        songDetails = await fetchSongDetails(song.cid);
+      } catch (error) {
+        // 若網路暫時中斷，仍允許已有音源的歌曲嘗試播放一次。
+        if (!song.sourceUrl) throw error;
+        console.warn('Fresh song URL unavailable; trying existing source URL:', {
+          cid: song.cid,
+          error: error?.message || 'Unknown error',
+        });
+      }
     }
 
     const fullSong = {
@@ -253,8 +313,8 @@ export async function playSong(song, coverUrl, coverDeUrl) {
       artistes: song.artistes || songDetails.artistes || [unknownArtistLabel()],
       coverUrl: coverUrl || song.coverUrl || songDetails.coverUrl,
       coverDeUrl: coverDeUrl || song.coverDeUrl || songDetails.coverDeUrl,
-      // hycdn accepts browser playback directly, while its access to Cloudflare
-      // Worker egress is unreliable. Keep the proxy as a fallback only.
+      // Monster Siren's official audio URL remains the primary source; the proxy
+      // is only a single fallback for browsers that cannot load it directly.
       audioUrl: songDetails.sourceUrl || '',
       fallbackAudioUrl: getProxyAudioUrl(songDetails.sourceUrl || ''),
       albumCid: song.albumCid || songDetails.albumCid
@@ -312,31 +372,14 @@ export async function playSong(song, coverUrl, coverDeUrl) {
     playerState.isLoadingSong = false;
 
     if (playerState.audioPlayer && fullSong.audioUrl) {
-      playerState.audioPlayer.src = fullSong.audioUrl;
-      playerState.audioPlayer.load();
-      try {
-        await playerState.audioPlayer.play();
-      } catch (error) {
-        const canUseProxyFallback = error?.name === 'NotSupportedError'
-          && fullSong.fallbackAudioUrl
-          && fullSong.fallbackAudioUrl !== fullSong.audioUrl;
-        if (!canUseProxyFallback) {
-          throw error;
-        }
-
-        console.warn('Direct audio playback failed; retrying via proxy:', fullSong.cid);
-        fullSong.isUsingAudioFallback = true;
-        playerState.audioPlayer.src = fullSong.fallbackAudioUrl;
-        playerState.audioPlayer.load();
-        await playerState.audioPlayer.play();
-      }
+      await playOfficialAudio(playerState.audioPlayer, fullSong, currentAudioLoadToken);
     }
 
     // 預熱下一首詳情（不打斷播放，方便連續切歌）
     const nextIdx = playerState.currentSongIndex + 1;
     if (nextIdx < playerState.currentPlaylist.length) {
       const nextSong = playerState.currentPlaylist[nextIdx];
-      if (nextSong?.cid && !nextSong.sourceUrl) {
+      if (nextSong?.cid) {
         fetchSongDetails(nextSong.cid).catch(() => {});
       }
     }
@@ -425,20 +468,20 @@ export async function playSongFromAlbum(index, albumId) {
 export async function playSongFromMasterList(song) {
   playerState.isLoadingSong = true;
   try {
-    const songDetails = await fetchMasterSongDetails(song.cid);
-    const albumDetailsFromFull = songDetails.album || null;
-    const albumCid = songDetails.albumCid || albumDetailsFromFull?.cid;
+    const songDetails = await fetchSongDetails(song.cid);
+    const albumCid = songDetails.albumCid || song.albumCid || song.album?.cid;
     if (!albumCid) {
       console.error('歌曲沒有專輯ID');
       return;
     }
 
     const songToPlay = {
+      ...song,
       ...songDetails,
       artistes: songDetails.artistes || song.artistes || [unknownArtistLabel()],
-      coverUrl: song.coverUrl || albumDetailsFromFull?.coverUrl || songDetails.coverUrl,
-      coverDeUrl: song.coverDeUrl || albumDetailsFromFull?.coverDeUrl || songDetails.coverDeUrl,
-      album: albumDetailsFromFull || songDetails.album || song.album || null,
+      coverUrl: song.coverUrl || songDetails.coverUrl,
+      coverDeUrl: song.coverDeUrl || songDetails.coverDeUrl,
+      album: song.album || null,
       albumCid
     };
 
@@ -446,33 +489,7 @@ export async function playSongFromMasterList(song) {
     playerState.currentSongIndex = 0;
     playerState.sourceContext = { type: 'song', albumCid };
     await playSong(songToPlay, songToPlay.coverUrl, songToPlay.coverDeUrl);
-
-    const albumDetailsPromise = albumDetailsFromFull
-      ? Promise.resolve(albumDetailsFromFull)
-      : fetchAlbumDetails(albumCid);
-
-    albumDetailsPromise
-      .then((albumDetails) => {
-        const currentSong = playerState.currentSong;
-        if (!currentSong || currentSong.cid !== song.cid) {
-          return;
-        }
-
-        const coverPatch = {
-          artistes: currentSong.artistes || albumDetails.artistes || song.artistes || [unknownArtistLabel()],
-          coverUrl: albumDetails.coverUrl,
-          coverDeUrl: albumDetails.coverDeUrl,
-          albumCid
-        };
-
-        Object.assign(currentSong, coverPatch);
-        if (playerState.currentPlaylist[0]?.cid === song.cid) {
-          Object.assign(playerState.currentPlaylist[0], coverPatch);
-        }
-      })
-      .catch((error) => {
-        console.warn(`?剜撠摩 ${albumCid} 閰單?憭望?:`, error);
-      });
+    hydrateCurrentSongAlbum(song.cid, albumCid);
   } catch (error) {
     console.error(`播放歌曲 ${song.cid} 時出錯:`, error);
   }
@@ -491,17 +508,16 @@ export async function playSongQueueFromMasterList(songs, startIndex = 0, sourceC
   const selectedSong = queue[safeStartIndex];
 
   try {
-    const songDetails = await fetchMasterSongDetails(selectedSong.cid);
-    const albumDetailsFromFull = songDetails.album || selectedSong.album || null;
-    const albumCid = songDetails.albumCid || selectedSong.albumCid || albumDetailsFromFull?.cid;
+    const songDetails = await fetchSongDetails(selectedSong.cid);
+    const albumCid = songDetails.albumCid || selectedSong.albumCid || selectedSong.album?.cid;
 
     const songToPlay = {
       ...selectedSong,
       ...songDetails,
-      artistes: songDetails.artistes || selectedSong.artistes || albumDetailsFromFull?.artistes || [unknownArtistLabel()],
-      coverUrl: selectedSong.coverUrl || songDetails.coverUrl || albumDetailsFromFull?.coverUrl,
-      coverDeUrl: selectedSong.coverDeUrl || songDetails.coverDeUrl || albumDetailsFromFull?.coverDeUrl,
-      album: albumDetailsFromFull || songDetails.album || null,
+      artistes: songDetails.artistes || selectedSong.artistes || [unknownArtistLabel()],
+      coverUrl: selectedSong.coverUrl || songDetails.coverUrl,
+      coverDeUrl: selectedSong.coverDeUrl || songDetails.coverDeUrl,
+      album: selectedSong.album || null,
       albumCid,
     };
 
@@ -510,6 +526,7 @@ export async function playSongQueueFromMasterList(songs, startIndex = 0, sourceC
     playerState.currentSongIndex = safeStartIndex;
     playerState.sourceContext = sourceContext || { type: 'queue' };
     await playSong(songToPlay, songToPlay.coverUrl, songToPlay.coverDeUrl);
+    hydrateCurrentSongAlbum(selectedSong.cid, albumCid);
   } catch (error) {
     console.error(`播放歌曲佇列 ${selectedSong.cid} 時出錯:`, error);
   }
@@ -518,7 +535,7 @@ export async function playSongQueueFromMasterList(songs, startIndex = 0, sourceC
 // 播放控制
 export function prefetchSongFromMasterList(song) {
   if (!song?.cid) return;
-  fetchMasterSongDetails(song.cid).catch(() => {});
+  fetchSongDetails(song.cid).catch(() => {});
 }
 
 export function togglePlay() {
