@@ -10,7 +10,24 @@ function cleanText(value) {
  * less brittle than relying on the position of a year section.
  */
 export async function getPrtsCharacterEpEntries(page) {
-  await page.goto(PRTS_MUSIC_URL, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+  let loaded = false;
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      // PRTS can keep non-essential scripts open long after its server-rendered
+      // table is available. Waiting for `domcontentloaded` makes a successful
+      // data response look like a failed sync on GitHub-hosted runners.
+      const response = await page.goto(PRTS_MUSIC_URL, { waitUntil: 'commit', timeout: 90_000 });
+      if (!response?.ok()) throw new Error(`PRTS music page returned ${response?.status() || 'no response'}`);
+      await page.locator('table').first().waitFor({ state: 'attached', timeout: 30_000 });
+      loaded = true;
+      break;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) await page.waitForTimeout(attempt * 2_000);
+    }
+  }
+  if (!loaded) throw new Error(`PRTS music page could not be loaded after 3 attempts: ${lastError?.message || 'unknown error'}`);
 
   return page.locator('table').evaluateAll((tables) => {
     const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
