@@ -62,12 +62,13 @@ function decodeHtml(value) {
     .replace(/&quot;/gi, '"');
 }
 
-async function getBilibiliVideoFromPrtsPage(request, entry) {
+async function getBilibiliVideoFromPrtsPage(page, entry) {
   if (!entry.songPageUrl) return null;
 
-  const response = await request.get(entry.songPageUrl);
-  if (!response.ok()) throw new Error(`PRTS song page request failed: ${response.status()}`);
-  const html = decodeHtml(await response.text());
+  const response = await page.goto(entry.songPageUrl, { waitUntil: 'commit', timeout: 60_000 });
+  if (!response?.ok()) throw new Error(`PRTS song page request failed: ${response?.status() || 'no response'}`);
+  await page.locator('body').waitFor({ state: 'attached', timeout: 30_000 });
+  const html = decodeHtml(await page.content());
   const iframeUrl = html.match(/(?:https?:)?\/\/player\.bilibili\.com\/player\.html\?[^"'<>\s]+/i)?.[0];
   if (!iframeUrl) return null;
 
@@ -114,6 +115,10 @@ try {
     locale: 'zh-CN',
     viewport: { width: 1440, height: 1100 },
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    extraHTTPHeaders: {
+      referer: 'https://prts.wiki/',
+      'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+    },
   });
   const page = await context.newPage();
   const [prtsEntries, songs, existingVideos] = await Promise.all([
@@ -121,11 +126,14 @@ try {
     getSupabaseRows('music_songs', 'select=id,name&limit=2000'),
     getSupabaseRows('music_character_ep_videos', 'select=bvid,song_id,is_visible,match_score,author_mid,raw&limit=2000'),
   ]);
-  const prtsVideoResults = await mapWithConcurrency(prtsEntries, 6, async (entry) => {
+  const prtsVideoResults = await mapWithConcurrency(prtsEntries, 2, async (entry) => {
+    const detailPage = await context.newPage();
     try {
-      return { entry, video: await getBilibiliVideoFromPrtsPage(context.request, entry) };
+      return { entry, video: await getBilibiliVideoFromPrtsPage(detailPage, entry) };
     } catch (error) {
       return { entry, error: error.message };
+    } finally {
+      await detailPage.close();
     }
   });
   const existingByBvid = new Map(existingVideos.map((video) => [String(video.bvid), video]));
