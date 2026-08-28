@@ -491,7 +491,7 @@ const characterEpIframeSrc = computed(() => {
   }
 
   const params = new URLSearchParams({
-    bvid: videoId,
+    [/^\d+$/.test(videoId) ? 'aid' : 'bvid']: videoId,
     autoplay: '1',
     muted: '1',
     danmaku: '0',

@@ -1,33 +1,18 @@
 import { chromium } from 'playwright';
-import { createHash } from 'node:crypto';
 import { findSongMatch, normalizeMatchText } from './character-ep-matching.mjs';
 import { getPrtsCharacterEpEntries } from './prts-character-ep-source.mjs';
 
-const sourceUid = String(process.env.BILIBILI_EP_SOURCE_UID || '161775300').trim();
-const sessdata = String(process.env.BILIBILI_SESSDATA || '');
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '');
 const applyChanges = process.argv.includes('--apply');
-const sourceKey = `bilibili:${sourceUid}`;
+const sourceKey = 'prts:music';
 
-if (!/^\d+$/.test(sourceUid)) throw new Error('BILIBILI_EP_SOURCE_UID must be numeric.');
 if (!supabaseUrl || !supabaseServiceRoleKey) {
   throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.');
 }
 
-const mixinKeyEncTab = [
-  46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35,
-  27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13,
-  37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4,
-  22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52,
-];
-
-function getMixinKey(imageKey, subKey) {
-  return mixinKeyEncTab.map((index) => `${imageKey}${subKey}`[index]).join('').slice(0, 32);
-}
-
 function isManualMatch(video) {
-  return ['manual', 'prts'].includes(video?.raw?.matchSource);
+  return video?.raw?.matchSource === 'manual';
 }
 
 async function getSupabaseRows(table, query) {
@@ -69,51 +54,48 @@ async function hideStaleVideos(videoIds) {
   if (!response.ok) throw new Error(`Supabase stale Character EP hide failed: ${response.status} ${await response.text()}`);
 }
 
-async function getBilibiliVideos(page) {
-  const navResponse = await page.request.get('https://api.bilibili.com/x/web-interface/nav');
-  if (!navResponse.ok()) throw new Error(`Bilibili nav API failed: ${navResponse.status()}`);
-  const nav = await navResponse.json();
-  const imageKey = nav?.data?.wbi_img?.img_url?.split('/').pop()?.split('.')[0] || '';
-  const subKey = nav?.data?.wbi_img?.sub_url?.split('/').pop()?.split('.')[0] || '';
-  if (!imageKey || !subKey) throw new Error('Bilibili nav API did not provide WBI signing keys.');
+function decodeHtml(value) {
+  return String(value || '')
+    .replace(/&amp;/gi, '&')
+    .replace(/&#x2F;/gi, '/')
+    .replace(/&#39;/gi, "'")
+    .replace(/&quot;/gi, '"');
+}
 
-  const videos = [];
-  let pageNumber = 1;
-  let pageCount = 1;
-  do {
-    const params = new URLSearchParams({
-      mid: sourceUid,
-      ps: '100',
-      pn: String(pageNumber),
-      order: 'pubdate',
-      platform: 'web',
-      web_location: '1550101',
-      wts: String(Math.floor(Date.now() / 1000)),
-    });
-    const query = [...params.entries()]
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value.replace(/[!'()*]/g, ''))}`)
-      .join('&');
-    params.set('w_rid', createHash('md5').update(`${query}${getMixinKey(imageKey, subKey)}`).digest('hex'));
+async function getBilibiliVideoFromPrtsPage(request, entry) {
+  if (!entry.songPageUrl) return null;
 
-    const response = await page.request.get(`https://api.bilibili.com/x/space/wbi/arc/search?${params}`);
-    if (!response.ok()) throw new Error(`Bilibili video API failed: ${response.status()}`);
-    const payload = await response.json();
-    if (payload?.code !== 0) throw new Error(`Bilibili video API returned ${payload?.code}: ${payload?.message || 'unknown error'}`);
+  const response = await request.get(entry.songPageUrl);
+  if (!response.ok()) throw new Error(`PRTS song page request failed: ${response.status()}`);
+  const html = decodeHtml(await response.text());
+  const iframeUrl = html.match(/(?:https?:)?\/\/player\.bilibili\.com\/player\.html\?[^"'<>\s]+/i)?.[0];
+  if (!iframeUrl) return null;
 
-    const list = payload?.data?.list?.vlist || [];
-    videos.push(...list.map((video) => ({
-      bvid: video.bvid,
-      title: video.title || '',
-      coverUrl: video.pic || '',
-      publishedAt: video.created ? new Date(video.created * 1000).toISOString() : null,
-    })).filter((video) => video.bvid));
-    // Bilibili's `count` is the total video count, not the number of pages.
-    pageCount = Math.max(1, Math.ceil(Number(payload?.data?.page?.count || 0) / 100));
-    pageNumber += 1;
-  } while (pageNumber <= pageCount);
+  const playerUrl = new URL(iframeUrl.startsWith('//') ? `https:${iframeUrl}` : iframeUrl);
+  const bvid = playerUrl.searchParams.get('bvid') || '';
+  const aid = playerUrl.searchParams.get('aid') || '';
+  const videoId = bvid || aid;
+  if (!videoId) return null;
 
-  return videos;
+  return {
+    videoId,
+    videoIdType: bvid ? 'bvid' : 'aid',
+    sourceUrl: `https://www.bilibili.com/video/${bvid || `av${aid}`}/`,
+  };
+}
+
+async function mapWithConcurrency(items, limit, callback) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await callback(items[index]);
+    }
+  });
+  await Promise.all(workers);
+  return results;
 }
 
 function findExactSongForPrtsEntry(entry, songs) {
@@ -126,23 +108,6 @@ function findExactSongForPrtsEntry(entry, songs) {
   return best?.score === 100 ? best : null;
 }
 
-function findBilibiliVideoForPrtsEntry(entry, videos) {
-  const variants = entry.titles.map(normalizeMatchText).filter((title) => title.length >= 2);
-  const candidates = videos.map((video) => {
-    const normalizedVideo = normalizeMatchText(video.title);
-    const score = Math.max(...variants.map((title) => {
-      if (title === normalizedVideo) return 100;
-      return normalizedVideo.includes(title) || title.includes(normalizedVideo) ? 96 : 0;
-    }));
-    return { video, score };
-  }).filter((candidate) => candidate.score >= 96);
-
-  candidates.sort((left, right) => (
-    right.score - left.score || String(right.video.publishedAt || '').localeCompare(String(left.video.publishedAt || ''))
-  ));
-  return candidates[0] || null;
-}
-
 const browser = await chromium.launch({ headless: true });
 try {
   const context = await browser.newContext({
@@ -150,53 +115,60 @@ try {
     viewport: { width: 1440, height: 1100 },
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
   });
-  if (sessdata) {
-    await context.addCookies([{ name: 'SESSDATA', value: sessdata, domain: '.bilibili.com', path: '/', secure: true }]);
-  }
-
   const page = await context.newPage();
-  const [prtsEntries, videos, songs, existingVideos] = await Promise.all([
+  const [prtsEntries, songs, existingVideos] = await Promise.all([
     getPrtsCharacterEpEntries(page),
-    getBilibiliVideos(page),
     getSupabaseRows('music_songs', 'select=id,name&limit=2000'),
     getSupabaseRows('music_character_ep_videos', 'select=bvid,song_id,is_visible,match_score,author_mid,raw&limit=2000'),
   ]);
+  const prtsVideoResults = await mapWithConcurrency(prtsEntries, 6, async (entry) => {
+    try {
+      return { entry, video: await getBilibiliVideoFromPrtsPage(context.request, entry) };
+    } catch (error) {
+      return { entry, error: error.message };
+    }
+  });
   const existingByBvid = new Map(existingVideos.map((video) => [String(video.bvid), video]));
   const unmatchedSongs = [];
   const unmatchedVideos = [];
+  const prtsPageFailures = [];
   const rows = [];
 
-  for (const entry of prtsEntries) {
+  for (const result of prtsVideoResults) {
+    const { entry, video } = result;
+    if (result.error) {
+      prtsPageFailures.push({ ...entry, error: result.error });
+      continue;
+    }
     const song = findExactSongForPrtsEntry(entry, songs);
     if (!song) {
       unmatchedSongs.push(entry);
       continue;
     }
-    const videoMatch = findBilibiliVideoForPrtsEntry(entry, videos);
-    if (!videoMatch) {
+    if (!video) {
       unmatchedVideos.push({ ...entry, song });
       continue;
     }
-    const existing = existingByBvid.get(videoMatch.video.bvid);
+    const existing = existingByBvid.get(video.videoId);
     const shouldPreserveManualMatch = isManualMatch(existing) && existing?.song_id && String(existing.song_id) !== song.songId;
     rows.push({
-      id: `bili:${videoMatch.video.bvid}`,
-      bvid: videoMatch.video.bvid,
+      id: `prts:bili:${video.videoIdType}:${video.videoId}`,
+      bvid: video.videoId,
       song_id: shouldPreserveManualMatch ? existing.song_id : song.songId,
-      title: videoMatch.video.title,
-      cover_url: videoMatch.video.coverUrl || null,
+      title: entry.titleText,
+      cover_url: null,
       author_mid: sourceKey,
-      source_url: `https://www.bilibili.com/video/${videoMatch.video.bvid}/`,
+      source_url: video.sourceUrl,
       is_visible: shouldPreserveManualMatch ? existing.is_visible : true,
-      match_score: shouldPreserveManualMatch ? existing.match_score || 100 : videoMatch.score,
+      match_score: shouldPreserveManualMatch ? existing.match_score || 100 : 100,
       raw: {
-        ...videoMatch.video,
         platform: 'bilibili',
         matchSource: 'prts',
-        prts: { titleText: entry.titleText, titles: entry.titles, mvCharacters: entry.mvCharacters },
+        prts: { titleText: entry.titleText, titles: entry.titles, mvCharacters: entry.mvCharacters, songPageUrl: entry.songPageUrl },
+        videoIdType: video.videoIdType,
       },
       updated_at: new Date().toISOString(),
-      published_at: videoMatch.video.publishedAt,
+      published_at: new Date().toISOString(),
     });
   }
 
@@ -208,19 +180,19 @@ try {
   console.log(JSON.stringify({
     mode: applyChanges ? 'apply' : 'dry-run',
     writesPerformed: applyChanges,
-    source: 'PRTS MV角色 → Bilibili official uploader',
+    source: 'PRTS MV角色 → PRTS song-page Bilibili iframe',
     prtsCharacterEntries: prtsEntries.length,
-    bilibiliVideosScanned: videos.length,
     matchedVideos: rows.length,
     unmatchedPrtsSongs: unmatchedSongs,
     prtsSongsWithoutBilibiliVideo: unmatchedVideos,
-    staleBilibiliRows: staleAutoVideoIds,
+    prtsPageFailures,
+    stalePrtsRows: staleAutoVideoIds,
   }, null, 2));
 
   if (applyChanges) {
     await upsertVideos(rows);
     await hideStaleVideos(staleAutoVideoIds);
-    console.log(`Applied ${rows.length} PRTS/Bilibili Character EP rows and hid ${staleAutoVideoIds.length} stale automatic Bilibili rows.`);
+    console.log(`Applied ${rows.length} PRTS/Bilibili Character EP rows and hid ${staleAutoVideoIds.length} stale automatic PRTS rows.`);
   }
 } finally {
   await browser.close();

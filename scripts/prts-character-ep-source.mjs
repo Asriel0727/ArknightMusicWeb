@@ -33,6 +33,15 @@ export async function getPrtsCharacterEpEntries(page) {
 
         const titleCell = cells[titleIndex];
         const titleText = clean(titleCell.textContent);
+        const songPageUrl = [...titleCell.querySelectorAll('a')]
+          .map((link) => link.href)
+          .find((href) => {
+            try {
+              return new URL(href).pathname.startsWith('/w/');
+            } catch {
+              return false;
+            }
+          }) || '';
         const titles = [...new Set([
           titleText,
           ...[...titleCell.querySelectorAll('a')].map((link) => clean(link.textContent)),
@@ -40,7 +49,7 @@ export async function getPrtsCharacterEpEntries(page) {
         ].filter((title) => title.length >= 2))];
         if (!titles.length) continue;
 
-        entries.push({ titleText, titles, mvCharacters });
+        entries.push({ titleText, titles, mvCharacters, songPageUrl });
       }
     }
 

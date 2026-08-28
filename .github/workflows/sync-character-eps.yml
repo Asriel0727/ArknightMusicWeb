@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'dry-run only reads PRTS character-MV mappings; apply writes Bilibili mappings'
+        description: 'dry-run only reads PRTS character-MV mappings and their embedded Bilibili players; apply writes mappings'
         required: true
         default: dry-run
         type: choice
@@ -29,8 +29,6 @@ jobs:
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      BILIBILI_EP_SOURCE_UID: ${{ vars.BILIBILI_EP_SOURCE_UID }}
-      BILIBILI_SESSDATA: ${{ secrets.BILIBILI_SESSDATA }}
     steps:
       # 角色 EP 同步不需要 repository 中的大型圖片資產；只取執行腳本與套件鎖檔，避免 checkout 卡住。
       - uses: actions/checkout@v4
@@ -49,7 +47,7 @@ jobs:
       - run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Reconcile PRTS Character EP and Bilibili video matching
+      - name: Reconcile PRTS Character EP and embedded Bilibili video mapping
         run: |
           if [ "${{ inputs.mode || 'dry-run' }}" = "apply" ]; then
             npm run character-eps:apply

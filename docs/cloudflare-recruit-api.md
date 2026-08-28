@@ -206,27 +206,25 @@ create index if not exists music_character_ep_videos_song_id_idx
 ```
 
 The table stores only public metadata and a platform video ID. Character-MV eligibility is read
-from PRTS's EP table (`MV角色` column), then matched to the official Bilibili uploader. The frontend
-embeds Bilibili's own player; this project does not download or proxy any video stream.
+from PRTS's EP table (`MV角色` column), then read from each PRTS song page's embedded Bilibili player.
+The frontend embeds Bilibili's own player; this project does not download or proxy any video stream.
 
 ## GitHub Action Character EP sync
 
 [`sync-character-eps.yml`](../.github/workflows/sync-character-eps.yml) runs every day at
 02:40 Asia/Taipei and can also be started from the **Actions** tab with **Run workflow**. It reads
-the PRTS EP `MV角色` table as the allow-list and finds the corresponding official Bilibili videos.
+the PRTS EP `MV角色` table as the allow-list and reads each song page's embedded Bilibili player.
 
 Add these repository secrets before running it:
 
 ```txt
 SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY
-BILIBILI_SESSDATA
 ```
 
-`BILIBILI_SESSDATA` is optional but recommended. Set it as a repository secret containing the
-`SESSDATA` cookie value from a Bilibili browser session you own; it is never committed or logged.
-Without it, Bilibili may return a `412` anti-abuse response to GitHub-hosted runners. To monitor a
-different uploader, set `BILIBILI_EP_SOURCE_UID` as a repository variable; it defaults to `161775300`.
+No Bilibili cookie, uploader ID, or Bilibili catalog API is required. If PRTS changes a song page
+or temporarily removes an embedded player, the dry-run report lists that row without writing a
+guessed mapping.
 
 `music_cache` keeps the original API payload for fallback. `music_albums` and `music_songs`
 store queryable, normalized data for your own database.
