@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30T12:03:23.418Z",
+  "generatedAt": "2026-08-30T16:49:37.020Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -120,13 +120,13 @@
       "syncedAt": "2026-07-17T03:49:54.718Z"
     },
     "wiki-critical-phase-transition": {
-      "publicPath": "/images/activities/wiki-critical-phase-transition.jpg",
-      "relativePath": "public/images/activities/wiki-critical-phase-transition.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/fa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%B8%83%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 300849,
-      "hash": "5c780614bf405e1b1f478e8b08680776f49361e9fd889c1b71423941814098cf",
-      "syncedAt": "2026-08-30T12:03:21.937Z"
+      "publicPath": "/images/activities/wiki-critical-phase-transition.webp",
+      "relativePath": "public/images/activities/wiki-critical-phase-transition.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Critical_Phase_Transition_banner.png?ad1099",
+      "contentType": "image/webp",
+      "size": 897002,
+      "hash": "20b351dda8bbcd3177410533a397d01331e8bc251e4823ae2fff96ff2e967364",
+      "syncedAt": "2026-08-30T16:49:31.370Z"
     },
     "prts-4ig3b4": {
       "publicPath": "/images/activities/prts-4ig3b4.jpg",
@@ -174,13 +174,13 @@
       "syncedAt": "2026-07-17T03:49:56.715Z"
     },
     "wiki-people-a-people": {
-      "publicPath": "/images/activities/wiki-people-a-people.jpg",
-      "relativePath": "public/images/activities/wiki-people-a-people.jpg",
-      "sourceUrl": "https://media.prts.wiki/a/a7/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%BA%BA%E4%BB%AC%EF%BC%8C%E6%88%91%E4%BB%AC_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 285012,
-      "hash": "8a53b4040abf3f805c793e0beac84f3b3de40a4c84f93eeacc3dcfa18413a82f",
-      "syncedAt": "2026-08-30T12:03:22.469Z"
+      "publicPath": "/images/activities/wiki-people-a-people.webp",
+      "relativePath": "public/images/activities/wiki-people-a-people.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_People%2C_A_People_banner.png?f1791f",
+      "contentType": "image/webp",
+      "size": 772342,
+      "hash": "69c4267e939619e37897883de8cb78daf8bc63baf034e51ee673b696095a7d87",
+      "syncedAt": "2026-08-30T16:49:31.404Z"
     },
     "prts-11g20zq": {
       "publicPath": "/images/activities/prts-11g20zq.png",
@@ -327,13 +327,13 @@
       "syncedAt": "2026-07-17T03:50:01.170Z"
     },
     "wiki-unrealized-realities": {
-      "publicPath": "/images/activities/wiki-unrealized-realities.jpg",
-      "relativePath": "public/images/activities/wiki-unrealized-realities.jpg",
-      "sourceUrl": "https://media.prts.wiki/d/de/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%9C%AA%E8%AE%B8%E4%B9%8B%E5%9C%B0_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 406684,
-      "hash": "d855af4d55d51b62e770c483e9ef340900e7a248bf76a38ebc20f839ac3de174",
-      "syncedAt": "2026-08-29T07:13:14.066Z"
+      "publicPath": "/images/activities/wiki-unrealized-realities.webp",
+      "relativePath": "public/images/activities/wiki-unrealized-realities.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Unrealized_Realities_banner.png?9f9744",
+      "contentType": "image/webp",
+      "size": 1007610,
+      "hash": "c9a3275c6d2f29cb4e43408dca9b93b50cc448b59c5bb6ac81f31b6fa7112741",
+      "syncedAt": "2026-08-30T16:49:31.430Z"
     },
     "prts-1azz97l": {
       "publicPath": "/images/activities/prts-1azz97l.jpg",
@@ -363,13 +363,13 @@
       "syncedAt": "2026-07-17T03:50:02.478Z"
     },
     "wiki-stronghold-protocol-alliance": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "sourceUrl": "https://media.prts.wiki/e/e7/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_29.jpg",
-      "contentType": "image/jpeg",
-      "size": 290757,
-      "hash": "cf1449fc689ffda9ab47b9aedb44c90cc51ee8c3c2ecf48e6beee6335f7286a3",
-      "syncedAt": "2026-08-29T07:13:14.590Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.webp",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_Alliance_banner.png?effa5d",
+      "contentType": "image/webp",
+      "size": 746486,
+      "hash": "851dc9dd47c446a5f2a8134f0e1e197a0b20c2e630c4b167cc7263772fd82703",
+      "syncedAt": "2026-08-30T16:49:31.453Z"
     },
     "prts-8669y1": {
       "publicPath": "/images/activities/prts-8669y1.jpg",
@@ -3261,22 +3261,22 @@
       "syncedAt": "2026-08-30T12:03:23.418Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.webp",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ending_a_Grand_Overture_banner.png?e80c0c",
-      "contentType": "image/webp",
-      "size": 847718,
-      "hash": "4527335cd9b23ecc2df1c83a0b12bd3fb37fbb4d745804e14b6c46f17110a11f",
-      "syncedAt": "2026-08-29T07:13:15.606Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
+      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 280529,
+      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
+      "syncedAt": "2026-08-30T16:49:36.174Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.webp",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
-      "contentType": "image/webp",
-      "size": 704954,
-      "hash": "d4f64bc65b796d6e53f800a1feafb3434dc356a274df765273d8b40923415f4c",
-      "syncedAt": "2026-08-29T07:13:15.697Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 268285,
+      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
+      "syncedAt": "2026-08-30T16:49:37.020Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
