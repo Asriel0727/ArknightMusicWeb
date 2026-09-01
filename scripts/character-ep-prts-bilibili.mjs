@@ -23,6 +23,21 @@ async function getSupabaseRows(table, query) {
   return response.json();
 }
 
+async function getAllSupabaseRows(table, select, pageSize = 1000) {
+  const rows = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const query = new URLSearchParams({
+      select,
+      limit: String(pageSize),
+      offset: String(offset),
+    });
+    const page = await getSupabaseRows(table, query.toString());
+    if (!Array.isArray(page)) throw new Error(`Supabase ${table} returned a non-array page.`);
+    rows.push(...page);
+    if (page.length < pageSize) return rows;
+  }
+}
+
 async function upsertVideos(rows) {
   if (!rows.length) return;
   const response = await fetch(`${supabaseUrl}/rest/v1/music_character_ep_videos?on_conflict=id`, {
@@ -123,8 +138,8 @@ try {
   const page = await context.newPage();
   const [prtsEntries, songs, existingVideos] = await Promise.all([
     getPrtsCharacterEpEntries(page),
-    getSupabaseRows('music_songs', 'select=id,name&limit=2000'),
-    getSupabaseRows('music_character_ep_videos', 'select=bvid,song_id,is_visible,match_score,author_mid,raw&limit=2000'),
+    getAllSupabaseRows('music_songs', 'id,name'),
+    getAllSupabaseRows('music_character_ep_videos', 'bvid,song_id,is_visible,match_score,author_mid,raw'),
   ]);
   const prtsVideoResults = await mapWithConcurrency(prtsEntries, 2, async (entry) => {
     const detailPage = await context.newPage();
@@ -190,6 +205,7 @@ try {
     writesPerformed: applyChanges,
     source: 'PRTS MV角色 → PRTS song-page Bilibili iframe',
     prtsCharacterEntries: prtsEntries.length,
+    musicSongsScanned: songs.length,
     matchedVideos: rows.length,
     unmatchedPrtsSongs: unmatchedSongs,
     prtsSongsWithoutBilibiliVideo: unmatchedVideos,

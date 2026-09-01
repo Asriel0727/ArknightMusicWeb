@@ -1,5 +1,18 @@
+import OpenCC from 'opencc-js';
+
+const toTraditional = OpenCC.Converter({ from: 'cn', to: 'twp' });
+
 export function normalizeMatchText(value) {
-  return String(value || '')
+  let source = String(value || '');
+  try {
+    // PRTS uses simplified Chinese while some music records are stored in
+    // traditional Chinese. Canonicalize both sides before comparing titles.
+    source = toTraditional(source);
+  } catch {
+    // Matching should remain usable if the optional converter cannot initialize.
+  }
+
+  return source
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
