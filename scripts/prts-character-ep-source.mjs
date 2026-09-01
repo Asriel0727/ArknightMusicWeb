@@ -31,6 +31,14 @@ export async function getPrtsCharacterEpEntries(page) {
 
   return page.locator('table').evaluateAll((tables) => {
     const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+    const splitMixedTitle = (value) => clean(value)
+      // PRTS sometimes concatenates a Japanese/Chinese title and its English
+      // title without a separator, e.g. `碧い瞳の中にin your blue eyes`.
+      .replace(/([\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff])([A-Za-z])/g, '$1|$2')
+      .replace(/([A-Za-z])([\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff])/g, '$1|$2')
+      .split('|')
+      .map(clean)
+      .filter((title) => title.length >= 2);
     const entries = [];
 
     for (const table of tables) {
@@ -63,6 +71,7 @@ export async function getPrtsCharacterEpEntries(page) {
           titleText,
           ...[...titleCell.querySelectorAll('a')].map((link) => clean(link.textContent)),
           ...titleText.split(/[／/|｜\n]/).map(clean),
+          ...splitMixedTitle(titleText),
         ].filter((title) => title.length >= 2))];
         if (!titles.length) continue;
 

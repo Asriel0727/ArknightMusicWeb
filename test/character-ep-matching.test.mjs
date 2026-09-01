@@ -15,6 +15,13 @@ test('matches simplified and traditional Chinese song titles', () => {
   assert.equal(match?.songId, 'shisui');
 });
 
+test('matches an English title appended to a non-Latin PRTS title', () => {
+  const match = findSongMatch('in your blue eyes', [
+    { id: 'blue-eyes', name: 'in your blue eyes' },
+  ]);
+  assert.equal(match?.songId, 'blue-eyes');
+});
+
 test('matches Every Road is a Yes from a standard YouTube title', () => {
   const match = findSongMatch('Arknights EP - Every Road is a Yes [Full Version]', [
     { id: 'every-road', name: 'Every Road is a Yes' },
