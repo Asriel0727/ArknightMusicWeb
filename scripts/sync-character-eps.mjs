@@ -1,9 +1,10 @@
 import { findSongMatch as findSongMatchForVideo } from './character-ep-matching.mjs';
+import { getSupabaseHeaders } from './supabase-headers.mjs';
 
 const sourceHandle = String(process.env.YOUTUBE_EP_SOURCE_HANDLE || 'rivervworkshop').trim().replace(/^@/, '');
 const youtubeApiKey = String(process.env.YOUTUBE_API_KEY || '');
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
-const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
 if (!sourceHandle) throw new Error('YOUTUBE_EP_SOURCE_HANDLE is required.');
 if (!youtubeApiKey) throw new Error('YOUTUBE_API_KEY is required.');
@@ -89,7 +90,7 @@ async function getJson(url, label) {
 
 async function getSupabaseRows(table, query) {
   const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${query}`, {
-    headers: { apikey: supabaseServiceRoleKey, authorization: `Bearer ${supabaseServiceRoleKey}` },
+    headers: getSupabaseHeaders(supabaseServiceRoleKey),
   });
   if (!response.ok) throw new Error(`Supabase ${table} read failed: ${response.status} ${await response.text()}`);
   return response.json();
@@ -99,12 +100,10 @@ async function upsertVideos(rows) {
   if (!rows.length) return;
   const response = await fetch(`${supabaseUrl}/rest/v1/music_character_ep_videos?on_conflict=id`, {
     method: 'POST',
-    headers: {
-      apikey: supabaseServiceRoleKey,
-      authorization: `Bearer ${supabaseServiceRoleKey}`,
+    headers: getSupabaseHeaders(supabaseServiceRoleKey, {
       'content-type': 'application/json',
       prefer: 'resolution=merge-duplicates',
-    },
+    }),
     body: JSON.stringify(rows),
   });
   if (!response.ok) throw new Error(`Supabase character EP upsert failed: ${response.status} ${await response.text()}`);

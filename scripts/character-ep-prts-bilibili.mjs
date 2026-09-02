@@ -1,9 +1,10 @@
 import { chromium } from 'playwright';
 import { findSongMatch, normalizeMatchText } from './character-ep-matching.mjs';
 import { getPrtsCharacterEpEntries } from './prts-character-ep-source.mjs';
+import { getSupabaseHeaders } from './supabase-headers.mjs';
 
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
-const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 const applyChanges = process.argv.includes('--apply');
 const sourceKey = 'prts:music';
 
@@ -17,7 +18,7 @@ function isManualMatch(video) {
 
 async function getSupabaseRows(table, query) {
   const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${query}`, {
-    headers: { apikey: supabaseServiceRoleKey, authorization: `Bearer ${supabaseServiceRoleKey}` },
+    headers: getSupabaseHeaders(supabaseServiceRoleKey),
   });
   if (!response.ok) throw new Error(`Supabase ${table} read failed: ${response.status} ${await response.text()}`);
   return response.json();
@@ -42,12 +43,10 @@ async function upsertVideos(rows) {
   if (!rows.length) return;
   const response = await fetch(`${supabaseUrl}/rest/v1/music_character_ep_videos?on_conflict=id`, {
     method: 'POST',
-    headers: {
-      apikey: supabaseServiceRoleKey,
-      authorization: `Bearer ${supabaseServiceRoleKey}`,
+    headers: getSupabaseHeaders(supabaseServiceRoleKey, {
       'content-type': 'application/json',
       prefer: 'resolution=merge-duplicates',
-    },
+    }),
     body: JSON.stringify(rows),
   });
   if (!response.ok) throw new Error(`Supabase character EP upsert failed: ${response.status} ${await response.text()}`);
@@ -58,12 +57,10 @@ async function hideStaleVideos(videoIds) {
   const params = new URLSearchParams({ author_mid: `eq.${sourceKey}`, bvid: `in.(${videoIds.join(',')})` });
   const response = await fetch(`${supabaseUrl}/rest/v1/music_character_ep_videos?${params}`, {
     method: 'PATCH',
-    headers: {
-      apikey: supabaseServiceRoleKey,
-      authorization: `Bearer ${supabaseServiceRoleKey}`,
+    headers: getSupabaseHeaders(supabaseServiceRoleKey, {
       'content-type': 'application/json',
       prefer: 'return=minimal',
-    },
+    }),
     body: JSON.stringify({ is_visible: false, updated_at: new Date().toISOString() }),
   });
   if (!response.ok) throw new Error(`Supabase stale Character EP hide failed: ${response.status} ${await response.text()}`);

@@ -222,6 +222,11 @@ SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY
 ```
 
+`SUPABASE_SERVICE_ROLE_KEY` is kept as the compatibility variable name. It may
+contain either the legacy `service_role` JWT or a newer `sb_secret_...` key.
+The Worker and sync scripts send newer secret keys through the `apikey` header
+only, while retaining the Bearer header for legacy keys.
+
 No Bilibili cookie, uploader ID, or Bilibili catalog API is required. If PRTS changes a song page
 or temporarily removes an embedded player, the dry-run report lists that row without writing a
 guessed mapping.

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import generatedActivityPools from '../src/data/generatedActivityPools.js';
+import { getSupabaseHeaders } from './supabase-headers.mjs';
 
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
 const VALID_SERVERS = new Set(['cn', 'global', 'tw']);
@@ -67,12 +68,10 @@ function getPoolImage(pool) {
 async function supabaseRequest(config, table, { method = 'GET', query = '', body, prefer } = {}) {
   const response = await fetch(`${config.url}/rest/v1/${table}${query}`, {
     method,
-    headers: {
-      apikey: config.key,
-      authorization: `Bearer ${config.key}`,
+    headers: getSupabaseHeaders(config.key, {
       ...(body ? { 'content-type': 'application/json' } : {}),
       ...(prefer ? { prefer } : {}),
-    },
+    }),
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
   if (!response.ok) throw new Error(`Supabase ${table} failed: ${response.status} ${await response.text()}`);

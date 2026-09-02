@@ -556,11 +556,11 @@ function requireAdminToken(request, env) {
 }
 
 function getSupabaseUrl(env) {
-  return (env.SUPABASE_URL || DEFAULT_SUPABASE_URL).replace(/\/$/, '');
+  return String(env.SUPABASE_URL || DEFAULT_SUPABASE_URL).trim().replace(/\/$/, '');
 }
 
 function hasSupabaseConfig(env) {
-  return Boolean(getSupabaseUrl(env) && env.SUPABASE_SERVICE_ROLE_KEY);
+  return Boolean(getSupabaseUrl(env) && String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim());
 }
 
 function normalizeOperatorReleaseServer(value) {
@@ -1537,11 +1537,18 @@ function parseAlbumPrewarmLimit(rawLimit) {
 }
 
 function supabaseHeaders(env, extraHeaders = {}) {
-  return {
-    apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-    authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+  const key = String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+  const headers = {
     ...extraHeaders,
+    apikey: key,
   };
+  if (key.startsWith('sb_secret_')) {
+    delete headers.authorization;
+    delete headers.Authorization;
+  } else {
+    headers.authorization = `Bearer ${key}`;
+  }
+  return headers;
 }
 
 async function readSupabaseCache(env, key) {
