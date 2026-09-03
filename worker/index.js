@@ -1541,6 +1541,7 @@ function supabaseHeaders(env, extraHeaders = {}) {
   const headers = {
     ...extraHeaders,
     apikey: key,
+    'user-agent': 'ArknightMusicWeb/2.0 (Supabase backend)',
   };
   if (key.startsWith('sb_secret_')) {
     delete headers.authorization;

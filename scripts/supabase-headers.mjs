@@ -10,6 +10,7 @@ export function getSupabaseHeaders(key, extraHeaders = {}) {
   const headers = {
     ...extraHeaders,
     apikey: normalizedKey,
+    'user-agent': 'ArknightMusicWeb/2.0 (Supabase backend)',
   };
 
   if (normalizedKey.startsWith('sb_secret_')) {

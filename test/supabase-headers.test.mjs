@@ -13,6 +13,7 @@ test('new Supabase secret keys use apikey only', () => {
   assert.equal(headers.authorization, undefined);
   assert.equal(headers.Authorization, undefined);
   assert.equal(headers['content-type'], 'application/json');
+  assert.equal(headers['user-agent'], 'ArknightMusicWeb/2.0 (Supabase backend)');
 });
 
 test('legacy service role keys keep the Bearer header', () => {
@@ -20,4 +21,5 @@ test('legacy service role keys keep the Bearer header', () => {
 
   assert.equal(headers.apikey, 'eyJlegacy-service-role');
   assert.equal(headers.authorization, 'Bearer eyJlegacy-service-role');
+  assert.equal(headers['user-agent'], 'ArknightMusicWeb/2.0 (Supabase backend)');
 });
