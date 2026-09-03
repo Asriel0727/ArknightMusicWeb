@@ -105,7 +105,7 @@
           </div>
           <iframe v-else-if="playerState.isPlaying" :key="epIframeKey" class="character-ep-frame"
             :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
-            allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            allow="autoplay" referrerpolicy="strict-origin-when-cross-origin"></iframe>
           <div v-else class="character-ep-paused">
             <img v-if="characterEp.coverUrl" :src="characterEp.coverUrl" :alt="characterEp.title || t('player.characterEp')">
             <i v-else class="fas fa-film" aria-hidden="true"></i>
@@ -495,6 +495,7 @@ const characterEpIframeSrc = computed(() => {
     autoplay: '1',
     muted: '1',
     danmaku: '0',
+    controls: '0',
     t: startTime,
   });
   return `https://player.bilibili.com/player.html?${params.toString()}`;
@@ -1301,6 +1302,11 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+.character-ep-frame {
+  pointer-events: none;
+  user-select: none;
 }
 
 .character-ep-youtube-frame {
