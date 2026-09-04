@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-03T21:26:00.141Z",
+  "generatedAt": "2026-09-04T09:46:08.600Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3225,13 +3225,13 @@
       "syncedAt": "2026-07-17T09:56:38.783Z"
     },
     "wiki-contingency-contract-arclight": {
-      "publicPath": "/images/activities/wiki-contingency-contract-arclight.png",
-      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Arclight_banner.png?58ee45",
-      "contentType": "image/png",
-      "size": 339979,
-      "hash": "8f1e28a3cc7eec1ad1f4eda824e5b70ebc847c13551b191011574550867d9b37",
-      "syncedAt": "2026-09-03T21:24:33.372Z"
+      "publicPath": "/images/activities/wiki-contingency-contract-arclight.jpg",
+      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.jpg",
+      "sourceUrl": "https://media.prts.wiki/0/0e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6%E6%B6%A4%E5%A2%A8%E4%BD%9C%E6%88%98_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 499320,
+      "hash": "049f6021c182183cb441414851082d8628de9588a2649385d6e9439bc0301165",
+      "syncedAt": "2026-09-04T09:46:08.600Z"
     },
     "wiki-babel-event-rerun": {
       "publicPath": "/images/activities/wiki-babel-event-rerun.png",
@@ -3563,9 +3563,13 @@
       "syncedAt": "2026-08-07T06:26:15.989Z"
     },
     "wiki-vector-breakthrough-trial-from-misery": {
-      "aliasOf": "wiki-vector-breakthrough-night-of-witchcraft",
-      "sourceUrl": "alias:wiki-vector-breakthrough-night-of-witchcraft",
-      "syncedAt": "2026-09-03T11:27:29.573Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-trial-from-misery.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-trial-from-misery.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg?v=1ncjrzlhhifhfzo59thvyz7ekciq7y3",
+      "contentType": "image/jpeg",
+      "size": 37150,
+      "hash": "87171981eb020a0445ba2b2d555e4ea326ef0545c9ee45df24831bbf4a20ff6f",
+      "syncedAt": "2026-09-04T09:46:07.461Z"
     },
     "wiki-interactive-exhibition": {
       "publicPath": "/images/activities/wiki-interactive-exhibition.jpg",
@@ -3586,9 +3590,13 @@
       "syncedAt": "2026-08-17T13:12:52.580Z"
     },
     "wiki-stronghold-protocol-alliance-part-2": {
-      "aliasOf": "wiki-stronghold-protocol-alliance-2nd-half",
-      "sourceUrl": "alias:wiki-stronghold-protocol-alliance-2nd-half",
-      "syncedAt": "2026-09-03T11:27:29.573Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance-part-2.jpg",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance-part-2.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg?v=t7tdfvs7j0xpzphw620i2iqi4qoh34v",
+      "contentType": "image/jpeg",
+      "size": 29705,
+      "hash": "5221355115c689c96b602f4207a87e3628657becc62c71f788a22356b9443242",
+      "syncedAt": "2026-09-04T09:46:07.089Z"
     },
     "prts-f6tcdg": {
       "publicPath": "/images/activities/prts-f6tcdg.jpg",
