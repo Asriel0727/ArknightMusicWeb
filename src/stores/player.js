@@ -127,6 +127,13 @@ async function playOfficialAudio(audioElement, song, expectedAudioLoadToken) {
       song.isUsingAudioFallback = attempt.source.startsWith('proxy');
       return;
     } catch (error) {
+      // 瀏覽器禁止自動播放不是音源失敗；保留 src，讓使用者按播放時可以直接重試。
+      if (error?.name === 'NotAllowedError') {
+        song.isUsingAudioFallback = attempt.source.startsWith('proxy');
+        playerState.isPlaying = false;
+        return;
+      }
+
       lastError = error;
       console.warn('Audio playback attempt failed', {
         cid: song.cid,

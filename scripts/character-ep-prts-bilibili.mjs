@@ -7,6 +7,7 @@ const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 const applyChanges = process.argv.includes('--apply');
 const sourceKey = 'prts:music';
+const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
 
 if (!supabaseUrl || !supabaseServiceRoleKey) {
   throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.');
@@ -14,6 +15,13 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 
 function isManualMatch(video) {
   return video?.raw?.matchSource === 'manual';
+}
+
+function getVideoOffsetSeconds(video) {
+  const value = video?.video_offset_seconds;
+  if (value === null || value === undefined || value === '') return DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS;
+  const offset = Number(value);
+  return Number.isFinite(offset) && offset >= 0 ? offset : DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS;
 }
 
 async function getSupabaseRows(table, query) {
@@ -136,7 +144,7 @@ try {
   const [prtsEntries, songs, existingVideos] = await Promise.all([
     getPrtsCharacterEpEntries(page),
     getAllSupabaseRows('music_songs', 'id,name'),
-    getAllSupabaseRows('music_character_ep_videos', 'bvid,song_id,is_visible,match_score,author_mid,raw'),
+    getAllSupabaseRows('music_character_ep_videos', 'bvid,song_id,is_visible,match_score,author_mid,raw,video_offset_seconds'),
   ]);
   const prtsVideoResults = await mapWithConcurrency(prtsEntries, 2, async (entry) => {
     const detailPage = await context.newPage();
@@ -181,6 +189,9 @@ try {
       source_url: video.sourceUrl,
       is_visible: shouldPreserveManualMatch ? existing.is_visible : true,
       match_score: shouldPreserveManualMatch ? existing.match_score || 100 : 100,
+      // Preserve manual calibration when the source sync runs again. New PRTS
+      // Bilibili rows start with the current 5-second intro estimate.
+      video_offset_seconds: getVideoOffsetSeconds(existing),
       raw: {
         platform: 'bilibili',
         matchSource: 'prts',

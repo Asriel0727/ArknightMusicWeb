@@ -124,6 +124,7 @@ const DEFAULT_LYRICS_TRANSLATION_PREWARM_LOCALES = ['zh-TW', 'zh-CN', 'en', 'ja'
 const MUSIC_COLLECTION_MAX_AGE_MS = 60 * 60 * 1000;
 const MUSIC_ALBUM_DETAIL_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const MUSIC_SONG_DETAIL_MAX_AGE_MS = 60 * 1000;
+const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
 
 export default {
   async fetch(request, env, ctx) {
@@ -3318,7 +3319,7 @@ async function syncMusicCache(env, options = {}) {
 async function getCharacterEpForSong(env, songId) {
   if (!hasSupabaseConfig(env) || !songId) return null;
   const params = new URLSearchParams({
-    select: 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url',
+    select: 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url,video_offset_seconds',
     song_id: `eq.${songId}`,
     is_visible: 'eq.true',
     // Character EP playback is intentionally pinned to the PRTS-curated
@@ -3328,9 +3329,20 @@ async function getCharacterEpForSong(env, songId) {
     order: 'published_at.desc',
     limit: '1',
   });
-  const rows = await supabaseRestRequest(env, 'music_character_ep_videos', { query: `?${params}` });
+  let rows;
+  try {
+    rows = await supabaseRestRequest(env, 'music_character_ep_videos', { query: `?${params}` });
+  } catch (error) {
+    // Keep old deployments readable during the short window before the
+    // migration is applied. The frontend has the same 5-second fallback.
+    if (!/video_offset_seconds|column .* does not exist/i.test(error.message || '')) throw error;
+    console.warn('Character EP offset column is not available yet; using the default offset.');
+    params.set('select', 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url');
+    rows = await supabaseRestRequest(env, 'music_character_ep_videos', { query: `?${params}` });
+  }
   const row = rows?.[0];
   if (!row) return null;
+  const numericOffset = Number(row.video_offset_seconds);
   return {
     bvid: row.bvid,
     songId: row.song_id,
@@ -3339,6 +3351,9 @@ async function getCharacterEpForSong(env, songId) {
     durationSeconds: row.duration_seconds,
     publishedAt: row.published_at,
     sourceUrl: row.source_url,
+    videoOffsetSeconds: Number.isFinite(numericOffset) && numericOffset >= 0
+      ? numericOffset
+      : DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS,
   };
 }
 

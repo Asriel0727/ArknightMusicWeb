@@ -196,6 +196,8 @@ create table if not exists public.music_character_ep_videos (
   source_url text not null,
   is_visible boolean not null default false,
   match_score integer not null default 0,
+  video_offset_seconds numeric(8,3) not null default 0
+    check (video_offset_seconds >= 0 and video_offset_seconds <= 3600),
   raw jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now()
 );
