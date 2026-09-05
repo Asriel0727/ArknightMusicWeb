@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-04T20:49:32.617Z",
+  "generatedAt": "2026-09-05T20:27:11.757Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -22,13 +22,13 @@
     "operators": 429,
     "avatars": {
       "total": 429,
-      "existing": 425,
-      "missing": 4
+      "existing": 429,
+      "missing": 0
     },
     "factions": {
       "total": 45,
-      "existing": 44,
-      "missing": 1
+      "existing": 45,
+      "missing": 0
     },
     "classes": {
       "total": 8,
@@ -37,18 +37,18 @@
     },
     "portraits": {
       "total": 1341,
-      "existing": 1329,
-      "missing": 12
+      "existing": 1340,
+      "missing": 1
     },
     "items": {
       "total": 87,
-      "existing": 86,
-      "missing": 1
+      "existing": 87,
+      "missing": 0
     },
     "skills": {
       "total": 889,
-      "existing": 882,
-      "missing": 7
+      "existing": 889,
+      "missing": 0
     },
     "modules": {
       "total": 499,
@@ -57,42 +57,14 @@
     }
   },
   "missing": {
-    "avatars": [
-      "public/images/operators/avatars/char_4217_makoto.png",
-      "public/images/operators/avatars/char_4218_aigis.png",
-      "public/images/operators/avatars/char_4219_yukari.png",
-      "public/images/operators/avatars/char_4220_kormr.png"
-    ],
-    "factions": [
-      "public/images/factions/logo_sees.png"
-    ],
+    "avatars": [],
+    "factions": [],
     "classes": [],
     "portraits": [
-      "public/images/operators/portraits/char_4217_makoto_1.png",
-      "public/images/operators/portraits/char_4217_makoto_2.png",
-      "public/images/operators/portraits/char_4217_makoto_p3r_1-3d290fdb.png",
-      "public/images/operators/portraits/char_4218_aigis_1.png",
-      "public/images/operators/portraits/char_4218_aigis_2.png",
-      "public/images/operators/portraits/char_4218_aigis_p3r_1-0554dcfb.png",
-      "public/images/operators/portraits/char_4219_yukari_1.png",
-      "public/images/operators/portraits/char_4219_yukari_2.png",
-      "public/images/operators/portraits/char_4219_yukari_p3r_1-ff56652f.png",
-      "public/images/operators/portraits/char_445_wscoot_epoque_49-a40747e5.png",
-      "public/images/operators/portraits/char_4220_kormr_1.png",
-      "public/images/operators/portraits/char_4220_kormr_p3r_1-97c0125c.png"
+      "public/images/operators/portraits/char_445_wscoot_epoque_49-a40747e5.png"
     ],
-    "items": [
-      "public/images/items/MTL_SL_DJ4.png"
-    ],
-    "skills": [
-      "public/images/skills/skchr_aigis_1.png",
-      "public/images/skills/skchr_aigis_2.png",
-      "public/images/skills/skchr_makoto_1.png",
-      "public/images/skills/skchr_makoto_2.png",
-      "public/images/skills/skchr_makoto_3.png",
-      "public/images/skills/skchr_yukari_1.png",
-      "public/images/skills/skchr_yukari_2.png"
-    ],
+    "items": [],
+    "skills": [],
     "modules": [
       "public/images/modules/uniequip_002_veen.png",
       "public/images/modules/uniequip_002_tanya.png",
@@ -2202,7 +2174,7 @@
         "label": "结城理",
         "publicPath": "/images/operators/avatars/char_4217_makoto.png",
         "relativePath": "public/images/operators/avatars/char_4217_makoto.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4217_makoto.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4217_makoto.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4217_makoto.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4217_makoto.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4217_makoto.png",
@@ -4088,7 +4060,7 @@
         "label": "埃癸斯",
         "publicPath": "/images/operators/avatars/char_4218_aigis.png",
         "relativePath": "public/images/operators/avatars/char_4218_aigis.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4218_aigis.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4218_aigis.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4218_aigis.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4218_aigis.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4218_aigis.png",
@@ -4479,7 +4451,7 @@
         "label": "岳羽由加莉",
         "publicPath": "/images/operators/avatars/char_4219_yukari.png",
         "relativePath": "public/images/operators/avatars/char_4219_yukari.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4219_yukari.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4219_yukari.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4219_yukari.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4219_yukari.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4219_yukari.png",
@@ -9976,7 +9948,7 @@
         "label": "虎狼丸",
         "publicPath": "/images/operators/avatars/char_4220_kormr.png",
         "relativePath": "public/images/operators/avatars/char_4220_kormr.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4220_kormr.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4220_kormr.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4220_kormr.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4220_kormr.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4220_kormr.png",
@@ -10561,7 +10533,7 @@
         "label": "S.E.E.S.",
         "publicPath": "/images/factions/logo_sees.png",
         "relativePath": "public/images/factions/logo_sees.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/factions/logo_sees.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/factions/logo_sees.png",
@@ -20453,7 +20425,7 @@
         "label": "结城理 - 结城理 Elite 1",
         "publicPath": "/images/operators/portraits/char_4217_makoto_1.png",
         "relativePath": "public/images/operators/portraits/char_4217_makoto_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4217_makoto_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4217_makoto_1.png",
@@ -20498,7 +20470,7 @@
         "label": "结城理 - 结城理 Elite 2",
         "publicPath": "/images/operators/portraits/char_4217_makoto_2.png",
         "relativePath": "public/images/operators/portraits/char_4217_makoto_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4217_makoto_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4217_makoto_2.png",
@@ -20523,7 +20495,7 @@
         "label": "结城理 - 结城理 - 见证荣光",
         "publicPath": "/images/operators/portraits/char_4217_makoto_p3r_1-3d290fdb.png",
         "relativePath": "public/images/operators/portraits/char_4217_makoto_p3r_1-3d290fdb.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4217_makoto_p3r%231.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4217_makoto_p3r%231.png",
@@ -28618,7 +28590,7 @@
         "label": "埃癸斯 - 埃癸斯 Elite 1",
         "publicPath": "/images/operators/portraits/char_4218_aigis_1.png",
         "relativePath": "public/images/operators/portraits/char_4218_aigis_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4218_aigis_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4218_aigis_1.png",
@@ -28663,7 +28635,7 @@
         "label": "埃癸斯 - 埃癸斯 Elite 2",
         "publicPath": "/images/operators/portraits/char_4218_aigis_2.png",
         "relativePath": "public/images/operators/portraits/char_4218_aigis_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4218_aigis_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4218_aigis_2.png",
@@ -28688,7 +28660,7 @@
         "label": "埃癸斯 - 埃癸斯 - 静思真谛",
         "publicPath": "/images/operators/portraits/char_4218_aigis_p3r_1-0554dcfb.png",
         "relativePath": "public/images/operators/portraits/char_4218_aigis_p3r_1-0554dcfb.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4218_aigis_p3r%231.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4218_aigis_p3r%231.png",
@@ -30283,7 +30255,7 @@
         "label": "岳羽由加莉 - 岳羽由加莉 Elite 1",
         "publicPath": "/images/operators/portraits/char_4219_yukari_1.png",
         "relativePath": "public/images/operators/portraits/char_4219_yukari_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4219_yukari_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4219_yukari_1.png",
@@ -30328,7 +30300,7 @@
         "label": "岳羽由加莉 - 岳羽由加莉 Elite 2",
         "publicPath": "/images/operators/portraits/char_4219_yukari_2.png",
         "relativePath": "public/images/operators/portraits/char_4219_yukari_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4219_yukari_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4219_yukari_2.png",
@@ -30353,7 +30325,7 @@
         "label": "岳羽由加莉 - 岳羽由加莉 - 戍卫晨昏",
         "publicPath": "/images/operators/portraits/char_4219_yukari_p3r_1-ff56652f.png",
         "relativePath": "public/images/operators/portraits/char_4219_yukari_p3r_1-ff56652f.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4219_yukari_p3r%231.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4219_yukari_p3r%231.png",
@@ -52568,7 +52540,7 @@
         "label": "虎狼丸 - 虎狼丸 Base",
         "publicPath": "/images/operators/portraits/char_4220_kormr_1.png",
         "relativePath": "public/images/operators/portraits/char_4220_kormr_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4220_kormr_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4220_kormr_1.png",
@@ -52593,7 +52565,7 @@
         "label": "虎狼丸 - 虎狼丸 - 飞越甜蜜之城",
         "publicPath": "/images/operators/portraits/char_4220_kormr_p3r_1-97c0125c.png",
         "relativePath": "public/images/operators/portraits/char_4220_kormr_p3r_1-97c0125c.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4220_kormr_p3r%231.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4220_kormr_p3r%231.png",
@@ -53623,7 +53595,7 @@
         "label": "聚能动力单元",
         "publicPath": "/images/items/MTL_SL_DJ4.png",
         "relativePath": "public/images/items/MTL_SL_DJ4.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/items/MTL_SL_DJ4.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/items/MTL_SL_DJ4.png",
@@ -54517,7 +54489,7 @@
         "label": "启动狂宴模式",
         "publicPath": "/images/skills/skchr_aigis_1.png",
         "relativePath": "public/images/skills/skchr_aigis_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_aigis_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_aigis_1.png",
@@ -54549,7 +54521,7 @@
         "label": "全弹发射",
         "publicPath": "/images/skills/skchr_aigis_2.png",
         "relativePath": "public/images/skills/skchr_aigis_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_aigis_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_aigis_2.png",
@@ -68661,7 +68633,7 @@
         "label": "俄耳甫斯的竖琴",
         "publicPath": "/images/skills/skchr_makoto_1.png",
         "relativePath": "public/images/skills/skchr_makoto_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_makoto_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_makoto_1.png",
@@ -68693,7 +68665,7 @@
         "label": "塔纳托斯的囚锁",
         "publicPath": "/images/skills/skchr_makoto_2.png",
         "relativePath": "public/images/skills/skchr_makoto_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_makoto_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_makoto_2.png",
@@ -68725,7 +68697,7 @@
         "label": "开辟明日的剑刃",
         "publicPath": "/images/skills/skchr_makoto_3.png",
         "relativePath": "public/images/skills/skchr_makoto_3.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_makoto_3.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_makoto_3.png",
@@ -81397,7 +81369,7 @@
         "label": "龙卷箭",
         "publicPath": "/images/skills/skchr_yukari_1.png",
         "relativePath": "public/images/skills/skchr_yukari_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_yukari_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_yukari_1.png",
@@ -81429,7 +81401,7 @@
         "label": "明镜止水",
         "publicPath": "/images/skills/skchr_yukari_2.png",
         "relativePath": "public/images/skills/skchr_yukari_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_yukari_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_yukari_2.png",
