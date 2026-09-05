@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-05T04:41:59.334Z",
+  "generatedAt": "2026-09-05T10:46:42.739Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3234,13 +3234,13 @@
       "syncedAt": "2026-09-04T16:30:20.051Z"
     },
     "wiki-babel-event-rerun": {
-      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
-      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
-      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 330324,
-      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
-      "syncedAt": "2026-09-04T16:30:24.464Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.png",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_Rerun_banner.png?b0dc17",
+      "contentType": "image/png",
+      "size": 1101120,
+      "hash": "10f4219a4968923762faddf0a6d8dae3ebb25da18c57b5da4cc42f99a53f05d6",
+      "syncedAt": "2026-09-05T10:46:42.392Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
@@ -3252,31 +3252,31 @@
       "syncedAt": "2026-08-27T10:01:38.118Z"
     },
     "wiki-stronghold-protocol-event": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 244822,
-      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
-      "syncedAt": "2026-09-04T16:30:25.091Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-event.png",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_banner.png?a4b4e2",
+      "contentType": "image/png",
+      "size": 844107,
+      "hash": "c139cc4c1ad6c9cd96f31de612221913b5cd946467b87fb6afed8c30badcf8ce",
+      "syncedAt": "2026-09-05T10:46:42.558Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
-      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 280529,
-      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
-      "syncedAt": "2026-09-04T16:30:25.816Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.webp",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ending_a_Grand_Overture_banner.png?e80c0c",
+      "contentType": "image/webp",
+      "size": 847718,
+      "hash": "4527335cd9b23ecc2df1c83a0b12bd3fb37fbb4d745804e14b6c46f17110a11f",
+      "syncedAt": "2026-09-05T10:46:42.581Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 268285,
-      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
-      "syncedAt": "2026-09-04T16:30:26.265Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.png",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
+      "contentType": "image/png",
+      "size": 975196,
+      "hash": "668f9851d9abb0da55688a7ae4a929704ea5aa06cc53fb5d93a9bed3f8c31c7c",
+      "syncedAt": "2026-09-05T10:46:42.739Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
