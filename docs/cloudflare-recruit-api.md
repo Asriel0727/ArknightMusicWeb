@@ -207,15 +207,20 @@ create index if not exists music_character_ep_videos_song_id_idx
   where is_visible = true;
 ```
 
-The table stores only public metadata and a platform video ID. Character-MV eligibility is read
-from PRTS's EP table (`MV角色` column), then read from each PRTS song page's embedded Bilibili player.
+The table stores only public metadata and a platform video ID. Character-MV candidates are discovered
+from all PRTS music rows, then verified by reading each PRTS song page's embedded Bilibili player.
+The PRTS `MV角色` column is retained as metadata but is not an eligibility allow-list.
 The frontend embeds Bilibili's own player; this project does not download or proxy any video stream.
 
 ## GitHub Action Character EP sync
 
 [`sync-character-eps.yml`](../.github/workflows/sync-character-eps.yml) runs every day at
 02:40 Asia/Taipei and can also be started from the **Actions** tab with **Run workflow**. It reads
-the PRTS EP `MV角色` table as the allow-list and reads each song page's embedded Bilibili player.
+the current song list from the Monster Siren API, reads all PRTS music rows, and reads each song
+page's embedded Bilibili player. The current upstream song list is intentional: `music_songs` can
+contain historical rows with reused IDs, so using its array order for duplicate titles can attach an
+MV to the wrong song. The dry-run report separates pages without a Bilibili iframe, Bilibili videos
+without a song-title match, and matched songs that are not present in Supabase.
 
 Add these repository secrets before running it:
 

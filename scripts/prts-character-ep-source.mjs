@@ -5,11 +5,12 @@ function cleanText(value) {
 }
 
 /**
- * Extract PRTS EP rows that explicitly list one or more MV characters.
- * The page is server-rendered MediaWiki HTML, so using its table headers is
- * less brittle than relying on the position of a year section.
+ * Extract all PRTS music rows that have a linked song page.
+ * `MV角色` is retained as metadata, but it is not used as an eligibility
+ * filter because some valid Bilibili-backed music pages leave that column as
+ * `-` or blank.
  */
-export async function getPrtsCharacterEpEntries(page) {
+export async function getPrtsMusicEntries(page) {
   let loaded = false;
   let lastError;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
@@ -44,17 +45,18 @@ export async function getPrtsCharacterEpEntries(page) {
     for (const table of tables) {
       const headerCells = [...table.querySelectorAll('tr')]
         .map((row) => [...row.querySelectorAll('th')].map((cell) => clean(cell.textContent)));
-      const header = headerCells.find((cells) => cells.includes('MV角色') && cells.includes('标题'));
+      const header = headerCells.find((cells) => cells.includes('标题') && cells.includes('艺术家'));
       if (!header) continue;
 
       const titleIndex = header.indexOf('标题');
       const characterIndex = header.indexOf('MV角色');
       for (const row of table.querySelectorAll('tr')) {
         const cells = [...row.querySelectorAll(':scope > td')];
-        if (cells.length <= Math.max(titleIndex, characterIndex)) continue;
+        if (titleIndex < 0 || cells.length <= titleIndex) continue;
 
-        const mvCharacters = clean(cells[characterIndex].textContent);
-        if (!mvCharacters || mvCharacters === '-') continue;
+        const mvCharacters = characterIndex >= 0
+          ? clean(cells[characterIndex]?.textContent)
+          : '';
 
         const titleCell = cells[titleIndex];
         const titleText = clean(titleCell.textContent);
@@ -75,7 +77,12 @@ export async function getPrtsCharacterEpEntries(page) {
         ].filter((title) => title.length >= 2))];
         if (!titles.length) continue;
 
-        entries.push({ titleText, titles, mvCharacters, songPageUrl });
+        entries.push({
+          titleText,
+          titles,
+          mvCharacters: mvCharacters === '-' ? '' : mvCharacters,
+          songPageUrl,
+        });
       }
     }
 

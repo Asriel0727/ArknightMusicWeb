@@ -1,10 +1,11 @@
 import { chromium } from 'playwright';
 import { findSongMatch, normalizeMatchText } from './character-ep-matching.mjs';
-import { getPrtsCharacterEpEntries } from './prts-character-ep-source.mjs';
+import { getPrtsMusicEntries } from './prts-character-ep-source.mjs';
 import { getSupabaseHeaders } from './supabase-headers.mjs';
 
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+const musicApiOrigin = String(process.env.MUSIC_API_ORIGIN || 'https://monster-siren.hypergryph.com').replace(/\/$/, '');
 const applyChanges = process.argv.includes('--apply');
 const sourceKey = 'prts:music';
 const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
@@ -45,6 +46,23 @@ async function getAllSupabaseRows(table, select, pageSize = 1000) {
     rows.push(...page);
     if (page.length < pageSize) return rows;
   }
+}
+
+async function getAuthoritativeMusicSongs() {
+  const response = await fetch(`${musicApiOrigin}/api/songs`, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Monster Siren song list read failed: ${response.status} ${await response.text()}`);
+  }
+
+  const payload = await response.json();
+  const songs = payload?.data?.list;
+  if (!Array.isArray(songs)) {
+    throw new Error('Monster Siren song list returned an invalid data.list payload.');
+  }
+
+  return songs
+    .filter((song) => song?.cid && song?.name)
+    .map((song) => ({ id: String(song.cid), name: String(song.name) }));
 }
 
 async function upsertVideos(rows) {
@@ -121,8 +139,16 @@ async function mapWithConcurrency(items, limit, callback) {
 
 function findExactSongForPrtsEntry(entry, songs) {
   const normalizedTitles = new Set(entry.titles.map(normalizeMatchText).filter((title) => title.length >= 2));
-  const exact = songs.find((song) => normalizedTitles.has(normalizeMatchText(song.name)));
-  if (exact) return { songId: String(exact.id), songName: exact.name, score: 100 };
+  const exactMatches = songs
+    .filter((song) => normalizedTitles.has(normalizeMatchText(song.name)))
+    // The official list should normally contain one canonical song per title.
+    // Keep the tie-break deterministic if the upstream API temporarily exposes
+    // duplicate exact titles instead of depending on array order.
+    .sort((left, right) => Number(right.id) - Number(left.id));
+  if (exactMatches.length) {
+    const exact = exactMatches[0];
+    return { songId: String(exact.id), songName: exact.name, score: 100 };
+  }
 
   const matches = entry.titles.map((title) => findSongMatch(title, songs)).filter(Boolean);
   const best = matches.sort((left, right) => right.score - left.score)[0];
@@ -141,11 +167,13 @@ try {
     },
   });
   const page = await context.newPage();
-  const [prtsEntries, songs, existingVideos] = await Promise.all([
-    getPrtsCharacterEpEntries(page),
+  const [prtsEntries, songs, databaseSongs, existingVideos] = await Promise.all([
+    getPrtsMusicEntries(page),
+    getAuthoritativeMusicSongs(),
     getAllSupabaseRows('music_songs', 'id,name'),
     getAllSupabaseRows('music_character_ep_videos', 'bvid,song_id,is_visible,match_score,author_mid,raw,video_offset_seconds'),
   ]);
+  const databaseSongIds = new Set(databaseSongs.map((song) => String(song.id)));
   const prtsVideoResults = await mapWithConcurrency(prtsEntries, 2, async (entry) => {
     const detailPage = await context.newPage();
     try {
@@ -157,8 +185,9 @@ try {
     }
   });
   const existingByBvid = new Map(existingVideos.map((video) => [String(video.bvid), video]));
-  const unmatchedSongs = [];
-  const unmatchedVideos = [];
+  const unmatchedSongPages = [];
+  const matchedSongsMissingFromSupabase = [];
+  const pagesWithoutBilibiliVideo = [];
   const prtsPageFailures = [];
   const rows = [];
 
@@ -168,13 +197,17 @@ try {
       prtsPageFailures.push({ ...entry, error: result.error });
       continue;
     }
-    const song = findExactSongForPrtsEntry(entry, songs);
-    if (!song) {
-      unmatchedSongs.push(entry);
+    if (!video) {
+      pagesWithoutBilibiliVideo.push(entry);
       continue;
     }
-    if (!video) {
-      unmatchedVideos.push({ ...entry, song });
+    const song = findExactSongForPrtsEntry(entry, songs);
+    if (!song) {
+      unmatchedSongPages.push({ ...entry, video });
+      continue;
+    }
+    if (!databaseSongIds.has(song.songId)) {
+      matchedSongsMissingFromSupabase.push({ ...entry, video, song });
       continue;
     }
     const existing = existingByBvid.get(video.videoId);
@@ -204,21 +237,29 @@ try {
   }
 
   const matchedBvids = new Set(rows.map((row) => row.bvid));
-  const staleAutoVideoIds = existingVideos
+  const canReconcileStaleRows = prtsPageFailures.length === 0 && prtsEntries.length > 0;
+  const staleAutoVideoIds = !canReconcileStaleRows
+    ? []
+    : existingVideos
     .filter((video) => video.author_mid === sourceKey && !matchedBvids.has(String(video.bvid)) && !isManualMatch(video))
     .map((video) => String(video.bvid));
 
   console.log(JSON.stringify({
     mode: applyChanges ? 'apply' : 'dry-run',
     writesPerformed: applyChanges,
-    source: 'PRTS MV角色 → PRTS song-page Bilibili iframe',
-    prtsCharacterEntries: prtsEntries.length,
+    source: 'official Monster Siren song list → PRTS song page → Bilibili iframe → song ID match',
+    musicSongsSource: `${musicApiOrigin}/api/songs`,
+    prtsMusicEntries: prtsEntries.length,
+    prtsEntriesWithBilibiliVideo: prtsVideoResults.filter((result) => result.video).length,
     musicSongsScanned: songs.length,
+    musicSongsInSupabase: databaseSongs.length,
     matchedVideos: rows.length,
-    unmatchedPrtsSongs: unmatchedSongs,
-    prtsSongsWithoutBilibiliVideo: unmatchedVideos,
+    pagesWithoutBilibiliVideo,
+    bilibiliVideosWithoutSongMatch: unmatchedSongPages,
+    matchedSongsMissingFromSupabase,
     prtsPageFailures,
     stalePrtsRows: staleAutoVideoIds,
+    staleRowsSkippedBecauseOfIncompleteScan: !canReconcileStaleRows,
   }, null, 2));
 
   if (applyChanges) {

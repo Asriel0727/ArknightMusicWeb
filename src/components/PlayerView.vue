@@ -253,6 +253,7 @@ let youtubeDriftTimer = null;
 let youtubePlayerGeneration = 0;
 let bilibiliPendingIframeKey = -1;
 let bilibiliSyncTimeout = null;
+let pendingSeekSyncCleanup = null;
 let skipNextBilibiliRestart = false;
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
@@ -263,6 +264,12 @@ const libraryActionStatusQueue = [];
 
 const LYRICS_TIME_OFFSET = 0.5;
 const BILIBILI_SYNC_TIMEOUT_MS = 15000;
+const AUDIO_SEEK_SYNC_FALLBACK_MS = 750;
+
+const cancelPendingSeekSync = () => {
+  pendingSeekSyncCleanup?.();
+  pendingSeekSyncCleanup = null;
+};
 
 const clearLibraryActionStatus = ({ clearQueue = true } = {}) => {
   if (libraryActionStatusTimeout) {
@@ -539,9 +546,11 @@ const clearYoutubePlayer = () => {
   youtubePlayer = null;
 };
 
-const syncYoutubeToAudio = (force = false) => {
+const syncYoutubeToAudio = (force = false, audioTimeOverride = null) => {
   if (!youtubePlayer || !playerState.audioPlayer || !playerState.isPlaying) return;
-  const audioTime = playerState.audioPlayer.currentTime || 0;
+  const audioTime = Number.isFinite(audioTimeOverride)
+    ? Math.max(0, audioTimeOverride)
+    : (playerState.audioPlayer.currentTime || 0);
   const videoTime = youtubePlayer.getCurrentTime?.() || 0;
   const expectedVideoTime = getCharacterEpVideoTime(audioTime, characterEpVideoOffsetSeconds.value);
   if (force || Math.abs(videoTime - expectedVideoTime) > 2.5) youtubePlayer.seekTo(expectedVideoTime, true);
@@ -639,9 +648,11 @@ const handleImageError = (event) => {
 const handleSeek = (event) => {
   const progressContainer = event.currentTarget;
   const rect = progressContainer.getBoundingClientRect();
-  const seekPosition = (event.clientX - rect.left) / rect.width;
+  const seekPosition = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+  const duration = playerState.audioPlayer?.duration;
+  const targetAudioTime = Number.isFinite(duration) ? seekPosition * duration : null;
   seek(seekPosition);
-  restartCharacterEpAfterSeek();
+  restartCharacterEpAfterSeek(targetAudioTime);
 };
 
 const getAudioCurrentTime = () => {
@@ -650,7 +661,7 @@ const getAudioCurrentTime = () => {
   return Number.isFinite(playerState.currentTime) ? playerState.currentTime : 0;
 };
 
-const startBilibiliSync = () => {
+const startBilibiliSync = (audioTimeOverride = null) => {
   const audio = playerState.audioPlayer;
   if (!audio || !isBilibiliCharacterEp.value) {
     if (bilibiliSyncTimeout) {
@@ -663,7 +674,9 @@ const startBilibiliSync = () => {
   }
 
   if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
-  epStartTime.value = getAudioCurrentTime();
+  epStartTime.value = Number.isFinite(audioTimeOverride)
+    ? Math.max(0, audioTimeOverride)
+    : getAudioCurrentTime();
   isBilibiliSyncPending.value = true;
   epIframeKey.value += 1;
   bilibiliPendingIframeKey = epIframeKey.value;
@@ -723,6 +736,7 @@ const handleBilibiliFrameLoad = () => {
 };
 
 const showCoverVisual = () => {
+  cancelPendingSeekSync();
   const shouldResumeAudio = isBilibiliSyncPending.value;
   if (bilibiliSyncTimeout) {
     clearTimeout(bilibiliSyncTimeout);
@@ -764,10 +778,53 @@ const showCharacterEp = () => {
   }
 };
 
-const restartCharacterEpAfterSeek = () => {
+const restartCharacterEpAt = (audioTime) => {
   if (visualMode.value !== 'ep' || !characterEp.value) return;
+  const normalizedAudioTime = Number.isFinite(audioTime) ? Math.max(0, audioTime) : getAudioCurrentTime();
+  if (isYoutubeCharacterEp.value) {
+    syncYoutubeToAudio(true, normalizedAudioTime);
+    return;
+  }
+  if (isBilibiliCharacterEp.value && playerState.isPlaying) {
+    startBilibiliSync(normalizedAudioTime);
+    return;
+  }
+  epStartTime.value = normalizedAudioTime;
+  epIframeKey.value += 1;
+};
+
+const restartCharacterEpAfterSeek = (targetAudioTime = null) => {
+  if (visualMode.value !== 'ep' || !characterEp.value) return;
+  cancelPendingSeekSync();
+
+  const audio = playerState.audioPlayer;
+  const requestedAudioTime = Number.isFinite(targetAudioTime)
+    ? Math.max(0, targetAudioTime)
+    : null;
+  if (!audio || requestedAudioTime === null) {
+    restartCharacterEpAt(getAudioCurrentTime());
+    return;
+  }
+
+  let settled = false;
+  let timeoutId = null;
+  const cleanup = () => {
+    audio.removeEventListener('seeked', settle);
+    if (timeoutId) clearTimeout(timeoutId);
+    if (pendingSeekSyncCleanup === cleanup) pendingSeekSyncCleanup = null;
+  };
+  const settle = () => {
+    if (settled) return;
+    settled = true;
+    cleanup();
+    restartCharacterEpAt(requestedAudioTime);
+  };
+
+  pendingSeekSyncCleanup = cleanup;
+  audio.addEventListener('seeked', settle, { once: true });
+  timeoutId = window.setTimeout(settle, AUDIO_SEEK_SYNC_FALLBACK_MS);
   requestAnimationFrame(() => {
-    restartCharacterEp();
+    if (!audio.seeking && Math.abs(audio.currentTime - requestedAudioTime) < 0.05) settle();
   });
 };
 
@@ -835,7 +892,6 @@ const handleShareSong = async () => {
   }, 1600);
 };
 
-// ?�步歌�?高亮?�滾??
 const syncLyricsHighlight = (currentTime) => {
   if (!playerState.lyrics || playerState.lyrics.length === 0) return;
   if (!lyricsContainerRef.value) return;
@@ -947,6 +1003,7 @@ watch([visualMode, characterEp], () => {
 });
 
 watch(() => playerState.currentSong, async (newSong) => {
+  cancelPendingSeekSync();
   activeLyricIndex.value = -1;
   clearLibraryActionStatus();
   closePlaylistManager();
@@ -1006,6 +1063,7 @@ onMounted(() => {
 
 // 組件?��??��??��??�循?��?超�?
 onUnmounted(() => {
+  cancelPendingSeekSync();
   clearYoutubePlayer();
   stopLyricsSync();
   if (bilibiliSyncTimeout) {
