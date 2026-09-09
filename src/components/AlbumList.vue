@@ -9,15 +9,63 @@
       <p>{{ t('album.noResults') }}</p>
     </div>
     <div v-else>
-      <div class="albums-container" ref="containerRef">
-        <AlbumCard 
-          v-for="album in displayAlbums" 
+      <section
+        ref="containerRef"
+        class="albums-container"
+        :class="{ 'is-dragging': isDragging }"
+        :aria-label="t('album.pageTitle')"
+        tabindex="0"
+        @keydown.left.prevent="showPreviousAlbum"
+        @keydown.right.prevent="showNextAlbum"
+        @pointerdown="handlePointerDown"
+        @pointermove="handlePointerMove"
+        @pointerup="handlePointerUp"
+        @pointercancel="handlePointerUp"
+        @wheel="handleRackWheel"
+      >
+        <div class="rack-floor" aria-hidden="true"></div>
+        <div
+          v-for="(album, index) in displayAlbums"
           :key="album.cid"
-          :album="album"
-          @view-album="handleViewAlbum"
-          @preload-album="handlePreloadAlbum"
-        />
-      </div>
+          class="album-slot"
+          :class="{ 'is-active': index === activeAlbumIndex }"
+          :style="getAlbumStyle(index)"
+          @click="handleAlbumClick(index, $event)"
+          @pointerenter="handlePreloadAlbum(album)"
+        >
+          <AlbumCard
+            :album="album"
+            @view-album="handleViewAlbum"
+            @preload-album="handlePreloadAlbum"
+          />
+        </div>
+
+        <div class="rack-controls" :aria-label="t('album.pageTitle')">
+          <button
+            type="button"
+            class="rack-arrow"
+            :disabled="displayAlbums.length <= 1"
+            :aria-label="t('album.prevPage')"
+            @click="showPreviousAlbum"
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <div class="rack-position" aria-live="polite">
+            <span>{{ activeAlbumIndex + 1 }}</span>
+            <span class="rack-position-divider">/</span>
+            <span>{{ displayAlbums.length }}</span>
+          </div>
+          <button
+            type="button"
+            class="rack-arrow"
+            :disabled="displayAlbums.length <= 1"
+            :aria-label="t('album.nextPage')"
+            @click="showNextAlbum"
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
       
       <!-- 分頁控件 -->
       <div v-if="totalPages > 1" class="pagination-wrapper">
@@ -73,43 +121,29 @@ import { fetchAlbums, getProxyImageUrl, searchMusic } from '../services/api.js';
 const { t, locale } = useI18n();
 const containerRef = ref(null);
 const windowWidth = ref(window.innerWidth);
+const activeAlbumIndex = ref(0);
+const isDragging = ref(false);
+const dragOffset = ref(0);
+const suppressAlbumClick = ref(false);
+let pointerStartX = 0;
 let wheelDeltaAccumulator = 0;
 let lastWheelPageAt = 0;
+let lastRackWheelAt = 0;
 
 const WHEEL_PAGE_THRESHOLD = 90;
 const WHEEL_PAGE_COOLDOWN_MS = 520;
+const RACK_WHEEL_COOLDOWN_MS = 280;
 const SCROLL_EDGE_THRESHOLD = 24;
 const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 // 響應式計算每頁顯示的專輯數量
 const albumsPerPage = computed(() => {
   const width = windowWidth.value;
-  
-  // 根據屏幕寬度計算每行可以顯示多少個專輯
-  // 專輯卡片最小寬度：250px (桌面) 或 200px (移動端)
-  // 加上間距：25px (桌面) 或 15px (移動端)
-  const cardMinWidth = width <= 900 ? 200 : 250;
-  const gap = width <= 900 ? 15 : 25;
-  const containerPadding = 40; // 左右padding
-  const availableWidth = width - containerPadding;
-  
-  // 計算每行可以放多少個
-  const cardsPerRow = Math.floor((availableWidth + gap) / (cardMinWidth + gap));
-  
-  // 根據屏幕高度計算可以顯示多少行
-  // 專輯卡片高度約：350px (包含圖片、文字、按鈕)
-  const cardHeight = 350;
-  const viewportHeight = window.innerHeight;
-  const headerHeight = 200; // 導航欄和頂部工具欄的高度
-  const paginationHeight = 100; // 分頁控件的高度
-  const availableHeight = viewportHeight - headerHeight - paginationHeight;
-  const rowsPerPage = Math.max(2, Math.floor(availableHeight / (cardHeight + gap))); // 至少顯示2行
-  
-  // 每頁顯示的數量 = 每行數量 × 每頁行數
-  const perPage = cardsPerRow * rowsPerPage;
-  
-  // 設置最小和最大值
-  return Math.max(5, Math.min(perPage, 25)); // 最少4個，最多24個
+
+  // 唱片架會以重疊卡片呈現，因此每頁可以承載更多專輯。
+  // 螢幕上約顯示 5～11 張，其餘專輯仍可透過左右滑動取用。
+  const visibleSlots = width <= 600 ? 5 : width <= 900 ? 7 : Math.max(9, Math.floor(width / 130));
+  return Math.max(18, Math.min(visibleSlots * 3, 36));
 });
 
 // 計算總頁數
@@ -125,6 +159,119 @@ const displayAlbums = computed(() => {
   const endIndex = startIndex + albumsPerPage.value;
   return albumsToShow.slice(startIndex, endIndex);
 });
+
+const getCircularOffset = (index) => {
+  const total = displayAlbums.value.length;
+  if (total <= 1) return 0;
+
+  let offset = index - activeAlbumIndex.value;
+  const half = total / 2;
+
+  if (offset > half) offset -= total;
+  if (offset < -half) offset += total;
+  return offset;
+};
+
+const getAlbumStyle = (index) => {
+  const offset = getCircularOffset(index);
+  const distance = Math.abs(offset);
+  const width = windowWidth.value;
+  const albumStep = width <= 600
+    ? 78
+    : width <= 900
+      ? Math.min(112, Math.max(78, width * 0.14))
+      : Math.min(150, Math.max(86, width * 0.105));
+
+  return {
+    '--album-offset': offset,
+    '--album-x': `${offset * albumStep + dragOffset.value}px`,
+    '--album-depth': `${Math.max(-520, -distance * 68)}px`,
+    '--album-scale': Math.max(0.58, 1 - distance * 0.075),
+    '--album-rotate': `${offset * -30}deg`,
+    '--album-opacity': Math.max(0, 1 - distance * 0.14),
+    zIndex: 100 - Math.round(distance),
+    pointerEvents: distance > 5 ? 'none' : 'auto',
+  };
+};
+
+const moveAlbum = (direction) => {
+  const total = displayAlbums.value.length;
+  if (total <= 1) return;
+
+  activeAlbumIndex.value = (activeAlbumIndex.value + direction + total) % total;
+  preloadAlbumImages([
+    displayAlbums.value[activeAlbumIndex.value],
+    displayAlbums.value[(activeAlbumIndex.value + direction + total) % total],
+  ].filter(Boolean), true, 'high');
+};
+
+const showPreviousAlbum = () => moveAlbum(-1);
+const showNextAlbum = () => moveAlbum(1);
+
+const handleAlbumClick = (index, event) => {
+  if (suppressAlbumClick.value) {
+    suppressAlbumClick.value = false;
+    return;
+  }
+  if (event.target.closest('button')) return;
+  if (index !== activeAlbumIndex.value) {
+    activeAlbumIndex.value = index;
+  }
+};
+
+const handlePointerDown = (event) => {
+  if (event.button !== undefined && event.button !== 0) return;
+  if (event.target.closest('button')) return;
+
+  pointerStartX = event.clientX;
+  dragOffset.value = 0;
+  isDragging.value = true;
+  containerRef.value?.setPointerCapture?.(event.pointerId);
+};
+
+const handlePointerMove = (event) => {
+  if (!isDragging.value) return;
+  dragOffset.value = event.clientX - pointerStartX;
+};
+
+const handlePointerUp = () => {
+  if (!isDragging.value) return;
+
+  const distance = dragOffset.value;
+  isDragging.value = false;
+  dragOffset.value = 0;
+  suppressAlbumClick.value = Math.abs(distance) >= 42;
+
+  if (Math.abs(distance) < 42) return;
+  if (distance < 0) {
+    showNextAlbum();
+  } else {
+    showPreviousAlbum();
+  }
+};
+
+const handleRackWheel = (event) => {
+  const horizontalDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+    ? event.deltaX
+    : event.shiftKey
+      ? event.deltaY
+      : 0;
+
+  if (Math.abs(horizontalDelta) < 8) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  const now = Date.now();
+  if (now - lastRackWheelAt < RACK_WHEEL_COOLDOWN_MS) return;
+  lastRackWheelAt = now;
+
+  if (horizontalDelta > 0) {
+    showNextAlbum();
+  } else {
+    showPreviousAlbum();
+  }
+};
 
 const preloadImage = (url, priority = 'low') => {
   if (!url) return;
@@ -292,6 +439,10 @@ watch(albumsPerPage, (newValue, oldValue) => {
 });
 
 watch(displayAlbums, () => {
+  activeAlbumIndex.value = 0;
+  dragOffset.value = 0;
+  isDragging.value = false;
+  suppressAlbumClick.value = false;
   preloadCurrentAndNextPageImages();
 }, { flush: 'post' });
 
@@ -345,11 +496,187 @@ main .page-title {
 }
 
 .albums-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 280px));
-  gap: 25px;
-  padding: 20px 0;
+  position: relative;
+  min-height: clamp(390px, 42vw, 520px);
+  margin: 12px -20px 0;
+  overflow: hidden;
+  perspective: 1300px;
+  perspective-origin: center 42%;
+  touch-action: pan-y;
+  outline: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.albums-container:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary-color), 0 0 0 6px rgba(88, 166, 255, 0.2);
+  border-radius: 16px;
+}
+
+.albums-container.is-dragging {
+  cursor: grabbing;
+}
+
+.album-slot {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  width: clamp(142px, 16vw, 210px);
+  height: clamp(300px, 33vw, 410px);
+  opacity: var(--album-opacity);
+  transform: translate3d(
+      calc(-50% + var(--album-x)),
+      0,
+      var(--album-depth)
+    )
+    rotateY(var(--album-rotate))
+    scale(var(--album-scale));
+  transform-style: preserve-3d;
+  transform-origin: center bottom;
+  transition: transform 360ms cubic-bezier(0.22, 0.8, 0.22, 1), opacity 280ms ease;
+  will-change: transform, opacity;
+}
+
+.albums-container.is-dragging .album-slot {
+  transition: none;
+}
+
+.album-slot::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 14px;
+  right: -12px;
+  bottom: 10px;
+  width: 18px;
+  border-radius: 0 12px 12px 0;
+  background: linear-gradient(90deg, rgba(12, 18, 28, 0.82), rgba(88, 166, 255, 0.22));
+  box-shadow: 8px 12px 20px rgba(0, 0, 0, 0.24);
+  transform: translateZ(-22px);
+}
+
+.album-slot::after {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  right: 8%;
+  bottom: -18px;
+  left: 8%;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.34);
+  filter: blur(12px);
+  transform: translateZ(-40px);
+}
+
+.album-slot.is-active {
+  filter: saturate(1.08) brightness(1.04);
+}
+
+.album-slot :deep(.album) {
+  width: 100%;
+  min-height: 100%;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(88, 166, 255, 0.05);
+  transition: box-shadow 260ms ease, border-color 260ms ease;
+}
+
+.album-slot.is-active :deep(.album) {
+  border-color: rgba(88, 166, 255, 0.5);
+  box-shadow: 0 24px 40px rgba(0, 0, 0, 0.48), 0 0 30px rgba(88, 166, 255, 0.16);
+}
+
+.album-slot :deep(.album:hover) {
+  transform: none;
+}
+
+.album-slot :deep(.album img) {
+  height: clamp(150px, 21vw, 245px);
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.album-slot :deep(.marquee-content) {
+  font-size: clamp(0.82rem, 1.25vw, 1.05rem);
+}
+
+.album-slot :deep(.album p) {
+  min-height: 2.5em;
+  margin-bottom: 10px;
+  font-size: clamp(0.7rem, 1vw, 0.84rem);
+}
+
+.album-slot :deep(.album button) {
+  min-height: 34px;
+  height: 34px;
+  padding: 6px 8px;
+  font-size: clamp(0.7rem, 1vw, 0.86rem);
+}
+
+.rack-floor {
+  position: absolute;
+  z-index: -3;
+  right: 4%;
+  bottom: 22px;
+  left: 4%;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.24), transparent);
+  box-shadow: 0 0 34px rgba(88, 166, 255, 0.2);
+  transform: rotateX(65deg) translateZ(-30px);
+}
+
+.rack-controls {
+  position: absolute;
+  z-index: 200;
+  right: 0;
+  bottom: 2px;
+  left: 0;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.rack-arrow {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(88, 166, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(18, 25, 36, 0.76);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  pointer-events: auto;
+  transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+
+.rack-arrow:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  transform: scale(1.08);
+}
+
+.rack-arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.rack-position {
+  min-width: 60px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.rack-position-divider {
+  padding: 0 4px;
+  color: var(--primary-color);
 }
 
 .loading-spinner {
@@ -505,8 +832,14 @@ main .page-title {
 
 @media (max-width: 900px) {
   .albums-container {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 260px));
-    gap: 15px;
+    min-height: 370px;
+    margin-right: -20px;
+    margin-left: -20px;
+  }
+
+  .album-slot {
+    width: clamp(130px, 21vw, 172px);
+    height: 300px;
   }
   
   .pagination-controls {
@@ -539,6 +872,29 @@ main .page-title {
 }
 
 @media (max-width: 600px) {
+  .albums-container {
+    min-height: 350px;
+    margin-top: 4px;
+  }
+
+  .album-slot {
+    top: 12px;
+    width: 132px;
+    height: 290px;
+  }
+
+  .album-slot :deep(.album) {
+    padding: 8px;
+  }
+
+  .album-slot :deep(.album img) {
+    height: 146px;
+  }
+
+  .rack-controls {
+    bottom: 0;
+  }
+
   .pagination-controls {
     flex-direction: column;
     gap: 10px;
