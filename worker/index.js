@@ -1391,14 +1391,25 @@ async function fetchActivityPoolOperatorNames() {
     fetchJson(`${EXCEL_BASE}/character_table.json`),
   ]);
   const operators = new Map();
-  for (const [id, character] of Object.entries(enCharacters || {})) {
-    if (!id.startsWith('char_') || !character?.name) continue;
+  const operatorIds = new Set([
+    ...Object.keys(enCharacters || {}),
+    ...Object.keys(cnCharacters || {}),
+  ]);
+  for (const id of operatorIds) {
+    const enCharacter = enCharacters?.[id];
     const cnCharacter = cnCharacters?.[id];
-    for (const name of [character.name, character.appellation]) {
+    if (!id.startsWith('char_') || !(enCharacter?.name || cnCharacter?.name)) continue;
+    const names = new Set([
+      enCharacter?.name,
+      enCharacter?.appellation,
+      cnCharacter?.name,
+      cnCharacter?.appellation,
+    ].filter(Boolean));
+    for (const name of names) {
       if (name) operators.set(activityPoolIdentity(name), {
         id,
         cnName: cnCharacter?.name || '',
-        rarity: Number(cnCharacter?.rarity ?? character.rarity ?? 0) + 1,
+        rarity: parseRarity(cnCharacter?.rarity ?? enCharacter?.rarity) + 1,
       });
     }
   }
