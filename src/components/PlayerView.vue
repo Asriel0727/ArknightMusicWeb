@@ -101,7 +101,8 @@
           :src="proxyImageUrl(playerState.currentSong?.coverDeUrl)" :alt="playerState.currentSong?.name"
           class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
           @error="handleImageError">
-        <div v-else-if="visualMode === 'ep' && characterEp" class="character-ep-visual">
+        <div v-else-if="visualMode === 'ep' && characterEp" class="character-ep-visual"
+          :class="{ expanded: isCharacterEpExpanded }">
           <div v-if="isYoutubeCharacterEp && playerState.isPlaying" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
           </div>
@@ -113,21 +114,31 @@
             <i v-else class="fas fa-film" aria-hidden="true"></i>
             <span>{{ t('player.epPaused') }}</span>
           </div>
+          <button class="character-ep-expand-button" type="button"
+            :aria-expanded="isCharacterEpExpanded" :aria-label="isCharacterEpExpanded ? t('player.closeVideo') : t('player.expandVideo')"
+            @click="toggleCharacterEpPreview">
+            <i :class="isCharacterEpExpanded ? 'fas fa-compress' : 'fas fa-expand'" aria-hidden="true"></i>
+            <span>{{ isCharacterEpExpanded ? t('player.closeVideo') : t('player.expandVideo') }}</span>
+          </button>
           <a class="character-ep-link" :href="characterEp.sourceUrl" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-up-right-from-square"></i> {{ t('player.openVideo') }}
           </a>
         </div>
+        <div v-if="isCharacterEpExpanded" class="character-ep-preview-backdrop" aria-hidden="true"
+          @click.self="closeCharacterEpPreview"></div>
       </div>
       <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-toolbar">
         <span class="lyrics-toolbar-title"><i class="fas fa-align-left"></i> {{ t('player.lyrics') }}</span>
-        <label class="lyrics-translation-toggle">
-          <input v-model="playerState.showLyricTranslation" type="checkbox" @change="handleLyricTranslationToggle">
-          <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-          <span class="toggle-label">{{ t('player.translationToggle') }}</span>
-        </label>
-        <span v-if="playerState.isTranslatingLyrics" class="lyrics-translation-status" role="status">
-          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> {{ t('common.loading') }}
-        </span>
+        <div class="lyrics-translation-controls">
+          <label class="lyrics-translation-toggle">
+            <input v-model="playerState.showLyricTranslation" type="checkbox" @change="handleLyricTranslationToggle">
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span class="toggle-label">{{ t('player.translationToggle') }}</span>
+          </label>
+          <span v-if="playerState.isTranslatingLyrics" class="lyrics-translation-status" role="status">
+            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> {{ t('common.loading') }}
+          </span>
+        </div>
       </div>
       <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationError" class="lyrics-translation-error" role="alert">
         {{ playerState.lyricTranslationError }}
@@ -243,6 +254,7 @@ const isAddingToPlaylist = ref(false);
 const characterEp = ref(null);
 const isCharacterEpLoading = ref(false);
 const isBilibiliSyncPending = ref(false);
+const isCharacterEpExpanded = ref(false);
 const visualMode = ref('cover');
 const epIframeKey = ref(0);
 const epStartTime = ref(0);
@@ -736,6 +748,7 @@ const handleBilibiliFrameLoad = () => {
 };
 
 const showCoverVisual = () => {
+  closeCharacterEpPreview();
   cancelPendingSeekSync();
   const shouldResumeAudio = isBilibiliSyncPending.value;
   if (bilibiliSyncTimeout) {
@@ -752,6 +765,21 @@ const showCoverVisual = () => {
     playerState.audioPlayer.play().catch(() => {
       playerState.isPlaying = false;
     });
+  }
+};
+
+const closeCharacterEpPreview = () => {
+  isCharacterEpExpanded.value = false;
+};
+
+const toggleCharacterEpPreview = () => {
+  if (!characterEp.value || visualMode.value !== 'ep') return;
+  isCharacterEpExpanded.value = !isCharacterEpExpanded.value;
+};
+
+const handleCharacterEpPreviewKeydown = (event) => {
+  if (event.key === 'Escape') {
+    closeCharacterEpPreview();
   }
 };
 
@@ -995,6 +1023,9 @@ watch(() => playerState.isPlaying, (isPlaying) => {
 });
 
 watch([visualMode, characterEp], () => {
+  if (visualMode.value !== 'ep' || !characterEp.value) {
+    closeCharacterEpPreview();
+  }
   if (visualMode.value === 'ep' && isYoutubeCharacterEp.value && playerState.isPlaying) {
     nextTick(createYoutubePlayer);
   } else {
@@ -1013,6 +1044,7 @@ watch(() => playerState.currentSong, async (newSong) => {
     lyricsContainerRef.value.scrollTop = 0;
   }
   characterEp.value = null;
+  closeCharacterEpPreview();
   isCharacterEpLoading.value = Boolean(newSong?.cid);
   if (bilibiliSyncTimeout) {
     clearTimeout(bilibiliSyncTimeout);
@@ -1054,6 +1086,7 @@ watch(locale, () => {
 
 // 組件?��??��?如�?�?��?�放?��??��?�?
 onMounted(() => {
+  window.addEventListener('keydown', handleCharacterEpPreviewKeydown);
   refreshFavoriteState().catch(() => { });
   loadUserPlaylists().catch(() => { });
   if (playerState.isPlaying) {
@@ -1063,6 +1096,7 @@ onMounted(() => {
 
 // 組件?��??��??��??�循?��?超�?
 onUnmounted(() => {
+  window.removeEventListener('keydown', handleCharacterEpPreviewKeydown);
   cancelPendingSeekSync();
   clearYoutubePlayer();
   stopLyricsSync();
@@ -1397,6 +1431,14 @@ onUnmounted(() => {
   font-size: 0.82rem;
 }
 
+.lyrics-translation-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .lyrics-translation-error {
   margin: -8px 0 0;
   color: #ff9b9b;
@@ -1499,6 +1541,25 @@ onUnmounted(() => {
   background: #06090d;
 }
 
+.character-ep-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1090;
+  background: rgba(2, 6, 12, 0.72);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.character-ep-visual.expanded {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1100;
+  width: min(680px, calc(100vw - 32px));
+  transform: translate(-50%, -50%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
 .character-ep-frame,
 .character-ep-paused {
   width: 100%;
@@ -1548,6 +1609,30 @@ onUnmounted(() => {
   border-radius: 999px;
   background: rgba(5, 9, 14, 0.8);
   font-size: 0.8rem;
+}
+
+.character-ep-expand-button {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 5px;
+  background: rgba(5, 9, 14, 0.78);
+  color: #fff;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.character-ep-expand-button:hover,
+.character-ep-expand-button:focus-visible,
+.character-ep-link:hover,
+.character-ep-link:focus-visible {
+  background: rgba(24, 37, 52, 0.94);
+  color: var(--primary-color);
 }
 
 .character-ep-link {
@@ -1908,11 +1993,20 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .lyrics-toolbar-title {
   color: var(--text-secondary);
   font-size: 0.9rem;
+}
+
+.lyrics-translation-controls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
 }
 
 .playlist-membership {
