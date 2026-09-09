@@ -786,6 +786,9 @@ function normalizeActivityCode(value) {
 
 function normalizeActivityType(value) {
   const type = String(value || '').trim().toLowerCase().replace(/[ _-]+/g, '_');
+  // Arknights Wiki uses "storycol" for Story Collection (故事集), which is
+  // handled as a story activity by the existing recruitment-pool pipeline.
+  if (type === 'storycol' || type === 'story_collection') return 'side_story';
   if (type === 'side_story' || type === 'sidestory') return 'side_story';
   if (type === 'intermezzi') return 'intermezzi';
   if (type === 'collaboration') return 'collaboration';
@@ -798,6 +801,7 @@ function normalizePrtsActivityType(categories) {
   const values = (categories || []).map((category) => String(category || ''));
   if (values.some((value) => value.includes('联动') || value.includes('合作'))) return 'collaboration';
   if (values.some((value) => value.includes('周年') || value.includes('纪念'))) return 'anniversary';
+  if (values.some((value) => value.includes('故事集'))) return 'side_story';
   if (values.some((value) => value.includes('支线故事'))) return 'side_story';
   if (values.some((value) => value.includes('别传') || value.includes('插曲'))) return 'intermezzi';
   if (values.some((value) => value.includes('活动'))) return 'campaign';
