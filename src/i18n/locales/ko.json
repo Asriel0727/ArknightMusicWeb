@@ -98,9 +98,14 @@
     "pageOf": "{current} / {total} 페이지",
     "perPageCount": "(페이지당 {n}개)",
     "viewAlbum": "앨범 보기",
+    "trackCount": "{count}곡",
+    "dragHint": "드래그하여 앨범 선반 회전",
+    "touchHint": "좌우로 스와이프하여 앨범 탐색",
+    "dismissHint": "조작 힌트 닫기",
     "trackList": "트랙 목록",
     "play": "재생",
-    "pageIndicator": "{current} / {total} 페이지"
+    "pageIndicator": "{current} / {total} 페이지",
+    "back": "뒤로"
   },
   "character": {
     "pageTitle": "오퍼레이터 도감",

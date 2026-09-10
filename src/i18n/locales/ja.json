@@ -98,9 +98,14 @@
     "pageOf": "{current} / {total} ページ",
     "perPageCount": "（1ページ {n} 件）",
     "viewAlbum": "アルバムを見る",
+    "trackCount": "{count}曲",
+    "dragHint": "ドラッグしてアルバムラックを回転",
+    "touchHint": "左右にスワイプしてアルバムを閲覧",
+    "dismissHint": "操作ヒントを閉じる",
     "trackList": "トラックリスト",
     "play": "再生",
-    "pageIndicator": "{current} / {total} ページ"
+    "pageIndicator": "{current} / {total} ページ",
+    "back": "戻る"
   },
   "character": {
     "pageTitle": "オペレーター図鑑",

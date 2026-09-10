@@ -98,9 +98,14 @@
     "pageOf": "第 {current} / {total} 页",
     "perPageCount": "（每页 {n} 个）",
     "viewAlbum": "查看专辑",
+    "trackCount": "{count} 首曲目",
+    "dragHint": "拖曳旋轉唱片架",
+    "touchHint": "左右滑動瀏覽專輯",
+    "dismissHint": "關閉操作提示",
     "trackList": "曲目列表",
     "play": "播放",
-    "pageIndicator": "第 {current} / {total} 页"
+    "pageIndicator": "第 {current} / {total} 页",
+    "back": "返回"
   },
   "character": {
     "pageTitle": "干员图鉴",

@@ -203,7 +203,6 @@ export const albumState = reactive({
   currentAlbumSongs: [],
   isLoading: false,
   hasMore: true,
-  currentPage: 1,
   isInitialFetchDone: false
 });
 

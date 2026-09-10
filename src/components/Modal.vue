@@ -84,7 +84,6 @@
 <script setup>
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { fetchAlbumDetails } from '../services/api.js';
 import { modalState, albumState, playerState, characterState } from '../stores/player.js';
 
 const AlbumDetails = defineAsyncComponent(() => import('./AlbumDetails.vue'));
@@ -141,7 +140,7 @@ const navText = computed(() => NAV_TEXT[locale.value] || NAV_TEXT.en);
 const shouldShowHomeNav = computed(() => modalState.currentView === 'album' || modalState.currentView === 'player');
 const canNavigateToAlbum = computed(() => Boolean(playerState.currentSong?.albumCid));
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'view-album']);
 
 const closeModal = (target = 'context') => {
   modalState.isOpen = false;
@@ -198,22 +197,13 @@ const handlePlaySong = () => {
   modalState.currentView = 'player';
 };
 
-const handleViewAlbumFromPlayer = async () => {
+const handleViewAlbumFromPlayer = () => {
   const currentSong = playerState.currentSong;
   if (!currentSong?.albumCid) {
     return;
   }
 
-  if (!albumState.currentAlbumDetails || albumState.currentAlbumDetails.cid !== currentSong.albumCid) {
-    try {
-      albumState.currentAlbumDetails = await fetchAlbumDetails(currentSong.albumCid);
-    } catch (error) {
-      console.error('Error fetching album details from player:', error);
-      return;
-    }
-  }
-
-  modalState.currentView = 'album';
+  emit('view-album', currentSong.albumCid);
 };
 
 watch(() => playerState.currentSong, (newSong) => {

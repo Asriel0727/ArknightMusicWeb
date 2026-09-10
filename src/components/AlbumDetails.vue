@@ -31,7 +31,8 @@
         @load="handleImageLoad"
         @error="handleImageError"
       >
-      <div class="song-list">
+      <div class="song-list projected-song-list">
+        <div class="projected-song-list-kicker">MSR / SIGNAL</div>
         <div v-if="totalPages > 1" class="song-list-header">
           <h3>{{ t('album.trackList') }}</h3>
           <div class="pagination-controls">
@@ -572,6 +573,181 @@ onUnmounted(() => {
   background: #3d8eff;
 }
 
+.projected-song-list {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(148, 222, 255, 0.5);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(93, 183, 230, 0.16), rgba(7, 25, 40, 0.3));
+  box-shadow: 0 0 36px rgba(93, 196, 255, 0.16), inset 0 0 30px rgba(129, 215, 255, 0.06);
+}
+
+.projected-song-list::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 7px,
+    rgba(150, 223, 255, 0.045) 8px,
+    transparent 9px
+  );
+  opacity: 0.74;
+  pointer-events: none;
+  animation: projected-song-scan 8s linear infinite;
+}
+
+.projected-song-list::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -30%;
+  left: 12%;
+  width: 76%;
+  height: 70%;
+  border-radius: 50%;
+  background: rgba(83, 192, 255, 0.12);
+  filter: blur(28px);
+  pointer-events: none;
+}
+
+.projected-song-list > * {
+  position: relative;
+  z-index: 1;
+}
+
+.projected-song-list-kicker {
+  margin-bottom: 4px;
+  color: rgba(125, 203, 246, 0.72);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+}
+
+.projected-song-list .song-list-header,
+.projected-song-list > h3 {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(158, 224, 255, 0.24);
+}
+
+.projected-song-list .song-list-header h3,
+.projected-song-list > h3 {
+  color: #effaff;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  letter-spacing: 0.04em;
+}
+
+.projected-song-list .song-list-header h3 {
+  margin: 0;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.projected-song-list #song-list-content {
+  gap: 6px;
+}
+
+.projected-song-list .song-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1.4fr) minmax(0, 1fr) 86px;
+  gap: 12px;
+  align-items: center;
+  min-height: 54px;
+  padding: 8px 12px;
+  border: 1px solid rgba(152, 218, 248, 0.12);
+  border-radius: 8px;
+  background: rgba(10, 41, 59, 0.25);
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.projected-song-list .song-item:hover {
+  border-color: rgba(126, 213, 255, 0.42);
+  background: rgba(72, 166, 211, 0.2);
+  box-shadow: 0 0 18px rgba(94, 197, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.projected-song-list .song-number {
+  width: auto;
+  color: rgba(120, 203, 255, 0.88);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.projected-song-list .song-title {
+  min-width: 0;
+  color: rgba(232, 248, 255, 0.98);
+  font-size: 0.98rem;
+}
+
+.projected-song-list .song-artist {
+  min-width: 0;
+  color: rgba(167, 217, 238, 0.7);
+  font-size: 0.84rem;
+}
+
+.projected-song-list .song-action {
+  width: 86px;
+  min-width: 86px;
+  max-width: 86px;
+}
+
+.projected-song-list .song-action button {
+  width: 100%;
+  min-height: 34px;
+  height: 34px;
+  padding: 6px 8px;
+  border: 1px solid rgba(183, 229, 255, 0.45);
+  border-radius: 7px;
+  background: rgba(69, 163, 224, 0.68);
+  box-shadow: 0 0 12px rgba(78, 177, 239, 0.12);
+  font-size: 0.82rem;
+}
+
+.projected-song-list .song-action button:hover {
+  border-color: rgba(207, 241, 255, 0.8);
+  background: rgba(73, 171, 235, 0.92);
+  box-shadow: 0 0 18px rgba(78, 177, 239, 0.3);
+}
+
+.projected-song-list .pagination-controls {
+  gap: 9px;
+}
+
+.projected-song-list .pagination-controls button {
+  width: 32px;
+  min-width: 32px;
+  max-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  border: 1px solid rgba(126, 213, 255, 0.42);
+  background: rgba(54, 139, 188, 0.24);
+  color: rgba(220, 244, 255, 0.92);
+  font-size: 1rem;
+}
+
+.projected-song-list .pagination-controls span {
+  min-width: 70px;
+  color: rgba(167, 217, 238, 0.72);
+  font-size: 0.8rem;
+}
+
+@keyframes projected-song-scan {
+  from {
+    transform: translateY(-10px);
+  }
+
+  to {
+    transform: translateY(10px);
+  }
+}
+
 .pagination-controls {
   display: flex;
   align-items: center;
@@ -648,6 +824,45 @@ onUnmounted(() => {
 @media (max-width: 900px) {
   .album-details-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .projected-song-list {
+    padding: 15px 12px;
+  }
+
+  .projected-song-list .song-item {
+    grid-template-columns: 26px minmax(0, 1fr) 72px;
+    gap: 7px;
+    min-height: 58px;
+    padding: 8px;
+  }
+
+  .projected-song-list .song-title {
+    font-size: 0.92rem;
+  }
+
+  .projected-song-list .song-artist {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 0.76rem;
+  }
+
+  .projected-song-list .song-action {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    width: 72px;
+    min-width: 72px;
+    max-width: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projected-song-list::before,
+  .projected-song-list .song-item {
+    animation: none !important;
+    transition: none !important;
   }
 }
 </style>

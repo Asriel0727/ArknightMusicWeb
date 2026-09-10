@@ -10,7 +10,17 @@
     <template v-else-if="currentPage === 'albums'">
       <TopBar @search="handleSearch" />
       <AlbumList ref="albumListRef" @view-album="handleViewAlbum" />
-      <Modal @close="handleModalClose" />
+      <Modal @close="handleModalClose" @view-album="handleViewAlbum" />
+      <AlbumEntryTransition
+        :active="albumTransition.active"
+        :ready="albumTransition.ready"
+        :settled="albumTransition.settled"
+        :album="albumTransition.album"
+        :songs="albumTransition.songs"
+        @complete="completeAlbumTransition"
+        @close="closeAlbumTransition"
+        @play-song="handleTransitionPlaySong"
+      />
     </template>
 
     <template v-else-if="currentPage === 'characters'">
@@ -51,8 +61,16 @@ import ParticleBackground from './components/ParticleBackground.vue';
 import Navbar from './components/Navbar.vue';
 import TopBar from './components/TopBar.vue';
 import Modal from './components/Modal.vue';
+import AlbumEntryTransition from './components/AlbumEntryTransition.vue';
 import { fetchAlbumDetails, fetchCharacterDetails } from './services/api.js';
-import { initAudioPlayer, modalState, albumState, characterState, playSongFromMasterList } from './stores/player.js';
+import {
+  initAudioPlayer,
+  modalState,
+  albumState,
+  characterState,
+  playSongFromAlbum,
+  playSongFromMasterList,
+} from './stores/player.js';
 
 const AlbumList = defineAsyncComponent(() => import('./components/AlbumList.vue'));
 const CharacterList = defineAsyncComponent(() => import('./components/CharacterList.vue'));
@@ -87,6 +105,13 @@ const currentPage = ref('albums');
 const audioPreloadMode = window.matchMedia('(hover: none) and (pointer: coarse)').matches
   ? 'metadata'
   : 'auto';
+const albumTransition = ref({
+  active: false,
+  ready: false,
+  settled: false,
+  album: null,
+  songs: [],
+});
 
 const clearSharedCharacterUrl = () => {
   const url = new URL(window.location.href);
@@ -107,15 +132,75 @@ const handleSearch = (query) => {
   }
 };
 
+const completeAlbumTransition = () => {
+  if (!albumTransition.value.active) return;
+  albumTransition.value = {
+    ...albumTransition.value,
+    settled: true,
+  };
+};
+
+const closeAlbumTransition = () => {
+  albumTransition.value = {
+    active: false,
+    ready: false,
+    settled: false,
+    album: null,
+    songs: [],
+  };
+  albumState.currentAlbumDetails = null;
+  albumState.isLoading = false;
+  modalState.currentView = 'album';
+  modalState.isOpen = false;
+};
+
+const handleTransitionPlaySong = async (songIndex) => {
+  const albumId = albumTransition.value.album?.cid;
+  if (!albumId || !Number.isInteger(songIndex)) return;
+
+  albumTransition.value = {
+    active: false,
+    ready: false,
+    settled: false,
+    album: null,
+    songs: [],
+  };
+  modalState.currentView = 'player';
+  modalState.isOpen = true;
+  await playSongFromAlbum(songIndex, albumId);
+};
+
 const handleViewAlbum = async (albumId) => {
+  const previewAlbum = albumState.allAlbums.find(
+    album => String(album?.cid) === String(albumId),
+  ) || { cid: albumId, name: t('album.trackList') };
+
+  albumTransition.value = {
+    active: true,
+    ready: false,
+    settled: false,
+    album: previewAlbum,
+    songs: [],
+  };
   albumState.currentAlbumDetails = null;
   albumState.isLoading = true;
   modalState.currentView = 'album';
-  modalState.isOpen = true;
+  modalState.isOpen = false;
   try {
-    albumState.currentAlbumDetails = await fetchAlbumDetails(albumId);
+    const details = await fetchAlbumDetails(albumId);
+    albumState.currentAlbumDetails = details;
+    albumTransition.value = {
+      ...albumTransition.value,
+      album: details || previewAlbum,
+      songs: Array.isArray(details?.songs) ? details.songs : [],
+      ready: true,
+    };
   } catch (error) {
     console.error('Error fetching album details:', error);
+    albumTransition.value = {
+      ...albumTransition.value,
+      ready: true,
+    };
   } finally {
     albumState.isLoading = false;
   }
@@ -151,6 +236,7 @@ const handleViewCharacter = async (character) => {
 };
 
 const handleModalClose = (target) => {
+  closeAlbumTransition();
   clearSharedCharacterUrl();
   modalState.isOpen = false;
   if (target === 'home') {
