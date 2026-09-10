@@ -67,6 +67,22 @@ body {
     flex-direction: column;
 }
 
+#app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#app > .mouse-canvas[inert],
+#app > .particle-canvas[inert] {
+  visibility: hidden;
+}
+
+#app > footer {
+    margin-top: auto;
+}
+
 header {
     width: 100%;
     padding: 20px;

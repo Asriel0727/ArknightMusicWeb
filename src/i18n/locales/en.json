@@ -91,6 +91,10 @@
     "loading": "Loading…"
   },
   "album": {
+    "selectAlbum": "Select album",
+    "loadError": "Unable to load this album. Please try again.",
+    "retry": "Retry",
+    "emptyTracks": "No playable tracks in this album yet.",
     "pageTitle": "Monster Siren albums",
     "noResults": "No albums found",
     "prevPage": "Previous",

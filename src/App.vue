@@ -17,9 +17,12 @@
         :settled="albumTransition.settled"
         :album="albumTransition.album"
         :songs="albumTransition.songs"
+        :origin="albumTransition.origin"
+        :error="albumTransition.error"
         @complete="completeAlbumTransition"
         @close="closeAlbumTransition"
         @play-song="handleTransitionPlaySong"
+        @retry="retryAlbumTransition"
       />
     </template>
 
@@ -112,6 +115,7 @@ const albumTransition = ref({
   album: null,
   songs: [],
 });
+let albumDetailLoadToken = 0;
 
 const clearSharedCharacterUrl = () => {
   const url = new URL(window.location.href);
@@ -122,6 +126,7 @@ const clearSharedCharacterUrl = () => {
 };
 
 const handlePageChange = (page) => {
+  if (albumTransition.value.active) closeAlbumTransition();
   clearSharedCharacterUrl();
   currentPage.value = page;
 };
@@ -141,6 +146,7 @@ const completeAlbumTransition = () => {
 };
 
 const closeAlbumTransition = () => {
+  albumDetailLoadToken++;
   albumTransition.value = {
     active: false,
     ready: false,
@@ -157,6 +163,7 @@ const closeAlbumTransition = () => {
 const handleTransitionPlaySong = async (songIndex) => {
   const albumId = albumTransition.value.album?.cid;
   if (!albumId || !Number.isInteger(songIndex)) return;
+  albumDetailLoadToken++;
 
   albumTransition.value = {
     active: false,
@@ -170,7 +177,8 @@ const handleTransitionPlaySong = async (songIndex) => {
   await playSongFromAlbum(songIndex, albumId);
 };
 
-const handleViewAlbum = async (albumId) => {
+const handleViewAlbum = async (albumId, origin = null) => {
+  const token = ++albumDetailLoadToken;
   const previewAlbum = albumState.allAlbums.find(
     album => String(album?.cid) === String(albumId),
   ) || { cid: albumId, name: t('album.trackList') };
@@ -181,6 +189,8 @@ const handleViewAlbum = async (albumId) => {
     settled: false,
     album: previewAlbum,
     songs: [],
+    origin,
+    error: false,
   };
   albumState.currentAlbumDetails = null;
   albumState.isLoading = true;
@@ -188,21 +198,40 @@ const handleViewAlbum = async (albumId) => {
   modalState.isOpen = false;
   try {
     const details = await fetchAlbumDetails(albumId);
+    if (token !== albumDetailLoadToken || !albumTransition.value.active) return;
     albumState.currentAlbumDetails = details;
     albumTransition.value = {
       ...albumTransition.value,
-      album: details || previewAlbum,
+      album: { ...previewAlbum, ...details },
       songs: Array.isArray(details?.songs) ? details.songs : [],
       ready: true,
     };
   } catch (error) {
+    if (token !== albumDetailLoadToken || !albumTransition.value.active) return;
     console.error('Error fetching album details:', error);
     albumTransition.value = {
       ...albumTransition.value,
       ready: true,
+      error: true,
     };
   } finally {
-    albumState.isLoading = false;
+    if (token === albumDetailLoadToken) albumState.isLoading = false;
+  }
+};
+
+const retryAlbumTransition = async () => {
+  const albumId = albumTransition.value.album?.cid;
+  if (!albumId || !albumTransition.value.active) return;
+  const token = ++albumDetailLoadToken;
+  albumTransition.value = { ...albumTransition.value, ready: false, error: false };
+  try {
+    const details = await fetchAlbumDetails(albumId);
+    if (token !== albumDetailLoadToken || !albumTransition.value.active) return;
+    albumState.currentAlbumDetails = details;
+    albumTransition.value = { ...albumTransition.value, album: { ...albumTransition.value.album, ...details }, songs: details?.songs || [], ready: true };
+  } catch {
+    if (token !== albumDetailLoadToken || !albumTransition.value.active) return;
+    albumTransition.value = { ...albumTransition.value, ready: true, error: true };
   }
 };
 

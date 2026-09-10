@@ -1,50 +1,87 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
-  <title id="title">使用者功能流程</title>
-  <desc id="desc">顯示使用者從首頁進入專輯、播放器、我的清單與角色功能的流程。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Arknights Music Web 使用者旅程</title>
+  <desc id="desc">從探索音樂、播放與收藏，到幹員圖鑑和個人化資料的網站使用流程。</desc>
   <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#08111f"/><stop offset="1" stop-color="#12182b"/></linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+    <linearGradient id="music" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2563eb"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+    <linearGradient id="library" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#ec4899"/></linearGradient>
+    <linearGradient id="operator" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d97706"/><stop offset="1" stop-color="#ef4444"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#020617" flood-opacity=".42"/></filter>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#94a3b8" stroke-opacity=".055"/></pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0L0 6L9 3z" fill="#94a3b8"/></marker>
     <style>
-      .bg { fill: #0d1117; }
-      .panel { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
-      .primary { fill: #58a6ff; }
-      .text { fill: #c9d1d9; font: 600 18px system-ui, sans-serif; }
-      .small { fill: #8b949e; font: 14px system-ui, sans-serif; }
-      .line { stroke: #58a6ff; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .h { fill:#f8fafc; font:700 24px system-ui,-apple-system,'Segoe UI',sans-serif; }
+      .k { fill:#94a3b8; font:600 13px system-ui,-apple-system,'Segoe UI',sans-serif; letter-spacing:1.6px; }
+      .t { fill:#f8fafc; font:700 17px system-ui,-apple-system,'Segoe UI',sans-serif; }
+      .s { fill:#cbd5e1; font:14px system-ui,-apple-system,'Segoe UI',sans-serif; }
+      .p { fill:#dbeafe; font:600 12px system-ui,-apple-system,'Segoe UI',sans-serif; }
+      .card { fill:#131d31; stroke:#2b3b57; stroke-width:1; }
+      .flow { fill:none; stroke:#94a3b8; stroke-opacity:.78; stroke-width:2; marker-end:url(#arrow); }
     </style>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L9,3 z" fill="#58a6ff" />
-    </marker>
   </defs>
-  <rect class="bg" width="980" height="420" rx="18" />
-  <rect class="panel" x="40" y="54" width="190" height="90" rx="10" />
-  <text class="text" x="135" y="94" text-anchor="middle">首頁</text>
-  <text class="small" x="135" y="120" text-anchor="middle">專輯 / 搜尋 / 導覽</text>
-  <rect class="panel" x="300" y="40" width="190" height="90" rx="10" />
-  <text class="text" x="395" y="80" text-anchor="middle">專輯詳情</text>
-  <text class="small" x="395" y="106" text-anchor="middle">歌曲列表與介紹</text>
-  <rect class="panel" x="560" y="40" width="190" height="90" rx="10" />
-  <text class="text" x="655" y="80" text-anchor="middle">播放器</text>
-  <text class="small" x="655" y="106" text-anchor="middle">歌詞 / 翻譯 / 分享</text>
-  <rect class="panel" x="300" y="170" width="190" height="90" rx="10" />
-  <text class="text" x="395" y="210" text-anchor="middle">我的清單</text>
-  <text class="small" x="395" y="236" text-anchor="middle">收藏 / 歌單 / 角色</text>
-  <rect class="panel" x="560" y="170" width="190" height="90" rx="10" />
-  <text class="text" x="655" y="210" text-anchor="middle">歌單播放</text>
-  <text class="small" x="655" y="236" text-anchor="middle">指定歌曲與 queue</text>
-  <rect class="panel" x="300" y="300" width="190" height="90" rx="10" />
-  <text class="text" x="395" y="340" text-anchor="middle">幹員圖鑑</text>
-  <text class="small" x="395" y="366" text-anchor="middle">搜尋 / 篩選</text>
-  <rect class="panel" x="560" y="300" width="190" height="90" rx="10" />
-  <text class="text" x="655" y="340" text-anchor="middle">角色詳情</text>
-  <text class="small" x="655" y="366" text-anchor="middle">立繪 / 技能 / 資料</text>
-  <rect class="panel" x="800" y="170" width="140" height="90" rx="10" />
-  <text class="text" x="870" y="210" text-anchor="middle">登入</text>
-  <text class="small" x="870" y="236" text-anchor="middle">同步個人資料</text>
-  <path class="line" d="M230 99 H292" />
-  <path class="line" d="M490 85 H552" />
-  <path class="line" d="M230 120 C260 170 270 200 292 210" />
-  <path class="line" d="M490 215 H552" />
-  <path class="line" d="M230 130 C250 265 270 330 292 345" />
-  <path class="line" d="M490 345 H552" />
-  <path class="line" d="M750 215 H792" />
-  <path class="line" d="M655 170 V138" />
+  <rect width="1200" height="560" rx="28" fill="url(#bg)"/>
+  <rect width="1200" height="560" rx="28" fill="url(#grid)"/>
+  <circle cx="1055" cy="-12" r="205" fill="#2563eb" opacity=".12"/>
+  <circle cx="118" cy="558" r="230" fill="#8b5cf6" opacity=".10"/>
+
+  <text class="k" x="56" y="58">ARKNIGHTS MUSIC WEB · EXPERIENCE MAP</text>
+  <text class="h" x="56" y="94">從探索到收藏，一條清楚的使用者旅程</text>
+  <text class="s" x="56" y="121">音樂、角色資料與個人清單會在同一個播放器體驗中串接。</text>
+  <rect x="56" y="152" width="1088" height="1" fill="#334155"/>
+
+  <g filter="url(#shadow)">
+    <rect x="56" y="194" width="194" height="284" rx="20" fill="url(#hero)"/>
+    <circle cx="91" cy="233" r="20" fill="#fff" fill-opacity=".18"/>
+    <text x="91" y="240" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="20">⌂</text>
+    <text x="82" y="286" fill="#fff" font-family="system-ui" font-size="13" font-weight="700" letter-spacing="1.4">START HERE</text>
+    <text x="82" y="325" fill="#fff" font-family="system-ui" font-size="25" font-weight="750">探索首頁</text>
+    <text x="82" y="355" fill="#e0e7ff" font-family="system-ui" font-size="14">從專輯、搜尋與導覽</text>
+    <text x="82" y="378" fill="#e0e7ff" font-family="system-ui" font-size="14">開始找到想聽的內容。</text>
+    <rect x="82" y="414" width="104" height="30" rx="15" fill="#fff" fill-opacity=".16"/>
+    <text x="134" y="434" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="12" font-weight="700">公開可使用</text>
+  </g>
+
+  <path class="flow" d="M250 274H300"/>
+  <text class="p" x="275" y="255" text-anchor="middle">選擇內容</text>
+
+  <g filter="url(#shadow)">
+    <rect class="card" x="310" y="194" width="260" height="126" rx="18"/>
+    <rect x="310" y="194" width="8" height="126" rx="4" fill="url(#music)"/>
+    <circle cx="350" cy="234" r="18" fill="#0ea5e9" fill-opacity=".18"/><text x="350" y="240" text-anchor="middle" fill="#7dd3fc" font-family="system-ui" font-size="18">♫</text>
+    <text class="t" x="382" y="236">專輯與歌曲</text><text class="s" x="382" y="262">瀏覽、搜尋、閱讀介紹</text>
+    <rect x="382" y="279" width="78" height="22" rx="11" fill="#0ea5e9" fill-opacity=".14"/><text class="p" x="421" y="294" text-anchor="middle">探索</text>
+
+    <rect class="card" x="310" y="352" width="260" height="126" rx="18"/>
+    <rect x="310" y="352" width="8" height="126" rx="4" fill="url(#operator)"/>
+    <circle cx="350" cy="392" r="18" fill="#f59e0b" fill-opacity=".18"/><text x="350" y="398" text-anchor="middle" fill="#fcd34d" font-family="system-ui" font-size="17">◇</text>
+    <text class="t" x="382" y="394">幹員與活動</text><text class="s" x="382" y="420">圖鑑、活動時程、招募工具</text>
+    <rect x="382" y="437" width="78" height="22" rx="11" fill="#f59e0b" fill-opacity=".14"/><text class="p" x="421" y="452" text-anchor="middle">資料</text>
+  </g>
+
+  <path class="flow" d="M570 257H632"/><path class="flow" d="M570 415H632"/>
+  <g filter="url(#shadow)">
+    <rect x="642" y="194" width="250" height="284" rx="20" fill="#101d34" stroke="#35628e"/>
+    <rect x="642" y="194" width="250" height="7" rx="3.5" fill="url(#music)"/>
+    <circle cx="690" cy="244" r="24" fill="#38bdf8" fill-opacity=".18"/><text x="690" y="252" text-anchor="middle" fill="#7dd3fc" font-family="system-ui" font-size="22">▶</text>
+    <text class="t" x="730" y="244">播放器核心</text>
+    <text class="s" x="682" y="292">播放佇列 · 進度 · 音量</text>
+    <text class="s" x="682" y="320">同步歌詞 · 翻譯 · 分享</text>
+    <text class="s" x="682" y="348">角色 EP 影片切換</text>
+    <rect x="682" y="388" width="170" height="42" rx="13" fill="#0ea5e9" fill-opacity=".14"/>
+    <text x="767" y="414" text-anchor="middle" fill="#bae6fd" font-family="system-ui" font-size="13" font-weight="700">不需登入也能完整播放</text>
+  </g>
+
+  <path class="flow" d="M892 336H942"/><text class="p" x="917" y="317" text-anchor="middle">選擇儲存</text>
+  <g filter="url(#shadow)">
+    <rect x="952" y="194" width="192" height="284" rx="20" fill="url(#library)"/>
+    <circle cx="990" cy="234" r="19" fill="#fff" fill-opacity=".16"/><text x="990" y="241" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="18">♥</text>
+    <text x="978" y="286" fill="#fff" font-family="system-ui" font-size="13" font-weight="700" letter-spacing="1.2">OPTIONAL LOGIN</text>
+    <text x="978" y="324" fill="#fff" font-family="system-ui" font-size="24" font-weight="750">我的清單</text>
+    <text x="978" y="355" fill="#f3e8ff" font-family="system-ui" font-size="14">最愛歌曲、歌單、</text>
+    <text x="978" y="378" fill="#f3e8ff" font-family="system-ui" font-size="14">角色清單跨裝置同步。</text>
+    <rect x="978" y="414" width="112" height="30" rx="15" fill="#fff" fill-opacity=".16"/>
+    <text x="1034" y="434" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="12" font-weight="700">登入後解鎖</text>
+  </g>
+  <text x="600" y="528" text-anchor="middle" fill="#64748b" font-family="system-ui" font-size="12">公開探索 → 播放器體驗 → 需要時才登入保存，任何一步都不會中斷聆聽。</text>
 </svg>

@@ -1,39 +1,51 @@
 <template>
-  <div class="album-details-grid" :class="{ 'single-panel': !hasRightPanel }">
-    <div class="album-details-left">
-      <img 
-        :key="album.cid + '-cover'"
-        :src="proxyImageUrl(album.coverUrl)" 
-        :alt="album.name" 
-        class="album-grid-cover"
-        decoding="async"
-        fetchpriority="high"
-        @load="handleImageLoad"
-        @error="handleImageError"
-      >
+  <div class="album-details-grid">
+    <header class="album-details-header">
+      <div class="album-details-kicker">專輯資料</div>
       <h2>{{ displayAlbumName }}</h2>
       <h3>{{ album.belong }}</h3>
-      <p class="album-intro api-pre-line">{{ displayIntro }}</p>
-    </div>
-    <div v-if="hasRightPanel" class="album-details-right" :class="{ loading: album.coverDeUrl && !imageLoaded }">
-      <div v-if="album.coverDeUrl && !imageLoaded" class="album-visual-placeholder">
-        {{ t('common.loading') }}
+    </header>
+
+    <section class="album-media-layout" :class="{ 'without-visual': !album.coverDeUrl }">
+      <div class="album-media-panel album-cover-panel">
+        <img
+          :key="album.cid + '-cover'"
+          :src="proxyImageUrl(album.coverUrl)"
+          :alt="album.name"
+          class="album-grid-cover"
+          decoding="async"
+          fetchpriority="high"
+          @load="handleCoverImageLoad"
+          @error="handleCoverImageError"
+        >
       </div>
-      <img 
+
+      <div
         v-if="album.coverDeUrl"
-        :key="album.cid + '-visual'"
-        :src="proxyImageUrl(album.coverDeUrl)" 
-        :alt="album.name" 
-        class="album-grid-visual"
-        loading="eager"
-        decoding="async"
-        fetchpriority="high"
-        @load="handleImageLoad"
-        @error="handleImageError"
+        class="album-media-panel album-visual-panel"
+        :class="{ loading: !visualLoaded }"
       >
-      <div class="song-list projected-song-list">
-        <div class="projected-song-list-kicker">MSR / SIGNAL</div>
-        <div v-if="totalPages > 1" class="song-list-header">
+        <div v-if="!visualLoaded" class="album-visual-placeholder">
+          {{ t('common.loading') }}
+        </div>
+        <img
+          :key="album.cid + '-visual'"
+          :src="proxyImageUrl(album.coverDeUrl)"
+          :alt="album.name"
+          class="album-grid-visual"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+          @load="handleVisualImageLoad"
+          @error="handleVisualImageError"
+        >
+      </div>
+    </section>
+
+    <p class="album-intro api-pre-line">{{ displayIntro }}</p>
+
+    <div class="song-list projected-song-list">
+      <div v-if="totalPages > 1" class="song-list-header">
           <h3>{{ t('album.trackList') }}</h3>
           <div class="pagination-controls">
             <button 
@@ -47,8 +59,8 @@
             >&gt;</button>
           </div>
         </div>
-        <h3 v-else>{{ t('album.trackList') }}</h3>
-        <div id="song-list-content">
+      <h3 v-else>{{ t('album.trackList') }}</h3>
+      <div id="song-list-content">
           <div 
             v-for="(song, index) in currentPageSongs" 
             :key="`${album.cid}-${song.cid}-${index}`"
@@ -63,9 +75,9 @@
               <button @click="handlePlaySong(getSongIndex(index))">{{ t('album.play') }}</button>
             </div>
           </div>
-        </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -166,11 +178,8 @@ const emit = defineEmits(['play-song']);
 const currentPage = ref(1);
 const songsPerPage = 4;
 const songTitleRefs = ref(new Map());
-const imageLoaded = ref(false);
-
-const hasRightPanel = computed(() => {
-  return Boolean(props.album?.coverDeUrl || props.album?.songs?.length);
-});
+const coverLoaded = ref(false);
+const visualLoaded = ref(false);
 
 // 確保 Map 始終存在
 if (!songTitleRefs.value) {
@@ -218,14 +227,26 @@ watch(() => props.album, (newAlbum) => {
   }
 }, { immediate: true });
 
-const handleImageLoad = (event) => {
-  imageLoaded.value = true;
+const handleCoverImageLoad = (event) => {
+  coverLoaded.value = true;
   event.target.classList.add('loaded');
 };
 
-const handleImageError = (event) => {
+const handleVisualImageLoad = (event) => {
+  visualLoaded.value = true;
+  event.target.classList.add('loaded');
+};
+
+const handleCoverImageError = (event) => {
+  coverLoaded.value = true;
+  event.target.classList.add('loaded');
   console.error('圖片加載失敗:', event.target.src);
-  imageLoaded.value = true;
+};
+
+const handleVisualImageError = (event) => {
+  visualLoaded.value = true;
+  event.target.classList.add('loaded');
+  console.error('圖片加載失敗:', event.target.src);
 };
 
 const changePage = (direction) => {
@@ -318,7 +339,8 @@ const applyMarquee = () => {
 // 監聽專輯變化，重置狀態
 watch(() => props.album.cid, () => {
   currentPage.value = 1;
-  imageLoaded.value = false;
+  coverLoaded.value = false;
+  visualLoaded.value = false;
   // 確保 Map 存在後再清理
   if (songTitleRefs.value) {
     songTitleRefs.value.clear();
@@ -371,56 +393,128 @@ onUnmounted(() => {
 
 <style scoped>
 .album-details-grid {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-  align-items: center;
-}
-
-.album-details-grid.single-panel {
   grid-template-columns: minmax(0, 1fr);
+  width: min(1120px, 100%);
+  gap: 20px;
+  margin: 0 auto;
+  padding: 8px 0 24px;
+  isolation: isolate;
 }
 
-.album-details-grid.single-panel .album-details-left {
-  max-width: 640px;
-  width: 100%;
-  justify-self: center;
+.album-details-grid > * {
+  position: relative;
+  z-index: 1;
 }
 
-.album-details-left {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: center;
+.album-details-header {
+  min-width: 0;
+  padding: clamp(18px, 3vw, 30px);
+  overflow: hidden;
+  border: 1px solid rgba(148, 222, 255, 0.26);
+  border-radius: 16px;
+  background: linear-gradient(112deg, rgba(21, 71, 99, 0.48), rgba(7, 25, 40, 0.78) 58%, rgba(38, 111, 150, 0.18));
+  box-shadow: inset 0 0 28px rgba(129, 215, 255, 0.06);
+}
+
+.album-details-header::after {
+  content: '';
+  position: absolute;
+  right: -4%;
+  bottom: -90%;
+  width: 56%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(128, 213, 255, 0.16);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(128, 213, 255, 0.035), 0 0 0 48px rgba(128, 213, 255, 0.02);
+}
+
+.album-details-kicker {
+  margin-bottom: 5px;
+  color: rgba(125, 203, 246, 0.78);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+}
+
+.album-details-header h2 {
+  margin: 0;
+  color: #effaff;
+  font-size: clamp(1.55rem, 3.2vw, 2.3rem);
+  line-height: 1.15;
+  text-align: left;
+  text-shadow: 0 0 22px rgba(100, 205, 255, 0.16);
+}
+
+.album-details-header h3 {
+  margin: 8px 0 0;
+  color: rgba(167, 217, 238, 0.76);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+.album-media-layout {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.74fr) minmax(0, 1.7fr);
+  gap: 20px;
+  align-items: stretch;
   min-width: 0;
 }
 
-.album-details-right {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: center;
-  min-height: 360px;
+.album-media-layout.without-visual {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.album-media-panel {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 222, 255, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(93, 183, 230, 0.14), rgba(7, 25, 40, 0.38));
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26), inset 0 0 26px rgba(129, 215, 255, 0.06);
+}
+
+.album-media-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.album-cover-panel {
+  aspect-ratio: 1;
+}
+
+.album-visual-panel {
+  display: grid;
+  min-height: 180px;
+  aspect-ratio: 16 / 7;
+  align-items: stretch;
+}
+
+.album-visual-panel.loading {
+  place-items: center;
 }
 
 .album-visual-placeholder {
-  width: 100%;
-  min-height: 220px;
-  border-radius: 8px;
-  background: linear-gradient(45deg, #30363d, #484f58);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(167, 217, 238, 0.72);
+  font-size: 0.9rem;
 }
 
 .album-grid-cover {
-  width: 70%;
-  max-width: 350px;
-  height: auto;
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
   display: block;
-  margin-bottom: 10px;
+  object-fit: cover;
   opacity: 0;
   transition: opacity 0.3s;
   background: linear-gradient(45deg, #30363d, #484f58);
@@ -432,11 +526,11 @@ onUnmounted(() => {
 
 .album-grid-visual {
   width: 100%;
-  height: auto;
-  min-height: 200px;
-  border-radius: 8px;
+  height: 100%;
+  min-height: 180px;
+  aspect-ratio: 16 / 7;
+  border-radius: inherit;
   display: block;
-  margin-bottom: 10px;
   opacity: 0;
   transition: opacity 0.2s;
   background: linear-gradient(45deg, #30363d, #484f58);
@@ -447,27 +541,16 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-.album-details-left h2 {
-  font-size: 1.8rem;
-  color: var(--primary-color);
+.album-intro {
+  line-height: 1.75;
   margin: 0;
-  text-align: center;
-}
-
-.album-details-left h3 {
-  font-size: 1.2rem;
-  color: var(--text-secondary);
-  margin: 0;
-  font-weight: 500;
-  text-align: center;
-}
-
-.album-details-left .album-intro {
-  line-height: 1.6;
-  margin: 0;
-  color: var(--text-color);
+  padding: 18px 20px 18px 24px;
+  border-left: 3px solid rgba(102, 203, 255, 0.72);
+  border-radius: 0 12px 12px 0;
+  background: rgba(9, 35, 52, 0.34);
+  color: rgba(220, 242, 252, 0.84);
   width: 100%;
-  text-align: center;
+  text-align: left;
 }
 
 .song-list {
@@ -576,13 +659,13 @@ onUnmounted(() => {
 .projected-song-list {
   position: relative;
   width: 100%;
-  padding: 20px;
+  padding: clamp(18px, 3vw, 28px);
   overflow: hidden;
   isolation: isolate;
   border: 1px solid rgba(148, 222, 255, 0.5);
-  border-radius: 14px;
-  background: linear-gradient(145deg, rgba(93, 183, 230, 0.16), rgba(7, 25, 40, 0.3));
-  box-shadow: 0 0 36px rgba(93, 196, 255, 0.16), inset 0 0 30px rgba(129, 215, 255, 0.06);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(48, 126, 166, 0.22), rgba(6, 22, 35, 0.62));
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22), inset 0 0 30px rgba(129, 215, 255, 0.06);
 }
 
 .projected-song-list::before {
@@ -657,11 +740,11 @@ onUnmounted(() => {
   grid-template-columns: 34px minmax(0, 1.4fr) minmax(0, 1fr) 86px;
   gap: 12px;
   align-items: center;
-  min-height: 54px;
-  padding: 8px 12px;
+  min-height: 58px;
+  padding: 9px 14px;
   border: 1px solid rgba(152, 218, 248, 0.12);
   border-radius: 8px;
-  background: rgba(10, 41, 59, 0.25);
+  background: rgba(5, 24, 37, 0.42);
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
@@ -822,12 +905,31 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
-  .album-details-grid {
-    grid-template-columns: 1fr;
+  .album-media-layout {
+    grid-template-columns: minmax(140px, 0.7fr) minmax(0, 1.65fr);
   }
 }
 
 @media (max-width: 600px) {
+  .album-details-grid {
+    gap: 18px;
+    padding-bottom: 70px;
+  }
+
+  .album-media-layout,
+  .album-media-layout.without-visual {
+    grid-template-columns: 1fr;
+  }
+
+  .album-cover-panel {
+    width: min(100%, 260px);
+    justify-self: center;
+  }
+
+  .album-visual-panel {
+    min-height: 140px;
+  }
+
   .projected-song-list {
     padding: 15px 12px;
   }

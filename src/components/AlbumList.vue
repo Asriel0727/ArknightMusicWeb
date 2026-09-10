@@ -8,7 +8,7 @@
     <div v-else-if="displayAlbums.length === 0" class="no-results">
       <p>{{ t('album.noResults') }}</p>
     </div>
-    <div v-else>
+    <div v-else class="album-list-stage">
       <section
         ref="containerRef"
         class="albums-container"
@@ -54,8 +54,9 @@
         </div>
         <div
           v-for="item in visibleAlbums"
-          :key="item.slotOffset"
+          :key="item.album.cid"
           class="album-slot"
+          :data-album-id="item.album.cid"
           :class="{
             'is-active': item.slotOffset === 0,
           }"
@@ -63,13 +64,16 @@
           @click="handleAlbumClick(item.index, $event)"
           @pointerenter="handlePreloadAlbum(item.album)"
         >
-          <div class="vinyl-record" aria-hidden="true"></div>
+          <div v-if="item.slotOffset === 0" class="vinyl-record" aria-hidden="true">
+            <VinylDisc :cover="getProxyImageUrl(item.album.coverUrl)" />
+          </div>
           <AlbumCard
             :key="item.album.cid"
             :album="item.album"
+            :active="item.slotOffset === 0"
             :track-count="getAlbumTrackCount(item.album)"
             :track-count-loading="isAlbumTrackCountLoading(item.album)"
-            @view-album="handleViewAlbum"
+            @view-album="(id, event) => handleViewAlbum(id, event)"
             @preload-album="handlePreloadAlbum"
           />
         </div>
@@ -105,9 +109,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AlbumCard from './AlbumCard.vue';
+import VinylDisc from './VinylDisc.vue';
 import { albumState, searchState } from '../stores/player.js';
 import { fetchAlbumDetails, fetchAlbums, getProxyImageUrl, searchMusic } from '../services/api.js';
 
@@ -133,9 +138,68 @@ let lastPointerAt = 0;
 let lastRackWheelAt = 0;
 let releaseFrame = null;
 let interactionHintTimer = null;
+let slideAudioContext = null;
+let slideAudioGain = null;
+let searchRequestToken = 0;
+let clickResetTimer = null;
 
 const RACK_WHEEL_COOLDOWN_MS = 280;
 const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+const playAlbumSlideSound = (direction = 1) => {
+  const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextConstructor) return;
+
+  try {
+    if (!slideAudioContext) {
+      slideAudioContext = new AudioContextConstructor();
+      slideAudioGain = slideAudioContext.createGain();
+      slideAudioGain.gain.value = isTouchDevice ? 0.035 : 0.05;
+      slideAudioGain.connect(slideAudioContext.destination);
+    }
+
+    if (slideAudioContext.state === 'suspended') {
+      void slideAudioContext.resume().catch(() => {});
+    }
+
+    const now = slideAudioContext.currentTime;
+    const click = slideAudioContext.createOscillator();
+    const clickGain = slideAudioContext.createGain();
+    const body = slideAudioContext.createOscillator();
+    const bodyGain = slideAudioContext.createGain();
+    const pitch = direction > 0 ? 1760 : 1580;
+
+    // A short high-frequency square pulse gives the carousel a crisp, mechanical "ka".
+    click.type = 'square';
+    click.frequency.setValueAtTime(pitch, now);
+    click.frequency.exponentialRampToValueAtTime(pitch * 0.58, now + 0.026);
+    clickGain.gain.setValueAtTime(0.0001, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.42, now + 0.001);
+    clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+    // A subtle, equally brief lower transient keeps the click tactile without becoming boomy.
+    body.type = 'triangle';
+    body.frequency.setValueAtTime(direction > 0 ? 520 : 470, now);
+    body.frequency.exponentialRampToValueAtTime(260, now + 0.032);
+    bodyGain.gain.setValueAtTime(0.0001, now);
+    bodyGain.gain.exponentialRampToValueAtTime(0.18, now + 0.002);
+    bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+
+    click.connect(clickGain);
+    clickGain.connect(slideAudioGain);
+    body.connect(bodyGain);
+    bodyGain.connect(slideAudioGain);
+    click.start(now);
+    body.start(now);
+    click.stop(now + 0.045);
+    body.stop(now + 0.05);
+    click.onended = () => { click.disconnect(); clickGain.disconnect(); };
+    body.onended = () => { body.disconnect(); bodyGain.disconnect(); };
+  } catch (error) {
+    // Audio feedback is optional and must never interrupt album navigation.
+    console.debug('Album slide sound unavailable:', error);
+  }
+};
 
 // 專輯資料只保留一份完整列表；唱片架只渲染目前位置附近的卡片。
 const displayAlbums = computed(() => {
@@ -184,7 +248,9 @@ const getAlbumStep = () => {
     ? 82
     : width <= 900
       ? Math.min(136, Math.max(86, width * 0.15))
-      : Math.min(196, Math.max(108, width * 0.135));
+      : width >= 1400
+        ? Math.min(250, Math.max(132, width * 0.1))
+        : Math.min(196, Math.max(108, width * 0.135));
 };
 
 const getAlbumStyle = (slotOffset) => {
@@ -198,13 +264,14 @@ const getAlbumStyle = (slotOffset) => {
     '--album-x': `${offset * albumStep + dragOffset.value}px`,
     '--album-depth': `${Math.max(-520, -distance * 68)}px`,
     '--album-scale': Math.max(0.58, 1 - distance * 0.075),
-    '--album-rotate': `${offset * -30}deg`,
+    '--album-rotate': `${Math.sign(offset) * -Math.min(64, distance * 23)}deg`,
     '--album-drag-rotate': `${dragRotation.value}deg`,
     '--album-parallax-x': `${parallaxX.value * parallaxStrength}px`,
     '--album-parallax-y': `${parallaxY.value * (0.5 + Math.min(distance, 4) * 0.08)}px`,
     '--vinyl-parallax-x': `${parallaxX.value * (0.8 + Math.min(distance, 4) * 0.1)}px`,
     '--vinyl-parallax-y': `${parallaxY.value * (0.65 + Math.min(distance, 4) * 0.08)}px`,
-    '--album-opacity': Math.max(0, 1 - distance * 0.14),
+    '--album-opacity': 1,
+    '--album-brightness': Math.max(0.58, 1 - distance * 0.1),
     zIndex: 100 - Math.round(distance),
     pointerEvents: distance > 5 ? 'none' : 'auto',
   };
@@ -213,7 +280,9 @@ const getAlbumStyle = (slotOffset) => {
 const moveAlbum = (direction) => {
   const total = displayAlbums.value.length;
   if (total <= 1) return;
+  dismissInteractionHint();
 
+  playAlbumSlideSound(direction);
   activeAlbumIndex.value = (activeAlbumIndex.value + direction + total) % total;
   preloadAlbumImages([
     displayAlbums.value[activeAlbumIndex.value],
@@ -232,6 +301,7 @@ const handleAlbumClick = (index, event) => {
   if (event.target.closest('button')) return;
 
   if (index !== activeAlbumIndex.value) {
+    playAlbumSlideSound(index > activeAlbumIndex.value ? 1 : -1);
     activeAlbumIndex.value = index;
   }
 };
@@ -329,6 +399,9 @@ const handlePointerUp = () => {
     dragRotation.value = 0;
     releaseFrame = null;
   });
+  // Suppress only the click generated by this drag, not the next deliberate tap.
+  window.clearTimeout(clickResetTimer);
+  clickResetTimer = window.setTimeout(() => { suppressAlbumClick.value = false; }, 0);
 };
 
 const getAmbientStyle = (album) => {
@@ -421,6 +494,7 @@ const initializeAlbums = async () => {
 
 // 處理搜索
 const handleSearch = async (query) => {
+  const token = ++searchRequestToken;
   if (!query) {
     searchState.query = '';
     searchState.filteredAlbums = [];
@@ -432,12 +506,14 @@ const handleSearch = async (query) => {
 
   try {
     const result = await searchMusic(query);
+    if (token !== searchRequestToken) return;
     searchState.filteredAlbums = result.albums || [];
   } catch (error) {
+    if (token !== searchRequestToken) return;
     console.warn('Backend search failed, fallback to local search:', error);
     searchState.filteredAlbums = albumState.allAlbums.filter(album => {
-      const nameMatch = album.name.toLowerCase().includes(query);
-      const artistMatch = album.artistes.join(', ').toLowerCase().includes(query);
+      const nameMatch = album.name.toLowerCase().includes(query.toLowerCase());
+      const artistMatch = (album.artistes || []).join(', ').toLowerCase().includes(query.toLowerCase());
       return nameMatch || artistMatch;
     });
   }
@@ -447,8 +523,24 @@ const handleSearch = async (query) => {
 const emit = defineEmits(['view-album']);
 
 // 查看專輯
-const handleViewAlbum = (albumId) => {
-  emit('view-album', albumId);
+const handleViewAlbum = async (albumId, event) => {
+  if (suppressAlbumClick.value) return;
+  const slot = event?.currentTarget?.closest('.album-slot');
+  // Measure the actual record and cover, so opening continues from the visible sleeve.
+  const rectData = (element) => {
+    if (!element) return null;
+    const { x, y, width, height } = element.getBoundingClientRect();
+    return { x, y, width, height };
+  };
+  if (slot && !slot.classList.contains('is-active')) {
+    activeAlbumIndex.value = displayAlbums.value.findIndex(album => String(album.cid) === String(albumId));
+    await nextTick();
+    return;
+  }
+  emit('view-album', albumId, {
+    disc: rectData(slot?.querySelector('.vinyl-record')),
+    cover: rectData(slot?.querySelector('.album > img')),
+  });
 };
 
 const getTrackCountFromAlbum = (album) => {
@@ -564,6 +656,7 @@ watch(locale, async () => {
 });
 
 onUnmounted(() => {
+  window.clearTimeout(clickResetTimer);
   if (releaseFrame !== null) {
     cancelAnimationFrame(releaseFrame);
   }
@@ -571,6 +664,9 @@ onUnmounted(() => {
     window.clearTimeout(interactionHintTimer);
   }
   window.removeEventListener('resize', handleResize);
+  if (slideAudioContext) {
+    void slideAudioContext.close();
+  }
 });
 
 // 暴露搜索處理函數給父組件
@@ -581,10 +677,14 @@ defineExpose({
 
 <style scoped>
 main {
+  --rack-card-width: clamp(230px, 22vw, 340px);
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding: 20px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1800px;
   margin: 0 auto;
 }
 
@@ -595,9 +695,16 @@ main .page-title {
   color: var(--text-color);
 }
 
+.album-list-stage {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
 .albums-container {
   position: relative;
-  min-height: clamp(420px, 44vw, 560px);
+  flex: 1;
+  min-height: max(calc(var(--rack-card-width) + 220px), calc(100dvh - 370px));
   margin: 12px -20px 0;
   overflow: hidden;
   isolation: isolate;
@@ -607,6 +714,22 @@ main .page-title {
   outline: none;
   cursor: grab;
   user-select: none;
+}
+
+.albums-container::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 5%;
+  left: 50%;
+  width: min(900px, 88%);
+  height: 78%;
+  background: linear-gradient(to top, rgba(122, 211, 255, 0.16), rgba(122, 211, 255, 0.045) 54%, transparent 86%);
+  clip-path: polygon(40% 100%, 60% 100%, 76% 0, 24% 0);
+  filter: blur(3px);
+  opacity: 0.8;
+  pointer-events: none;
+  transform: translateX(-50%);
 }
 
 .albums-container:focus-visible {
@@ -620,14 +743,15 @@ main .page-title {
 
 .album-slot {
   position: absolute;
-  top: 20px;
+  top: 50%;
   left: 50%;
-  width: clamp(172px, 20vw, 270px);
-  height: clamp(330px, 35vw, 460px);
+  width: var(--rack-card-width);
+  height: calc(var(--rack-card-width) + 160px);
   opacity: var(--album-opacity);
+  filter: brightness(var(--album-brightness));
   transform: translate3d(
       calc(-50% + var(--album-x) + var(--album-parallax-x)),
-      var(--album-parallax-y),
+      calc(-50% + var(--album-parallax-y)),
       var(--album-depth)
     )
     rotateY(var(--album-rotate))
@@ -651,7 +775,7 @@ main .page-title {
   background-position: center;
   background-size: cover;
   filter: blur(42px) saturate(1.45);
-  opacity: 0.3;
+  opacity: 0.13;
   pointer-events: none;
   transform: translate3d(var(--ambient-parallax-x), var(--ambient-parallax-y), 0) scale(1.12);
 }
@@ -807,54 +931,12 @@ main .page-title {
 .vinyl-record {
   position: absolute;
   z-index: 1;
-  top: 14px;
-  right: -34px;
-  width: 92%;
+  top: 24px;
+  right: -24%;
+  width: 88%;
   aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at center, #3b4654 0 5%, #121820 5.5% 8%, transparent 8.5%),
-    repeating-radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 5px),
-    radial-gradient(circle at 35% 28%, #3c4655, #080b10 62%, #020307 100%);
-  box-shadow: 14px 16px 24px rgba(0, 0, 0, 0.42), inset 0 0 0 8px rgba(0, 0, 0, 0.16);
-  opacity: 0.12;
+  opacity: 1;
   pointer-events: none;
-  transform: translate3d(var(--vinyl-parallax-x), var(--vinyl-parallax-y), -28px) rotate(0deg);
-  transition: opacity 420ms ease, transform 560ms cubic-bezier(0.16, 1.08, 0.3, 1);
-}
-
-.vinyl-record::before {
-  content: '';
-  position: absolute;
-  inset: 9%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: inherit;
-}
-
-.vinyl-record::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 13%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgba(88, 166, 255, 0.75);
-  box-shadow: 0 0 10px rgba(88, 166, 255, 0.38);
-  transform: translate(-50%, -50%);
-}
-
-.album-slot.is-active .vinyl-record {
-  opacity: 0.88;
-  transform: translate3d(calc(10px + var(--vinyl-parallax-x)), var(--vinyl-parallax-y), -28px) rotate(360deg);
-  animation: vinyl-spin 12s linear infinite;
-}
-
-@keyframes vinyl-spin {
-  to {
-    transform: translate3d(calc(10px + var(--vinyl-parallax-x)), var(--vinyl-parallax-y), -28px) rotate(360deg);
-  }
 }
 
 .album-slot.is-active {
@@ -871,6 +953,8 @@ main .page-title {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(88, 166, 255, 0.05);
+  background: linear-gradient(145deg, rgba(20, 49, 64, 0.72), rgba(7, 18, 28, 0.82));
+  backdrop-filter: blur(8px) saturate(1.08);
   transition: box-shadow 260ms ease, border-color 260ms ease;
 }
 
@@ -901,6 +985,7 @@ main .page-title {
 
 .album-slot.is-active :deep(.album) {
   border-color: rgba(88, 166, 255, 0.5);
+  background: linear-gradient(145deg, rgba(19, 56, 75, 0.78), rgba(7, 21, 33, 0.88));
   box-shadow: 0 24px 40px rgba(0, 0, 0, 0.48), 0 0 30px rgba(88, 166, 255, 0.16);
 }
 
@@ -918,7 +1003,7 @@ main .page-title {
 }
 
 .album-slot.is-active :deep(.album)::after {
-  animation: album-sheen 4.8s ease-in-out 1.1s infinite;
+  animation: none;
 }
 
 @keyframes album-sheen {
@@ -944,7 +1029,9 @@ main .page-title {
 }
 
 .album-slot :deep(.album img) {
-  height: clamp(180px, 23vw, 280px);
+  height: auto;
+  aspect-ratio: 1;
+  flex-shrink: 0;
   margin-bottom: 10px;
   border-radius: 8px;
   -webkit-user-drag: none;
@@ -953,6 +1040,16 @@ main .page-title {
 
 .album-slot :deep(.marquee-content) {
   font-size: clamp(1.05rem, 1.55vw, 1.32rem);
+  color: #e6f2fa;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  overflow: hidden;
+  line-height: 1.35;
+  animation: none !important;
+  padding-left: 0 !important;
 }
 
 .album-slot :deep(.album p) {
@@ -962,10 +1059,17 @@ main .page-title {
 }
 
 .album-slot :deep(.album button) {
-  min-height: 34px;
-  height: 34px;
+  min-height: 44px;
+  height: 44px;
+  max-height: 44px;
   padding: 6px 8px;
   font-size: clamp(0.7rem, 1vw, 0.86rem);
+}
+
+.album-slot:not(.is-active) :deep(.album button) {
+  background: #223641;
+  color: #c9dce8;
+  border: 1px solid #486580;
 }
 
 .rack-floor {
@@ -995,8 +1099,8 @@ main .page-title {
 }
 
 .rack-arrow {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border: 1px solid rgba(88, 166, 255, 0.5);
   border-radius: 50%;
   background: rgba(18, 25, 36, 0.76);
@@ -1062,7 +1166,47 @@ main .page-title {
   color: var(--text-secondary);
 }
 
+@media (min-width: 1400px) {
+  main {
+    max-width: 1880px;
+    padding: 28px 32px;
+  }
+
+  main .page-title {
+    margin-bottom: 22px;
+    font-size: clamp(1.45rem, 1.5vw, 1.9rem);
+  }
+
+  .albums-container {
+    min-height: max(calc(var(--rack-card-width) + 230px), calc(100dvh - 370px));
+    margin: 16px -32px 0;
+  }
+
+  .album-slot {
+    width: var(--rack-card-width);
+    height: calc(var(--rack-card-width) + 160px);
+  }
+
+  .album-slot :deep(.album) {
+    padding: 14px;
+  }
+
+  .album-slot :deep(.album img) {
+    height: auto;
+  }
+
+  .album-slot :deep(.marquee-content) {
+    font-size: clamp(1.15rem, 1.65vw, 1.55rem);
+  }
+
+  .album-slot :deep(.album p) {
+    font-size: clamp(0.96rem, 1.2vw, 1.12rem);
+  }
+
+}
+
 @media (max-width: 900px) {
+  main { --rack-card-width: 220px; }
   .albums-container {
     min-height: 390px;
     margin-right: -20px;
@@ -1070,12 +1214,12 @@ main .page-title {
   }
 
   .album-slot {
-    width: clamp(156px, 24vw, 220px);
-    height: 340px;
+    width: var(--rack-card-width);
+    height: 350px;
   }
 
   .album-slot :deep(.album img) {
-    height: clamp(160px, 22vw, 210px);
+    height: auto;
   }
 }
 
@@ -1086,9 +1230,9 @@ main .page-title {
   }
 
   .album-slot {
-    top: 12px;
-    width: 148px;
-    height: 320px;
+    top: 50%;
+    width: 172px;
+    height: 328px;
   }
 
   .album-slot :deep(.album) {
@@ -1096,7 +1240,7 @@ main .page-title {
   }
 
   .album-slot :deep(.album img) {
-    height: 158px;
+    height: auto;
   }
 
   .rack-controls {
@@ -1123,6 +1267,7 @@ main .page-title {
   .album-slot :deep(.album p) {
     font-size: 0.84rem;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {

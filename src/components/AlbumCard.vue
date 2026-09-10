@@ -25,7 +25,7 @@
       </div>
     </div>
     <p>{{ album.artistes.join(', ') }}</p>
-    <button @click="$emit('view-album', album.cid)">{{ t('album.viewAlbum') }}</button>
+    <button @click="$emit('view-album', album.cid, $event)">{{ t(active ? 'album.viewAlbum' : 'album.selectAlbum') }}</button>
   </div>
 </template>
 
@@ -37,6 +37,7 @@ import { getProxyImageUrl } from '../services/api.js';
 const { t } = useI18n();
 
 const props = defineProps({
+  active: { type: Boolean, default: true },
   album: {
     type: Object,
     required: true
@@ -82,7 +83,7 @@ const checkMarquee = () => {
       marqueeContainer.value.style.overflow = 'hidden';
       marqueeContent.value.style.animation = 'marquee 10s linear infinite';
     } else {
-      marqueeContainer.value.style.overflow = 'visible';
+      marqueeContainer.value.style.overflow = 'hidden';
       marqueeContent.value.style.animation = 'none';
       marqueeContent.value.style.paddingLeft = '0';
     }

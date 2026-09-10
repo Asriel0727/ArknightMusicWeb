@@ -91,6 +91,10 @@
     "loading": "載入中…"
   },
   "album": {
+    "selectAlbum": "選取專輯",
+    "loadError": "專輯暫時無法載入，請稍後再試。",
+    "retry": "重試",
+    "emptyTracks": "這張專輯目前沒有可播放的曲目。",
     "pageTitle": "塞壬唱片專輯",
     "noResults": "沒有找到專輯",
     "prevPage": "上一頁",

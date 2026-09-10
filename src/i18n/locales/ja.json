@@ -91,6 +91,10 @@
     "loading": "読み込み中…"
   },
   "album": {
+    "selectAlbum": "アルバムを選択",
+    "loadError": "アルバムを読み込めませんでした。もう一度お試しください。",
+    "retry": "再試行",
+    "emptyTracks": "このアルバムには再生できる曲がありません。",
     "pageTitle": "モンスターサイレン アルバム",
     "noResults": "アルバムが見つかりません",
     "prevPage": "前へ",

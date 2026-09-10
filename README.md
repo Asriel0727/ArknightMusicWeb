@@ -49,14 +49,27 @@
 
 ```mermaid
 flowchart LR
-  U["使用者瀏覽器"] --> F["Vue 3 + Vite 前端"]
-  F -->|"音樂 / 角色 / 活動 API"| W["Cloudflare Worker"]
-  F -->|"個人清單 / 登入"| W
-  W --> K["Cloudflare KV + Cache"]
-  W --> S["Supabase"]
-  W --> M["Monster Siren API"]
-  W --> G["Arknights Wiki / PRTS / GameData"]
-  W --> B["Bilibili 角色 EP metadata"]
+  U(["👤 使用者"])
+  F["🖥️ Vue 3 前端<br/>播放與互動"]
+  W{{"☁️ Cloudflare Worker<br/>資料協調層"}}
+  S[("🗄️ Supabase<br/>歌曲 · 清單 · EP")]
+  K[("⚡ KV / Cache<br/>Session · 快取")]
+  M["🎵 Monster Siren"]
+  G["◇ GameData / Wiki"]
+  Y["▶ YouTube EP"]
+  U --> F -->|API| W
+  W --> S & K
+  W -.同步 / fallback.-> M & G & Y
+  classDef user fill:#1e293b,stroke:#64748b,color:#f8fafc,stroke-width:1px
+  classDef front fill:#0c4a6e,stroke:#38bdf8,color:#f0f9ff,stroke-width:2px
+  classDef worker fill:#7c2d12,stroke:#fb923c,color:#fff7ed,stroke-width:2px
+  classDef data fill:#064e3b,stroke:#34d399,color:#ecfdf5,stroke-width:2px
+  classDef source fill:#312e81,stroke:#a5b4fc,color:#eef2ff,stroke-width:1px
+  class U user
+  class F front
+  class W worker
+  class S,K data
+  class M,G,Y source
 ```
 
 資料流原則：前端只處理顯示、互動與本機播放狀態；外部來源、快取、帳號驗證與 Supabase 存取集中由 Worker 協調。這能減少 CORS、GitHub raw 限流與來源格式變動直接影響使用者。
@@ -116,13 +129,26 @@ VITE_RECRUIT_API_BASE=https://<your-worker>.workers.dev
 
 ```mermaid
 flowchart TB
-  App["App.vue\n頁面切換、分享網址、audio 初始化"]
-  App --> UI["components/\n各功能畫面"]
-  UI --> State["stores/player.js\n播放器、Modal、資料狀態"]
-  UI --> Services["services/\n前端 API、Auth、快取、資產"]
-  Services --> Worker["worker/index.js\n路由、整合、快取、資料同步"]
-  UI --> I18n["i18n/\n五種語言字串"]
-  Worker --> DB["Supabase / KV"]
+  App["🧭 App.vue<br/>頁面與分享入口"]
+  UI["🧩 components/<br/>功能畫面"]
+  State["▶ stores/player.js<br/>播放與狀態"]
+  Services["🔌 services/<br/>API · Auth · Asset"]
+  Worker{{"☁️ worker/index.js<br/>路由與資料整合"}}
+  I18n["🌐 i18n/<br/>五種語言"]
+  DB[("🗄️ Supabase / KV")]
+  App --> UI
+  UI --> State & Services & I18n
+  Services --> Worker --> DB
+  classDef app fill:#1e3a5f,stroke:#60a5fa,color:#eff6ff
+  classDef state fill:#164e63,stroke:#22d3ee,color:#ecfeff
+  classDef worker fill:#7c2d12,stroke:#fb923c,color:#fff7ed,stroke-width:2px
+  classDef data fill:#064e3b,stroke:#34d399,color:#ecfdf5
+  classDef side fill:#312e81,stroke:#a5b4fc,color:#eef2ff
+  class App,UI app
+  class State,Services state
+  class Worker worker
+  class DB data
+  class I18n side
 ```
 
 | 想修改的內容 | 優先查看 | 注意事項 |

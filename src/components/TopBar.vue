@@ -23,13 +23,13 @@ const handleSearch = (query) => {
 <style scoped>
 .topbar-section {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1880px;
   margin: 0 auto 18px auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 0 40px;
+  padding: 0 32px;
 }
 
 .topbar-left {
@@ -58,7 +58,7 @@ const handleSearch = (query) => {
 
 @media (max-width: 600px) {
   .topbar-section {
-    padding: 0 2px;
+    padding: 0 20px;
     gap: 4px;
   }
 }
