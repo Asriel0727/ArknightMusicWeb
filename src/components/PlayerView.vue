@@ -1,5 +1,6 @@
 <template>
-  <div class="player-view-grid" :class="{ 'single-panel': !hasRightPanel }">
+  <div class="player-view-grid"
+    :class="{ 'single-panel': !hasRightPanel, 'embedded-player-view': playerProps.embedded }">
     <div v-if="playerState.isLoadingSong" class="player-loading-overlay" role="status">
       <span class="player-loading-dots" aria-hidden="true"><i></i><i></i><i></i></span>
       <span>{{ t('common.loading') }}</span>
@@ -235,6 +236,9 @@ import { formatTime } from '../utils/time.js';
 import { getCharacterEpVideoOffsetSeconds, getCharacterEpVideoTime } from '../utils/characterEpPlayback.js';
 
 const { t, locale } = useI18n();
+const playerProps = defineProps({
+  embedded: { type: Boolean, default: false },
+});
 const emit = defineEmits(['view-album']);
 
 const lyricsContainerRef = ref(null);

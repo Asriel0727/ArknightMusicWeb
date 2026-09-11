@@ -59,6 +59,7 @@
           :data-album-id="item.album.cid"
           :class="{
             'is-active': item.slotOffset === 0,
+            'is-opening': isOpeningAlbum(item.album),
           }"
           :style="getAlbumStyle(item.slotOffset)"
           @click="handleAlbumClick(item.index, $event)"
@@ -128,6 +129,7 @@ const parallaxX = ref(0);
 const parallaxY = ref(0);
 const suppressAlbumClick = ref(false);
 const showInteractionHint = ref(false);
+const openingAlbumId = ref(null);
 const albumTrackCounts = ref({});
 const albumTrackLoading = ref({});
 const albumTrackRequests = new Map();
@@ -142,8 +144,12 @@ let slideAudioContext = null;
 let slideAudioGain = null;
 let searchRequestToken = 0;
 let clickResetTimer = null;
+let openingAlbumTimer = null;
 
 const RACK_WHEEL_COOLDOWN_MS = 280;
+const OPENING_CARD_HOLD_MS = 1650;
+const MAX_PARALLAX_Y_UP = 0;
+const MAX_PARALLAX_Y_DOWN = 8;
 const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 const playAlbumSlideSound = (direction = 1) => {
@@ -208,7 +214,7 @@ const displayAlbums = computed(() => {
 
 const visibleAlbumRadius = computed(() => {
   const width = windowWidth.value;
-  return Math.max(2, Math.min(4, Math.round(width / 320)));
+  return Math.max(2, Math.min(3, Math.round(width / 320)));
 });
 
 const visibleAlbumCount = computed(() => visibleAlbumRadius.value * 2 + 1);
@@ -216,6 +222,8 @@ const visibleAlbumCount = computed(() => visibleAlbumRadius.value * 2 + 1);
 const activeAlbum = computed(() => {
   return displayAlbums.value[activeAlbumIndex.value] || null;
 });
+
+const isOpeningAlbum = (album) => String(album?.cid) === openingAlbumId.value;
 
 const parallaxStyle = computed(() => ({
   '--ambient-parallax-x': `${parallaxX.value * 0.32}px`,
@@ -314,7 +322,9 @@ const updateParallax = (event) => {
   const normalizedY = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
 
   parallaxX.value = normalizedX * 18;
-  parallaxY.value = normalizedY * 12;
+  // The rack is clipped at its top edge, so keep upward parallax smaller than downward motion.
+  const parallaxLimitY = normalizedY < 0 ? MAX_PARALLAX_Y_UP : MAX_PARALLAX_Y_DOWN;
+  parallaxY.value = normalizedY * parallaxLimitY;
 };
 
 const handlePointerLeave = () => {
@@ -413,13 +423,15 @@ const getAmbientStyle = (album) => {
 };
 
 const handleRackWheel = (event) => {
+  if (!event.target?.closest?.('.album-slot')) return;
+
   const horizontalDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY)
     ? event.deltaX
-    : event.shiftKey
-      ? event.deltaY
-      : 0;
+    : event.deltaY;
 
-  if (Math.abs(horizontalDelta) < 8) return;
+  const deltaScale = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
+  const normalizedDelta = horizontalDelta * deltaScale;
+  if (Math.abs(normalizedDelta) < 8) return;
 
   event.preventDefault();
   event.stopPropagation();
@@ -428,7 +440,7 @@ const handleRackWheel = (event) => {
   if (now - lastRackWheelAt < RACK_WHEEL_COOLDOWN_MS) return;
   lastRackWheelAt = now;
 
-  if (horizontalDelta > 0) {
+  if (normalizedDelta > 0) {
     showNextAlbum();
   } else {
     showPreviousAlbum();
@@ -537,10 +549,22 @@ const handleViewAlbum = async (albumId, event) => {
     await nextTick();
     return;
   }
+  resetOpeningAlbum();
+  openingAlbumId.value = String(albumId);
+  openingAlbumTimer = window.setTimeout(resetOpeningAlbum, OPENING_CARD_HOLD_MS);
   emit('view-album', albumId, {
     disc: rectData(slot?.querySelector('.vinyl-record')),
     cover: rectData(slot?.querySelector('.album > img')),
+    card: rectData(slot?.querySelector('.album')),
   });
+};
+
+const resetOpeningAlbum = () => {
+  openingAlbumId.value = null;
+  if (openingAlbumTimer !== null) {
+    window.clearTimeout(openingAlbumTimer);
+    openingAlbumTimer = null;
+  }
 };
 
 const getTrackCountFromAlbum = (album) => {
@@ -657,6 +681,7 @@ watch(locale, async () => {
 
 onUnmounted(() => {
   window.clearTimeout(clickResetTimer);
+  resetOpeningAlbum();
   if (releaseFrame !== null) {
     cancelAnimationFrame(releaseFrame);
   }
@@ -671,7 +696,8 @@ onUnmounted(() => {
 
 // 暴露搜索處理函數給父組件
 defineExpose({
-  handleSearch
+  handleSearch,
+  resetOpeningAlbum,
 });
 </script>
 
@@ -703,6 +729,7 @@ main .page-title {
 
 .albums-container {
   position: relative;
+  --rack-card-rise: clamp(30px, 3vw, 36px);
   flex: 1;
   min-height: max(calc(var(--rack-card-width) + 220px), calc(100dvh - 370px));
   margin: 12px -20px 0;
@@ -743,7 +770,7 @@ main .page-title {
 
 .album-slot {
   position: absolute;
-  top: 50%;
+  top: calc(50% - var(--rack-card-rise));
   left: 50%;
   width: var(--rack-card-width);
   height: calc(var(--rack-card-width) + 160px);
@@ -937,10 +964,43 @@ main .page-title {
   aspect-ratio: 1;
   opacity: 1;
   pointer-events: none;
+  transform: translate3d(0, 0, 0) rotateZ(0deg);
+  transform-origin: center;
+  transition: transform 420ms cubic-bezier(0.2, 0.85, 0.25, 1), opacity 240ms ease;
 }
 
 .album-slot.is-active {
   filter: saturate(1.08) brightness(1.04);
+}
+
+.album-slot.is-opening {
+  z-index: 260 !important;
+}
+
+.album-slot.is-opening .vinyl-record {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.album-slot.is-opening :deep(.album) {
+  animation: album-card-lift 520ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+@keyframes album-card-lift {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  42% {
+    opacity: 1;
+    transform: translate3d(0, -16px, 38px) scale(1.045);
+  }
+
+  100% {
+    opacity: 0.2;
+    transform: translate3d(0, -12px, 24px) scale(1.02);
+  }
 }
 
 .album-slot :deep(.album) {
@@ -996,12 +1056,6 @@ main .page-title {
     0 0 18px rgba(88, 166, 255, 0.28);
 }
 
-.album-slot:hover :deep(.album)::after {
-  opacity: 0.48;
-  transform: translateX(285%) skewX(-16deg);
-  transition: transform 720ms ease, opacity 180ms ease;
-}
-
 .album-slot.is-active :deep(.album)::after {
   animation: none;
 }
@@ -1024,8 +1078,10 @@ main .page-title {
   }
 }
 
-.album-slot :deep(.album:hover) {
-  transform: none;
+.albums-container:not(.is-dragging) .album-slot:not(.is-opening):hover :deep(.album),
+.albums-container:not(.is-dragging) .album-slot:not(.is-opening) :deep(.album:hover) {
+  transform: rotateZ(-1deg);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(88, 166, 255, 0.05);
 }
 
 .album-slot :deep(.album img) {
@@ -1036,6 +1092,11 @@ main .page-title {
   border-radius: 8px;
   -webkit-user-drag: none;
   user-select: none;
+}
+
+.albums-container:not(.is-dragging) .album-slot:not(.is-opening):hover .vinyl-record {
+  transform: translate3d(24%, 0, 14px) rotateZ(7deg);
+  opacity: 1;
 }
 
 .album-slot :deep(.marquee-content) {
@@ -1230,7 +1291,7 @@ main .page-title {
   }
 
   .album-slot {
-    top: 50%;
+    top: calc(50% - var(--rack-card-rise));
     width: 172px;
     height: 328px;
   }

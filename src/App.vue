@@ -19,9 +19,13 @@
         :songs="albumTransition.songs"
         :origin="albumTransition.origin"
         :error="albumTransition.error"
+        :player-open="albumTransition.playerOpen"
+        :player-song-index="albumTransition.playerSongIndex"
         @complete="completeAlbumTransition"
         @close="closeAlbumTransition"
         @play-song="handleTransitionPlaySong"
+        @play-queue-song="handleEmbeddedQueueSong"
+        @close-player="closeEmbeddedPlayer"
         @retry="retryAlbumTransition"
       />
     </template>
@@ -114,6 +118,8 @@ const albumTransition = ref({
   settled: false,
   album: null,
   songs: [],
+  playerOpen: false,
+  playerSongIndex: null,
 });
 let albumDetailLoadToken = 0;
 
@@ -147,12 +153,15 @@ const completeAlbumTransition = () => {
 
 const closeAlbumTransition = () => {
   albumDetailLoadToken++;
+  albumListRef.value?.resetOpeningAlbum?.();
   albumTransition.value = {
     active: false,
     ready: false,
     settled: false,
     album: null,
     songs: [],
+    playerOpen: false,
+    playerSongIndex: null,
   };
   albumState.currentAlbumDetails = null;
   albumState.isLoading = false;
@@ -163,18 +172,36 @@ const closeAlbumTransition = () => {
 const handleTransitionPlaySong = async (songIndex) => {
   const albumId = albumTransition.value.album?.cid;
   if (!albumId || !Number.isInteger(songIndex)) return;
-  albumDetailLoadToken++;
+  albumListRef.value?.resetOpeningAlbum?.();
 
   albumTransition.value = {
-    active: false,
-    ready: false,
-    settled: false,
-    album: null,
-    songs: [],
+    ...albumTransition.value,
+    playerOpen: true,
+    playerSongIndex: songIndex,
   };
-  modalState.currentView = 'player';
-  modalState.isOpen = true;
+  modalState.currentView = 'album';
+  modalState.isOpen = false;
   await playSongFromAlbum(songIndex, albumId);
+};
+
+const handleEmbeddedQueueSong = async (songIndex) => {
+  const albumId = albumTransition.value.album?.cid;
+  if (!albumId || !Number.isInteger(songIndex)) return;
+
+  albumTransition.value = {
+    ...albumTransition.value,
+    playerOpen: true,
+    playerSongIndex: songIndex,
+  };
+  await playSongFromAlbum(songIndex, albumId);
+};
+
+const closeEmbeddedPlayer = () => {
+  albumTransition.value = {
+    ...albumTransition.value,
+    playerOpen: false,
+    playerSongIndex: null,
+  };
 };
 
 const handleViewAlbum = async (albumId, origin = null) => {
@@ -189,6 +216,8 @@ const handleViewAlbum = async (albumId, origin = null) => {
     settled: false,
     album: previewAlbum,
     songs: [],
+    playerOpen: false,
+    playerSongIndex: null,
     origin,
     error: false,
   };
