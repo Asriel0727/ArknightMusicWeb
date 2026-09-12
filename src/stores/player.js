@@ -188,6 +188,7 @@ export const playerState = reactive({
   currentSongIndex: 0,
   currentPlaylist: [],
   sourceContext: null,
+  characterEpVisualMode: 'cover',
   lyrics: [],
   showLyricTranslation: false,
   isTranslatingLyrics: false,
@@ -293,6 +294,7 @@ export async function playSong(song, coverUrl, coverDeUrl) {
   playerState.lyricTranslationError = '';
   try {
     resetPlaybackProgress();
+    playerState.characterEpVisualMode = 'cover';
     playerState.showLyricTranslation = false;
     playerState.isTranslatingLyrics = false;
     lyricTranslationToken += 1;

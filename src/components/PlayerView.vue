@@ -259,7 +259,7 @@ const characterEp = ref(null);
 const isCharacterEpLoading = ref(false);
 const isBilibiliSyncPending = ref(false);
 const isCharacterEpExpanded = ref(false);
-const visualMode = ref('cover');
+const visualMode = ref(playerState.characterEpVisualMode);
 const epIframeKey = ref(0);
 const epStartTime = ref(0);
 const youtubePlayerContainer = ref(null);
@@ -270,7 +270,6 @@ let youtubePlayerGeneration = 0;
 let bilibiliPendingIframeKey = -1;
 let bilibiliSyncTimeout = null;
 let pendingSeekSyncCleanup = null;
-let skipNextBilibiliRestart = false;
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
 let userScrollTimeout = null;
@@ -285,6 +284,30 @@ const AUDIO_SEEK_SYNC_FALLBACK_MS = 750;
 const cancelPendingSeekSync = () => {
   pendingSeekSyncCleanup?.();
   pendingSeekSyncCleanup = null;
+};
+
+const resyncCharacterEpAfterPageReturn = () => {
+  if (
+    document.visibilityState !== 'visible'
+    || visualMode.value !== 'ep'
+    || !characterEp.value
+    || !playerState.isPlaying
+    || isBilibiliSyncPending.value
+  ) {
+    return;
+  }
+
+  const audioTime = getAudioCurrentTime();
+  if (isYoutubeCharacterEp.value) {
+    nextTick(() => {
+      createYoutubePlayer();
+      syncYoutubeToAudio(true, audioTime);
+    });
+    return;
+  }
+
+  // Bilibili's embedded player cannot seek through a public API, so recreate it at the live audio time.
+  startBilibiliSync(audioTime);
 };
 
 const clearLibraryActionStatus = ({ clearQueue = true } = {}) => {
@@ -678,8 +701,7 @@ const getAudioCurrentTime = () => {
 };
 
 const startBilibiliSync = (audioTimeOverride = null) => {
-  const audio = playerState.audioPlayer;
-  if (!audio || !isBilibiliCharacterEp.value) {
+  if (!isBilibiliCharacterEp.value) {
     if (bilibiliSyncTimeout) {
       clearTimeout(bilibiliSyncTimeout);
       bilibiliSyncTimeout = null;
@@ -696,7 +718,6 @@ const startBilibiliSync = (audioTimeOverride = null) => {
   isBilibiliSyncPending.value = true;
   epIframeKey.value += 1;
   bilibiliPendingIframeKey = epIframeKey.value;
-  audio.pause();
   bilibiliSyncTimeout = window.setTimeout(() => {
     if (
       !isBilibiliSyncPending.value ||
@@ -705,15 +726,9 @@ const startBilibiliSync = (audioTimeOverride = null) => {
       return;
     }
 
-    console.warn('Bilibili iframe sync timed out; keeping audio playback available.');
+    console.warn('Bilibili iframe sync timed out; keeping audio playback uninterrupted.');
     isBilibiliSyncPending.value = false;
     bilibiliPendingIframeKey = -1;
-    skipNextBilibiliRestart = false;
-    visualMode.value = 'cover';
-    audio.currentTime = epStartTime.value;
-    audio.play().catch(() => {
-      playerState.isPlaying = false;
-    });
     bilibiliSyncTimeout = null;
   }, BILIBILI_SYNC_TIMEOUT_MS);
 };
@@ -727,49 +742,24 @@ const handleBilibiliFrameLoad = () => {
     return;
   }
 
-  const audio = playerState.audioPlayer;
-  if (!audio) {
-    if (bilibiliSyncTimeout) {
-      clearTimeout(bilibiliSyncTimeout);
-      bilibiliSyncTimeout = null;
-    }
-    isBilibiliSyncPending.value = false;
-    return;
-  }
-
-  if (bilibiliSyncTimeout) {
-    clearTimeout(bilibiliSyncTimeout);
-    bilibiliSyncTimeout = null;
-  }
-  audio.currentTime = epStartTime.value;
-  isBilibiliSyncPending.value = false;
-  skipNextBilibiliRestart = true;
-  const playPromise = audio.play();
-  playPromise?.catch?.(() => {
-    skipNextBilibiliRestart = false;
-    playerState.isPlaying = false;
-  });
-};
-
-const showCoverVisual = () => {
-  closeCharacterEpPreview();
-  cancelPendingSeekSync();
-  const shouldResumeAudio = isBilibiliSyncPending.value;
   if (bilibiliSyncTimeout) {
     clearTimeout(bilibiliSyncTimeout);
     bilibiliSyncTimeout = null;
   }
   isBilibiliSyncPending.value = false;
   bilibiliPendingIframeKey = -1;
-  skipNextBilibiliRestart = false;
-  visualMode.value = 'cover';
+};
 
-  if (shouldResumeAudio && playerState.audioPlayer?.paused) {
-    playerState.audioPlayer.currentTime = epStartTime.value;
-    playerState.audioPlayer.play().catch(() => {
-      playerState.isPlaying = false;
-    });
+const showCoverVisual = () => {
+  closeCharacterEpPreview();
+  cancelPendingSeekSync();
+  if (bilibiliSyncTimeout) {
+    clearTimeout(bilibiliSyncTimeout);
+    bilibiliSyncTimeout = null;
   }
+  isBilibiliSyncPending.value = false;
+  bilibiliPendingIframeKey = -1;
+  visualMode.value = 'cover';
 };
 
 const closeCharacterEpPreview = () => {
@@ -1007,10 +997,6 @@ watch(() => playerState.isPlaying, (isPlaying) => {
   if (visualMode.value === 'ep' && characterEp.value) {
     if (isBilibiliCharacterEp.value) {
       if (isBilibiliSyncPending.value) return;
-      if (isPlaying && skipNextBilibiliRestart) {
-        skipNextBilibiliRestart = false;
-        return;
-      }
     }
     // B 站 UGC iframe 沒有公開的暫停／seek API；恢復時以音樂目前秒數重新建立。
     restartCharacterEp();
@@ -1026,12 +1012,23 @@ watch(() => playerState.isPlaying, (isPlaying) => {
   }
 });
 
+watch(visualMode, (mode) => {
+  playerState.characterEpVisualMode = mode;
+});
+
 watch([visualMode, characterEp], () => {
   if (visualMode.value !== 'ep' || !characterEp.value) {
     closeCharacterEpPreview();
   }
   if (visualMode.value === 'ep' && isYoutubeCharacterEp.value && playerState.isPlaying) {
     nextTick(createYoutubePlayer);
+  } else if (
+    visualMode.value === 'ep'
+    && isBilibiliCharacterEp.value
+    && playerState.isPlaying
+    && !isBilibiliSyncPending.value
+  ) {
+    nextTick(() => startBilibiliSync());
   } else {
     clearYoutubePlayer();
   }
@@ -1056,9 +1053,8 @@ watch(() => playerState.currentSong, async (newSong) => {
   }
   isBilibiliSyncPending.value = false;
   bilibiliPendingIframeKey = -1;
-  skipNextBilibiliRestart = false;
-  visualMode.value = 'cover';
-  epStartTime.value = 0;
+  visualMode.value = playerState.characterEpVisualMode;
+  epStartTime.value = getAudioCurrentTime();
   const requestedSongId = newSong?.cid;
   if (!requestedSongId) {
     isCharacterEpLoading.value = false;
@@ -1091,6 +1087,8 @@ watch(locale, () => {
 // 組件?��??��?如�?�?��?�放?��??��?�?
 onMounted(() => {
   window.addEventListener('keydown', handleCharacterEpPreviewKeydown);
+  window.addEventListener('focus', resyncCharacterEpAfterPageReturn);
+  document.addEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
   refreshFavoriteState().catch(() => { });
   loadUserPlaylists().catch(() => { });
   if (playerState.isPlaying) {
@@ -1101,6 +1099,8 @@ onMounted(() => {
 // 組件?��??��??��??�循?��?超�?
 onUnmounted(() => {
   window.removeEventListener('keydown', handleCharacterEpPreviewKeydown);
+  window.removeEventListener('focus', resyncCharacterEpAfterPageReturn);
+  document.removeEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
   cancelPendingSeekSync();
   clearYoutubePlayer();
   stopLyricsSync();

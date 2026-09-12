@@ -2,7 +2,8 @@
   <Transition name="album-entry-transition">
     <div v-if="active" ref="dialog" class="album-entry-transition"
       :class="{ 'is-landed': landed, 'is-player-mode': playerOpen }"
-      role="dialog" aria-modal="true" aria-labelledby="projection-title" tabindex="-1" @keydown="handleKeydown">
+      role="dialog" aria-modal="true" aria-labelledby="projection-title" tabindex="-1"
+      @keydown="handleKeydown" @pointerdown="handleSkipPointerDown">
       <div class="transition-scrim" aria-hidden="true"></div>
       <button ref="closeButton" class="projection-exit" type="button" @click="emit('close')">
         <span aria-hidden="true">←</span> {{ t('album.back') }}
@@ -198,6 +199,13 @@ function releaseDialog() {
 
 function handleKeydown(event) {
   if (event.key === 'Escape') { event.preventDefault(); emit('close'); return; }
+  if (!landed.value && (event.key === 'Enter' || event.key === ' ')) {
+    if (!event.target.closest('.projection-exit')) {
+      event.preventDefault();
+      skipEntranceAnimation();
+    }
+    return;
+  }
   if (event.key !== 'Tab') return;
   const focusable = [...dialog.value.querySelectorAll('button:not(:disabled), [tabindex="0"]')]
     .filter(element => !element.closest('[inert]'));
@@ -207,6 +215,22 @@ function handleKeydown(event) {
   } else if (!event.shiftKey && document.activeElement === last) {
     event.preventDefault(); first?.focus();
   }
+}
+
+function skipEntranceAnimation() {
+  if (!props.active || landed.value) return;
+
+  // Invalidate the pending scene and let the responsive CSS take over immediately.
+  generation++;
+  animations.forEach(animation => animation.cancel());
+  animations = [];
+  landed.value = true;
+  emit('complete');
+}
+
+function handleSkipPointerDown(event) {
+  if (landed.value || event.target.closest('.projection-exit')) return;
+  skipEntranceAnimation();
 }
 
 async function openScene() {
@@ -433,23 +457,38 @@ onUnmounted(() => { generation++; releaseDialog(); });
 .track-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .track-heading h2 { margin: 0; font-size: 18px; color: #e9f3fa; }
 .track-heading > span { color: #9dbccf; font-size: 12px; }
-.song-projection-list { margin: 14px 0 0; padding: 0; list-style: none; border-top: 1px solid #7fb5cd40; }
+.song-projection-list {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
 .song-projection-row {
   display: grid;
   grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 1fr) 84px;
   gap: 16px;
   align-items: center;
   min-height: 64px;
-  padding: 10px 8px;
-  border-bottom: 1px solid #7fb5cd26;
+  padding: 12px 14px;
+  border: 1px solid rgba(151, 190, 205, 0.2);
+  border-radius: 12px;
+  background: rgba(10, 33, 45, 0.62);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
-.song-projection-row:hover, .song-projection-row:focus-within { background: #85c5e00d; }
+.song-projection-row:hover, .song-projection-row:focus-within {
+  border-color: rgba(137, 192, 214, 0.48);
+  background: rgba(22, 61, 78, 0.78);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
 .song-projection-row.is-launching {
   position: relative;
   z-index: 3;
   border-color: rgba(126, 198, 255, 0.76);
-  background: linear-gradient(90deg, rgba(88, 166, 255, 0.2), rgba(88, 166, 255, 0.06), rgba(88, 166, 255, 0.2));
-  box-shadow: 0 0 26px rgba(88, 166, 255, 0.2), inset 0 0 18px rgba(126, 198, 255, 0.12);
+  background: rgba(36, 91, 114, 0.88);
+  box-shadow: 0 8px 22px rgba(34, 114, 150, 0.26);
   animation: track-row-lift 180ms cubic-bezier(.2, .9, .25, 1) both;
 }
 .song-projection-row.is-launching::after {

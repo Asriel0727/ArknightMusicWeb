@@ -1,7 +1,7 @@
 <template>
   <section class="topbar-section">
     <div class="topbar-left">
-      <NowPlayingBar />
+      <NowPlayingBar @open-current-album="handleOpenCurrentAlbum" />
     </div>
     <div class="topbar-right">
       <SearchBar @search="handleSearch" />
@@ -13,10 +13,14 @@
 import NowPlayingBar from './NowPlayingBar.vue';
 import SearchBar from './SearchBar.vue';
 
-const emit = defineEmits(['search']);
+const emit = defineEmits(['search', 'open-current-album']);
 
 const handleSearch = (query) => {
   emit('search', query);
+};
+
+const handleOpenCurrentAlbum = () => {
+  emit('open-current-album');
 };
 </script>
 
@@ -43,8 +47,7 @@ const handleSearch = (query) => {
 
 @media (max-width: 900px) {
   .topbar-section {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 0 15px;
     gap: 8px;
     flex-direction: column;
     align-items: stretch;

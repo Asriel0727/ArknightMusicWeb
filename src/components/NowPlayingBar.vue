@@ -56,11 +56,12 @@
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { playerState, dropdownState, modalState } from '../stores/player.js';
+import { playerState, dropdownState } from '../stores/player.js';
 import { playSongFromMasterList, prefetchSongFromMasterList } from '../stores/player.js';
 import { fetchSongs } from '../services/api.js';
 
 const { t } = useI18n();
+const emit = defineEmits(['open-current-album']);
 
 const barRef = ref(null);
 const titleRef = ref(null);
@@ -249,14 +250,12 @@ const handleSongClick = (song) => {
   dropdownState.isOpen = false;
 };
 
-// 處理標題點擊，打開播放器視圖
+// 處理標題點擊，導向目前歌曲所屬專輯。
 const handleTitleClick = (event) => {
-  event.stopPropagation(); // 防止觸發外部點擊事件
-  if (playerState.currentSong) {
-    modalState.currentView = 'player';
-    modalState.isOpen = true;
-    dropdownState.isOpen = false; // 關閉下拉菜單（如果打開的話）
-  }
+  event.stopPropagation();
+  if (!playerState.currentSong?.albumCid) return;
+  dropdownState.isOpen = false;
+  emit('open-current-album');
 };
 
 // 點擊外部關閉下拉列表
@@ -290,8 +289,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--card-bg);
+  border: 1px solid rgba(126, 193, 211, 0.18);
   border-radius: 8px;
+  background: linear-gradient(135deg, rgba(7, 30, 42, 0.72), rgba(16, 54, 66, 0.6));
+  box-shadow: inset 0 1px rgba(184, 229, 239, 0.04);
   padding: 10px 15px;
   width: 100%;
   max-width: 600px;
@@ -325,9 +326,9 @@ onUnmounted(() => {
 }
 
 .now-playing-dropdown {
-  background: var(--primary-color);
-  color: #222;
-  border: none;
+  border: 1px solid rgba(158, 218, 231, 0.42);
+  background: rgba(53, 130, 151, 0.78);
+  color: #e8f6fa;
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -337,11 +338,12 @@ onUnmounted(() => {
   cursor: pointer;
   font-size: 1.1rem;
   margin-left: 8px;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .now-playing-dropdown:hover {
-  background: #3d8eff;
+  border-color: rgba(204, 241, 248, 0.72);
+  background: rgba(70, 159, 181, 0.92);
   color: #fff;
 }
 
@@ -355,8 +357,8 @@ onUnmounted(() => {
   transition: opacity 0.2s ease, visibility 0.2s ease;
   max-height: 60vh;
   overflow-y: auto;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
+  background: rgba(8, 35, 47, 0.96);
+  border: 1px solid rgba(126, 193, 211, 0.24);
   border-radius: 8px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
   z-index: 2000;

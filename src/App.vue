@@ -8,7 +8,7 @@
     </template>
 
     <template v-else-if="currentPage === 'albums'">
-      <TopBar @search="handleSearch" />
+      <TopBar @search="handleSearch" @open-current-album="handleOpenCurrentAlbum" />
       <AlbumList ref="albumListRef" @view-album="handleViewAlbum" />
       <Modal @close="handleModalClose" @view-album="handleViewAlbum" />
       <AlbumEntryTransition
@@ -75,6 +75,7 @@ import {
   modalState,
   albumState,
   characterState,
+  playerState,
   playSongFromAlbum,
   playSongFromMasterList,
 } from './stores/player.js';
@@ -143,6 +144,16 @@ const handleSearch = (query) => {
   }
 };
 
+const handleOpenCurrentAlbum = async () => {
+  const albumId = playerState.currentSong?.albumCid;
+  const songId = playerState.currentSong?.cid;
+  if (!albumId || albumTransition.value.active) return;
+
+  const origin = await albumListRef.value?.focusAlbumForOpening?.(albumId);
+  if (!origin) return;
+  await handleViewAlbum(albumId, origin, { openPlayerForSongId: songId });
+};
+
 const completeAlbumTransition = () => {
   if (!albumTransition.value.active) return;
   albumTransition.value = {
@@ -204,7 +215,7 @@ const closeEmbeddedPlayer = () => {
   };
 };
 
-const handleViewAlbum = async (albumId, origin = null) => {
+const handleViewAlbum = async (albumId, origin = null, { openPlayerForSongId = null } = {}) => {
   const token = ++albumDetailLoadToken;
   const previewAlbum = albumState.allAlbums.find(
     album => String(album?.cid) === String(albumId),
@@ -216,7 +227,7 @@ const handleViewAlbum = async (albumId, origin = null) => {
     settled: false,
     album: previewAlbum,
     songs: [],
-    playerOpen: false,
+    playerOpen: Boolean(openPlayerForSongId),
     playerSongIndex: null,
     origin,
     error: false,
@@ -229,10 +240,15 @@ const handleViewAlbum = async (albumId, origin = null) => {
     const details = await fetchAlbumDetails(albumId);
     if (token !== albumDetailLoadToken || !albumTransition.value.active) return;
     albumState.currentAlbumDetails = details;
+    const songs = Array.isArray(details?.songs) ? details.songs : [];
+    const playerSongIndex = openPlayerForSongId
+      ? songs.findIndex(song => String(song?.cid) === String(openPlayerForSongId))
+      : null;
     albumTransition.value = {
       ...albumTransition.value,
       album: { ...previewAlbum, ...details },
-      songs: Array.isArray(details?.songs) ? details.songs : [],
+      songs,
+      playerSongIndex: playerSongIndex >= 0 ? playerSongIndex : null,
       ready: true,
     };
   } catch (error) {

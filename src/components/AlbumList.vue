@@ -12,7 +12,11 @@
       <section
         ref="containerRef"
         class="albums-container"
-        :class="{ 'is-dragging': isDragging }"
+        :class="{
+          'is-dragging': isDragging,
+          'is-auto-navigating': isAutoNavigating,
+          'is-rack-relocating': isRackRelocating,
+        }"
         :style="parallaxStyle"
         :aria-label="t('album.pageTitle')"
         tabindex="0"
@@ -122,6 +126,9 @@ const containerRef = ref(null);
 const windowWidth = ref(window.innerWidth);
 const activeAlbumIndex = ref(0);
 const isDragging = ref(false);
+const isAutoNavigating = ref(false);
+const isRackRelocating = ref(false);
+const autoNavigationTargetIndex = ref(null);
 const dragOffset = ref(0);
 const dragVelocity = ref(0);
 const dragRotation = ref(0);
@@ -140,6 +147,9 @@ let lastPointerAt = 0;
 let lastRackWheelAt = 0;
 let releaseFrame = null;
 let interactionHintTimer = null;
+let autoNavigationToken = 0;
+let autoNavigationStepTimer = null;
+let resolveAutoNavigationStep = null;
 let slideAudioContext = null;
 let slideAudioGain = null;
 let searchRequestToken = 0;
@@ -285,12 +295,12 @@ const getAlbumStyle = (slotOffset) => {
   };
 };
 
-const moveAlbum = (direction) => {
+const moveAlbum = (direction, { withSound = true } = {}) => {
   const total = displayAlbums.value.length;
   if (total <= 1) return;
   dismissInteractionHint();
 
-  playAlbumSlideSound(direction);
+  if (withSound) playAlbumSlideSound(direction);
   activeAlbumIndex.value = (activeAlbumIndex.value + direction + total) % total;
   preloadAlbumImages([
     displayAlbums.value[activeAlbumIndex.value],
@@ -534,29 +544,129 @@ const handleSearch = async (query) => {
 
 const emit = defineEmits(['view-album']);
 
-// 查看專輯
-const handleViewAlbum = async (albumId, event) => {
-  if (suppressAlbumClick.value) return;
-  const slot = event?.currentTarget?.closest('.album-slot');
-  // Measure the actual record and cover, so opening continues from the visible sleeve.
+const getAlbumOrigin = (albumId) => {
+  const slot = [...(containerRef.value?.querySelectorAll('.album-slot') || [])]
+    .find(element => String(element.dataset.albumId) === String(albumId));
   const rectData = (element) => {
     if (!element) return null;
     const { x, y, width, height } = element.getBoundingClientRect();
     return { x, y, width, height };
   };
+
+  return {
+    disc: rectData(slot?.querySelector('.vinyl-record')),
+    cover: rectData(slot?.querySelector('.album > img')),
+    card: rectData(slot?.querySelector('.album')),
+  };
+};
+
+const waitForAutoNavigationStep = (delay) => new Promise((resolve) => {
+  resolveAutoNavigationStep = () => {
+    resolveAutoNavigationStep = null;
+    resolve();
+  };
+  autoNavigationStepTimer = window.setTimeout(() => {
+    autoNavigationStepTimer = null;
+    resolveAutoNavigationStep?.();
+  }, delay);
+});
+
+const stopAutoNavigationSkipListeners = () => {
+  window.removeEventListener('pointerdown', skipAutoNavigation, true);
+  window.removeEventListener('keydown', handleAutoNavigationSkipKey, true);
+};
+
+const skipAutoNavigation = (event) => {
+  if (!isAutoNavigating.value || !Number.isInteger(autoNavigationTargetIndex.value)) return;
+
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  autoNavigationToken += 1;
+  if (autoNavigationStepTimer !== null) {
+    window.clearTimeout(autoNavigationStepTimer);
+    autoNavigationStepTimer = null;
+  }
+  resolveAutoNavigationStep?.();
+  isRackRelocating.value = true;
+  activeAlbumIndex.value = autoNavigationTargetIndex.value;
+};
+
+const handleAutoNavigationSkipKey = (event) => {
+  if (['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) return;
+  if (!isAutoNavigating.value) return;
+  event.preventDefault();
+  skipAutoNavigation();
+};
+
+const startAutoNavigationSkipListeners = () => {
+  window.addEventListener('pointerdown', skipAutoNavigation, true);
+  window.addEventListener('keydown', handleAutoNavigationSkipKey, true);
+};
+
+const markAlbumOpening = (albumId) => {
+  resetOpeningAlbum();
+  openingAlbumId.value = String(albumId);
+  openingAlbumTimer = window.setTimeout(resetOpeningAlbum, OPENING_CARD_HOLD_MS);
+  return getAlbumOrigin(albumId);
+};
+
+const focusAlbumForOpening = async (albumId) => {
+  const index = displayAlbums.value.findIndex(album => String(album.cid) === String(albumId));
+  if (index < 0) return null;
+
+  const total = displayAlbums.value.length;
+  const currentIndex = activeAlbumIndex.value;
+  const forwardDistance = (index - currentIndex + total) % total;
+  const backwardDistance = (currentIndex - index + total) % total;
+  const direction = forwardDistance <= backwardDistance ? 1 : -1;
+  const stepCount = Math.min(forwardDistance, backwardDistance);
+  dismissInteractionHint();
+
+  // Show a few clear single-card turns, then relocate the virtual rack off-animation for distant albums.
+  // Updating every card faster than its transition causes the card stack to collapse visually.
+  if (stepCount > 0) {
+    const visibleStepCount = Math.min(stepCount, 6);
+    const navigationToken = ++autoNavigationToken;
+    isAutoNavigating.value = true;
+    autoNavigationTargetIndex.value = index;
+    startAutoNavigationSkipListeners();
+    for (let step = 0; step < visibleStepCount; step += 1) {
+      if (navigationToken !== autoNavigationToken) break;
+      moveAlbum(direction, { withSound: false });
+      await waitForAutoNavigationStep(140);
+    }
+
+    if (navigationToken === autoNavigationToken && visibleStepCount < stepCount) {
+      isRackRelocating.value = true;
+      activeAlbumIndex.value = index;
+      await nextTick();
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    }
+
+    await nextTick();
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    isRackRelocating.value = false;
+    isAutoNavigating.value = false;
+    autoNavigationTargetIndex.value = null;
+    stopAutoNavigationSkipListeners();
+    // Wait for the final quick turn to settle before measuring it as the opening origin.
+    await new Promise(resolve => window.setTimeout(resolve, 150));
+  }
+
+  preloadAlbumsAroundActive();
+  return markAlbumOpening(albumId);
+};
+
+// 查看專輯
+const handleViewAlbum = async (albumId, event) => {
+  if (suppressAlbumClick.value) return;
+  const slot = event?.currentTarget?.closest('.album-slot');
   if (slot && !slot.classList.contains('is-active')) {
     activeAlbumIndex.value = displayAlbums.value.findIndex(album => String(album.cid) === String(albumId));
     await nextTick();
     return;
   }
-  resetOpeningAlbum();
-  openingAlbumId.value = String(albumId);
-  openingAlbumTimer = window.setTimeout(resetOpeningAlbum, OPENING_CARD_HOLD_MS);
-  emit('view-album', albumId, {
-    disc: rectData(slot?.querySelector('.vinyl-record')),
-    cover: rectData(slot?.querySelector('.album > img')),
-    card: rectData(slot?.querySelector('.album')),
-  });
+  emit('view-album', albumId, markAlbumOpening(albumId));
 };
 
 const resetOpeningAlbum = () => {
@@ -688,6 +798,11 @@ onUnmounted(() => {
   if (interactionHintTimer !== null) {
     window.clearTimeout(interactionHintTimer);
   }
+  if (autoNavigationStepTimer !== null) {
+    window.clearTimeout(autoNavigationStepTimer);
+  }
+  resolveAutoNavigationStep?.();
+  stopAutoNavigationSkipListeners();
   window.removeEventListener('resize', handleResize);
   if (slideAudioContext) {
     void slideAudioContext.close();
@@ -698,6 +813,7 @@ onUnmounted(() => {
 defineExpose({
   handleSearch,
   resetOpeningAlbum,
+  focusAlbumForOpening,
 });
 </script>
 
@@ -743,22 +859,6 @@ main .page-title {
   user-select: none;
 }
 
-.albums-container::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  top: 5%;
-  left: 50%;
-  width: min(900px, 88%);
-  height: 78%;
-  background: linear-gradient(to top, rgba(122, 211, 255, 0.16), rgba(122, 211, 255, 0.045) 54%, transparent 86%);
-  clip-path: polygon(40% 100%, 60% 100%, 76% 0, 24% 0);
-  filter: blur(3px);
-  opacity: 0.8;
-  pointer-events: none;
-  transform: translateX(-50%);
-}
-
 .albums-container:focus-visible {
   box-shadow: 0 0 0 2px var(--primary-color), 0 0 0 6px rgba(88, 166, 255, 0.2);
   border-radius: 16px;
@@ -791,6 +891,14 @@ main .page-title {
 }
 
 .albums-container.is-dragging .album-slot {
+  transition: none;
+}
+
+.albums-container.is-auto-navigating .album-slot {
+  transition-duration: 130ms;
+}
+
+.albums-container.is-rack-relocating .album-slot {
   transition: none;
 }
 
