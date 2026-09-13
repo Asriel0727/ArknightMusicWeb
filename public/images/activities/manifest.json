@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-13T04:59:42.831Z",
+  "generatedAt": "2026-09-13T12:05:21.133Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -120,13 +120,13 @@
       "syncedAt": "2026-07-17T03:49:54.718Z"
     },
     "wiki-critical-phase-transition": {
-      "publicPath": "/images/activities/wiki-critical-phase-transition.webp",
-      "relativePath": "public/images/activities/wiki-critical-phase-transition.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Critical_Phase_Transition_banner.png?ad1099",
-      "contentType": "image/webp",
-      "size": 897002,
-      "hash": "20b351dda8bbcd3177410533a397d01331e8bc251e4823ae2fff96ff2e967364",
-      "syncedAt": "2026-08-30T16:49:31.370Z"
+      "publicPath": "/images/activities/wiki-critical-phase-transition.jpg",
+      "relativePath": "public/images/activities/wiki-critical-phase-transition.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/fa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%B8%83%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_02.jpg",
+      "contentType": "image/jpeg",
+      "size": 300849,
+      "hash": "5c780614bf405e1b1f478e8b08680776f49361e9fd889c1b71423941814098cf",
+      "syncedAt": "2026-09-13T12:05:19.584Z"
     },
     "prts-4ig3b4": {
       "publicPath": "/images/activities/prts-4ig3b4.jpg",
@@ -363,13 +363,13 @@
       "syncedAt": "2026-07-17T03:50:02.478Z"
     },
     "wiki-stronghold-protocol-alliance": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.webp",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_Alliance_banner.png?effa5d",
-      "contentType": "image/webp",
-      "size": 746486,
-      "hash": "851dc9dd47c446a5f2a8134f0e1e197a0b20c2e630c4b167cc7263772fd82703",
-      "syncedAt": "2026-09-12T20:41:23.443Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.jpg",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.jpg",
+      "sourceUrl": "https://media.prts.wiki/e/e7/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_29.jpg",
+      "contentType": "image/jpeg",
+      "size": 290757,
+      "hash": "cf1449fc689ffda9ab47b9aedb44c90cc51ee8c3c2ecf48e6beee6335f7286a3",
+      "syncedAt": "2026-09-13T12:05:20.310Z"
     },
     "prts-8669y1": {
       "publicPath": "/images/activities/prts-8669y1.jpg",
@@ -3225,13 +3225,13 @@
       "syncedAt": "2026-07-17T09:56:38.783Z"
     },
     "wiki-contingency-contract-arclight": {
-      "publicPath": "/images/activities/wiki-contingency-contract-arclight.jpg",
-      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.jpg",
-      "sourceUrl": "https://media.prts.wiki/0/0e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6%E6%B6%A4%E5%A2%A8%E4%BD%9C%E6%88%98_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 499320,
-      "hash": "049f6021c182183cb441414851082d8628de9588a2649385d6e9439bc0301165",
-      "syncedAt": "2026-09-13T04:59:42.398Z"
+      "publicPath": "/images/activities/wiki-contingency-contract-arclight.png",
+      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Arclight_banner.png?58ee45",
+      "contentType": "image/png",
+      "size": 339979,
+      "hash": "8f1e28a3cc7eec1ad1f4eda824e5b70ebc847c13551b191011574550867d9b37",
+      "syncedAt": "2026-09-13T12:05:20.581Z"
     },
     "wiki-babel-event-rerun": {
       "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
@@ -3252,13 +3252,13 @@
       "syncedAt": "2026-09-13T04:59:42.831Z"
     },
     "wiki-stronghold-protocol-event": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-event.webp",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_banner.png?a4b4e2",
-      "contentType": "image/webp",
-      "size": 552298,
-      "hash": "f3211da4446c2beaf1e9cc607aa14e79e9c3baf3c76078c34b7736877cc6fbaf",
-      "syncedAt": "2026-09-12T20:41:44.419Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 244822,
+      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
+      "syncedAt": "2026-09-13T12:05:20.957Z"
     },
     "wiki-ending-a-grand-overture": {
       "publicPath": "/images/activities/wiki-ending-a-grand-overture.png",
@@ -3270,13 +3270,13 @@
       "syncedAt": "2026-09-12T20:41:44.644Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 268285,
-      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
-      "syncedAt": "2026-09-08T16:46:20.299Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.png",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
+      "contentType": "image/png",
+      "size": 975196,
+      "hash": "668f9851d9abb0da55688a7ae4a929704ea5aa06cc53fb5d93a9bed3f8c31c7c",
+      "syncedAt": "2026-09-13T12:05:21.133Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
