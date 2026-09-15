@@ -65,37 +65,47 @@
       <Transition name="projection-player-stage">
         <section v-if="playerOpen" class="projection-player-stage" :aria-label="t('album.play')">
           <div class="projection-player-toolbar">
-            <button class="projection-player-back" type="button" @click="emit('close-player')">
-              <span aria-hidden="true">←</span> {{ t('album.back') }} {{ t('album.trackList') }}
+            <div class="projection-player-context">
+              <span class="projection-player-eyebrow">{{ album?.name || t('album.trackList') }}</span>
+              <span class="projection-player-status">
+                <span class="projection-player-status-dot" aria-hidden="true"></span>
+                {{ t('album.play') }}
+              </span>
+            </div>
+            <button v-if="songs.length" class="projection-player-queue-toggle" type="button"
+              :aria-expanded="queueOpen" aria-controls="projection-player-queue" @click="queueOpen = !queueOpen">
+              <i class="fas fa-list" aria-hidden="true"></i>
+              <span>{{ t('album.trackList') }}</span>
+              <span class="projection-player-queue-count">{{ songs.length }}</span>
+              <i :class="queueOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" aria-hidden="true"></i>
             </button>
-            <span class="projection-player-status">
-              <span class="projection-player-status-dot" aria-hidden="true"></span>
-              {{ t('album.play') }}
-            </span>
           </div>
 
           <div class="projection-player-body">
             <PlayerView :embedded="true" />
           </div>
 
-          <section v-if="songs.length" class="projection-player-queue" :aria-label="t('album.trackList')">
-            <div class="projection-player-queue-heading">
-              <span>{{ t('album.trackList') }}</span>
-              <span>{{ t('album.trackCount', { count: songs.length }) }}</span>
-            </div>
-            <ol class="projection-player-queue-list">
-              <li v-for="(song, index) in songs" :key="song.cid || `queue-${index}`"
-                class="projection-player-queue-item" :class="{ active: activeQueueIndex === index }">
-                <button type="button" @click="emit('play-queue-song', index)">
-                  <span class="projection-player-queue-number">{{ String(index + 1).padStart(2, '0') }}</span>
-                  <span class="projection-player-queue-name">{{ song.name }}</span>
-                  <span class="projection-player-queue-state" aria-hidden="true">
-                    {{ activeQueueIndex === index ? '▶' : '＋' }}
-                  </span>
-                </button>
-              </li>
-            </ol>
-          </section>
+          <Transition name="projection-queue-drawer">
+            <section v-if="songs.length && queueOpen" id="projection-player-queue" class="projection-player-queue"
+              :aria-label="t('album.trackList')">
+              <div class="projection-player-queue-heading">
+                <span>{{ t('album.trackList') }}</span>
+                <span>{{ t('album.trackCount', { count: songs.length }) }}</span>
+              </div>
+              <ol class="projection-player-queue-list">
+                <li v-for="(song, index) in songs" :key="song.cid || `queue-${index}`"
+                  class="projection-player-queue-item" :class="{ active: activeQueueIndex === index }">
+                  <button type="button" @click="handleQueueSong(index)">
+                    <span class="projection-player-queue-number">{{ String(index + 1).padStart(2, '0') }}</span>
+                    <span class="projection-player-queue-name">{{ song.name }}</span>
+                    <span class="projection-player-queue-state" aria-hidden="true">
+                      {{ activeQueueIndex === index ? '▶' : '＋' }}
+                    </span>
+                  </button>
+                </li>
+              </ol>
+            </section>
+          </Transition>
         </section>
       </Transition>
     </div>
@@ -132,6 +142,7 @@ const sourceCard = ref(null);
 const sleeve = ref(null);
 const landed = ref(false);
 const selectedTrackIndex = ref(null);
+const queueOpen = ref(false);
 let playerLaunchTimer = null;
 const proxyImageUrl = url => url ? getProxyImageUrl(url) : '';
 const coverUrl = computed(() => proxyImageUrl(props.album?.coverUrl));
@@ -215,6 +226,11 @@ function handleKeydown(event) {
   } else if (!event.shiftKey && document.activeElement === last) {
     event.preventDefault(); first?.focus();
   }
+}
+
+function handleQueueSong(index) {
+  queueOpen.value = false;
+  emit('play-queue-song', index);
 }
 
 function skipEntranceAnimation() {
@@ -302,7 +318,10 @@ watch(() => props.active, active => {
   else { generation++; releaseDialog(); }
 }, { immediate: true });
 watch(() => props.playerOpen, isOpen => {
-  if (!isOpen) selectedTrackIndex.value = null;
+  if (!isOpen) {
+    selectedTrackIndex.value = null;
+    queueOpen.value = false;
+  }
 });
 onUnmounted(() => { generation++; releaseDialog(); });
 </script>
@@ -512,19 +531,21 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-player-stage {
   position: absolute;
   z-index: 5;
-  inset: clamp(66px, 8vh, 86px) clamp(18px, 4vw, 72px) clamp(42px, 7vh, 86px);
+  inset: clamp(72px, 9vh, 96px) clamp(18px, 6vw, 110px) clamp(34px, 5vh, 70px);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 14px;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(14px, 2vh, 24px);
   min-height: 0;
-  padding: clamp(14px, 2vw, 26px);
+  padding: clamp(18px, 2.4vw, 34px);
   overflow: hidden;
-  border: 1px solid rgba(115, 182, 208, 0.28);
-  border-top: 2px solid rgba(138, 200, 223, 0.76);
-  border-radius: 12px 12px 20px 20px;
-  background: linear-gradient(135deg, rgba(9, 35, 49, 0.68), rgba(5, 19, 31, 0.74) 64%, rgba(16, 56, 72, 0.54));
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34), inset 0 0 42px rgba(117, 211, 255, 0.06);
-  backdrop-filter: blur(8px) saturate(1.12);
+  border: 1px solid rgba(129, 199, 221, 0.22);
+  border-top-color: rgba(156, 221, 242, 0.58);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(79, 176, 211, 0.12), transparent 26%),
+    linear-gradient(135deg, rgba(7, 29, 42, 0.88), rgba(4, 17, 28, 0.93) 64%, rgba(12, 46, 59, 0.82));
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(214, 244, 255, 0.07);
+  backdrop-filter: blur(16px) saturate(1.05);
 }
 .projection-player-stage-enter-active,
 .projection-player-stage-leave-active {
@@ -540,28 +561,31 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 40px;
-}
-.projection-player-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   min-height: 38px;
-  padding: 7px 12px;
-  border: 1px solid rgba(121, 183, 208, 0.35);
-  border-radius: 999px;
-  background: rgba(11, 35, 49, 0.72);
-  color: #d9edf7;
-  cursor: pointer;
-  font: inherit;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(137, 198, 218, 0.14);
 }
-.projection-player-back:hover { background: rgba(53, 101, 128, 0.78); }
-.projection-player-status {
+.projection-player-context,
+.projection-player-status,
+.projection-player-queue-toggle {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+.projection-player-context { min-width: 0; gap: 14px; }
+.projection-player-eyebrow {
+  min-width: 0;
+  overflow: hidden;
+  color: #dcecf3;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.projection-player-status {
   color: #a8cbd9;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -573,6 +597,29 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   box-shadow: 0 0 12px rgba(126, 198, 255, 0.9);
   animation: player-status-pulse 1.4s ease-in-out infinite;
 }
+.projection-player-queue-toggle {
+  flex: none;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid rgba(125, 193, 216, 0.24);
+  border-radius: 999px;
+  background: rgba(23, 66, 83, 0.44);
+  color: #d9edf7;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+.projection-player-queue-toggle:hover { background: rgba(49, 111, 136, 0.62); }
+.projection-player-queue-count {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(102, 186, 222, 0.22);
+  color: #aee5fb;
+  font-size: 10px;
+}
 .projection-player-body {
   min-height: 0;
   overflow: auto;
@@ -582,41 +629,45 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-player-body :deep(.embedded-player-view) {
   width: 100%;
   min-height: 100%;
-  grid-template-columns: minmax(210px, 0.78fr) minmax(250px, 1fr) minmax(260px, 1fr);
-  gap: clamp(18px, 3vw, 42px);
+  grid-template-columns: minmax(270px, 0.9fr) minmax(340px, 1.1fr);
+  gap: clamp(24px, 4vw, 68px);
   align-items: stretch;
 }
 .projection-player-body :deep(.embedded-player-view .player-view-left) {
-  grid-column: 1 / span 2;
-  display: grid;
-  grid-template-columns: minmax(190px, 0.85fr) minmax(240px, 1fr);
-  align-items: center;
-  gap: clamp(18px, 3vw, 42px);
+  grid-column: 1;
+  display: flex;
+  justify-content: center;
   max-width: none;
   min-height: 0;
-  position: relative;
 }
-.projection-player-body :deep(.embedded-player-view .player-container),
+.projection-player-body :deep(.embedded-player-view .player-container) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(100%, 410px);
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
 .projection-player-body :deep(.embedded-player-view .player-header) {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  text-align: center;
 }
 .projection-player-body :deep(.embedded-player-view .player-cover) {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-  justify-self: center;
-  width: clamp(190px, 22vw, 330px);
+  width: clamp(190px, 21vw, 300px);
   height: auto;
   aspect-ratio: 1;
   box-sizing: border-box;
-  margin: 0;
-  padding: clamp(18px, 2vw, 30px);
+  margin: 0 0 20px;
+  padding: clamp(18px, 2vw, 27px);
 }
+.projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
 .projection-player-body :deep(.embedded-player-view .player-info) {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: end;
   min-width: 0;
-  text-align: left;
+  text-align: center;
 }
 .projection-player-body :deep(.embedded-player-view .player-info h4) {
   margin-bottom: 8px;
@@ -625,32 +676,49 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
-.projection-player-body :deep(.embedded-player-view .player-info p) { font-size: 1rem; }
+.projection-player-body :deep(.embedded-player-view .player-info p) { margin: 0; font-size: 0.96rem; }
 .projection-player-body :deep(.embedded-player-view .player-controls) {
-  grid-column: 2;
-  grid-row: 2;
-  align-self: start;
-  margin-top: 16px;
+  margin-top: 22px;
 }
 .projection-player-body :deep(.embedded-player-view .controls-top) {
-  justify-content: flex-start;
+  justify-content: center;
   gap: 12px;
 }
 .projection-player-body :deep(.embedded-player-view .progress-container) { margin: 18px 0 10px; }
-.projection-player-body :deep(.embedded-player-view .controls-bottom) { justify-content: flex-start; }
+.projection-player-body :deep(.embedded-player-view .controls-bottom) { justify-content: center; }
 .projection-player-body :deep(.embedded-player-view .player-view-right) {
-  grid-column: 3;
+  grid-column: 2;
   max-width: none;
   min-height: 0;
   overflow: hidden;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: clamp(14px, 2vw, 22px);
+  border: 1px solid rgba(132, 198, 220, 0.14);
+  border-radius: 14px;
+  background: rgba(2, 15, 25, 0.24);
 }
 .projection-player-body :deep(.embedded-player-view .player-visual-panel) {
-  width: min(100%, 300px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  align-items: stretch;
+  width: 100%;
+  margin: 0;
+  gap: 0 14px;
+}
+.projection-player-body :deep(.embedded-player-view .player-visual-switch) { grid-column: 1 / -1; }
+.projection-player-body :deep(.embedded-player-view .album-grid-visual-small),
+.projection-player-body :deep(.embedded-player-view .character-ep-visual) {
+  grid-column: 1;
   align-self: center;
+  width: 100%;
+  max-height: 150px;
+  object-fit: cover;
 }
 .projection-player-body :deep(.embedded-player-view .lyrics-container) {
-  height: min(36vh, 330px);
+  flex: 1;
+  height: auto;
+  min-height: 180px;
   max-height: none;
   padding: 14px;
   border: 1px solid rgba(127, 181, 205, 0.16);
@@ -672,9 +740,19 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 .projection-player-body :deep(.embedded-player-view.single-panel .player-view-right) { display: none; }
 .projection-player-queue {
-  min-height: 0;
-  border-top: 1px solid rgba(127, 181, 205, 0.22);
-  padding-top: 10px;
+  position: absolute;
+  z-index: 2;
+  right: clamp(18px, 2.4vw, 34px);
+  bottom: clamp(18px, 2.4vw, 34px);
+  left: clamp(18px, 2.4vw, 34px);
+  max-height: min(260px, 35vh);
+  padding: 14px;
+  overflow-y: auto;
+  border: 1px solid rgba(126, 198, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(5, 24, 37, 0.96);
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
 }
 .projection-player-queue-heading {
   display: flex;
@@ -729,6 +807,10 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-player-queue-number { color: #7ba4b6; font: 12px monospace; }
 .projection-player-queue-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .projection-player-queue-state { color: #8fd1ff; text-align: center; }
+.projection-queue-drawer-enter-active,
+.projection-queue-drawer-leave-active { transition: opacity 180ms ease, transform 240ms ease; }
+.projection-queue-drawer-enter-from,
+.projection-queue-drawer-leave-to { opacity: 0; transform: translateY(14px); }
 .record-dock {
   position: absolute; z-index: 1;
   width: var(--dock-size); height: var(--dock-size);
@@ -913,7 +995,7 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 @media (max-width: 900px) {
   .projection-player-stage {
-    inset: 64px 12px 22px;
+    inset: 64px 12px 18px;
     gap: 10px;
     padding: 12px;
   }
@@ -929,7 +1011,7 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     height: auto;
   }
   .projection-player-body :deep(.embedded-player-view .player-container) {
-    display: block;
+    display: flex;
     width: 100%;
     padding: 0;
   }
@@ -957,14 +1039,18 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .projection-player-body :deep(.embedded-player-view .controls-bottom) { justify-content: space-between; }
   .projection-player-body :deep(.embedded-player-view .player-view-right) {
     grid-column: 1;
-    overflow: visible;
+    overflow: hidden;
+    padding: 14px;
   }
   .projection-player-body :deep(.embedded-player-view .lyrics-container) {
+    flex: none;
     height: min(28vh, 240px);
   }
   .projection-player-queue {
-    max-height: min(28vh, 220px);
-    overflow-y: auto;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    max-height: min(36vh, 260px);
     padding-right: 3px;
   }
   .projection-player-queue-list {
@@ -980,8 +1066,14 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .song-projection { top: 72px; bottom: 120px; width: calc(100% - 28px); padding: 18px 14px; }
   .projection-player-stage { inset: 66px 8px 14px; padding: 10px; border-radius: 10px 10px 18px 18px; }
   .projection-player-status { display: none; }
-  .projection-player-back { min-height: 36px; padding: 6px 10px; font-size: 12px; }
+  .projection-player-toolbar { gap: 8px; padding-bottom: 10px; }
+  .projection-player-eyebrow { font-size: 12px; }
+  .projection-player-queue-toggle { min-height: 32px; padding: 6px 9px; }
+  .projection-player-queue-toggle > span:not(.projection-player-queue-count) { display: none; }
   .projection-player-body :deep(.embedded-player-view .player-cover) { width: min(58vw, 210px); padding: 18px; }
+  .projection-player-body :deep(.embedded-player-view .player-visual-panel) { grid-template-columns: minmax(96px, 0.7fr) minmax(0, 1fr); }
+  .projection-player-body :deep(.embedded-player-view .album-grid-visual-small),
+  .projection-player-body :deep(.embedded-player-view .character-ep-visual) { max-height: 116px; }
   .album-visuals { gap: 10px; margin: 18px 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr); }
   .album-visuals figure { height: clamp(100px, 28vw, 150px); }
   .album-intro { font-size: 13px; margin-bottom: 22px; }
