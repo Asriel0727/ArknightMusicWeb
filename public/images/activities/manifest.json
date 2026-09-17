@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T17:09:36.362Z",
+  "generatedAt": "2026-09-17T11:54:14.944Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3642,6 +3642,24 @@
       "size": 230208,
       "hash": "6af88cd7ab132af58c201ec6864a603c9286ce396a691e021b867a1c9fcae2df",
       "syncedAt": "2026-09-15T11:55:37.892Z"
+    },
+    "prts-1cpfmn2": {
+      "publicPath": "/images/activities/prts-1cpfmn2.jpg",
+      "relativePath": "public/images/activities/prts-1cpfmn2.jpg",
+      "sourceUrl": "https://media.prts.wiki/8/82/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%80%90%E5%BD%B1%E9%9B%86%E8%B6%A3_03.jpg",
+      "contentType": "image/jpeg",
+      "size": 222127,
+      "hash": "d1db2c0fac46875858093d8b7b09d4ce8ec77279bc18bcf097c06dc981343771",
+      "syncedAt": "2026-09-17T11:54:14.426Z"
+    },
+    "prts-gfdcn8": {
+      "publicPath": "/images/activities/prts-gfdcn8.jpg",
+      "relativePath": "public/images/activities/prts-gfdcn8.jpg",
+      "sourceUrl": "https://media.prts.wiki/5/50/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%80%90%E5%BD%B1%E9%9B%86%E8%B6%A3_07.JPG",
+      "contentType": "image/jpeg",
+      "size": 270614,
+      "hash": "39fafc020da1751ab3d3fd8cb13ea0bf30a4b8b19690e7d3020e3b3781229b5e",
+      "syncedAt": "2026-09-17T11:54:14.944Z"
     }
   }
 }
