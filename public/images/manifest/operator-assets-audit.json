@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-19T20:46:16.207Z",
+  "generatedAt": "2026-09-20T20:53:19.548Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -36,9 +36,9 @@
       "missing": 0
     },
     "portraits": {
-      "total": 1341,
+      "total": 1342,
       "existing": 1340,
-      "missing": 1
+      "missing": 2
     },
     "items": {
       "total": 87,
@@ -61,6 +61,7 @@
     "factions": [],
     "classes": [],
     "portraits": [
+      "public/images/operators/portraits/char_4196_reckpr_yun_12-1b818903.png",
       "public/images/operators/portraits/char_445_wscoot_epoque_49-a40747e5.png"
     ],
     "items": [],
@@ -30843,6 +30844,31 @@
         "portraitId": "char_4196_reckpr_2",
         "category": "elite",
         "phase": 2
+      },
+      {
+        "type": "portrait",
+        "id": "char_4196_reckpr_yun#12",
+        "label": "录武官 - 录武官 - 照寰瀛",
+        "publicPath": "/images/operators/portraits/char_4196_reckpr_yun_12-1b818903.png",
+        "relativePath": "public/images/operators/portraits/char_4196_reckpr_yun_12-1b818903.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4196_reckpr_yun%2312.png",
+          "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4196_reckpr_yun%2312.png",
+          "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/characters/char_4196_reckpr_yun%2312.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charportraits/char_4196_reckpr_yun%2312.png",
+          "https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main/portraits/char_4196_reckpr_yun%2312.png",
+          "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main/characters/char_4196_reckpr_yun%2312.png",
+          "https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/char_4196_reckpr_yun%2312.png",
+          "https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/char_4196_reckpr_yun%2312.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/char_4196_reckpr_yun%2312.png",
+          "https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/char_4196_reckpr_yun%2312.png"
+        ],
+        "operatorId": "char_4196_reckpr",
+        "skinId": "char_4196_reckpr@yun#12",
+        "portraitId": "char_4196_reckpr_yun#12",
+        "category": "skin",
+        "phase": null
       },
       {
         "type": "portrait",
