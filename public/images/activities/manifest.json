@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-24T18:03:30.555Z",
+  "generatedAt": "2026-09-24T21:38:25.711Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -120,13 +120,13 @@
       "syncedAt": "2026-07-17T03:49:54.718Z"
     },
     "wiki-critical-phase-transition": {
-      "publicPath": "/images/activities/wiki-critical-phase-transition.jpg",
-      "relativePath": "public/images/activities/wiki-critical-phase-transition.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/fa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%B8%83%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 300849,
-      "hash": "5c780614bf405e1b1f478e8b08680776f49361e9fd889c1b71423941814098cf",
-      "syncedAt": "2026-09-24T18:03:28.202Z"
+      "publicPath": "/images/activities/wiki-critical-phase-transition.webp",
+      "relativePath": "public/images/activities/wiki-critical-phase-transition.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Critical_Phase_Transition_banner.png?ad1099",
+      "contentType": "image/webp",
+      "size": 897002,
+      "hash": "20b351dda8bbcd3177410533a397d01331e8bc251e4823ae2fff96ff2e967364",
+      "syncedAt": "2026-09-24T21:37:43.963Z"
     },
     "prts-4ig3b4": {
       "publicPath": "/images/activities/prts-4ig3b4.jpg",
@@ -363,13 +363,13 @@
       "syncedAt": "2026-07-17T03:50:02.478Z"
     },
     "wiki-stronghold-protocol-alliance": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.jpg",
-      "sourceUrl": "https://media.prts.wiki/e/e7/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_29.jpg",
-      "contentType": "image/jpeg",
-      "size": 290757,
-      "hash": "cf1449fc689ffda9ab47b9aedb44c90cc51ee8c3c2ecf48e6beee6335f7286a3",
-      "syncedAt": "2026-09-24T18:03:29.054Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-alliance.webp",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-alliance.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_Alliance_banner.png?effa5d",
+      "contentType": "image/webp",
+      "size": 746486,
+      "hash": "851dc9dd47c446a5f2a8134f0e1e197a0b20c2e630c4b167cc7263772fd82703",
+      "syncedAt": "2026-09-24T21:37:44.139Z"
     },
     "prts-8669y1": {
       "publicPath": "/images/activities/prts-8669y1.jpg",
@@ -2894,11 +2894,11 @@
     "wiki-medjehtiqedti-bound": {
       "publicPath": "/images/activities/wiki-medjehtiqedti-bound.webp",
       "relativePath": "public/images/activities/wiki-medjehtiqedti-bound.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Medjehtiqedti_Bound_banner.png?7edb09",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9",
       "contentType": "image/webp",
-      "size": 820454,
-      "hash": "f4bfbd8959f044238e6741d8c7135e610b0c83669cbae72d3eed12b3eded4d4f",
-      "syncedAt": "2026-09-24T18:03:28.399Z"
+      "size": 937618,
+      "hash": "976f271280b33315706608a217db8cc5144ce5a28f99752c525657a164a323fb",
+      "syncedAt": "2026-09-24T21:37:44.004Z"
     },
     "wiki-trials-for-navigator-6": {
       "publicPath": "/images/activities/wiki-trials-for-navigator-6.png",
@@ -3252,13 +3252,13 @@
       "syncedAt": "2026-09-24T18:03:29.646Z"
     },
     "wiki-stronghold-protocol-event": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 244822,
-      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
-      "syncedAt": "2026-09-24T18:03:30.161Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-event.webp",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_banner.png?a4b4e2",
+      "contentType": "image/webp",
+      "size": 552298,
+      "hash": "f3211da4446c2beaf1e9cc607aa14e79e9c3baf3c76078c34b7736877cc6fbaf",
+      "syncedAt": "2026-09-24T21:38:15.485Z"
     },
     "wiki-ending-a-grand-overture": {
       "publicPath": "/images/activities/wiki-ending-a-grand-overture.webp",
