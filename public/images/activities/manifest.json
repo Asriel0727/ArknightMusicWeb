@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-24T21:38:25.711Z",
+  "generatedAt": "2026-09-25T05:07:36.344Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3225,31 +3225,31 @@
       "syncedAt": "2026-07-17T09:56:38.783Z"
     },
     "wiki-contingency-contract-arclight": {
-      "publicPath": "/images/activities/wiki-contingency-contract-arclight.webp",
-      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Arclight_banner.png?58ee45",
-      "contentType": "image/webp",
-      "size": 303800,
-      "hash": "3e665cb4832a701f24069d67e3079261a6d67bab9f3c3c03865d0d2bd2b2de04",
-      "syncedAt": "2026-09-24T18:03:29.131Z"
+      "publicPath": "/images/activities/wiki-contingency-contract-arclight.jpg",
+      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.jpg",
+      "sourceUrl": "https://media.prts.wiki/0/0e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6%E6%B6%A4%E5%A2%A8%E4%BD%9C%E6%88%98_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 499320,
+      "hash": "049f6021c182183cb441414851082d8628de9588a2649385d6e9439bc0301165",
+      "syncedAt": "2026-09-25T05:07:34.834Z"
     },
     "wiki-babel-event-rerun": {
-      "publicPath": "/images/activities/wiki-babel-event-rerun.webp",
-      "relativePath": "public/images/activities/wiki-babel-event-rerun.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_Rerun_banner.png?b0dc17",
-      "contentType": "image/webp",
-      "size": 793802,
-      "hash": "78c21c9cbd263d4b46c34b6e40b0c3a570491b19e5b5b7ade70c3cb6f537e06a",
-      "syncedAt": "2026-09-24T18:03:29.325Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-09-25T05:07:35.366Z"
     },
     "wiki-icebreaker-games-1": {
-      "publicPath": "/images/activities/wiki-icebreaker-games-1.png",
-      "relativePath": "public/images/activities/wiki-icebreaker-games-1.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Icebreaker_Games_1_banner.png?bc023f",
-      "contentType": "image/png",
-      "size": 913153,
-      "hash": "7132c2b19a41b6902eaf03f80b4305ce4cbdb432133900bf36b583ea6f898073",
-      "syncedAt": "2026-09-24T18:03:29.646Z"
+      "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
+      "relativePath": "public/images/activities/wiki-icebreaker-games-1.jpg",
+      "sourceUrl": "https://media.prts.wiki/5/55/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%BF%83%E8%9E%8D%E5%85%B1%E7%AB%9E01_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 435015,
+      "hash": "7b69a78f87da359df5b2bf0d3d700872580ba3564c7644ce82487187914ee244",
+      "syncedAt": "2026-09-25T05:07:35.921Z"
     },
     "wiki-stronghold-protocol-event": {
       "publicPath": "/images/activities/wiki-stronghold-protocol-event.webp",
@@ -3270,13 +3270,13 @@
       "syncedAt": "2026-09-24T11:59:53.330Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.webp",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
-      "contentType": "image/webp",
-      "size": 704954,
-      "hash": "d4f64bc65b796d6e53f800a1feafb3434dc356a274df765273d8b40923415f4c",
-      "syncedAt": "2026-09-24T18:03:30.555Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 268285,
+      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
+      "syncedAt": "2026-09-25T05:07:36.344Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
