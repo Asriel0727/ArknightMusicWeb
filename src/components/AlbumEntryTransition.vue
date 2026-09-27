@@ -5,7 +5,7 @@
       role="dialog" aria-modal="true" aria-labelledby="projection-title" tabindex="-1"
       @keydown="handleKeydown" @pointerdown="handleSkipPointerDown">
       <div class="transition-scrim" aria-hidden="true"></div>
-      <button ref="closeButton" class="projection-exit" type="button" @click="emit('close')">
+      <button ref="closeButton" class="projection-exit" type="button" @click="handleExit">
         <span aria-hidden="true">←</span> {{ t('album.back') }}
       </button>
 
@@ -65,12 +65,14 @@
       <Transition name="projection-player-stage">
         <section v-if="playerOpen" class="projection-player-stage" :aria-label="t('album.play')">
           <div class="projection-player-toolbar">
-            <div class="projection-player-context">
-              <span class="projection-player-eyebrow">{{ album?.name || t('album.trackList') }}</span>
-              <span class="projection-player-status">
-                <span class="projection-player-status-dot" aria-hidden="true"></span>
-                {{ t('album.play') }}
-              </span>
+            <div class="projection-player-toolbar-left">
+              <div class="projection-player-context">
+                <span class="projection-player-eyebrow">{{ album?.name || t('album.trackList') }}</span>
+                <span class="projection-player-status">
+                  <span class="projection-player-status-dot" aria-hidden="true"></span>
+                  {{ t('album.play') }}
+                </span>
+              </div>
             </div>
             <button v-if="songs.length" class="projection-player-queue-toggle" type="button"
               :aria-expanded="queueOpen" aria-controls="projection-player-queue" @click="queueOpen = !queueOpen">
@@ -82,7 +84,8 @@
           </div>
 
           <div class="projection-player-body">
-            <PlayerView :embedded="true" />
+            <PlayerView ref="playerViewRef" :embedded="true"
+              @character-ep-expanded-change="isCharacterEpExpanded = $event" />
           </div>
 
           <Transition name="projection-queue-drawer">
@@ -135,6 +138,7 @@ const emit = defineEmits(['complete', 'close', 'play-song', 'play-queue-song', '
 const { t } = useI18n();
 const dialog = ref(null);
 const closeButton = ref(null);
+const playerViewRef = ref(null);
 const dock = ref(null);
 const travel = ref(null);
 const tilt = ref(null);
@@ -143,6 +147,7 @@ const sleeve = ref(null);
 const landed = ref(false);
 const selectedTrackIndex = ref(null);
 const queueOpen = ref(false);
+const isCharacterEpExpanded = ref(false);
 let playerLaunchTimer = null;
 const proxyImageUrl = url => url ? getProxyImageUrl(url) : '';
 const coverUrl = computed(() => proxyImageUrl(props.album?.coverUrl));
@@ -209,7 +214,11 @@ function releaseDialog() {
 }
 
 function handleKeydown(event) {
-  if (event.key === 'Escape') { event.preventDefault(); emit('close'); return; }
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    handleExit();
+    return;
+  }
   if (!landed.value && (event.key === 'Enter' || event.key === ' ')) {
     if (!event.target.closest('.projection-exit')) {
       event.preventDefault();
@@ -226,6 +235,14 @@ function handleKeydown(event) {
   } else if (!event.shiftKey && document.activeElement === last) {
     event.preventDefault(); first?.focus();
   }
+}
+
+function handleExit() {
+  if (isCharacterEpExpanded.value) {
+    playerViewRef.value?.closeCharacterEpPreview();
+    return;
+  }
+  emit('close');
 }
 
 function handleQueueSong(index) {
@@ -565,6 +582,12 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   padding-bottom: 14px;
   border-bottom: 1px solid rgba(137, 198, 218, 0.14);
 }
+.projection-player-toolbar-left {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 18px;
+}
 .projection-player-context,
 .projection-player-status,
 .projection-player-queue-toggle {
@@ -622,13 +645,15 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 .projection-player-body {
   min-height: 0;
-  overflow: auto;
+  display: grid;
+  overflow: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(126, 198, 255, 0.35) transparent;
 }
 .projection-player-body :deep(.embedded-player-view) {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
   grid-template-columns: minmax(270px, 0.9fr) minmax(340px, 1.1fr);
   gap: clamp(24px, 4vw, 68px);
   align-items: stretch;
@@ -636,7 +661,10 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-player-body :deep(.embedded-player-view .player-view-left) {
   grid-column: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
+  height: 100%;
+  align-self: stretch;
   max-width: none;
   min-height: 0;
 }
@@ -645,6 +673,7 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   flex-direction: column;
   justify-content: center;
   width: min(100%, 410px);
+  max-width: 410px;
   margin: 0;
   padding: 0;
   background: transparent;
@@ -664,7 +693,17 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   margin: 0 0 20px;
   padding: clamp(18px, 2vw, 27px);
 }
-.projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
+.projection-player-body :deep(.embedded-player-view .vinyl-tonearm) {
+  display: block;
+  top: clamp(18px, 2.2vw, 28px);
+  left: calc(50% + clamp(106px, 9vw, 128px));
+  z-index: 2;
+  height: clamp(112px, 10vw, 138px);
+  transform: rotate(22deg);
+}
+.projection-player-body :deep(.embedded-player-view .vinyl-tonearm.playing) {
+  transform: rotate(4deg);
+}
 .projection-player-body :deep(.embedded-player-view .player-info) {
   min-width: 0;
   text-align: center;
@@ -685,9 +724,20 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   gap: 12px;
 }
 .projection-player-body :deep(.embedded-player-view .progress-container) { margin: 18px 0 10px; }
-.projection-player-body :deep(.embedded-player-view .controls-bottom) { justify-content: center; }
+.projection-player-body :deep(.embedded-player-view .controls-bottom) {
+  width: 100%;
+  justify-content: flex-start;
+}
+.projection-player-body :deep(.embedded-player-view .character-ep-visual.expanded) {
+  width: min(1180px, calc(100vw - 110px));
+  max-width: none;
+  height: auto;
+  max-height: calc(100vh - 100px);
+}
 .projection-player-body :deep(.embedded-player-view .player-view-right) {
   grid-column: 2;
+  height: 100%;
+  align-self: stretch;
   max-width: none;
   min-height: 0;
   overflow: hidden;
@@ -699,26 +749,36 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   background: rgba(2, 15, 25, 0.24);
 }
 .projection-player-body :deep(.embedded-player-view .player-visual-panel) {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
-  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   margin: 0;
-  gap: 0 14px;
+  gap: 8px;
 }
-.projection-player-body :deep(.embedded-player-view .player-visual-switch) { grid-column: 1 / -1; }
-.projection-player-body :deep(.embedded-player-view .album-grid-visual-small),
+.projection-player-body :deep(.embedded-player-view .player-visual-switch) { align-self: center; }
+.projection-player-body :deep(.embedded-player-view .album-grid-visual-small) {
+  width: min(100%, 580px);
+  max-width: 580px;
+  height: clamp(210px, 32vh, 300px);
+  max-height: 300px;
+  object-fit: contain;
+  background: #06090d;
+  margin: 0;
+}
 .projection-player-body :deep(.embedded-player-view .character-ep-visual) {
-  grid-column: 1;
-  align-self: center;
-  width: 100%;
-  max-height: 150px;
-  object-fit: cover;
+  width: min(100%, 580px);
+  max-width: 580px;
+  height: clamp(210px, 32vh, 300px);
+  max-height: 300px;
+  aspect-ratio: 16 / 9;
+  margin: 0;
 }
 .projection-player-body :deep(.embedded-player-view .lyrics-container) {
   flex: 1;
   height: auto;
-  min-height: 180px;
+  min-height: 0;
   max-height: none;
   padding: 14px;
   border: 1px solid rgba(127, 181, 205, 0.16);
@@ -994,12 +1054,15 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .song-projection-row { min-height: 72px; }
 }
 @media (max-width: 900px) {
+  .projection-player-body { overflow: auto; }
   .projection-player-stage {
     inset: 64px 12px 18px;
     gap: 10px;
     padding: 12px;
   }
   .projection-player-body :deep(.embedded-player-view) {
+    height: auto;
+    min-height: 100%;
     grid-template-columns: minmax(0, 1fr);
     gap: 18px;
   }
@@ -1009,6 +1072,7 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     flex-direction: column;
     gap: 12px;
     height: auto;
+    align-self: start;
   }
   .projection-player-body :deep(.embedded-player-view .player-container) {
     display: flex;
@@ -1039,12 +1103,16 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .projection-player-body :deep(.embedded-player-view .controls-bottom) { justify-content: space-between; }
   .projection-player-body :deep(.embedded-player-view .player-view-right) {
     grid-column: 1;
+    height: auto;
+    align-self: start;
     overflow: hidden;
     padding: 14px;
   }
+  .projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
   .projection-player-body :deep(.embedded-player-view .lyrics-container) {
     flex: none;
     height: min(28vh, 240px);
+    min-height: 0;
   }
   .projection-player-queue {
     right: 12px;

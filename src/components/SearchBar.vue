@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { searchState } from '../stores/player.js';
 
 const searchQuery = ref('');
@@ -24,6 +24,20 @@ const handleSearch = () => {
   searchState.query = searchQuery.value.trim().toLowerCase();
   emit('search', searchState.query);
 };
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  handleSearch();
+};
+
+// Keep the input in sync when another part of the page clears the shared search.
+watch(() => searchState.query, (query) => {
+  if (query !== searchQuery.value) {
+    searchQuery.value = query;
+  }
+});
+
+defineExpose({ clearSearch });
 </script>
 
 <style scoped>

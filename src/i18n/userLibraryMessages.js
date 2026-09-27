@@ -88,6 +88,7 @@ export const userLibraryMessages = {
     },
     player: {
       shareSong: '分享歌曲',
+      volume: '音量',
       copiedShareLink: '已複製分享連結',
       lyrics: '歌詞',
       translationToggle: '翻譯',
@@ -194,6 +195,7 @@ export const userLibraryMessages = {
     },
     player: {
       shareSong: '分享歌曲',
+      volume: '音量',
       copiedShareLink: '已复制分享链接',
       lyrics: '歌词',
       translationToggle: '翻译',
@@ -300,6 +302,7 @@ export const userLibraryMessages = {
     },
     player: {
       shareSong: 'Share song',
+      volume: 'Volume',
       copiedShareLink: 'Copied share link',
       lyrics: 'Lyrics',
       translationToggle: 'Translate',
@@ -406,6 +409,7 @@ export const userLibraryMessages = {
     },
     player: {
       shareSong: '曲を共有',
+      volume: '音量',
       copiedShareLink: '共有リンクをコピーしました',
       lyrics: '歌詞',
       translationToggle: '翻訳',
@@ -512,6 +516,7 @@ export const userLibraryMessages = {
     },
     player: {
       shareSong: '곡 공유',
+      volume: '볼륨',
       copiedShareLink: '공유 링크가 복사되었습니다',
       lyrics: '가사',
       translationToggle: '번역',

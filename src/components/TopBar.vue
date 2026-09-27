@@ -4,16 +4,18 @@
       <NowPlayingBar @open-current-album="handleOpenCurrentAlbum" />
     </div>
     <div class="topbar-right">
-      <SearchBar @search="handleSearch" />
+      <SearchBar ref="searchBarRef" @search="handleSearch" />
     </div>
   </section>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import NowPlayingBar from './NowPlayingBar.vue';
 import SearchBar from './SearchBar.vue';
 
 const emit = defineEmits(['search', 'open-current-album']);
+const searchBarRef = ref(null);
 
 const handleSearch = (query) => {
   emit('search', query);
@@ -22,6 +24,12 @@ const handleSearch = (query) => {
 const handleOpenCurrentAlbum = () => {
   emit('open-current-album');
 };
+
+const clearSearch = () => {
+  searchBarRef.value?.clearSearch();
+};
+
+defineExpose({ clearSearch });
 </script>
 
 <style scoped>

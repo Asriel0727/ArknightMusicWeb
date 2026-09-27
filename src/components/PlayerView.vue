@@ -39,6 +39,18 @@
               @click="handleShareSong">
               <i :class="shareIcon"></i>
             </button>
+            <div v-if="playerProps.embedded" class="compact-volume-control">
+              <button class="control-btn" type="button" :title="t('player.volume')"
+                :aria-expanded="isCompactVolumeOpen" @click="isCompactVolumeOpen = !isCompactVolumeOpen">
+                <i :class="volumeIcon"></i>
+              </button>
+              <Transition name="compact-volume-popover">
+                <div v-if="isCompactVolumeOpen" class="compact-volume-popover" @click.stop>
+                  <input type="range" :value="playerState.volume" min="0" max="1" step="0.05"
+                    :aria-label="t('player.volume')" @input="handleVolumeChange">
+                </div>
+              </Transition>
+            </div>
           </div>
           <div class="progress-container" @click="handleSeek">
             <div class="progress-bar" :style="{ width: progressPercent + '%' }"></div>
@@ -48,7 +60,7 @@
             <span>{{ formatTime(playerState.duration) }}</span>
           </div>
           <div class="controls-bottom">
-            <div class="volume-control">
+            <div v-if="!playerProps.embedded" class="volume-control">
               <button class="control-btn" @click="toggleMute">
                 <i :class="volumeIcon"></i>
               </button>
@@ -229,7 +241,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { playerState, togglePlay, playPreviousSong, playNextSong, seek, setVolume, toggleMute, refreshLyricTranslations, togglePlayMode } from '../stores/player.js';
-import { createSongShareUrl as createSongSharePageUrl, fetchCharacterEp, getProxyImageUrl } from '../services/api.js';
+import { fetchCharacterEp, getProxyImageUrl } from '../services/api.js';
 import { authState } from '../services/auth.js';
 import { addFavoriteSong, addSongToPlaylist, createPlaylist, fetchFavoriteSongs, fetchPlaylists, removeFavoriteSong, removeSongFromPlaylist } from '../services/userLibrary.js';
 import { formatTime } from '../utils/time.js';
@@ -239,10 +251,11 @@ const { t, locale } = useI18n();
 const playerProps = defineProps({
   embedded: { type: Boolean, default: false },
 });
-const emit = defineEmits(['view-album']);
+const emit = defineEmits(['view-album', 'character-ep-expanded-change']);
 
 const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);
+const isCompactVolumeOpen = ref(false);
 const hasCopiedShareLink = ref(false);
 const isFavoriteSong = ref(false);
 const favoriteActionPending = ref(false);
@@ -763,12 +776,15 @@ const showCoverVisual = () => {
 };
 
 const closeCharacterEpPreview = () => {
+  if (!isCharacterEpExpanded.value) return;
   isCharacterEpExpanded.value = false;
+  emit('character-ep-expanded-change', false);
 };
 
 const toggleCharacterEpPreview = () => {
   if (!characterEp.value || visualMode.value !== 'ep') return;
   isCharacterEpExpanded.value = !isCharacterEpExpanded.value;
+  emit('character-ep-expanded-change', isCharacterEpExpanded.value);
 };
 
 const handleCharacterEpPreviewKeydown = (event) => {
@@ -875,8 +891,11 @@ const createSongShareUrl = () => {
   }
 
   const appUrl = new URL(window.location.href);
+  // Use a direct app URL so recipients arrive at this exact track immediately,
+  // rather than first loading the worker's social-preview redirect page.
+  appUrl.search = '';
   appUrl.searchParams.set('song', songId);
-  return createSongSharePageUrl(songId, appUrl.toString());
+  return appUrl.toString();
 };
 
 const copyText = async (text) => {
@@ -1117,6 +1136,8 @@ onUnmounted(() => {
     clearTimeout(libraryActionStatusTimeout);
   }
 });
+
+defineExpose({ closeCharacterEpPreview });
 </script>
 
 <style scoped>
@@ -1126,7 +1147,7 @@ onUnmounted(() => {
   grid-template-columns: repeat(2, minmax(0, 520px));
   justify-content: center;
   gap: clamp(24px, 4vw, 48px);
-  align-items: center;
+  align-items: start;
 }
 
 .player-loading-overlay {
@@ -1169,7 +1190,8 @@ onUnmounted(() => {
   flex-direction: column;
   width: 100%;
   max-width: 520px;
-  height: 100%;
+  height: auto;
+  align-self: start;
   justify-self: center;
   min-height: 0;
 }
@@ -1559,10 +1581,39 @@ onUnmounted(() => {
   top: 50%;
   left: 50%;
   z-index: 1100;
-  width: min(680px, calc(100vw - 32px));
+  width: min(1120px, calc(100vw - 64px));
+  max-height: calc(100vh - 64px);
   transform: translate(-50%, -50%);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
 }
+
+.compact-volume-control {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+.compact-volume-popover {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  width: 132px;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgba(126, 198, 255, 0.28);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(24, 66, 84, 0.96), rgba(5, 20, 31, 0.96));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28), inset 0 1px rgba(224, 248, 255, 0.08);
+}
+
+.compact-volume-popover input { width: 100%; accent-color: var(--primary-color); cursor: pointer; }
+.compact-volume-popover-enter-active,
+.compact-volume-popover-leave-active { transition: opacity 160ms ease, transform 160ms ease; }
+.compact-volume-popover-enter-from,
+.compact-volume-popover-leave-to { opacity: 0; transform: translateY(6px) scale(0.96); }
 
 .character-ep-frame,
 .character-ep-paused {

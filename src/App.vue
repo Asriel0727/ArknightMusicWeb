@@ -8,7 +8,7 @@
     </template>
 
     <template v-else-if="currentPage === 'albums'">
-      <TopBar @search="handleSearch" @open-current-album="handleOpenCurrentAlbum" />
+      <TopBar ref="topBarRef" @search="handleSearch" @open-current-album="handleOpenCurrentAlbum" />
       <AlbumList ref="albumListRef" @view-album="handleViewAlbum" />
       <Modal @close="handleModalClose" @view-album="handleViewAlbum" />
       <AlbumEntryTransition
@@ -109,6 +109,7 @@ watch(
 
 const audioPlayerRef = ref(null);
 const albumListRef = ref(null);
+const topBarRef = ref(null);
 const currentPage = ref('albums');
 const audioPreloadMode = window.matchMedia('(hover: none) and (pointer: coarse)').matches
   ? 'metadata'
@@ -149,6 +150,9 @@ const handleOpenCurrentAlbum = async () => {
   const songId = playerState.currentSong?.cid;
   if (!albumId || albumTransition.value.active) return;
 
+  // The rack can only navigate albums present in its current data set. Resetting
+  // search also invalidates any in-flight search response in AlbumList.
+  topBarRef.value?.clearSearch();
   const origin = await albumListRef.value?.focusAlbumForOpening?.(albumId);
   if (!origin) return;
   await handleViewAlbum(albumId, origin, { openPlayerForSongId: songId });
@@ -328,9 +332,24 @@ const handleSharedSongLink = async () => {
     return;
   }
 
-  modalState.currentView = 'player';
-  modalState.isOpen = true;
   await playSongFromMasterList({ cid: songId });
+  if (!playerState.currentSong?.albumCid) {
+    modalState.currentView = 'player';
+    modalState.isOpen = true;
+    return;
+  }
+
+  // Match the regular album playback experience, including its lyrics panel.
+  currentPage.value = 'albums';
+  for (let attempt = 0; attempt < 120 && !albumListRef.value; attempt += 1) {
+    await new Promise(resolve => requestAnimationFrame(resolve));
+  }
+  if (!albumListRef.value) {
+    modalState.currentView = 'player';
+    modalState.isOpen = true;
+    return;
+  }
+  await handleOpenCurrentAlbum();
 };
 
 const handleSharedCharacterLink = async () => {
