@@ -44,7 +44,17 @@ const SONG_LYRICS_TRANSLATION_CACHE_TTL_SECONDS = 60 * 60 * 24 * 90;
 const SONG_LYRICS_TRANSLATION_SCHEMA_VERSION = 1;
 const USER_ACCOUNT_KEY_PREFIX = 'userAccount:v1:';
 const USER_SESSION_KEY_PREFIX = 'userSession:v1:';
-const USER_SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
+const USER_SESSION_TTL_SECONDS = 60 * 60 * 24 * 14;
+const PASSWORD_HASH_VERSION = 2;
+// Keep the proven Worker-compatible PBKDF2 cost. Login throttling and short
+// sessions provide the complementary online-attack protection.
+const PASSWORD_PBKDF2_ITERATIONS = 100000;
+const LEGACY_PASSWORD_PBKDF2_ITERATIONS = 100000;
+const AUTH_RATE_LIMIT_PREFIX = 'authRate:v1:';
+const AUTH_RATE_LIMIT_WINDOW_SECONDS = 15 * 60;
+const SIGN_IN_IP_LIMIT = 12;
+const SIGN_IN_LOGIN_LIMIT = 6;
+const SIGN_UP_IP_LIMIT = 4;
 const GOOGLE_TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
 const TRANSLATION_LINE_SEPARATOR = '\n';
 const MAX_TRANSLATION_BATCH_TEXT_LENGTH = 4200;
@@ -2028,17 +2038,9 @@ async function handleSongSharePage(request, env, url) {
 }
 
 function buildSharedSongAppUrl(request, url, songId) {
-  const rawApp = url.searchParams.get('app') || DEFAULT_APP_ORIGIN;
-  let appUrl;
-
-  try {
-    appUrl = new URL(rawApp);
-    if (appUrl.protocol !== 'https:' && appUrl.protocol !== 'http:') {
-      throw new Error('Invalid app protocol');
-    }
-  } catch {
-    appUrl = new URL(DEFAULT_APP_ORIGIN);
-  }
+  // Share URLs must always return to this application. Accepting an arbitrary
+  // `app` query parameter made this endpoint an open redirect.
+  const appUrl = new URL(DEFAULT_APP_ORIGIN);
 
   appUrl.searchParams.set('song', songId);
   return appUrl.toString();
@@ -2108,7 +2110,20 @@ async function handleUserApiRequest(request, env, url) {
   }
 
   if (url.pathname === '/api/auth/user') {
-    return json({ ok: true, user: auth.user });
+    const account = await env.ARKNIGHTS_DATA.get(getUserAccountKey(auth.user.loginKey), 'json');
+    return json({ ok: true, user: buildPublicUser(account || auth.user) });
+  }
+
+  if (url.pathname === '/api/auth/sign-out') {
+    if (request.method !== 'POST') {
+      return methodNotAllowed('POST');
+    }
+    await env.ARKNIGHTS_DATA.delete(auth.sessionKey);
+    return json({ ok: true });
+  }
+
+  if (url.pathname === '/api/auth/change-password') {
+    return handleChangePassword(request, env, auth);
   }
 
   if (url.pathname === '/api/user/favorite-songs') {
@@ -2140,10 +2155,16 @@ async function handleKeySignUp(request, env) {
   const body = await readJsonBody(request);
   const loginKey = normalizeLoginKey(body.loginKey || body.email);
   const password = String(body.password || '');
-  const validation = validateLoginCredentials(loginKey, password);
+  const validation = validateNewCredentials(loginKey, password);
   if (validation) {
-    return json({ ok: false, error: validation }, 400);
+    const code = password.length < 8 || password.length > 12
+      ? 'INVALID_NEW_PASSWORD'
+      : 'INVALID_LOGIN_KEY';
+    return json({ ok: false, error: validation, code }, 400);
   }
+
+  const rateLimit = await enforceAuthRateLimit(request, env, 'sign-up', [getRequestClientId(request)]);
+  if (rateLimit) return rateLimit;
 
   const accountKey = getUserAccountKey(loginKey);
   const existing = await env.ARKNIGHTS_DATA.get(accountKey, 'json');
@@ -2152,7 +2173,7 @@ async function handleKeySignUp(request, env) {
   }
 
   const salt = randomBase64Url(16);
-  const passwordHash = await hashPassword(password, salt);
+  const passwordHash = await hashPassword(password, salt, PASSWORD_PBKDF2_ITERATIONS);
   const user = {
     id: crypto.randomUUID(),
     loginKey,
@@ -2162,10 +2183,11 @@ async function handleKeySignUp(request, env) {
     ...user,
     salt,
     passwordHash,
+    passwordHashVersion: PASSWORD_HASH_VERSION,
   };
   await env.ARKNIGHTS_DATA.put(accountKey, JSON.stringify(account));
 
-  const session = await createUserSession(env, user);
+  const session = await createUserSession(env, buildPublicUser(account));
   return json({ ok: true, session });
 }
 
@@ -2182,22 +2204,69 @@ async function handleKeySignIn(request, env) {
     return json({ ok: false, error: validation }, 400);
   }
 
+  const rateLimit = await enforceAuthRateLimit(request, env, 'sign-in', [
+    getRequestClientId(request),
+    `login:${await sha256Hex(loginKey)}`,
+  ]);
+  if (rateLimit) return rateLimit;
+
   const account = await env.ARKNIGHTS_DATA.get(getUserAccountKey(loginKey), 'json');
   if (!account) {
-    return json({ ok: false, error: 'Invalid login key or password' }, 401);
+    return json({ ok: false, error: 'Invalid login key or password', code: 'INVALID_CREDENTIALS' }, 401);
   }
 
-  const passwordHash = await hashPassword(password, account.salt);
-  if (passwordHash !== account.passwordHash) {
-    return json({ ok: false, error: 'Invalid login key or password' }, 401);
+  const iterations = account.passwordHashVersion >= PASSWORD_HASH_VERSION
+    ? PASSWORD_PBKDF2_ITERATIONS
+    : LEGACY_PASSWORD_PBKDF2_ITERATIONS;
+  const passwordHash = await hashPassword(password, account.salt, iterations);
+  if (!constantTimeEqual(passwordHash, account.passwordHash)) {
+    return json({ ok: false, error: 'Invalid login key or password', code: 'INVALID_CREDENTIALS' }, 401);
   }
 
-  const session = await createUserSession(env, {
-    id: account.id,
-    loginKey: account.loginKey,
-    createdAt: account.createdAt,
-  });
+  await clearAuthRateLimits(env, 'sign-in', [getRequestClientId(request), `login:${await sha256Hex(loginKey)}`]);
+  const session = await createUserSession(env, buildPublicUser(account));
   return json({ ok: true, session });
+}
+
+async function handleChangePassword(request, env, auth) {
+  if (request.method !== 'POST') {
+    return methodNotAllowed('POST');
+  }
+
+  const body = await readJsonBody(request);
+  const currentPassword = String(body.currentPassword || '');
+  const newPassword = String(body.newPassword || '');
+  const validation = validateNewPassword(newPassword);
+  if (validation) return json({ ok: false, error: validation, code: 'INVALID_NEW_PASSWORD' }, 400);
+
+  try {
+    const accountKey = getUserAccountKey(auth.user.loginKey);
+    const account = await env.ARKNIGHTS_DATA.get(accountKey, 'json');
+    if (!account) return json({ ok: false, error: 'Account not found' }, 404);
+
+    const iterations = account.passwordHashVersion >= PASSWORD_HASH_VERSION
+      ? PASSWORD_PBKDF2_ITERATIONS
+      : LEGACY_PASSWORD_PBKDF2_ITERATIONS;
+    const currentHash = await hashPassword(currentPassword, account.salt, iterations);
+    if (!constantTimeEqual(currentHash, account.passwordHash)) {
+      return json({ ok: false, error: 'Current password is incorrect', code: 'INVALID_CURRENT_PASSWORD' }, 401);
+    }
+
+    account.salt = randomBase64Url(16);
+    account.passwordHash = await hashPassword(newPassword, account.salt, PASSWORD_PBKDF2_ITERATIONS);
+    account.passwordHashVersion = PASSWORD_HASH_VERSION;
+    await env.ARKNIGHTS_DATA.put(accountKey, JSON.stringify(account));
+    await env.ARKNIGHTS_DATA.delete(auth.sessionKey);
+
+    const session = await createUserSession(env, buildPublicUser(account));
+    return json({ ok: true, session });
+  } catch (error) {
+    console.error('Password update failed:', {
+      loginKey: auth.user.loginKey,
+      message: error?.message || 'Unknown error',
+    });
+    return json({ ok: false, error: 'Password update is temporarily unavailable', code: 'PASSWORD_UPDATE_FAILED' }, 500);
+  }
 }
 
 async function createUserSession(env, user) {
@@ -2225,11 +2294,32 @@ function validateLoginCredentials(loginKey, password) {
     return 'Login key must be 3-32 characters: a-z, 0-9, _ or -';
   }
 
-  if (password.length < 6) {
+  if (password.length < 6 || password.length > 128) {
     return 'Password must be at least 6 characters';
   }
 
   return '';
+}
+
+function validateNewCredentials(loginKey, password) {
+  const loginKeyError = validateLoginCredentials(loginKey, password);
+  return loginKeyError || validateNewPassword(password);
+}
+
+function validateNewPassword(password) {
+  if (password.length < 8 || password.length > 12) {
+    return 'New password must be 8-12 characters';
+  }
+  return '';
+}
+
+function buildPublicUser(account) {
+  return {
+    id: account.id,
+    loginKey: account.loginKey,
+    createdAt: account.createdAt,
+    passwordUpgradeRequired: Number(account.passwordHashVersion || 1) < PASSWORD_HASH_VERSION,
+  };
 }
 
 function getUserAccountKey(loginKey) {
@@ -2240,7 +2330,7 @@ async function getUserSessionKey(token) {
   return `${USER_SESSION_KEY_PREFIX}${await sha256Hex(token)}`;
 }
 
-async function hashPassword(password, salt) {
+async function hashPassword(password, salt, iterations) {
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
     new TextEncoder().encode(password),
@@ -2253,12 +2343,23 @@ async function hashPassword(password, salt) {
       name: 'PBKDF2',
       hash: 'SHA-256',
       salt: new TextEncoder().encode(salt),
-      iterations: 100000,
+      iterations,
     },
     keyMaterial,
     256
   );
   return bytesToBase64Url(new Uint8Array(bits));
+}
+
+function constantTimeEqual(left, right) {
+  const leftBytes = new TextEncoder().encode(String(left || ''));
+  const rightBytes = new TextEncoder().encode(String(right || ''));
+  if (leftBytes.length !== rightBytes.length) return false;
+  let result = 0;
+  for (let index = 0; index < leftBytes.length; index += 1) {
+    result |= leftBytes[index] ^ rightBytes[index];
+  }
+  return result === 0;
 }
 
 function randomBase64Url(size) {
@@ -2281,12 +2382,54 @@ async function getAuthenticatedUser(request, env) {
     return { ok: false, status: 401, error: 'Login required' };
   }
 
-  const session = await env.ARKNIGHTS_DATA.get(await getUserSessionKey(token), 'json');
+  const sessionKey = await getUserSessionKey(token);
+  const session = await env.ARKNIGHTS_DATA.get(sessionKey, 'json');
   if (!session?.user) {
     return { ok: false, status: 401, error: 'Invalid session' };
   }
 
-  return { ok: true, user: session.user };
+  return { ok: true, user: session.user, sessionKey };
+}
+
+function getRequestClientId(request) {
+  return request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+}
+
+async function enforceAuthRateLimit(request, env, action, identifiers) {
+  const limits = action === 'sign-up'
+    ? [SIGN_UP_IP_LIMIT]
+    : [SIGN_IN_IP_LIMIT, SIGN_IN_LOGIN_LIMIT];
+  const keys = await Promise.all(identifiers.map((identifier) => getAuthRateLimitKey(action, identifier)));
+  const results = await Promise.all(keys.map((key, index) => consumeAuthRateLimit(env, key, limits[index])));
+  const blocked = results.find((result) => result.blocked);
+  if (!blocked) return null;
+  return json(
+    { ok: false, error: 'Too many attempts. Please try again later.', code: 'RATE_LIMITED', retryAfter: blocked.retryAfter },
+    429,
+    0,
+    { 'retry-after': String(blocked.retryAfter) }
+  );
+}
+
+async function consumeAuthRateLimit(env, key, limit) {
+  const now = Date.now();
+  const existing = await env.ARKNIGHTS_DATA.get(key, 'json');
+  const record = existing?.resetAt > now ? existing : { count: 0, resetAt: now + AUTH_RATE_LIMIT_WINDOW_SECONDS * 1000 };
+  if (record.count >= limit) {
+    return { blocked: true, retryAfter: Math.max(1, Math.ceil((record.resetAt - now) / 1000)) };
+  }
+  record.count += 1;
+  await env.ARKNIGHTS_DATA.put(key, JSON.stringify(record), { expirationTtl: Math.max(1, Math.ceil((record.resetAt - now) / 1000)) });
+  return { blocked: false };
+}
+
+async function getAuthRateLimitKey(action, identifier) {
+  return `${AUTH_RATE_LIMIT_PREFIX}${action}:${await sha256Hex(identifier)}`;
+}
+
+async function clearAuthRateLimits(env, action, identifiers) {
+  const keys = await Promise.all(identifiers.map((identifier) => getAuthRateLimitKey(action, identifier)));
+  await Promise.all(keys.map((key) => env.ARKNIGHTS_DATA.delete(key)));
 }
 
 async function handleFavoriteSongsRequest(request, env, user, url) {
@@ -4378,11 +4521,13 @@ function isAllowedMusicAssetUrl(rawUrl, type) {
     }
 
     if (type === 'image') {
-      return /\.(png|jpg|jpeg|webp)$/i.test(url.pathname);
+      return /^(web|res\d*)\.hycdn\.cn$/i.test(url.hostname) &&
+        /\.(png|jpg|jpeg|webp)$/i.test(url.pathname);
     }
 
     if (type === 'lyrics') {
-      return /\.(lrc|txt)$/i.test(url.pathname);
+      return /^(web|res\d*)\.hycdn\.cn$/i.test(url.hostname) &&
+        /\.(lrc|txt)$/i.test(url.pathname);
     }
 
     if (type === 'audio') {

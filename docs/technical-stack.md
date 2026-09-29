@@ -67,6 +67,8 @@ POST /api/lyrics/translate
 ```txt
 POST /api/auth/sign-up
 POST /api/auth/sign-in
+POST /api/auth/sign-out
+POST /api/auth/change-password
 GET /api/auth/user
 GET/POST/DELETE /api/user/favorite-songs
 GET/POST/PATCH/DELETE /api/user/playlists
@@ -107,6 +109,8 @@ Admin endpoint 需要 `SYNC_TOKEN`。
 - `user_playlist_songs`
 - `user_character_lists`
 - `user_character_list_items`
+
+登入與註冊會由 Worker 的 KV 提供短期 rate limit；新註冊帳號需要 8 至 12 字元密碼，可使用大小寫與特殊符號。舊帳號登入後若顯示密碼升級提醒，必須透過 `POST /api/auth/change-password` 更新密碼，才能採用目前的雜湊規則。
 
 Schema 位於：
 

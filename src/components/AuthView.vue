@@ -7,13 +7,46 @@
       </div>
 
       <div v-if="authState.user" class="signed-in-panel">
-        <span>{{ t('auth.currentUser', { name: authState.user.loginKey }) }}</span>
-        <button class="auth-submit secondary" type="button" @click="signOut">
+        <div>
+          <span>{{ t('auth.currentUser', { name: authState.user.loginKey }) }}</span>
+          <p v-if="authState.user.passwordUpgradeRequired" class="auth-security-notice">
+            {{ t('auth.passwordUpgradeNotice') }}
+          </p>
+        </div>
+        <button class="auth-submit secondary" type="button" @click="handleSignOut">
           {{ t('auth.signOut') }}
         </button>
       </div>
 
-      <template v-else>
+      <form
+        v-if="authState.user?.passwordUpgradeRequired"
+        class="auth-form password-change-form"
+        @submit.prevent="handlePasswordChange"
+      >
+        <h2>{{ t('auth.changePassword') }}</h2>
+        <label>
+          <span>{{ t('auth.currentPassword') }}</span>
+          <input v-model="currentPassword" autocomplete="current-password" type="password">
+        </label>
+        <label>
+          <span>{{ t('auth.newPassword') }}</span>
+          <input
+            v-model="newPassword"
+            autocomplete="new-password"
+            type="password"
+            minlength="8"
+            maxlength="12"
+            :placeholder="t('auth.newPasswordPlaceholder')"
+          >
+        </label>
+        <p class="auth-hint">{{ t('auth.passwordUpgradeHint') }}</p>
+        <p v-if="authState.error" class="auth-error">{{ authErrorMessage }}</p>
+        <button class="auth-submit" type="submit" :disabled="authState.isLoading">
+          {{ t('auth.updatePassword') }}
+        </button>
+      </form>
+
+      <template v-if="!authState.user">
         <div class="auth-mode-tabs">
           <button
             type="button"
@@ -46,11 +79,13 @@
               v-model="password"
               autocomplete="current-password"
               type="password"
+              :minlength="mode === 'sign-up' ? 8 : undefined"
+              :maxlength="mode === 'sign-up' ? 12 : undefined"
               :placeholder="t('auth.passwordPlaceholder')"
             >
           </label>
           <p class="auth-hint">{{ t('auth.keyHint') }}</p>
-          <p v-if="authState.error" class="auth-error">{{ authState.error }}</p>
+          <p v-if="authState.error" class="auth-error">{{ authErrorMessage }}</p>
           <button class="auth-submit" type="submit" :disabled="authState.isLoading">
             {{ mode === 'sign-in' ? t('auth.signIn') : t('auth.signUp') }}
           </button>
@@ -61,14 +96,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { authState, signIn, signOut, signUp } from '../services/auth.js';
+import { authState, changePassword, signIn, signOut, signUp } from '../services/auth.js';
 
 const { t } = useI18n();
 const mode = ref('sign-in');
 const loginKey = ref('');
 const password = ref('');
+const currentPassword = ref('');
+const newPassword = ref('');
+
+const authErrorMessage = computed(() => {
+  const code = authState.errorCode;
+  if (code === 'RATE_LIMITED') {
+    return t('auth.rateLimited', { minutes: Math.max(1, Math.ceil(authState.retryAfter / 60)) });
+  }
+  const messageKey = {
+    INVALID_CREDENTIALS: 'invalidCredentials',
+    INVALID_LOGIN_KEY: 'invalidLoginKey',
+    INVALID_CURRENT_PASSWORD: 'invalidCurrentPassword',
+    INVALID_NEW_PASSWORD: 'invalidNewPassword',
+    PASSWORD_UPDATE_FAILED: 'passwordUpdateFailed',
+    REQUEST_FAILED: 'requestFailed',
+  }[code];
+  return messageKey ? t(`auth.${messageKey}`) : authState.error;
+});
 
 const handleSubmit = async () => {
   if (mode.value === 'sign-in') {
@@ -77,6 +130,19 @@ const handleSubmit = async () => {
   }
 
   await signUp(loginKey.value, password.value).catch(() => {});
+};
+
+const handleSignOut = async () => {
+  await signOut();
+};
+
+const handlePasswordChange = async () => {
+  await changePassword(currentPassword.value, newPassword.value)
+    .then(() => {
+      currentPassword.value = '';
+      newPassword.value = '';
+    })
+    .catch(() => {});
 };
 </script>
 
@@ -149,6 +215,23 @@ const handleSubmit = async () => {
 
 .auth-error {
   color: #ff7b72;
+}
+
+.auth-security-notice {
+  margin: 8px 0 0;
+  color: #f2c14e;
+  line-height: 1.5;
+}
+
+.password-change-form {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.password-change-form h2 {
+  margin: 0;
+  font-size: 1.1rem;
 }
 
 .signed-in-panel {

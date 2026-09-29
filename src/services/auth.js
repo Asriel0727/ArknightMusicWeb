@@ -8,6 +8,8 @@ export const authState = reactive({
   user: null,
   isLoading: false,
   error: '',
+  errorCode: '',
+  retryAfter: 0,
 });
 
 function saveSession(session) {
@@ -68,13 +70,56 @@ export async function signUp(loginKey, password) {
   return submitAuth('/api/auth/sign-up', loginKey, password);
 }
 
-export function signOut() {
-  saveSession(null);
+export async function signOut() {
+  const token = getAuthToken();
+  try {
+    if (token) {
+      await fetch(`${API_ORIGIN}/api/auth/sign-out`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      });
+    }
+  } catch {
+    // Local sign-out must still succeed if the network is unavailable.
+  } finally {
+    saveSession(null);
+  }
+}
+
+export async function changePassword(currentPassword, newPassword) {
+  authState.isLoading = true;
+  authState.error = '';
+  authState.errorCode = '';
+  authState.retryAfter = 0;
+
+  try {
+    const response = await fetch(`${API_ORIGIN}/api/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.ok === false) throw createAuthError(data, response);
+    saveSession(data.session);
+    return data.session;
+  } catch (error) {
+    authState.error = error.message;
+    authState.errorCode = error.code || 'REQUEST_FAILED';
+    authState.retryAfter = error.retryAfter || 0;
+    throw error;
+  } finally {
+    authState.isLoading = false;
+  }
 }
 
 async function submitAuth(path, loginKey, password) {
   authState.isLoading = true;
   authState.error = '';
+  authState.errorCode = '';
+  authState.retryAfter = 0;
 
   try {
     const response = await fetch(`${API_ORIGIN}${path}`, {
@@ -86,17 +131,34 @@ async function submitAuth(path, loginKey, password) {
     });
     const data = await response.json();
     if (!response.ok || data.ok === false) {
-      throw new Error(data.error || '登入失敗');
+      throw createAuthError(data, response);
     }
 
     saveSession(data.session);
     return data.session;
   } catch (error) {
     authState.error = error.message;
+    authState.errorCode = error.code || 'REQUEST_FAILED';
+    authState.retryAfter = error.retryAfter || 0;
     throw error;
   } finally {
     authState.isLoading = false;
   }
+}
+
+function createAuthError(data, response) {
+  const error = new Error(data.error || '登入失敗');
+  error.code = data.code || getLegacyAuthErrorCode(data.error, response?.status);
+  const retryAfter = Number(data.retryAfter || response?.headers?.get('retry-after') || 0);
+  error.retryAfter = Number.isFinite(retryAfter) ? retryAfter : 0;
+  return error;
+}
+
+function getLegacyAuthErrorCode(message, status) {
+  if (status === 401) return 'INVALID_CREDENTIALS';
+  if (status === 429) return 'RATE_LIMITED';
+  if (/password/i.test(String(message || '')) && status === 400) return 'INVALID_NEW_PASSWORD';
+  return '';
 }
 
 export async function refreshCurrentUser() {
