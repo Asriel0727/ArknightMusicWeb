@@ -34,8 +34,6 @@
             v-model="newPassword"
             autocomplete="new-password"
             type="password"
-            minlength="8"
-            maxlength="12"
             :placeholder="t('auth.newPasswordPlaceholder')"
           >
         </label>
@@ -79,11 +77,10 @@
               v-model="password"
               autocomplete="current-password"
               type="password"
-              :minlength="mode === 'sign-up' ? 8 : undefined"
-              :maxlength="mode === 'sign-up' ? 12 : undefined"
               :placeholder="t('auth.passwordPlaceholder')"
             >
           </label>
+          <p v-if="mode === 'sign-up'" class="auth-hint">{{ t('auth.passwordRules') }}</p>
           <p class="auth-hint">{{ t('auth.keyHint') }}</p>
           <p v-if="authState.error" class="auth-error">{{ authErrorMessage }}</p>
           <button class="auth-submit" type="submit" :disabled="authState.isLoading">
@@ -117,10 +114,12 @@ const authErrorMessage = computed(() => {
     INVALID_LOGIN_KEY: 'invalidLoginKey',
     INVALID_CURRENT_PASSWORD: 'invalidCurrentPassword',
     INVALID_NEW_PASSWORD: 'invalidNewPassword',
+    LOGIN_KEY_TAKEN: 'loginKeyTaken',
+    SESSION_EXPIRED: 'sessionExpired',
     PASSWORD_UPDATE_FAILED: 'passwordUpdateFailed',
     REQUEST_FAILED: 'requestFailed',
   }[code];
-  return messageKey ? t(`auth.${messageKey}`) : authState.error;
+  return messageKey ? t(`auth.${messageKey}`) : t('auth.requestFailed');
 });
 
 const handleSubmit = async () => {

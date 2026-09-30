@@ -2169,7 +2169,7 @@ async function handleKeySignUp(request, env) {
   const accountKey = getUserAccountKey(loginKey);
   const existing = await env.ARKNIGHTS_DATA.get(accountKey, 'json');
   if (existing) {
-    return json({ ok: false, error: 'Login key already exists' }, 409);
+    return json({ ok: false, error: 'Login key already exists', code: 'LOGIN_KEY_TAKEN' }, 409);
   }
 
   const salt = randomBase64Url(16);
@@ -2201,7 +2201,8 @@ async function handleKeySignIn(request, env) {
   const password = String(body.password || '');
   const validation = validateLoginCredentials(loginKey, password);
   if (validation) {
-    return json({ ok: false, error: validation }, 400);
+    const code = /^[a-z0-9_-]{3,32}$/.test(loginKey) ? 'INVALID_CREDENTIALS' : 'INVALID_LOGIN_KEY';
+    return json({ ok: false, error: validation, code }, 400);
   }
 
   const rateLimit = await enforceAuthRateLimit(request, env, 'sign-in', [
@@ -2242,7 +2243,7 @@ async function handleChangePassword(request, env, auth) {
   try {
     const accountKey = getUserAccountKey(auth.user.loginKey);
     const account = await env.ARKNIGHTS_DATA.get(accountKey, 'json');
-    if (!account) return json({ ok: false, error: 'Account not found' }, 404);
+    if (!account) return json({ ok: false, error: 'Account not found', code: 'SESSION_EXPIRED' }, 401);
 
     const iterations = account.passwordHashVersion >= PASSWORD_HASH_VERSION
       ? PASSWORD_PBKDF2_ITERATIONS

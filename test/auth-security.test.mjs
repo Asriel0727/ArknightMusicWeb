@@ -72,12 +72,14 @@ test('new accounts require a stronger password and do not request an upgrade', a
     body: JSON.stringify({ loginKey: 'doctor_01', password: 'short' }),
   });
   assert.equal(weak.response.status, 400);
+  assert.equal(weak.data.code, 'INVALID_NEW_PASSWORD');
 
   const tooLong = await call(env, '/api/auth/sign-up', {
     method: 'POST',
     body: JSON.stringify({ loginKey: 'doctor_01', password: 'Abc!234567890' }),
   });
   assert.equal(tooLong.response.status, 400);
+  assert.equal(tooLong.data.code, 'INVALID_NEW_PASSWORD');
 
   const created = await call(env, '/api/auth/sign-up', {
     method: 'POST',
