@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-01T13:33:15.192Z",
+  "generatedAt": "2026-10-02T09:13:45.665Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -381,13 +381,13 @@
       "syncedAt": "2026-07-17T03:50:02.948Z"
     },
     "wiki-retracing-our-steps": {
-      "publicPath": "/images/activities/wiki-retracing-our-steps.jpg",
-      "relativePath": "public/images/activities/wiki-retracing-our-steps.jpg",
-      "sourceUrl": "https://media.prts.wiki/8/8e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82025_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 480283,
-      "hash": "44e22a52a3b168c1a17d2c4f92c6cbbf10a76e3e275d18d0aa27988380c320ac",
-      "syncedAt": "2026-09-03T16:37:59.947Z"
+      "publicPath": "/images/activities/wiki-retracing-our-steps.webp",
+      "relativePath": "public/images/activities/wiki-retracing-our-steps.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Retracing_Our_Steps_banner.png?b9ad3c",
+      "contentType": "image/webp",
+      "size": 1256218,
+      "hash": "8ac8a284ad3b252cdd26e23203cfdda6f358cbb514a2d1bce8d49332c4431803",
+      "syncedAt": "2026-10-02T09:13:03.923Z"
     },
     "prts-18lchyx": {
       "publicPath": "/images/activities/prts-18lchyx.jpg",
@@ -2894,11 +2894,11 @@
     "wiki-medjehtiqedti-bound": {
       "publicPath": "/images/activities/wiki-medjehtiqedti-bound.webp",
       "relativePath": "public/images/activities/wiki-medjehtiqedti-bound.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Medjehtiqedti_Bound_banner.png?7edb09",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9",
       "contentType": "image/webp",
-      "size": 820454,
-      "hash": "f4bfbd8959f044238e6741d8c7135e610b0c83669cbae72d3eed12b3eded4d4f",
-      "syncedAt": "2026-10-01T13:33:11.247Z"
+      "size": 937618,
+      "hash": "976f271280b33315706608a217db8cc5144ce5a28f99752c525657a164a323fb",
+      "syncedAt": "2026-10-02T09:12:53.265Z"
     },
     "wiki-trials-for-navigator-6": {
       "publicPath": "/images/activities/wiki-trials-for-navigator-6.png",
