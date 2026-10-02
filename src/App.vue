@@ -49,6 +49,10 @@
       <Modal @close="handleModalClose" />
     </template>
 
+    <template v-else-if="currentPage === 'story'">
+      <StoryStage />
+    </template>
+
     <template v-else-if="currentPage === 'library'">
       <UserLibraryView />
       <Modal @close="handleModalClose" />
@@ -85,6 +89,7 @@ const CharacterList = defineAsyncComponent(() => import('./components/CharacterL
 const RecruitCardMaker = defineAsyncComponent(() => import('./components/RecruitCardMaker.vue'));
 const RecruitmentCalculator = defineAsyncComponent(() => import('./components/RecruitmentCalculator.vue'));
 const ActivityList = defineAsyncComponent(() => import('./components/ActivityList.vue'));
+const StoryStage = defineAsyncComponent(() => import('./components/StoryStage.vue'));
 const UserLibraryView = defineAsyncComponent(() => import('./components/UserLibraryView.vue'));
 const AuthView = defineAsyncComponent(() => import('./components/AuthView.vue'));
 

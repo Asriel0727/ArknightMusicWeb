@@ -51,6 +51,10 @@
           <i class="fas fa-calendar-days"></i>
           <span>{{ activityLabel }}</span>
         </button>
+        <button class="nav-tab" :class="{ active: currentPage === 'story' }" @click="changePage('story')">
+          <i class="fas fa-book-open"></i>
+          <span>{{ storyLabel }}</span>
+        </button>
         <button
           v-if="authState.user"
           class="nav-tab"
@@ -117,6 +121,8 @@ const activityLabels = {
   ko: '이벤트',
 };
 const activityLabel = computed(() => activityLabels[locale.value] || activityLabels.en);
+const storyLabels = { 'zh-TW': '劇情', 'zh-CN': '剧情', en: 'Story', ja: 'ストーリー', ko: '스토리' };
+const storyLabel = computed(() => storyLabels[locale.value] || storyLabels.en);
 
 const localeModel = computed({
   get: () => locale.value,
