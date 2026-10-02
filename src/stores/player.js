@@ -434,7 +434,7 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
     playerState.lyrics = translatedLyrics;
   } catch (error) {
     if (translationToken === lyricTranslationToken) {
-      playerState.lyricTranslationError = error?.message || 'Translation unavailable';
+      playerState.lyricTranslationError = i18n.global.t('player.translationUnavailable');
     }
     console.warn('Lyric translation failed:', error);
   } finally {

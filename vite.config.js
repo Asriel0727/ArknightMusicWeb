@@ -13,7 +13,12 @@ export default defineConfig({
     port: 3000,
     // 3000 被占用時自動改用下一個可用埠（終端機會印出實際網址）
     strictPort: false,
-    open: true
+    open: true,
+    // Build outputs are generated artifacts and can be locked by a preview or file explorer on Windows.
+    // They must not be part of the development server's HMR watcher.
+    watch: {
+      ignored: ['**/dist/**', '**/dist-portable/**'],
+    },
   },
   build: {
     rollupOptions: {

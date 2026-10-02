@@ -55,7 +55,10 @@ const AUTH_RATE_LIMIT_WINDOW_SECONDS = 15 * 60;
 const SIGN_IN_IP_LIMIT = 12;
 const SIGN_IN_LOGIN_LIMIT = 6;
 const SIGN_UP_IP_LIMIT = 4;
-const GOOGLE_TRANSLATE_ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
+const GOOGLE_TRANSLATE_ENDPOINTS = [
+  'https://translate.googleapis.com/translate_a/single',
+  'https://translate.google.com/translate_a/single',
+];
 const TRANSLATION_LINE_SEPARATOR = '\n';
 const MAX_TRANSLATION_BATCH_TEXT_LENGTH = 4200;
 const SUPPORTED_TRANSLATION_LOCALES = new Set(['zh-TW', 'zh-CN', 'en', 'ja', 'ko']);
@@ -2961,9 +2964,20 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
   )).length;
   const diagnostics = translatedLines.translationDiagnostics || { failedBatchCount: 0 };
   const translationFailed = untranslatedCount > 0;
+  const errorCode = 'translation_provider_unavailable';
 
   if (translationFailed) {
-    console.warn({ message: 'Lyric translation returned incomplete result', songId, targetLocale, translatableCount, translatedCount, untranslatedCount, failedBatchCount: diagnostics.failedBatchCount });
+    console.warn({
+      message: 'Lyric translation returned incomplete result',
+      songId,
+      targetLocale,
+      translatableCount,
+      translatedCount,
+      untranslatedCount,
+      failedBatchCount: diagnostics.failedBatchCount,
+      errorCode,
+      failureReasons: diagnostics.failureReasons || [],
+    });
   } else {
     console.info({ message: 'Lyric translation completed', songId, targetLocale, translatableCount, translatedCount, failedBatchCount: diagnostics.failedBatchCount });
   }
@@ -2996,7 +3010,8 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
     translatedCount,
     untranslatedCount,
     failedBatchCount: diagnostics.failedBatchCount,
-    error: translationFailed ? 'Translation provider returned an incomplete result' : undefined,
+    error: translationFailed ? 'Translation service unavailable' : undefined,
+    errorCode: translationFailed ? errorCode : undefined,
     translation: translations[0] || '',
     source: songId ? 'translated' : 'line-cache',
   }, 200, 3600);
@@ -3166,6 +3181,8 @@ async function translateServerLines(env, lines, targetLocale, options = {}) {
   }));
   const translatableLines = [];
   let failedBatchCount = 0;
+  let providerRateLimited = false;
+  const failureReasons = new Set();
 
   for (const line of result) {
     if (shouldSkipServerTranslation(line.text, line.sourceLocale, targetLocale)) {
@@ -3204,13 +3221,24 @@ async function translateServerLines(env, lines, targetLocale, options = {}) {
       }
     } catch (error) {
       failedBatchCount += 1;
-      console.warn('Server lyric translation batch failed:', error.message);
+      failureReasons.add(error.message);
+      console.warn({
+        message: 'Server lyric translation batch failed',
+        provider: 'google-translate-public',
+        targetLocale,
+        lineCount: batch.length,
+        reason: error.message,
+      });
+      if (error?.code === 'translation_rate_limited') {
+        providerRateLimited = true;
+        break;
+      }
     }
   }
 
   // Google may occasionally reject or reformat a multi-line request. Retry only
   // unresolved lines individually so a single bad batch never leaves silent blanks.
-  for (const line of result) {
+  for (const line of providerRateLimited ? [] : result) {
     if (shouldSkipServerTranslation(line.text, line.sourceLocale, targetLocale) || line.translation) {
       continue;
     }
@@ -3232,12 +3260,19 @@ async function translateServerLines(env, lines, targetLocale, options = {}) {
       }
     } catch (error) {
       failedBatchCount += 1;
-      console.warn('Server lyric translation fallback failed:', error.message);
+      failureReasons.add(error.message);
+      console.warn({
+        message: 'Server lyric translation fallback failed',
+        provider: 'google-translate-public',
+        targetLocale,
+        lineCount: 1,
+        reason: error.message,
+      });
     }
   }
 
   Object.defineProperty(result, 'translationDiagnostics', {
-    value: { failedBatchCount },
+    value: { failedBatchCount, failureReasons: [...failureReasons].slice(0, 3) },
     enumerable: false,
   });
   return result;
@@ -3276,25 +3311,79 @@ function createServerTranslationBatches(lines) {
 async function translateServerBatch(batch, targetLocale) {
   const text = batch.map((line) => line.text).join(TRANSLATION_LINE_SEPARATOR);
   const sourceLocale = batch[0]?.sourceLocale || 'auto';
-  const params = new URLSearchParams({
-    client: 'gtx',
-    sl: sourceLocale,
-    tl: targetLocale,
-    dt: 't',
-    q: text,
-  });
-  const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?${params.toString()}`, {
-    headers: {
-      accept: 'application/json',
-      referer: DEFAULT_APP_ORIGIN,
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`Translate request failed: ${response.status} (${response.statusText})`);
+  const errors = [];
+
+  for (const endpoint of GOOGLE_TRANSLATE_ENDPOINTS) {
+    const params = new URLSearchParams({
+      client: 'gtx',
+      sl: sourceLocale,
+      tl: targetLocale,
+      dt: 't',
+      q: text,
+    });
+
+    try {
+      const response = await fetch(`${endpoint}?${params.toString()}`, {
+        headers: {
+          accept: 'application/json',
+          referer: DEFAULT_APP_ORIGIN,
+        },
+      });
+      if (!response.ok) {
+        const responseText = await response.text();
+        const reason = `HTTP ${response.status} ${response.statusText}`;
+        errors.push(reason);
+        console.warn({
+          message: 'Google public translation endpoint request failed',
+          provider: 'google-translate-public',
+          endpoint,
+          status: response.status,
+          statusText: response.statusText,
+          responsePreview: String(responseText || '').slice(0, 300),
+          sourceLocale,
+          targetLocale,
+          lineCount: batch.length,
+          textLength: text.length,
+        });
+        continue;
+      }
+
+      const translatedText = readGoogleTranslateResponse(await response.json());
+      if (translatedText) {
+        return translatedText.split(TRANSLATION_LINE_SEPARATOR);
+      }
+
+      errors.push('empty translation response');
+      console.warn({
+        message: 'Google public translation endpoint returned an empty translation',
+        provider: 'google-translate-public',
+        endpoint,
+        sourceLocale,
+        targetLocale,
+        lineCount: batch.length,
+        textLength: text.length,
+      });
+    } catch (error) {
+      const reason = error?.message || 'Unknown translation request failure';
+      errors.push(reason);
+      console.warn({
+        message: 'Google public translation endpoint request threw',
+        provider: 'google-translate-public',
+        endpoint,
+        sourceLocale,
+        targetLocale,
+        lineCount: batch.length,
+        textLength: text.length,
+        reason,
+      });
+    }
   }
 
-  const data = await response.json();
-  return readGoogleTranslateResponse(data).split(TRANSLATION_LINE_SEPARATOR);
+  const error = new Error(`Google public translation failed: ${[...new Set(errors)].join('; ').slice(0, 300)}`);
+  if (errors.some((reason) => reason.startsWith('HTTP 429'))) {
+    error.code = 'translation_rate_limited';
+  }
+  throw error;
 }
 
 function readGoogleTranslateResponse(data) {

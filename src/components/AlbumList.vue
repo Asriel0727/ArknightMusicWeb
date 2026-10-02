@@ -158,6 +158,8 @@ let openingAlbumTimer = null;
 
 const RACK_WHEEL_COOLDOWN_MS = 280;
 const OPENING_CARD_HOLD_MS = 1650;
+const AUTO_NAVIGATION_STEP_MS = 220;
+const AUTO_NAVIGATION_VISIBLE_STEPS = 3;
 const MAX_PARALLAX_Y_UP = 0;
 const MAX_PARALLAX_Y_DOWN = 8;
 const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
@@ -622,10 +624,32 @@ const focusAlbumForOpening = async (albumId) => {
   const stepCount = Math.min(forwardDistance, backwardDistance);
   dismissInteractionHint();
 
-  // Show a few clear single-card turns, then relocate the virtual rack off-animation for distant albums.
-  // Updating every card faster than its transition causes the card stack to collapse visually.
+  // The requested album can already be centered after a previous visit. Play a short
+  // round trip in that case so opening the currently playing song still has a visible
+  // rack-navigation cue before the album-entry transition begins.
+  if (stepCount === 0 && total > 1) {
+    const navigationToken = ++autoNavigationToken;
+    isAutoNavigating.value = true;
+    autoNavigationTargetIndex.value = index;
+    startAutoNavigationSkipListeners();
+
+    moveAlbum(1, { withSound: false });
+    await waitForAutoNavigationStep(AUTO_NAVIGATION_STEP_MS);
+    if (navigationToken === autoNavigationToken) {
+      moveAlbum(-1, { withSound: false });
+      await waitForAutoNavigationStep(AUTO_NAVIGATION_STEP_MS);
+    }
+
+    isRackRelocating.value = false;
+    isAutoNavigating.value = false;
+    autoNavigationTargetIndex.value = null;
+    stopAutoNavigationSkipListeners();
+  }
+
+  // Show the navigation direction, then relocate distant targets next to the active slot
+  // so the final turn into the target album is always visible.
   if (stepCount > 0) {
-    const visibleStepCount = Math.min(stepCount, 6);
+    const visibleStepCount = Math.min(stepCount, AUTO_NAVIGATION_VISIBLE_STEPS);
     const navigationToken = ++autoNavigationToken;
     isAutoNavigating.value = true;
     autoNavigationTargetIndex.value = index;
@@ -633,14 +657,23 @@ const focusAlbumForOpening = async (albumId) => {
     for (let step = 0; step < visibleStepCount; step += 1) {
       if (navigationToken !== autoNavigationToken) break;
       moveAlbum(direction, { withSound: false });
-      await waitForAutoNavigationStep(140);
+      await waitForAutoNavigationStep(AUTO_NAVIGATION_STEP_MS);
     }
 
-    if (navigationToken === autoNavigationToken && visibleStepCount < stepCount) {
+    const remainingSteps = stepCount - visibleStepCount;
+    if (navigationToken === autoNavigationToken && remainingSteps > 1) {
+      // Keep the target one step away after relocation, otherwise the jump hides its arrival.
       isRackRelocating.value = true;
-      activeAlbumIndex.value = index;
+      activeAlbumIndex.value = (index - direction + total) % total;
       await nextTick();
       await new Promise(resolve => requestAnimationFrame(resolve));
+      isRackRelocating.value = false;
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    }
+
+    if (navigationToken === autoNavigationToken && remainingSteps > 0) {
+      moveAlbum(direction, { withSound: false });
+      await waitForAutoNavigationStep(AUTO_NAVIGATION_STEP_MS);
     }
 
     await nextTick();
@@ -895,7 +928,7 @@ main .page-title {
 }
 
 .albums-container.is-auto-navigating .album-slot {
-  transition-duration: 130ms;
+  transition-duration: 200ms;
 }
 
 .albums-container.is-rack-relocating .album-slot {
@@ -1082,7 +1115,7 @@ main .page-title {
 }
 
 .album-slot.is-opening {
-  z-index: 260 !important;
+  z-index: 2;
 }
 
 .album-slot.is-opening .vinyl-record {
@@ -1091,24 +1124,8 @@ main .page-title {
 }
 
 .album-slot.is-opening :deep(.album) {
-  animation: album-card-lift 520ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
-}
-
-@keyframes album-card-lift {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  42% {
-    opacity: 1;
-    transform: translate3d(0, -16px, 38px) scale(1.045);
-  }
-
-  100% {
-    opacity: 0.2;
-    transform: translate3d(0, -12px, 24px) scale(1.02);
-  }
+  opacity: 0.2;
+  transition: opacity 180ms ease;
 }
 
 .album-slot :deep(.album) {

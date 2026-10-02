@@ -125,6 +125,8 @@ VITE_RECRUIT_API_BASE=https://<your-worker>.workers.dev
 | `SUPABASE_SERVICE_ROLE_KEY` | Worker / CI secret | Supabase 寫入與管理操作 | **不可提交** |
 | `BILIBILI_SESSDATA` | GitHub secret（選用） | 降低 Bilibili 反自動化失敗率 | **不可提交** |
 
+歌詞翻譯目前使用 Google 的公開翻譯端點，主要端點失敗時會改用備援主機。此路徑不需 API key，但沒有服務等級保證；Worker log 會保留端點、HTTP 狀態與供應商回應摘要，方便診斷失敗原因。
+
 ## 維護地圖
 
 ```mermaid

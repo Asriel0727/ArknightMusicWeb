@@ -122,8 +122,21 @@ const albumTransition = ref({
   songs: [],
   playerOpen: false,
   playerSongIndex: null,
+  autoOpenPlayer: false,
 });
 let albumDetailLoadToken = 0;
+
+const openDeferredPlayerIfReady = () => {
+  const transition = albumTransition.value;
+  if (!transition.active || !transition.settled || !transition.autoOpenPlayer
+    || !transition.ready || transition.error) return;
+
+  albumTransition.value = {
+    ...transition,
+    playerOpen: true,
+    autoOpenPlayer: false,
+  };
+};
 
 const clearSharedCharacterUrl = () => {
   const url = new URL(window.location.href);
@@ -164,6 +177,7 @@ const completeAlbumTransition = () => {
     ...albumTransition.value,
     settled: true,
   };
+  openDeferredPlayerIfReady();
 };
 
 const closeAlbumTransition = () => {
@@ -177,6 +191,7 @@ const closeAlbumTransition = () => {
     songs: [],
     playerOpen: false,
     playerSongIndex: null,
+    autoOpenPlayer: false,
   };
   albumState.currentAlbumDetails = null;
   albumState.isLoading = false;
@@ -231,8 +246,9 @@ const handleViewAlbum = async (albumId, origin = null, { openPlayerForSongId = n
     settled: false,
     album: previewAlbum,
     songs: [],
-    playerOpen: Boolean(openPlayerForSongId),
+    playerOpen: false,
     playerSongIndex: null,
+    autoOpenPlayer: Boolean(openPlayerForSongId),
     origin,
     error: false,
   };
@@ -255,6 +271,7 @@ const handleViewAlbum = async (albumId, origin = null, { openPlayerForSongId = n
       playerSongIndex: playerSongIndex >= 0 ? playerSongIndex : null,
       ready: true,
     };
+    openDeferredPlayerIfReady();
   } catch (error) {
     if (token !== albumDetailLoadToken || !albumTransition.value.active) return;
     console.error('Error fetching album details:', error);
