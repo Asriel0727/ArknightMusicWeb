@@ -39,3 +39,25 @@ test('changing a choice after stepping back replaces the previous branch', () =>
   assert.equal(runner.choose('2').text, '第二條路');
   assert.equal(runner.next().text, '合流');
 });
+
+test('audio commands become local playback state and sound events', () => {
+  const commands = parseStoryScript([
+    '[PlayMusic(intro="$opening_intro", key="$opening_loop", volume=0.5)]',
+    '[PlaySound(key="$impact", volume=0.2)]',
+    '[name="甲"] 第一行',
+    '[StopMusic]',
+    '[name="甲"] 第二行',
+  ].join('\n'));
+  const runner = createStoryRunner(commands);
+  const first = runner.next();
+  assert.equal(first.state.music.key, 'opening_loop');
+  assert.deepEqual(first.events, [{ type: 'sound', key: 'impact', volume: 0.2 }]);
+  assert.equal(runner.next().state.music, null);
+});
+
+test('plain narration and brackets inside quoted command text are retained', () => {
+  const commands = parseStoryScript('[Subtitle(text="請看[這裡]")]\n沒有說話者的旁白');
+  assert.equal(commands[0].attributes.text, '請看[這裡]');
+  assert.equal(commands[1].kind, 'dialogue');
+  assert.equal(commands[1].text, '沒有說話者的旁白');
+});

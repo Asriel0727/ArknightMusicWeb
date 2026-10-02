@@ -1,79 +1,190 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "storyId": "W2G/BEG",
+  "title": "初始引導",
   "sourcePage": "https://prts.wiki/w/W2G/BEG",
   "script": {
     "path": "script.txt",
-    "bytes": 17110,
-    "sha256": "157ca5d0257be02de47f7abedbc7befb71ef98fd317ce0f4f224406bd9459c47",
-    "sourceUrl": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/story/obt/guide/beg/0_welcome_to_guide.txt"
+    "bytes": 17109,
+    "sha256": "8260749449b1a61638b41da4b98ae567fb07d3ca9852e8adeb67252d48f91ded",
+    "sourceUrl": "https://prts.wiki/index.php?title=W2G%2FBEG&action=raw"
   },
+  "commandCount": 333,
+  "firstVisual": "bg_0_babel",
   "assets": {
     "bg_0_babel": {
-      "path": "images/bg_0_babel.png",
-      "bytes": 308578,
-      "sha256": "0cae67b874b156517b73bc97413825943b556a0f1379077a1785fa969563936f",
-      "sourceUrl": "https://media.prts.wiki/9/91/Avg_bg_0_babel.png"
+      "path": "images/bg_0_babel.webp",
+      "bytes": 23262,
+      "sha256": "b5efae81b956190b4b1582f3ee92b3a608c2469d18bca7678b317b8a8cccbac3",
+      "sourceUrl": "https://media.prts.wiki/9/91/Avg_bg_0_babel.png",
+      "originalPath": "images/bg_0_babel.png",
+      "originalBytes": 308578,
+      "originalSha256": "0cae67b874b156517b73bc97413825943b556a0f1379077a1785fa969563936f"
     },
     "bg_0_am": {
-      "path": "images/bg_0_am.png",
-      "bytes": 258354,
-      "sha256": "b53ff603a4861b6bb0a6949620487ae5f3eb4759dc9324c3a188b885944ffc2d",
-      "sourceUrl": "https://media.prts.wiki/f/f0/Avg_bg_0_am.png"
-    },
-    "bg_indoor_1": {
-      "path": "images/bg_indoor_1.png",
-      "bytes": 282649,
-      "sha256": "a5c204792ac1a4a8862557a5d6acfdfeab9417e2e3ddc5097745a45f332a663f",
-      "sourceUrl": "https://media.prts.wiki/0/0b/Avg_bg_bg_indoor_1.png"
-    },
-    "bg_wild_a": {
-      "path": "images/bg_wild_a.png",
-      "bytes": 406662,
-      "sha256": "005645cb2dcf4f74268563db415812735fa4eb67d41abc701f9ec65e4322ae7c",
-      "sourceUrl": "https://media.prts.wiki/9/9f/Avg_bg_bg_wild_a.png"
-    },
-    "avg_0_1": {
-      "path": "images/avg_0_1.png",
-      "bytes": 739340,
-      "sha256": "0b137adaebe87856dffa1eda18d02169ca7ef6b2076fda655d85c335b8888303",
-      "sourceUrl": "https://media.prts.wiki/6/69/Avg_avg_0_1.png"
+      "path": "images/bg_0_am.webp",
+      "bytes": 12576,
+      "sha256": "c4dde3540fe143cac1f344ebd8f56512f670489a47786a5386513b7e24206e29",
+      "sourceUrl": "https://media.prts.wiki/f/f0/Avg_bg_0_am.png",
+      "originalPath": "images/bg_0_am.png",
+      "originalBytes": 258354,
+      "originalSha256": "b53ff603a4861b6bb0a6949620487ae5f3eb4759dc9324c3a188b885944ffc2d"
     },
     "avg_0_2": {
-      "path": "images/avg_0_2.png",
-      "bytes": 449156,
-      "sha256": "bee94189e2190fa8c41c7eb40796387327bb91b081fdd9a8ef75274e0fa76dfb",
-      "sourceUrl": "https://media.prts.wiki/b/bc/Avg_avg_0_2.png"
+      "path": "images/avg_0_2.webp",
+      "bytes": 21146,
+      "sha256": "36767bc6998477753750221f0c97ab2dd3696eaa9618be49fba2ec69dd1a7678",
+      "sourceUrl": "https://media.prts.wiki/b/bc/Avg_avg_0_2.png",
+      "originalPath": "images/avg_0_2.png",
+      "originalBytes": 449156,
+      "originalSha256": "bee94189e2190fa8c41c7eb40796387327bb91b081fdd9a8ef75274e0fa76dfb"
     },
-    "avg_0_3": {
-      "path": "images/avg_0_3.png",
-      "bytes": 506535,
-      "sha256": "8f761b0863c85ebd7f09276b60c1a9ff5caab366ba579a5f67637a7780b78fa3",
-      "sourceUrl": "https://media.prts.wiki/f/fb/Avg_avg_0_3.png"
+    "avg_0_1": {
+      "path": "images/avg_0_1.webp",
+      "bytes": 93066,
+      "sha256": "74957e66b3c0fe0a4ac98bdddd3b2a4b64557a9e75890340b5cf39fccc53c0d9",
+      "sourceUrl": "https://media.prts.wiki/6/69/Avg_avg_0_1.png",
+      "originalPath": "images/avg_0_1.png",
+      "originalBytes": 739340,
+      "originalSha256": "0b137adaebe87856dffa1eda18d02169ca7ef6b2076fda655d85c335b8888303"
     },
     "char_002_amiya_1": {
-      "path": "images/char_002_amiya_1.png",
-      "bytes": 246434,
-      "sha256": "ba6e98a474e87897177ce563f289495476f9a934eedcd5bdf6977b0cd4be2629",
-      "sourceUrl": "https://media.prts.wiki/0/09/Avg_char_002_amiya_1.png"
-    },
-    "char_013_riop": {
-      "path": "images/char_013_riop.png",
-      "bytes": 235362,
-      "sha256": "5ae134c8584b7eb8f251e3cb196751265e8b29fc2f98c70a702cf9f6773fdf9d",
-      "sourceUrl": "https://media.prts.wiki/9/96/Avg_char_013_riop.png"
+      "path": "images/char_002_amiya_1.webp",
+      "bytes": 48230,
+      "sha256": "2a880d1e450a9c95048337c66002e382d546920dca8a9c7334d199e6273dbb9b",
+      "sourceUrl": "https://media.prts.wiki/0/09/Avg_char_002_amiya_1.png",
+      "originalPath": "images/char_002_amiya_1.png",
+      "originalBytes": 246434,
+      "originalSha256": "ba6e98a474e87897177ce563f289495476f9a934eedcd5bdf6977b0cd4be2629"
     },
     "char_016_medic": {
-      "path": "images/char_016_medic.png",
-      "bytes": 160979,
-      "sha256": "2efe9e02a77fa9f73bfdea15e04c18ddc49f0fccf7464bffc87bc9ee632fd476",
-      "sourceUrl": "https://media.prts.wiki/3/39/Avg_char_016_medic.png"
+      "path": "images/char_016_medic.webp",
+      "bytes": 32694,
+      "sha256": "7565005d00ebb6e4820c91aa802906107ab1fb1ae71840be07d9217effff83e6",
+      "sourceUrl": "https://media.prts.wiki/3/39/Avg_char_016_medic.png",
+      "originalPath": "images/char_016_medic.png",
+      "originalBytes": 160979,
+      "originalSha256": "2efe9e02a77fa9f73bfdea15e04c18ddc49f0fccf7464bffc87bc9ee632fd476"
+    },
+    "bg_indoor_1": {
+      "path": "images/bg_indoor_1.webp",
+      "bytes": 14828,
+      "sha256": "e250652fae2a944f551a67d2e4cedf1fd0bf421bba77ebf26f510ef05056f17a",
+      "sourceUrl": "https://media.prts.wiki/0/0b/Avg_bg_bg_indoor_1.png",
+      "originalPath": "images/bg_indoor_1.png",
+      "originalBytes": 282649,
+      "originalSha256": "a5c204792ac1a4a8862557a5d6acfdfeab9417e2e3ddc5097745a45f332a663f"
+    },
+    "char_013_riop": {
+      "path": "images/char_013_riop.webp",
+      "bytes": 42422,
+      "sha256": "226e2e19336e989428b5be4aaedf1924f6b79cf2ecd7f70fd3d2f4915cda90ca",
+      "sourceUrl": "https://media.prts.wiki/9/96/Avg_char_013_riop.png",
+      "originalPath": "images/char_013_riop.png",
+      "originalBytes": 235362,
+      "originalSha256": "5ae134c8584b7eb8f251e3cb196751265e8b29fc2f98c70a702cf9f6773fdf9d"
     },
     "char_1002_nsabr_1": {
-      "path": "images/char_1002_nsabr_1.png",
-      "bytes": 218381,
-      "sha256": "b4370ba92178302b4a4d9e8a4000c2e2345db6ec8b8464f1e8ed2f0df3958965",
-      "sourceUrl": "https://media.prts.wiki/1/1e/Avg_char_1002_nsabr_1.png"
+      "path": "images/char_1002_nsabr_1.webp",
+      "bytes": 36368,
+      "sha256": "374016943901521da8c20aef7c771a979921534db7b05950b510474f30e14a38",
+      "sourceUrl": "https://media.prts.wiki/1/1e/Avg_char_1002_nsabr_1.png",
+      "originalPath": "images/char_1002_nsabr_1.png",
+      "originalBytes": 218381,
+      "originalSha256": "b4370ba92178302b4a4d9e8a4000c2e2345db6ec8b8464f1e8ed2f0df3958965"
+    },
+    "bg_wild_a": {
+      "path": "images/bg_wild_a.webp",
+      "bytes": 13296,
+      "sha256": "59beeb7455c44199a41c6c3366756eb1c76d0b607a4a6dce29d9bbcaec92ac46",
+      "sourceUrl": "https://media.prts.wiki/9/9f/Avg_bg_bg_wild_a.png",
+      "originalPath": "images/bg_wild_a.png",
+      "originalBytes": 406662,
+      "originalSha256": "005645cb2dcf4f74268563db415812735fa4eb67d41abc701f9ec65e4322ae7c"
+    },
+    "avg_0_3": {
+      "path": "images/avg_0_3.webp",
+      "bytes": 45146,
+      "sha256": "14e6199b60ec6cf3ffaca9bdc7040f9e598646f8d51f00b09cbe0a72c61e4826",
+      "sourceUrl": "https://media.prts.wiki/f/fb/Avg_avg_0_3.png",
+      "originalPath": "images/avg_0_3.png",
+      "originalBytes": 506535,
+      "originalSha256": "8f761b0863c85ebd7f09276b60c1a9ff5caab366ba579a5f67637a7780b78fa3"
     }
-  }
+  },
+  "audio": {
+    "babel_loop": {
+      "path": "audio/babel_loop.mp3",
+      "bytes": 213830,
+      "sha256": "67a6658e2c7facdd7eeb3dbaf39dc8ca20a7af7c48f6516b8a301862efa7d280",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/beta1_180603/m_dia_babel_loop.mp3"
+    },
+    "ekg_loop": {
+      "path": "audio/ekg_loop.mp3",
+      "bytes": 469621,
+      "sha256": "90f241dd77f7f4ac865a2c6ab6a035c3141daa5832482b57f648c6ab4a124fe8",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/dialog/d_avg_ekg_loop.mp3"
+    },
+    "flashback": {
+      "path": "audio/flashback.mp3",
+      "bytes": 47481,
+      "sha256": "228d87191549be69bcff723d03e46517e80103cc873ed53891bb36f195c719e5",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/general/g_ui/g_ui_stagepush.mp3"
+    },
+    "e_atk_arrow_h": {
+      "path": "audio/e_atk_arrow_h.mp3",
+      "bytes": 5659,
+      "sha256": "116a6184655cd90ab8724644c597e24ffea2ba8b671a01a232c91145ab2adf78",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/enemy/e_atk/e_atk_arrow_h.mp3"
+    },
+    "darkness01_intro": {
+      "path": "audio/darkness01_intro.mp3",
+      "bytes": 266910,
+      "sha256": "fcccb4896fbd5981a6571f3df7a54b66944d91ede0950c7a9a262c693ba8ec98",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/beta1_180603/m_dia_darkness01_intro.mp3"
+    },
+    "darkness01_loop": {
+      "path": "audio/darkness01_loop.mp3",
+      "bytes": 946094,
+      "sha256": "3587db8355fea143047dcd03c563fbf247634162b73e71d7546928ee1b390899",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/beta1_180603/m_dia_darkness01_loop.mp3"
+    },
+    "e_atk_blunt_n": {
+      "path": "audio/e_atk_blunt_n.mp3",
+      "bytes": 5659,
+      "sha256": "bd48b4203cec89656d1cd81e708a9c9c170b0e37a142b78087caa2dadd598c0f",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/enemy/e_atk/e_atk_blunt_n.mp3"
+    },
+    "b_char_rockexplo": {
+      "path": "audio/b_char_rockexplo.mp3",
+      "bytes": 12555,
+      "sha256": "3978c36899472137df2cb92a9cc0954730b8acb5a55477a02545c8ae967c12f7",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/battle/b_char/b_char_rockexplo.mp3"
+    },
+    "escape_intro": {
+      "path": "audio/escape_intro.mp3",
+      "bytes": 943586,
+      "sha256": "3ebee6619d0fb668d8610a61f4a536c18ae4828976c4ca09b85e2314e18e66da",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/beta2_180603/m_dia_escape_intro.mp3"
+    },
+    "escape_loop": {
+      "path": "audio/escape_loop.mp3",
+      "bytes": 908896,
+      "sha256": "be9ab35a5cd090fde35e5fab54630e7a1c77cd5d28f54bc296f2a86f194593d2",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/beta2_180603/m_dia_escape_loop.mp3"
+    },
+    "d_gen_soldiersrun": {
+      "path": "audio/d_gen_soldiersrun.mp3",
+      "bytes": 84680,
+      "sha256": "fc72dd972a9391891abf9dc152d7e601e32f1beaf1b3c2412224ddcf58b3b277",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_gen_soldiersrun.mp3"
+    },
+    "d_sp_ballista": {
+      "path": "audio/d_sp_ballista.mp3",
+      "bytes": 58767,
+      "sha256": "4245eca206cd799ac99d1e037e7c7d0a8f589b751ba9411c5d33152b55ebd612",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_sp_ballista.mp3"
+    }
+  },
+  "videos": {}
 }
