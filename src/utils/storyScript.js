@@ -16,7 +16,7 @@ export function parseStoryScript(source) {
     const attributes = {};
     const params = command?.[2] ?? header;
     for (const item of params.matchAll(/([A-Za-z]\w*)\s*=\s*(?:"([^"]*)"|([^,]+))(?:,|$)/g)) {
-      attributes[item[1].toLowerCase()] = (item[2] ?? item[3]).trim();
+      attributes[item[1].toLowerCase()] = (item[2] ?? item[3]).trim().replace(/^"|"$/g, '');
     }
     return [{ kind, attributes, text: trimmed.slice(closing + 1).trim(), line: lineIndex + 1 }];
   });
@@ -83,7 +83,7 @@ export function createStoryRunner(commands) {
         state.speaker = a.name || '';
         return capture(command, events, { type: 'dialogue', speaker: state.speaker, text: command.text });
       }
-      if (kind === 'playvideo' || kind === 'video') return capture(command, events, { type: 'video', videoId: a.key || a.name || a.video });
+      if (kind === 'playvideo' || kind === 'video') return capture(command, events, { type: 'video', videoId: a.key || a.name || a.video || a.res });
       if (kind === 'startbattle') return capture(command, events, { type: 'end' });
       apply(command);
     }

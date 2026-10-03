@@ -1,0 +1,58 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+
+[PlaySound(key="test/phone")]
+[Delay(time=2)]
+[Image(image="bg_1_call", fadetime=2, xScale=1, yScale=1)]
+[ImageTween(xScaleTo=1, yScaleTo=1, duration=2, ease="InOutCubic", block=true)]
+
+[name="米莎"]   ……
+
+[Dialog]
+[Delay(time=1)]
+[name="阿米娅"]   是米莎？
+[name="阿米娅"]   告诉我你的位置，我马上去救你。
+[name="米莎"]   你是去救“密钥”的……
+[name="阿米娅"]   我不可能眼睁睁看你走向深渊。
+[name="米莎"]   ……
+[name="米莎"]   东北方向……
+[name="米莎"]   有一片废弃矿场……我把“密钥”埋在那里……
+[name="阿米娅"]   谢谢你能告诉我这个消息。
+[name="阿米娅"]   我们会把你一起救出来，你会得救的。
+[name="米莎"]   ……
+[name="米莎"]   这种希望……已经不需要了……
+[name="阿米娅"]   ……？
+[name="米莎"]   你说过……罗德岛会拯救别人。
+[name="阿米娅"]   拯救……但不代表要被任人宰割。
+[name="米莎"]   也许这是属于我和其他感染者的宿命……
+[name="米莎"]   我做了我能做的一切，阿米娅。
+[name="米莎"]   你想去拯救无辜者……那就去救吧。只有你们能做到。
+[Dialog]
+[Delay(time=1)]
+[name="米莎"]   我只会让火焰蔓延到我想拯救的人身上。
+[name="米莎"]   成了这样的人，不是我所希望的……
+[name="米莎"]   你不要来找我了。
+[name="米莎"]   永——
+[name="米莎"]   远的噩梦——
+[Dialog]
+[Delay(time=1)]
+[name="米莎"]   该结束了。
+[name="阿米娅"]   米莎……
+[Dialog]
+[Delay(time=1)]
+[name="米莎"]   永别了。
+[Dialog]
+[Delay(time=1)]
+[name="阿米娅"]   米莎……！
+[Dialog]
+[Delay(time=1)]
+[name="阿米娅"]   挂断了……
+[name="阿米娅"]   究竟发生了什么……？
+[name="阿米娅"]   不该是这样的……
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

@@ -1,0 +1,77 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+
+[name="陈"]   整合运动——
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=0.8, crossfade=1, delay=0.5)]
+[Image(image="avg_01", fadetime=2, xScale=1, yScale=1)]
+[ImageTween(xScaleTo=1, yScaleTo=1, duration=2, ease="InOutCubic", block=true)]
+[Dialog]
+[Delay(time=1)]
+[name="陈"]   一个曾经被人忽视的民间团体，以前所未有的速度扩张成为——
+[name="陈"]   史上最大的感染者组织。
+[Image(image="bg_0_guard", fadetime=1, xScale=1, yScale=1)]
+[ImageTween(image="bg_0_guard", xScaleTo=1.3, yScaleTo=1.3, duration=20)]
+[name="陈"]   在切尔诺伯格城市庆典前夕，“整合运动”在全城引发暴动。
+[name="陈"]   他们聪明地绕开城内的守卫力量寻找到重要设施的弱点，成功瘫痪了切尔诺伯格的数个城市动力系统。
+[name="陈"]   最终使整座城市未能从一场陨石雨天灾中逃离。
+
+
+[name="陈"]   在整个事件前后曾有数百人动用全部通讯手段与切尔诺伯格当局联络，均以失败告终。
+
+
+[Image(fadetime=2)]
+[Dialog]
+
+[name="阿米娅"]   虽然我并没有看过具体的报告……不过按照我所了解的来看，整合运动排除了城内一切非矿石病感染者？
+
+[Background(image="bg_0_ori", fadetime=1, xScaleFrom=1.3, yScaleFrom=1.3)]
+[BackgroundTween(image="bg_0_ori", duration=15, xScaleFrom=1.3, yScaleFrom=1.3, xScaleTo=1, yScaleto=1, yFrom=116, yTo=0)]
+
+
+[name="陈"]   一百万市民，只有约五万人成功逃离至龙门外围。
+[name="陈"]   除去没有前往龙门的难民，粗略估计，整合运动利用一场天灾至少消灭了这座城市里一半的人口。
+
+
+[name="阿米娅"]   能够在天灾中活下来的普通人，大部分恐怕也会成为矿石病感染者……
+
+[Dialog]
+
+[Image(fadetime=1, block=true)]
+[Delay(time=1)]
+
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1",fadetime=0.3 ,focus=2)]
+
+[name="陈"]   作为一般人来说，是无法理解这样做的目的。
+[name="陈"]   矿石病一经感染，根本没有治愈的可能，寿命也会极大缩短。
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   是这样……
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   不过我想你明白他们这么做是为了什么。
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   感染者因为本身极具危险性，而遭到所有政权排挤。
+[name="阿米娅"]   因此无处可去的他们一直渴望将一个以感染者为成员的组织扩张为——一个感染者的国家。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   这话从你口中说出来，总觉得怪怪的。
+[name="陈"]   “罗德岛制药”是同样以感染者为成员的公司，如果不是因为公开接受天灾对策委托，
+[name="陈"]   可能大多数人都会认为你们背后隐藏的不利的目的。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   这不一样……
+[name="阿米娅"]   我们有着……我们不得不遵循的信条。
+[Dialog]
+[Blocker(block=true)]
+[Image]

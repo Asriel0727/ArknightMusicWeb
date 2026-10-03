@@ -1,0 +1,50 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1#2", name2="char_103_angel_1", focus=1)]
+
+[name="阿米娅"]   辛苦了，德克萨斯，能天使。
+[name="阿米娅"]   谢谢你们！在你们进驻之前，情报搜集一直是罗德岛的短板……
+
+[Character(name="char_002_amiya_1#2", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   不用对我们这么见外，相比这些若是你的谜题没有那么困难就更好了。
+
+[Character(name="char_002_amiya_1#5", name2="char_103_angel_1", focus=1)]
+
+[name="阿米娅"]   其实……我也努力问过陈长官，不过关于密钥的线索只有这么多了。
+[name="阿米娅"]   或者说她只愿意透露这些给我们……理论上近卫局也在找这样东西。
+
+[Character(name="char_002_amiya_1#5", name2="char_103_angel_1", focus=1)]
+[name="阿米娅"]   德克萨斯是在这里发现了可疑的人吗？
+
+[Character(name="char_102_texas_1")]
+
+[name="德克萨斯"]   是的。
+[name="德克萨斯"]   另外……捡到了她的钱包，如果没错的话。
+[name="德克萨斯"]   一张学生证，我不懂乌萨斯的语言，名字应该叫米莎……一张正规的出境记录书。
+[name="德克萨斯"]   此外还有几张乌萨斯帝国其他城市的联系方式，两张过期未检的电影票。
+[name="德克萨斯"]   以及……半张照片。
+[name="德克萨斯"]   在确认身份前，编号暂且定为了“目标5”，以便对不方便透露的人讲。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   了解。
+[name="阿米娅"]   其他小组搜索“密钥”类似的线索也受到了阻力。
+[name="阿米娅"]   整合运动在所有“密钥”携带者出没过的地方都加大了行动力度。
+
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   他们可能也在找“密钥”吧，所以这东西究竟是什么？
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]   也许只有找到它的那一刻，我们才会知道……
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

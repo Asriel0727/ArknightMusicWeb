@@ -1,0 +1,203 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第三关（后）
+
+
+
+// Comments
+
+
+
+[Background(image="bg_cher_5",fadetime=1,screenadapt="coverall")]
+
+[Delay(time=1)]
+
+[PlaySound(key="$d_gen_soldiersrun", volume=0.6)]
+
+
+
+[Character(name="char_130_doberm_ex", focus=1)]
+
+[name="杜宾"]  天色越来越暗了。
+
+[name="杜宾"]  Ace，临光和E2小队那边，不要紧吗？
+
+[Character(name="char_014_riope", name2="char_130_doberm_ex", focus=1)]
+
+[name="Ace"]  到现在为止，还没出现过能难倒她的事。
+
+[name="Ace"]  像这样的没有纪律的暴民，来个几十人也拦不住她。
+
+[Character(name="char_014_riope", name2="char_013_riop", focus=2)]
+
+[name="近卫干员"]  那你呢，不算刚才的战斗，你一路上击倒了多少敌人？
+
+[Character(name="char_014_riope", name2="char_013_riop", focus=1)]
+
+[name="Ace"]  ......
+
+[Character(name="char_014_riope", name2="char_013_riop", focus=1)]
+
+[name="Ace"]  ——三十几个。
+
+[Character(name="char_014_riope", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  ......噢。
+
+[Character(name="char_013_riop", name2="char_130_doberm_ex", focus=1)]
+
+[name="近卫干员"]  头儿还是一样强......
+
+[Character(name="char_013_riop", name2="char_014_riope", focus=2)]
+
+[name="Ace"]  不过，在天灾面前，再强的人都需要低头。
+
+[name="Ace"]  相比整合运动，天灾才是真正麻烦的家伙。
+
+
+
+[Character(name="char_013_riop", name2="char_014_riope", focus=1)]
+
+[name="近卫干员"]  话说以前我住的移动城市，遇到天灾警报时就开始移动离开了，所以这算是我第一次在这么近距离观察天灾......
+
+[name="近卫干员"]  这个东西在电视上看真的好可怕......
+
+
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]  可不止如此啊！天灾几乎天天都在发生，各种各样的自然灾害都有，只是很多地点都在离城市很远的地方......
+
+[name="医疗干员"]  它会重塑地形，还会带来大量的源石。
+
+
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=1)]
+
+[name="近卫干员"]  那如果我们在天灾底下待着的话，真的会......？
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]  即使是我们感染者，不及时离开也会被灾害中伴随的破坏所伤。不好好躲起来的话可没法活下来！
+
+[name="医疗干员"]  正常人......就很容易被感染，到时候麻烦就更大了。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_016_medic", focus=1)]
+
+
+
+[name="阿米娅"]  天空越来越暗淡了。就连天际线都仿佛被云层捏住了一样......
+
+[name="阿米娅"]  明明空气很通透，乌云却静止不动，好像在把各处的压抑感通通抽出，凝聚在一处。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  就算我不是天灾信使，但我还是看得出，我们头顶上的绝不是什么好东西。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  现在我们都不太能确定，仅有一些推测。
+
+[name="杜宾"]  说实话，原本利用天灾攻击城市就是一个非常疯狂的计划。
+
+[name="杜宾"]  再过几个小时，就连无比坚固的切尔诺伯格都可能会被撕得粉碎——变成布满源石的巨型废墟。
+
+[name="杜宾"]  那群暴徒当中幸运活下来的人，即将面对的将会是整个国家无尽的报复......根本就没有实力和增援的守卫部队抗衡才对。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  然而，整合运动却不管不顾......
+
+[name="阿米娅"]  仅仅是在各处重复着杀戮和战斗，使整个城市陷入战火。
+
+[name="阿米娅"]  仿佛没有指挥一般。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  但切城可能更像一个标志，或者是一个原爆点。
+
+[name="杜宾"]  如果能够成功夺取切城，甚至事先夺取了更多我们不了解的东西，那么他们将发展成有史以来各国面临的最大的感染者危机。
+
+[name="杜宾"]  混乱可能只是表象的，实际这才是幕后的指挥者的目的。
+
+
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  ——
+
+[name="Ace"]  以最坏的情况为前提规划之后的方针，这理所当然。
+
+
+
+
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  真的有这样残忍的指挥者存在吗？
+
+[name="阿米娅"]  我......其实一直都难以接受......
+
+[name="阿米娅"]  他又怎么会让部下处于天灾的危机之中而不顾呢......
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  除非......
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  ......
+
+[Dialog]
+
+//////////////插入cg///////////////////
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="avg_01",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  我以前经历的战争中......就有这样做的领导者。
+
+[name="杜宾"]  于他而言，士兵不过是棋子，达到目的后就可以随意丢弃。
+
+//[name="杜宾"]  因为比起战争本身，训练与管理的成本太高了。
+
+//[name="杜宾"]  如果整合运动的运作，真如他们宣传的那般......
+
+[name="杜宾"]  只需在必要时，轻轻的推一下——追随者就会振臂高呼。穿上衣服，戴上标志，所有的感染者都可以是整合运动。
+
+[name="杜宾"]  被压迫、想要呼喊的感染者太多了。
+
+//[name="杜宾"]  只要在铁屋子上钻个口，哪怕外面就是一片火海，里面的人依然会互相推搡着探出身子。
+
+[name="杜宾"]  ......
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[name="杜宾"]  这种领袖并不是指挥官。
+
+[name="杜宾"]  践踏敌人，同时也践踏同伴，又或者说，“随从”，的生命。
+
+[name="杜宾"]  可能压根就连随从都不是，只是将他们看做纯粹的棋子。
+
+[name="杜宾"]  这样的人，是暴君。

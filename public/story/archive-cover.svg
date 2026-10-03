@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">
+  <defs><radialGradient id="paper"><stop stop-color="#354650"/><stop offset="1" stop-color="#0d161e"/></radialGradient><pattern id="holes" width="38" height="18" patternUnits="userSpaceOnUse"><rect x="10" y="3" width="15" height="12" rx="2" fill="#b9a580" opacity=".6"/></pattern></defs>
+  <rect width="480" height="270" fill="url(#paper)"/>
+  <path d="M0 28H480M0 242H480" stroke="#857557" opacity=".6"/>
+  <rect y="7" width="480" height="18" fill="url(#holes)"/><rect y="245" width="480" height="18" fill="url(#holes)"/>
+  <rect x="168" y="68" width="144" height="124" rx="8" fill="#111d25" stroke="#baa47e" stroke-width="2"/>
+  <path d="M215 95L215 155L270 125Z" fill="#d4bd94"/>
+  <path d="M191 175H289" stroke="#baa47e" stroke-width="2"/>
+  <text x="240" y="218" fill="#baa47e" font-family="monospace" font-size="11" text-anchor="middle" letter-spacing="4">TERRA FILM ARCHIVE</text>
+</svg>

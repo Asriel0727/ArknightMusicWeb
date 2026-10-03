@@ -1,0 +1,37 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   米莎已经同意成为近卫局的重要协力者，随同我们寻找密钥。
+[name="陈"]   阿米娅，罗德岛为此做出的一切努力，对此我表示感谢。
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]   分内之事，陈长官。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   博士，此次搜索任务完成的很好，相信龙门对此结果会感到非常满意。
+[name="陈"]   米莎将正式由罗德岛移交至近卫局。
+
+[Character(name="char_010_chen_1", name2="char_136_hsguma", focus=1)]
+[name="陈"]   我们额外派出一些人力负责保护她的安全。
+[name="陈"]   星熊，交给你了。
+
+[Character(name="char_010_chen_1", name2="char_136_hsguma", focus=2)]
+[name="星熊"]   收到。
+
+[Character(name="char_010_chen_1")]
+[name="陈"]   那么接下来，{@nickname}，为了让近卫局的行动尽可能的保密，我希望罗德岛能帮我们制造出一些机会。
+[name="陈"]   ……是的，整合运动依然在此地区徘徊，伺机而动。
+[name="陈"]   你们如果能主动出击，可以有效牵制他们的行动。
+[name="陈"]   这听起来有些冒险，不过如果是你的话，相信不会有什么问题。
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

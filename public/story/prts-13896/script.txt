@@ -1,0 +1,14 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_wild_a", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character( name="char_002_amiya_1")]
+
+[name="阿米娅"]   博士，按照陈长官给我们的定位信息，我们已经抵达整合运动的据点附近。
+[name="阿米娅"]   ……是的，为了您的安全，您现在必须留在受保护的安全地带。
+[name="阿米娅"]   好在我们拥有一批无人机，虽然远程联络不太方便。
+[name="阿米娅"]   嗯，请放心交给我，我会严格执行您的部署。}}
+{{内测剧情导航}}

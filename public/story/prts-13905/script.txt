@@ -1,0 +1,23 @@
+//!torch
+[HEADER(is_tutorial=true, deny_auto_switch_scene=true)] 引导1到引导2(a)
+
+[Character(name="char_002_amiya_1")]
+[Blocker(afrom=1, a=0, fadetime=1, block=true)]
+
+[name="阿米娅"]   他想起来什么了吗？
+[name="阿米娅"]   这么长时间过去了，我希望博士他没有太多异样。
+[Character(name="char_002_amiya_1", focus=-1)]
+
+[name="？？？"]   他正在按照我的做，从反馈来看，一切按照你所想的进行。
+[name="？？？"]   看来是我低估了他。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   请不要这么说……我相信他一定能回来。
+[name="阿米娅"]   如果意识能够顺利恢复的话……
+[name="阿米娅"]   就能度过这些难关。
+[name="阿米娅"]   从现在开始……
+
+[StartBattle(stageId="guide/level_guide_2")]
+[Tutorial(waitForSignal="battle_start")]}}
+{{内测剧情导航}}

@@ -1,0 +1,417 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第二关（后）
+
+
+
+// Comments
+
+[PlayMusic(intro="$darkness01_intro", key="$darkness01_loop", volume=0.8, crossfade=1.5)]
+
+[Background(image="bg_cher_1",fadetime=1,screenadapt="coverall")]
+
+[Delay(time=1)]
+
+
+
+
+
+
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]   呼，呼。终于搞定了。博士好像已经完全适应指挥了啊。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  ......不错。
+
+[name="杜宾"]  罗德岛正需要你这样的头脑，可不能让凯尔希过度劳累了。
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]   杜宾......
+
+[name="阿米娅"]  博士还刚恢复，而且什么都回忆不起来，我不想让博士压力太大......
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  我也不想给博士这样的压力。
+
+[name="杜宾"]  但是在现在的局势下，既然你选择了把指挥交给博士，他一定要知道自己在做什么。
+
+[Character(name="char_002_amiya_1#3", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  嗯......我明白了。
+
+[Character(name="char_002_amiya_1#3", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  这不仅是为了博士自己，也为了整个小队，甚至是为了整个罗德岛。
+
+[name="杜宾"]  博士，该动身了，继续前进吧。
+
+[Character(name="char_013_riop", name2="char_130_doberm_ex", focus=1)]
+
+[name="近卫干员"]   抱歉，杜宾教官......我头有点晕，我可以......
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]   别慌，你先别乱走动，让我看下......
+
+[name="医疗干员"]   没有明显受伤，也不是疲劳。
+
+[name="医疗干员"]   症状延缓的药效有可能快结束了，以防万一先补充点药物吧。虽然罗德岛剩下的不太多了......
+
+
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=1)]
+
+[name="近卫干员"]   已经不多了吗？那，我还是先撑一会儿吧，至少省下来回去可以留给感染状况更紧急的人用......
+
+
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]   都这个时候你就别逞强了！我要扎了，忍住哦。
+
+[CameraShake(duration=1,xstrength=8,ystrength=8,vibrato=30,randomness=90,fadeout=true,block=false)]
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]   唔！
+
+[name="近卫干员"]   好像感觉好多了。
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]   胡说。哪有这么快见效，那其实只是你的心理作用。
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=1)]
+
+[name="近卫干员"]   嘿，原来是这样吗？啊，谢谢医生......
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]   刚才症状很轻，我只用了小剂量，别担心。
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=1)]
+
+[name="近卫干员"]   其实最早我也是听闻罗德岛在招募感染者，所以想来试试就加入了......
+
+[name="近卫干员"]   不过后来没想到罗德岛还有能减缓感染恶化速度的药物。
+
+[Character(name="char_013_riop", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]   罗德岛，虽然表面上是一家制药公司，实际是奔波在各国间，长于处理感染者问题的特殊组织。
+
+
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+[Image(image="avg_2_1",x=-100, y=-50,xScale=1.3, yScale=1.3, fadetime=2)]
+
+[ImageTween(xFrom=-100, yFrom=-50, xTo=0, yTo=0, xScaleFrom=1.3, yScaleFrom=1.3, xScaleTo=1, yScaleTo=1, duration=35, block=false)]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=1, block=true)]
+
+
+
+[name="杜宾"]   因为凯尔希医生研发的这个药物，虽然并不能治疗感染，但也能成为很多感染者的希望。
+
+[name="杜宾"]   因此吸引了很多不愿意与普通人为敌，但是又无处可去的感染者，就像你我一样。
+
+[name="杜宾"]   罗德岛也因此选择了一条和整合运动相反的道路————我们希望感染者不再是这个世界永远的“疫病”。
+
+
+
+[Dialog]
+
+
+
+[Character(name="char_empty")]
+
+[Delay(time=0.8)]
+
+///[CharacterCutin(widgetID="1", name="char_002_amiya_1", style="cutin", fadestyle= "horiz_expand_center", fadetime=0.5, offsetx=-400, width=200, block=true)]
+
+[name="阿米娅"]  但是即使我们不断地做出尝试......依然事与愿违。
+
+[name="阿米娅"]  各国内，感染者和非感染者的矛盾愈演愈烈，但是对其的研究却进展缓慢。
+
+///[CharacterCutin(widgetID="1", fadetime=0.5, block=true)]
+
+
+
+[Image(image="bg_0_rhodes2",x=-100, y=-50,xScale=1.3, yScale=1.3, fadetime=2)]
+
+[ImageTween(xFrom=-100, yFrom=-50, xTo=0, yTo=0, xScaleFrom=1.3, yScaleFrom=1.3, xScaleTo=1, yScaleTo=1, duration=35, block=false)]
+
+
+
+[name="杜宾"]  光是坐在那里搞科研，是没法为所有人都争取到喘息的机会的。
+
+[name="杜宾"]  我们自身就是感染者，在处理感染者的问题上我们也更有优势，无论是恶劣的作战环境还是了解感染者本身。
+
+[name="杜宾"]  各种方式加入到感染者与其他人的纷争之中。阻止战乱，拯救更多的人。无论他们是否被感染。
+
+[name="杜宾"]  罗德岛的队伍逐渐壮大，也有了能够参与作战行动的队伍。这就是今天的罗德岛。
+
+
+
+
+
+//[name="阿米娅"]  如果能以这种方式获得支持，我们相信依靠凯尔希医生的医疗部门，罗德岛也总有一天能够找到治疗感染的办法。
+
+//[name="阿米娅"]  如果这片大地再也没有感染者的容身之所的话......我们就自己创造自己的容身之所。
+
+
+
+[name="杜宾"]  我们遇见的问题，变得越来越复杂......
+
+[name="杜宾"]  我们历经的战斗，则越来越残忍。
+
+
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[image]
+
+
+
+[name="杜宾"]  但我们从不会因此停下脚步。
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  从现在起，博士你也不能停下你的脚步。
+
+
+
+
+
+[Decision(options="我和罗德岛......;......", values="1;2")]
+
+[Predicate(references="1;2")]
+
+[Character(name="char_002_amiya_1#4")]
+
+[Delay(time=0.8)]
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  博士以前一直都是罗德岛最顶尖的源石病与天灾的研究专家之一，也是活跃在最前线的战场指挥官。
+
+[name="阿米娅"]  即使是现在失去了记忆，我也相信博士肯定能为我们的药物和疾病研究带来极大的帮助和进展。
+
+[name="阿米娅"]  更重要的是，博士也是我们的重要的家人......
+
+
+
+
+
+[Decision(options="我还不知道我能不能做到;......", values="1;2")]
+
+[Predicate(references="1;2")]
+
+[Character(name="char_002_amiya_1#3")]
+
+[name="阿米娅"]  没关系的博士......
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+
+
+[name="杜宾"]  阿米娅是想通过自己的方式，让博士你慢慢熟悉指挥，参与战斗。
+
+[name="杜宾"]  只是，博士，我依然要向你强调。我们绝不是因为需要一个失忆者的羸弱指挥能力才来营救你的。
+
+//[name="杜宾"]  而是因为发生了整合运动的暴乱破坏了原计划，我们才不得不求助于你。
+
+//[name="杜宾"]  我和阿米娅都拥有指挥小队进行作战的经验。
+
+[name="杜宾"]  我们可能都会因为专注于对你的保护而懈怠了全局的掌控。我们才不得不让博士你，至少也为了自己的生命，出一份力。
+
+[name="杜宾"]  如果能够回到曾经并肩作战时的状态，那再好不过。
+
+[name="杜宾"]  而一旦你站了出来，就需要做到最好，仅此而已。
+
+
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]  ......又让你费心了，杜宾教官......
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  唉。
+
+[name="杜宾"]  抱歉，阿米娅。在这样的情况下，我还是不能松下这根弦。
+
+[name="杜宾"]  我所能做的事情很有限，而你和博士则有着更多的可能。
+
+[name="杜宾"]  博士如果是你最需要信任的人，那么我一定要让他明白他将要面对的是什么。
+
+[name="杜宾"]  加速前进吧。
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]  ......嗯......
+
+[Character]
+
+[Dialog]
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=2,block=true)]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=1,block=true)]
+
+
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  十分抱歉，博士......明明你才恢复过来，就得让你跟着大家行动，还要做战斗的指挥。
+
+[name="阿米娅"]  一般来说大家是不会把这样重要的工作交给第一次见面的人。
+
+[name="阿米娅"]  大家也是因为相信我的判断,才没有多说什么——
+
+[name="阿米娅"]  要是被罗德岛的其他医疗干员，像是芙蓉啦，安塞尔啊他们知道了，肯定要生气的！
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]  博士，罗德岛还有着很多很多有意思的伙伴哦！
+
+[name="阿米娅"]  有很多是你不认识的，也有一些是你以前就————
+
+[Character(name="char_002_amiya_1#1")]
+
+[Delay(time=0.2)]
+
+[Character(name="char_002_amiya_1#4")]
+
+[Delay(time=0.5)]
+
+[name="阿米娅"]  ......
+
+[name="阿米娅"]  对不起，博士......都怪我......
+
+[name="阿米娅"]  明明你什么都不清楚什么都想不起来，我却害你陷入了这样的状况中......
+
+[name="阿米娅"]  甚至把你和罗德岛小队的诸位都卷进危险......
+
+[name="阿米娅"]  我真是......
+
+
+
+[Decision(options="不用在意这些小事。;......做你该做的吧。;......", values="1;2;3")]
+
+[Predicate(references="1;2;3")]
+
+[Character(name="char_002_amiya_1#6")]
+
+[name="阿米娅"]  博士......
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  嗯......
+
+[Character(name="char_002_amiya_1#6", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]  呼......呼......
+
+[name="医疗干员"]  被我发现阿米娅你在偷懒和博士聊天！
+
+[Character(name="char_002_amiya_1#6", name2="char_016_medic", focus=1)]
+
+[name="阿米娅"]  医生......！我不是.......
+
+[Character(name="char_002_amiya_1#6", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]  别在意，别在意啦！不过嘛......我可都听到了—
+
+[name="医疗干员"]  阿米娅怎么能把所有的担子和责任都抗在自己身上呢。可别忘记了，我们也是你的伙伴哦！
+
+[name="医疗干员"]  作战会议时你就说过，营救{@nickname}博士本身就是件相当危险的任务。
+
+[name="医疗干员"]  但，既然是重要的伙伴的话，肯定不能坐视不理吧？
+
+[name="医疗干员"]  我完全相信阿米娅的判断的！所以我也相信博士！所以阿米娅可千万不要自责啊。
+
+[name="医疗干员"]  至少直到现在，我们大家都还健健康康的在这里行动着不是吗？
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]  医生......
+
+[Character(name="char_016_medic", name2="char_130_doberm_ex",focus=2)]
+
+[name="杜宾"]  那个，现在还不是闲聊的时候。
+
+[Character(name="char_016_medic", name2="char_130_doberm_ex",focus=1)]
+
+[name="医生"]  对，对不起！
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]  抱歉，我忍不住......
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex",focus=2)]
+
+[name="杜宾"]  ......唉，阿米娅。
+
+[name="杜宾"]  我也希望博士成为罗德岛重要的一员，成为大家可以托付后背给他的人。
+
+[name="杜宾"]  但是现在在这里，为了大家的安全，我才不得不说刚才那些话。说实话每次参与作战，难道不是因为大家都信任着你吗？
+
+[name="杜宾"]  别忘了，最早大家都是为了你而来的。
+
+[Character(name="char_002_amiya_1#3")]
+
+[name="阿米娅"]  ......嗯！
+
+
+
+[Character]
+
+[Dialog]
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=1,block=true)]
+
+[Background]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=1,block=true)]
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5)]
+
+
+
+[Character(name="char_1502_crowns#2")]
+
+[name="？？？"]  ......
+
+[name="？？？"]  塔露拉那里，应该已经结束了。去告诉塔露拉，这里，有些污渍混了进来。
+
+[name="？？？"]  她如果有兴趣，就来看看。
+
+[name="？？？"]  顺便......也把这个消息，告诉其他人。
+
+[name="？？？"]  别让他们那么轻易地就逃走了。
+
+[Background(image="bg_cher_1",fadetime=1,screenadapt="coverall")]
+
+[name="？？？"]  追。
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

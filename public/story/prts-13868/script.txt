@@ -1,0 +1,91 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+
+[PlaySound(key="Test/slideshow", volume=1.2, delay=0.5, loop=true, channel="slide")]
+[PlayMusic(intro="mist_loop", key="mist_loop", volume=1, crossfade=1, delay=0.5)]
+[Delay(time=1)]
+[PlaySound(key="Test/slideshow1", volume=0.8, delay=0.5, channel="slide1")]
+[name="女性的声音"]    ……
+[name="女性的声音"]    ……截至12月24日的数据，
+[Dialog]
+[Delay(time=1)]
+
+[Image(image="lungmen", fadetime=0.5, xScale=1.7, yScale=1.7, x=-665, y=252)]
+[ImageTween(image="lungmen", fadetime=0.5, xScaleFrom=1.7, yScaleFrom=1.7, xScaleTo=1.5, yScaleTo=1.5, xTo=-490, yTo=155, duration=20)]
+[name="女性的声音"]    罗杰斯——
+[name="女性的声音"]    11月中旬爆发动乱，1225人伤亡，失踪人数未知。
+[name="女性的声音"]    奥托——
+[name="女性的声音"]    12月7日发生小规模冲突 ，20人伤亡，121人失踪。
+[name="女性的声音"]    库哈斯——
+[name="女性的声音"]    12月12日，864人伤亡，2200余人失踪。
+[name="女性的声音"]    由于天灾的靠近，短波通讯再次中断，至此再也没有接收到任何西边的信息。
+[Dialog]
+[Delay(time=1)]
+[name="低沉的声音"]    还有来自不是维多利亚的数据吗？那个国家落入那群暴徒手中已经只是时间问题了。
+[Dialog]
+[Delay(time=1)]
+[PlaySound(key="Test/slideshow1", volume=0.8, delay=0.5, channel="slide1")]
+[name="女性的声音"]    【切尔诺伯格】……
+[name="女性的声音"]    23日早晨开始发生动乱，目前已经……虽然你应该已经知道了，但还需说明的是……710人伤亡。但是更重要的是……
+[name="女性的声音"]    从天灾发生的3天前我们就已经开始发送的天灾预警通告，百余人参与了这项行动。
+[Dialog]
+[Delay(time=1)]
+[Image(fadetime=1)]
+[name="女性的声音"]    不过并没有得到对方的回应。
+[Dialog]
+[Delay(time=1)]
+[PlaySound(key="Test/slideshow1", volume=0.8, delay=0.5, channel="slide1")]
+[Image(image="bg_0_guard", fadetime=1, xScale=1, yScale=1)]
+[ImageTween(image="bg_0_guard", xScaleTo=1.3, yScaleTo=1.3, duration=10)]
+[name="女性的声音"]    切尔诺伯格如预料的一样已经被整合运动完全控制，并且被那场天灾陨石雨吞没，化为不毛之地。
+
+[Dialog]
+[Delay(time=1)]
+[name="女性的声音"]    对整合运动来说……
+[name="女性的声音"]    被天灾附着后的切尔诺伯格成为了只有感染者才能驻留的据点，成为了将暴乱发展到我们龙门的跳板——
+[Dialog]
+[Image(fadetime=1)]
+[Delay(time=1)]
+[Image(image="lungmen", fadetime=0.5, xScale=1.7, yScale=1.7, x=665, y=252)]
+[ImageTween(image="lungmen", fadetime=0.5, xScaleFrom=1.7, yScaleFrom=1.7, xScaleTo=1.5, yScaleTo=1.5, xTo=490, yTo=155, duration=20)]
+[Dialog]
+[Delay(time=1)]
+[name="低沉的声音"]    关于这个女孩，她怎么样了，陈？
+[Delay(time=1)]
+
+[Delay(time=1)]
+[name="陈"]    虽然……刚找到她的时候，我难以想象她会是这个组织的公开领导人。
+[Image(fadetime=1)]
+[ShowItem(image="item_photo", style="photo", fadestyle="horiz_expand_center", fadetime=0.5 )]
+[name="陈"]    让人有些不放心，不过目前的结果来看，您让我分配给她任务，一切都完成得很好。
+[Delay(time=1)]
+[PlaySound(key="Test/slideshow1", volume=0.8, delay=0.5, channel="slide1")]
+[Image(image="bg_1_tv", fadetime=0.5, xScale=1, yScale=1)]
+[hideItem(fadetime=0.5 )]
+[ImageTween(image="bg_1_tv", xScaleTo=1.3, yScaleTo=1.3, duration=20)]
+[name="陈"]    她与她带领的“罗德岛”，在整合运动的第一轮对龙门的渗透中，顺利反制了对方的核心人员。
+[name="陈"]    暂时延缓了整合运动的全面攻势。
+[name="低沉的声音"]    我看到了。
+[name="陈"]    和您估计的一样，虽然龙门近卫局正面抵挡整合运动绰绰有余，但是如果那次被成功渗透——
+[name="陈"]    ——局势必将产生重大变化，造成民众间的大规模恐慌。
+[name="低沉的声音"]    虽然如此……
+[name="低沉的声音"]    敌人的行动始终要比我想象的要快
+[name="低沉的声音"]    那么下一步，你知道该怎么做。
+[Dialog]
+[stopsound(channel="slide", fadetime=1)]
+[Image(fadetime=1)]
+[Delay(time=1)]
+[character(name="char_010_chen_1#1",fadetime=0.5)]
+[name="陈"]    ……
+[name="陈"]    了解，我把命令分发下去。
+[Dialog]
+[Delay(time=1)]
+[character(name="char_010_chen_1#1", fadetime=0.5, focus=-1)]
+[name="低沉的声音"]    从现在起，我们需要严格按照时间计划进行。
+[name="女性的声音"]    祝你顺利。
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

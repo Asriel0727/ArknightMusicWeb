@@ -1,0 +1,397 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第一关（前）
+
+
+
+// Comments
+
+
+
+
+
+[Background(image="bg_indoor_1", fadetime=1)]
+
+
+
+[PlayMusic(intro="$darkness01_intro", key="$darkness01_loop", volume=0.8, crossfade=1.5)]
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  阿米娅，你们怎么样？
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  嗯，虽然和凯尔希医生还是无法联系上......
+
+[name="阿米娅"]  不过博士已经使用神经连接至罗德岛了。至少，他可以慢慢去适应。怎么也比在城中孤军奋战要好。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  再往前就是出口了。
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  嗯，大家，准备————
+
+[character]
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=0.2,block=true)]
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Delay(time=1)]
+
+
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=2, block=true)]
+
+[Character(name="char_002_amiya_1#7", name2="char_013_riop", focus=2)]
+
+[name="近卫干员"] 阿米娅......！
+
+[Character(name="char_002_amiya_1#7", name2="char_013_riop", focus=1)]
+
+[name="阿米娅"]  脚步声？
+
+
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"] 在我们上方！
+
+[name="杜宾"] 有人一直在我们上方，随着我们一起移动......！
+
+[name="杜宾"] ————！！
+
+[name="杜宾"] ——不好！阿米娅！
+
+[PlayMusic(intro="$escapebattle_intro", key="$escapebattle_loop", volume=0.8, crossfade=3)]
+
+[Character(name="char_002_amiya_1#5")]
+
+[name="阿米娅"]   博士危险！快躲开！
+
+[character(fadetime=0)]
+
+[Dialog(fadetime=0)]
+
+[PlaySound(key="$d_sp_ballista",volume=1.0)]
+
+[Blocker(a=1, r=100, g=100, b=100, fadetime=0.1,block=true)]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=0.3, block=true)]
+
+
+
+[CameraShake(duration=2,xstrength=5,ystrength=3,vibrato=30,randomness=90,fadeout=true,block=true)]
+
+[Blocker(a=0.2, r=100, g=100, b=100, fadetime=1,block=true)]
+
+
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]   唔啊啊啊！
+
+[Character(name="char_002_amiya_1#5")]
+
+[name="阿米娅"]  咳，咳——
+
+[name="阿米娅"]  什么......？
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]   阿米娅，博士！
+
+[name="医疗干员"]   咳......烟太大了看不清......你们没受伤吧？
+
+
+
+[Character(name="char_002_amiya_1#5")]
+
+[name="阿米娅"]  我还好——
+
+[name="阿米娅"]  博士也没事。
+
+[Character(name="char_002_amiya_1#5", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  天花板被他们......开了个洞！
+
+[name="杜宾"]  上面快塌了......阿米娅，我们需要离开这里。
+
+
+
+//受到弩箭攻击
+
+[PlaySound(key="$d_sp_ballista",volume=0.5)]
+
+//[Blocker(a=1, r=100, g=100, b=100, fadetime=0.1,block=true)]
+
+//[Blocker(a=0, r=0, g=0, b=0, fadetime=0.3, block=true)]
+
+[CameraShake(duration=2,xstrength=5,ystrength=3,vibrato=30,randomness=90,fadeout=true,block=true)]
+
+
+
+[name="杜宾"]  趁着烟雾，立刻转移！
+
+
+
+
+
+
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  好！
+
+[name="阿米娅"]  博士，还能站起来吗？小心点，跟我来。
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.8)]
+
+[Character]
+
+[Background]
+
+[PlaySound(key="$d_sp_ballista",volume=0.6)]
+
+[CameraShake(duration=2,xstrength=5,ystrength=3,vibrato=30,randomness=90,fadeout=true,block=true)]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[Delay(time=0.5)]
+
+
+
+
+
+[Character(name="char_013_riop",fadetime=0.4)]
+
+[name="近卫干员"]  呼，呼，前面就是出口......我们逃出来了吗？
+
+[Dialog]
+
+[Character]
+
+[Background(image="bg_cherbefore_1",x=0, y=20, xScale=1.1, yScale=1.1, fadetime=1)]
+
+[BackgroundTween(xFrom=0, yFrom=20, xTo=0, yTo=0, xScaleFrom=1.1, yScaleFrom=1.1, xScaleTo=1, yScaleTo=1, duration=4, block=true)]
+
+
+
+[Dialog]
+
+
+
+
+
+[Character(name="char_1502_crowns#2")]
+
+[name="？？？"]  ——动手
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  敌袭！小心！
+
+[character(fadetime=0)]
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+
+
+[Character(name="char_002_amiya_1#5")]
+
+[name="阿米娅"]  ——！
+
+[name="阿米娅"]  怎么会？！
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  埋伏？
+
+[name="杜宾"]  开玩笑的吧，我们的行动已经被发现了？
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]   唔啊啊啊！
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  找掩体，快！
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  博士，这边！
+
+
+
+
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+
+
+[Character(name="char_002_amiya_1#7", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  杜宾......
+
+[Character(name="char_1002_nsabr_1",name2="char_1002_nsabr_2",focus=2)]
+
+[name="整合运动"]  ————————————
+
+[Character(name="char_002_amiya_1#7", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  看来就在刚才，他们调拨了更多人来占领这个区域。
+
+[name="杜宾"]  阿米娅，我们得找个口子直接突破这里。
+
+
+
+
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[Character(fadetime=0)]
+
+[Background(fadetime=0)]
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+[Image(image="avg_1_1",x=0, y=-50, xScale=1.2, yScale=1.2, fadetime=1)]
+
+[ImageTween(xFrom=0, yFrom=-50, xTo=0, yTo=0, xScaleFrom=1.2, yScaleFrom=1.2, xScaleTo=1, yScaleTo=1, duration=10, block=false)]
+
+
+
+[name="杜宾"]  站在废墟最高处的那个家伙，大概就是指挥这些整合运动来这里的人。
+
+[name="阿米娅"]  那个人......
+
+[name="阿米娅"]  看上去和其他那些整合运动......不太一样......
+
+[name="杜宾"]  领袖，或者是指挥官。看上去有点难以对付。
+
+[name="杜宾"]  如果可以，我们需要避开————
+
+
+
+[Blocker(a=1, r=0.95, g=0.95, b=0.95, fadetime=4, block=true)]
+
+[Background(image="bg_cher_1", width=1, height=1, screenadapt="coverall")]
+
+[Image]
+
+[Blocker(a=0.3, r=0.95, g=0.95, b=0.95, fadetime=0, block=true)]
+
+[Character(name="char_002_amiya_1#5")]
+
+[name="阿米娅"]  ......？
+
+[name="阿米娅"]  烟雾？
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  糟糕......！
+
+[Character(name="char_1502_crowns#2")]
+
+[name="？？？"]  ————
+
+[name="？？？"]  ————撕碎他们。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  他们要借着烟雾偷袭！
+
+
+
+[PlaySound(key="$e_atk_arrow_h")]
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$e_atk_arrow_h")]
+
+[Blocker(a=0.3, r=0.95, g=0.95, b=0.95, fadetime=0.2, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+[Character(name="char_002_amiya_1#7", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  杜宾......
+
+[name="杜宾"]  阿米娅，你保护好博士。
+
+
+
+
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, fadetime=0.2, block=true)]
+
+[Character(fadetime=0)]
+
+[Background(fadetime=0)]
+
+[Image(image="avg_1_3",x=0, y=-20, xScale=1.1, yScale=1.1, fadetime=1)]
+
+[ImageTween(xFrom=0, yFrom=-20, xTo=0, yTo=0, xScaleFrom=1.1, yScaleFrom=1.1, xScaleTo=1, yScaleTo=1, duration=4, block=false)]
+
+[Blocker(a=0, fadetime=0.5, block=true)]
+
+[Delay(time=0.6)]
+
+[name="阿米娅"]   嗯，博士，请不要离开我身边。
+
+[name="杜宾"]   所有人，全力向西突破包围！！
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Image(image="avg_1_3",x=0, y=0, xScale=1, yScale=1, fadetime=1)]
+
+[PlaySound(key="$flashback", volume=0.7)]
+
+
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-700, xScaleFrom=1, yScaleFrom=1, xScaleTo=8, yScaleTo=8, duration=1.6, block=false)]
+
+
+
+[PlaySound(key="$flashback", volume=0.7, Delay=0.3)]
+
+[PlaySound(key="$flashback", volume=0.7, Delay=0.7)]
+
+[Delay(time=0.2)]
+
+[Blocker(a=1,r=255, g=255, b=255, fadetime=0.3, block=true)]
+
+[Image]
+
+[Blocker(block=true, fadetime=0.5)]

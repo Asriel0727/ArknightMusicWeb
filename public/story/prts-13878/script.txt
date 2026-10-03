@@ -1,0 +1,43 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   干的漂亮，博士。
+[name="能天使"]   来这里前，我一直以为你只是“罗德岛制药”的研发人员之类的。
+[name="能天使"]   从没想到不抛头露面的你还可以负责这样的工作。
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]   干员间的相互协调、运用和有序部署，这些工作今后都将有赖于{@nickname}博士先生。
+[name="阿米娅"]   {@nickname}对罗德岛来说是特别的存在。
+
+[Character(name="char_102_texas_1")]
+
+[name="德克萨斯"]   总之我的工作告一段落了，我先……去罗德岛看一下之前那个女孩的状况。
+[name="德克萨斯"]   有其他紧急的需要请联系我。
+
+
+[Character(name="char_002_amiya_1#6")]
+[name="阿米娅"]   哦！好的……
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]   这几天辛苦你们了。
+
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1#7")]
+[name="阿米娅"]   博士，我们必须派遣一支先遣队抢先保护那个孩子。
+[name="阿米娅"]   整合运动的游击作战不断拖延龙门的行动，我们多少都会受到影响。
+[name="阿米娅"]   我们必须在敌人发现“密钥”之前找到她。
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

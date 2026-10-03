@@ -1,0 +1,49 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_010_chen_1", name2="char_012_misa_1", focus=0)]
+[Delay(time=1)]
+
+[Character(name="char_010_chen_1", name2="char_012_misa_1", focus=1)]
+[name="陈"]   你就是米莎。
+[name="陈"]   我们又检查了一遍你的随身物品。不好意思，这是例行公事。
+[name="陈"]   现在你可以把它们领回去了。
+
+[Character(name="char_010_chen_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+[name="米莎"]   ……你是？
+
+[Character(name="char_010_chen_1", name2="char_012_misa_1", focus=1)]
+
+[name="陈"]   陈，近卫局督察组组长。
+[name="陈"]   如果你同意与我们合作，我们不会亏待你。
+[name="陈"]   在行动期间，你将接受近卫局全面保护。
+[name="陈"]   成功提取“密钥”后，我们会为你安排妥善的居住环境。
+[name="陈"]   你将获得有一定限制的人身自由，以及矿石病的优先治疗。
+[name="陈"]   条件不算丰厚，不过足以让你度过一段平安的时光。
+
+[Character(name="char_010_chen_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+
+[Character(name="char_010_chen_1", name2="char_012_misa_1", focus=1)]
+
+[name="陈"]   做出明智的选择，米莎。
+[name="陈"]   龙门的安全，对你自己以及你的流亡同胞都有好处。
+[name="陈"]   好好考虑一下。
+
+[Character(name="char_010_chen_1", name2="char_012_misa_1", focus=2)]
+[name="米莎"]   ……
+[Dialog]
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+[name="阿米娅"]   米莎……
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

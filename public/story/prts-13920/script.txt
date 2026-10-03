@@ -1,0 +1,101 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Delay(time=1)]
+
+[Image(image="bg_1_back", fadetime=0.5, xScale=1.5, yScale=1.5, y=200)]
+[ImageTween(image="bg_1_back", xScaleTo=1, yScaleTo=1, duration=10, yTo=0, ease="InOutCubic", block=false)]
+[Delay(time=1)]
+
+[name="阿米娅"]   你还活着…………
+[name="阿米娅"]   …………
+[name="碎骨"]   啊，没错……你亲手夺走了我的一切希望……
+[name="碎骨"]   最终让我学会……
+[name="碎骨"]   要怎么在仇恨中生存……
+[name="碎骨"]   ……
+[name="碎骨"]   我所承受的一切痛苦……我将全部奉还给你们……
+[Dialog]
+[Delay(time=1)]
+[name="碎骨"]   ……摧毁他们，全部。
+
+[Dialog]
+[Image(fadetime=1, block=true)]
+[Delay(time=1)]
+
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   ……是埋伏。
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   针对你们曾经的卑鄙伎俩……以眼还眼。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   阿米娅！
+[name="陈"]   ……！
+[name="陈"]   ……碎骨？
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   抱歉，陈长官，现在没时间解释……
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   好，先解决眼下情况。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   各位，立刻撤出此区域，尽快！
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   追上去……
+[name="碎骨"]   不要给罗德岛任何逃生的机会……
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   ……情况就是这样。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   所以说，W所有的挑衅都是为了激怒我们，使埋伏的碎骨方便得手，对吗？
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   是的，她的话都是谎言。
+[name="阿米娅"]   但碎骨的出现确实出乎我的意料……
+[name="阿米娅"]   ……
+[Delay(time=1)]
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   稍后再讨论这件事。
+[name="陈"]   博士，阿米娅，敌人追上来了。
+[name="陈"]   准备迎敌。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   了解。
+[name="阿米娅"]   博士，在矿场中埋伏了大量部队，不过对我们来说……时间是最重要的。
+[name="阿米娅"]   请您做好准备……
+[name="阿米娅"]   我也不知道对方还有多少人……我们必须将所有眼前的敌人——
+[name="阿米娅"]   逐个清除——
+
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

@@ -1,0 +1,192 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="Battle/bgm_epic_intro", key="Battle/bgm_epic_loop", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   虽然不知道还有多久，不过至少他们的进攻状况有些疲软。
+[name="芙兰卡"]   这种程度的进攻规模，我在黑钢工作的时候也遇到过不少。
+[name="芙兰卡"]   不过像这样的顽强抵抗的非常少见，值得表扬一下。
+
+[Character(name="char_107_liskam_1")]
+
+[name="雷蛇"]   你总是用轻描淡写的词描述些非常严重的状况……
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   有机会包围碎骨吗？能够抓住他的话更好……
+
+[Character(name="char_107_liskam_1")]
+
+[name="雷蛇"]   很难，敌人躲在掩体中。
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]   如果不得已还是不能……毕竟还不知道米莎的去向。
+
+[Character(name="char_002_amiya_1")]
+[name="阿米娅"]   芙兰卡小姐，能告诉我下附近的地形吗？
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   到处都是崩塌的建筑残骸，废弃工业设备，未经粉碎的原矿。
+[name="芙兰卡"]   敌人虽然无力进攻，但我们也没法轻易反攻出去。
+
+[Character(name="char_107_liskam_1")]
+
+[name="雷蛇"]   不能这样陷入僵持，浪费时间只会对敌人有利。
+
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   ……
+[Delay(time=1)]
+
+[name="陈"]   能天使、德克萨斯。
+[name="陈"]   沿着那边的隐蔽处——
+
+[Character(name="char_102_texas_1")]
+[name="德克萨斯"]   ……
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   ……
+
+[name="能天使"]   ……明白。
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+
+[Delay(time=1)]
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   ……死守各处掩体。
+[name="碎骨"]   ……阻止罗德岛继续推进战线。
+
+[Dialog]
+[Delay(time=1)]
+
+[name="碎骨"]   ……
+[name="碎骨"]   你又一次把我逼上了绝路。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   他在和你说话？
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   ……
+[Delay(time=1)]
+
+[name="阿米娅"]   碎骨。
+[name="阿米娅"]   我只想问你一件事。
+[name="阿米娅"]   米莎在哪儿？
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   米莎已经走了。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   ……
+
+[Character(name="char_002_amiya_1#7", name2="char_1500_skulsr", focus=2)]
+
+[name="碎骨"]   你没能拯救她，阿米娅。
+
+[Character(name="char_002_amiya_1#7", name2="char_1500_skulsr", focus=1)]
+
+[name="阿米娅"]   是你带给她这样的命运，她没有力量保护自己，而你在不断纠缠她……
+[name="阿米娅"]   ……最终把她推进深渊。
+
+[Character(name="char_002_amiya_1#7", name2="char_1500_skulsr", focus=2)]
+
+[name="碎骨"]   你错了……
+[name="碎骨"]   把她推进深渊的……不是我。
+
+[name="碎骨"]   换我……问你一个问题。
+[name="碎骨"]   你获胜……会得到什么？
+
+[Character(name="char_002_amiya_1#7", name2="char_1500_skulsr", focus=1)]
+
+[name="阿米娅"]   我们应该得到的东西。
+
+[Character(name="char_002_amiya_1#7", name2="char_1500_skulsr", focus=2)]
+
+[name="碎骨"]   这其中还包括了……得那些压迫我们的人的承认？
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=1)]
+
+[name="阿米娅"]   我能理解你的感受……
+[name="阿米娅"]   但是，与所有人为敌——这种想法只会让我们——
+
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=2)]
+
+[name="碎骨"]   恐怕只有你自己这样想……
+[name="碎骨"]   那些使我们生存状况不断恶化的罪人，你充当他们的帮凶。
+[name="碎骨"]   你以为你让我们消失后，就会得到他们的认可、他们的承认吗。
+[name="碎骨"]   你错了，阿米娅。
+
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=1)]
+
+[name="阿米娅"]   碎骨。
+[name="阿米娅"]   我们感染矿石病那一刻，便不知道自己什么时候会结束自己的生命。
+[name="阿米娅"]   为此努力寻找治疗方法，为的就是解决这种冲突……
+
+
+[Character(name="char_002_amiya_1#7", name2="char_1500_skulsr", focus=2)]
+[name="碎骨"]   我原本也是这么想的。
+[name="碎骨"]   可是告诉我，这么多年来，有任何成果吗？
+[name="碎骨"]   我们连自己是什么，甚至这种石头是什么都不知道。
+[name="碎骨"]   ——那些所谓的无辜者，一直在恐吓我们，唾弃我们——
+[name="碎骨"]   ——我们的努力在他们眼中只是在动摇社会的稳定基础——
+[Delay(time=1)]
+[name="碎骨"]   你能够选择去……去展现你所谓的仁慈……
+[name="碎骨"]   然后你那不可能的道路，妄图依靠美好的幻想“拯救”那些人……
+[name="碎骨"]   你有这种选择的机会……可惜我没有。
+[Dialog]
+[Character(name="char_002_amiya_1#7")]
+
+[Delay(time=1)]
+
+[name="阿米娅"]   我……曾经也没有。
+[name="阿米娅"]   所以我珍惜这样的机会，而不是放弃生命，以暴力迁怒无辜者。
+[Dialog]
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   ……好了。
+[Delay(time=1)]
+
+[name="碎骨"]   我不想再听到这些……
+[name="碎骨"]   病的不是我们，是这片大地……
+[name="碎骨"]   这个肌体腐烂，病入膏肓的大地……
+[name="碎骨"]   充满了谎言，冰冷，残酷……
+[name="碎骨"]   现在……我手上握着武器，这就是答案。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   ……
+[Delay(time=1)]
+[name="阿米娅"]   最终你依然选择这条道路吗？
+[Dialog]
+
+[Character(name="char_1500_skulsr")]
+
+[Delay(time=1)]
+[name="碎骨"]   我要保护……那仅存的一丝希望。
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

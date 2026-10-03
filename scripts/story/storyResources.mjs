@@ -6,13 +6,14 @@ const audioKinds = new Set(['playmusic', 'playsound']);
 
 export function extractStoryText(raw) {
   const text = String(raw || '').replaceAll('\r\n', '\n').trim();
-  const marker = text.match(/\|\s*文本数据\s*=\s*\n/);
+  const marker = text.match(/\|\s*文本数据\s*=\s*/);
   const source = marker ? text.slice(marker.index + marker[0].length).split(/^\s*}}\s*$/m)[0].trim() : text;
   const commands = parseStoryScript(source);
-  if (commands[0]?.kind !== 'header' || !commands.some((command) => command.kind === 'dialogue')) {
+  if (!commands.some((command) => ['dialogue', 'video', 'playvideo'].includes(command.kind)) || (!marker && commands[0]?.kind !== 'header')) {
     throw new Error('Unexpected script format');
   }
-  return `${source.split('\n').map((line) => line.trimEnd()).join('\n')}\n`;
+  const header = commands[0]?.kind === 'header' ? '' : '[HEADER()]\n';
+  return `${header}${source.split('\n').map((line) => line.trimEnd()).join('\n')}\n`;
 }
 
 export function collectStoryResources(source, variables = {}) {
@@ -40,7 +41,7 @@ export function collectStoryResources(source, variables = {}) {
       }
     }
     if (kind === 'playvideo' || kind === 'video') {
-      const id = resolve(a.key || a.name || a.video);
+      const id = resolve(a.key || a.name || a.video || a.res);
       if (id) videos.add(id);
     }
   }
@@ -58,7 +59,7 @@ export function imageCandidates(id) {
 }
 
 export function audioUrl(key, variables) {
-  const resource = variables[key];
+  const resource = key.startsWith('Sound_Beta_2/') ? key : variables[key];
   if (typeof resource !== 'string' || !resource.startsWith('Sound_Beta_2/')) {
     throw new Error(`No PRTS audio mapping for ${key}`);
   }

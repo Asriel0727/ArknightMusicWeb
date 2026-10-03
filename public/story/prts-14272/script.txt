@@ -1,0 +1,281 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第六关（后）
+
+
+
+// Comments
+
+
+
+[Background(image="bg_cher_5", width=1, height=1, fadetime=1)]
+
+[PlayMusic(intro="$chernormal_intro", key="$chernormal_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Delay(time=1)]
+
+
+
+[Character(name="char_1507_Mephisto_1#4")]
+
+[name="梅菲斯特"]   这女人......怎么回事......
+
+[Dialog]
+
+[Character(name="char_148_nearl_1#3")]
+
+[name="临光"]   你这家伙居然追这么快吗————
+
+
+
+[Delay(time=0.6)]
+
+
+
+[Character(name="char_148_nearl_1")]
+
+[name="临光"]   果然你不是总指挥吧。
+
+[name="临光"]   制压切城军事据点的整合运动像机器一样高效——
+
+[name="临光"]   而你领着的这批各个都像神经错乱的暴徒。
+
+[name="临光"]   屠杀，纵火，围猎......只不过是满足你自己残忍的趣味而已吧？
+
+[name="临光"]   依着自己低劣的品味肆意妄为。看来也就不过是个小头目而已。
+
+
+
+[Character(name="char_1507_Mephisto_1#2")]
+
+[name="梅菲斯特"]   ——
+
+[name="梅菲斯特"]   ——浮士德。
+
+[name="梅菲斯特"]   把她那张嘴给我打穿。
+
+
+
+[Character(name="char_1508_Faust_1#2")]
+
+[name="浮士德"]   ......
+
+
+
+[Character(name="char_148_nearl_1#4")]
+
+[name="临光"]   ！
+
+
+
+//射箭
+
+[CameraShake(duration=1, xstrength=8, ystrength=6, vibrato=30, randomness=90, fadeout=true, block=false)]
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+
+
+[Character(name="char_148_nearl_1#3")]
+
+[name="临光"]   啧......
+
+[name="临光"]   没教养的家伙！
+
+[Character(name="char_002_amiya_1#7 ")]
+
+[name="阿米娅"]  临光！
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  是狙击手！沿着掩体走，小心周围的楼房！
+
+[name="杜宾"]  临光，别和他废话了！
+
+
+
+[Character(name="char_148_nearl_1#7")]
+
+[name="临光"]   不行！这个弩弹是特制的。朝你们射击就不妙了！
+
+[name="临光"]   我还能撑住，别担心我！你们保护好自己，不要暴露成为目标！
+
+[Character(name="char_1507_Mephisto_1#2")]
+
+[name="梅菲斯特"]  挡开了浮士德的弩炮？凭这么小的盾牌——？！
+
+[Character(name="char_1507_Mephisto_1#3")]
+
+[name="梅菲斯特"]  继续！把她打成碎渣！
+
+[Character(name="char_1508_Faust_1#2")]
+
+[name="浮士德"]   ————！
+
+[Character(name="char_148_nearl_1#3")]
+
+[name="临光"]   啧——！
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  快回避，我来！
+
+[CameraShake(duration=1, xstrength=8, ystrength=6, vibrato=30, randomness=90, fadeout=true, block=false)]
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[Character(name="char_002_amiya_1#7 ")]
+
+[name="阿米娅"]  啊，Ace！
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=1, xstrength=8, ystrength=6, vibrato=30, randomness=90, fadeout=true, block=false)]
+
+
+
+[Character(name="char_130_doberm_ex", name2="char_014_riope",focus=1)]
+
+[name="杜宾"]  替一个骑士挡箭，你这家伙也太可靠了吧。
+
+[Character(name="char_130_doberm_ex", name2="char_014_riope",focus=2)]
+
+[name="Ace"]  这么危险的场合，我可不能干站着让她一个人出风头。
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  找到敌方狙击的位置了，反击！
+
+
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=0.5, block=true)]
+
+[PlaySound(key="$e_atk_arrow_h")]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=0.5, block=true)]
+
+[PlaySound(key="$e_atk_arrow_h")]
+
+
+
+[Character(name="char_1508_Faust_1#2")]
+
+[name="浮士德"]   ......！
+
+[CameraShake(duration=1, xstrength=8, ystrength=6, vibrato=30, randomness=90, fadeout=true, block=false)]
+
+
+
+[Character(name="char_002_amiya_1#7 ")]
+
+[name="阿米娅"]  打中了吗？
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  没有，只是简单压制而已。
+
+[name="Ace"]  其实前两波攻击来自不同的方向——
+
+[name="Ace"]  假如那个小疯子口中的浮士德是多个人的代称的话，他们也可以从多个方向狙击我们。
+
+[Character(name="char_014_riope",name2="char_130_doberm_ex",focus=2)]
+
+[name="杜宾"]  这么大的威力的弩弹......我只见过陨星用过。
+
+[name="杜宾"]  看来整合运动已经搞到了不少危险的武器。
+
+[Character(name="char_148_nearl_1#3")]
+
+[name="临光"]  别给他喘息的机会......！我们需要一些人断后，把那些追兵抵挡住。
+
+[Character(name="char_002_amiya_1#7 ")]
+
+[name="阿米娅"]  明白！
+
+[name="阿米娅"]  大家，击退靠近的敌人！
+
+[Character(name="char_1507_Mephisto_1#4")]
+
+[name="梅菲斯特"]  你们这些家伙......为什么不肯老老实实的？
+
+[name="梅菲斯特"]  ——————我要把你们，通通————
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  临光，趁现在，快！
+
+[Character(name="char_148_nearl_1#7")]
+
+[name="临光"]   E2全体，准备冲击！
+
+[name="临光"]   一次击溃前方的阻挡目标！
+
+
+
+[Character(name="char_1002_nsabr_2")]
+
+[name="整合运动成员"]  快！别让她靠近......
+
+[name="整合运动成员"]  咕咳——唔啊啊啊啊！
+
+
+
+[Character(name="char_148_nearl_1#7")]
+
+[name="临光"]   这些人想要对抗卡西米尔骑士——应该先去练几百年再说。
+
+[Character(name="char_148_nearl_1#7",name2="char_130_doberm_ex",focus=2)]
+
+[name="临光"]   杜宾！跟上我！
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=0.2, block=true)]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=0.2, block=true)]
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  了解！
+
+[name="杜宾"]  暂时别管那个智障小孩了，他还没有进一步的动作！
+
+[name="杜宾"]  各小队的重装干员，注意保护队伍，千万要提防来自侧面的进攻！
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  记得警惕敌方狙击手！
+
+[name="杜宾"]  以及，小心敌方的重装防御者，不要被他们突入。
+
+[name="杜宾"]  阿米娅，保护好博士！
+
+
+
+[Character(name="char_002_amiya_1#7 ")]
+
+[name="阿米娅"]  博士，拉紧我！
+
+
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

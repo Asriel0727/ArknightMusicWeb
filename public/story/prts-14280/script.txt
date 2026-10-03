@@ -1,0 +1,299 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第十关（前）
+
+
+
+[PlayMusic(intro="$chernormal_intro", key="$chernormal_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[Background(image="bg_cher_10", fadetime=1)]
+
+[Blocker(a=0, r=0, g=0, b=0, fadetime=0.5,block=true)]
+
+
+
+[Delay(time=0.3)]
+
+[PlaySound(key="$d_gen_explo_n")]
+
+[CameraShake(duration=1, xstrength=3, ystrength=5, vibrato=30, randomness=90, fadeout=false)]
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  呼.....
+
+[name="杜宾"]  成功了......暂时撑过来了。
+
+[Character(name="char_148_nearl_1#3", name2="char_130_doberm_ex", focus=1)]
+
+[name="临光"]  灾势减弱了，但各位还是要小心！
+
+[Character(name="char_148_nearl_1#3", name2="char_130_doberm_ex", focus=2)]
+
+
+
+[name="杜宾"]  情况太糟糕了......天灾已经到达了，如果我们不快点到达出口的话......
+
+[name="杜宾"]  我们被困住了......还被包围了......刚才远处的整合运动还在徘徊。
+
+[Character(name="char_002_amiya_1#5", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  周围......都是倒塌的房子和碎石。
+
+[name="阿米娅"]  大家有受伤吗？医生？
+
+[name="阿米娅"]  医生？
+
+[Character(name="char_002_amiya_1#5", name2="char_016_medic", focus=1)]
+
+[name="医疗干员"]  阿......米娅......我......
+
+[Character(name="char_002_amiya_1#4", name2="char_016_medic", focus=2)]
+
+[name="阿米娅"]  没事的！我们能办到的。
+
+[Character(name="char_002_amiya_1#4", name2="char_148_nearl_1#3", focus=2)]
+
+[name="临光"]  灾云中心不在我们所处的城区，我们还有最后撤退的机会！
+
+[name="临光"]  我们该抓紧时间突围。
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  被摧毁的建筑形成了障碍物......
+
+[name="杜宾"]  真糟糕，明明到了最后关头，所有的事情都在阻挠我们。
+
+[name="杜宾"]  如果我们能——
+
+
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[name="杜宾"]  ......能......
+
+
+
+
+
+
+
+[PlayMusic(intro="$calamity_intro", key="$calamity_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Character(fadetime=0)]
+
+[PlaySound(key="$d_gen_walk_n",volume=1)]
+
+
+
+
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  来了。
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  有一个人正在慢慢靠近我们......
+
+[name="近卫干员"]  那是谁......
+
+[dialog]
+
+[Character(fadetime=0)]
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[Background(image="bg_cher_7", fadetime=0)]
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+[PlaySound(key="$d_gen_walk_n")]
+
+
+
+[Character(name="char_011_talula_1#2",fadetime=1,block=true)]
+
+[Delay(time=2)]
+
+[character(fadetime=1)]
+
+
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[Character(name="char_002_amiya_1#5")]
+
+[name="阿米娅"]  不......不可能......
+
+
+
+[Dialog(fadetime=0)]
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[Background(image="bg_cher_10", fadetime=0)]
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  那个人正在接近！
+
+[name="近卫干员"]  ——
+
+[name="近卫干员"]  一旦敌人进入射程，就立刻攻击！
+
+[name="近卫干员"]  但是，那个人为什么一点躲避的意思都没有......直接朝这边过来了？
+
+[Dialog]
+
+[character]
+
+[PlaySound(key="$d_gen_walk_n")]
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]  不，她......
+
+[name="阿米娅"]  她......她是资料上整合运动的......
+
+[Character(name="char_148_nearl_1#7")]
+
+[name="临光"]  ——
+
+[name="临光"]  我能从她身上感受到不祥。周围的空气也弥漫着一种危险的味道。
+
+[Character(name="char_148_nearl_1#7", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  ......临光......
+
+[Character(name="char_148_nearl_1#7", name2="char_130_doberm_ex", focus=1)]
+
+[name="临光"]  我不清楚，但是......
+
+[Dialog]
+
+[character]
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[Background(image="bg_cher_8", fadetime=0)]
+
+[Dialog(fadetime=0)]
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+
+
+[PlaySound(key="$d_gen_walk_n",volume=1)]
+
+[Character(name="char_011_talula_1#2",fadetime=2)]
+
+[Background(image="bg_cher_8",x=0, y=0, xScale=1.1, yScale=1.1, fadetime=1)]
+
+[BackgroundTween(xFrom=0, yFrom=0, xTo=0, yTo=0, xScaleFrom=1.1, yScaleFrom=1.1, xScaleTo=1, yScaleTo=1, duration=4, block=true)]
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+
+
+[character]
+
+[Background(image="bg_cher_10", fadetime=0)]
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+
+
+[Character(name="char_148_nearl_1#3")]
+
+[name="临光"]  那是......钢铁和硫磺的味道。
+
+[name="临光"]  有什么东西在焚烧。
+
+[name="临光"]  如果是火焰的话......
+
+[Character(name="char_002_amiya_1#3")]
+
+[name="阿米娅"]  ......她就是——
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  整合运动的暴君......
+
+[Character(name="char_002_amiya_1#3")]
+
+[name="阿米娅"]  塔露拉。
+
+[PlaySound(key="$d_gen_thunders_amb")]
+
+[CameraShake(duration=1, xstrength=5, ystrength=3, vibrato=30, randomness=90, block=false)]
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  我有很不好的预感。
+
+
+
+[stopmusic(faetime=2)]
+
+[character]
+
+[Dialog]
+
+
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true, fadetime=1)]
+
+[Background]
+
+[Blocker(a=1, initr=2, r=1, g=1, b=1, block=true, fadetime=0.3)]
+
+[Blocker(a=0, fadetime=0.3, block=false)]
+
+
+
+[Character(name="char_011_talula_1")]
+
+[name="塔露拉"]  ......
+
+[name="塔露拉"]  ............
+
+[Delay(time=1)]
+
+[Dialog]
+
+[PlaySound(key="$flashback", volume=1.3)]
+
+[Blocker(a=1, initr=2, r=255, g=255, b=255, fadetime=0.5, block=true)]
+
+
+
+[Character(name="char_148_nearl_1#3")]
+
+[name="临光"]  那大概......是能烧尽整片大地的火焰吧。
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

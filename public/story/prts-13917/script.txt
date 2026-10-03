@@ -1,0 +1,111 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   不得不说。
+[name="陈"]   W造成的麻烦要比碎骨强上很多。
+[name="陈"]   她知道如何利用地形向我们施加压力，进攻方向的安排也经过缜密推敲。
+[name="陈"]   与碎骨蛮横的作战风格有很大不同。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   看上去她非常狡猾……
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   另外，阿米娅。从这里开始，我们逐渐接近切尔诺伯格了。
+[name="陈"]   越是远离龙门，你们就会变得越孤立。
+
+[Dialog]
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   ……
+[Delay(time=1)]
+[name="阿米娅"]   陈长官，{@nickname}博士。请看前面。
+[name="阿米娅"]   那边挂着什么东西……是一条围巾？
+[name="阿米娅"]   ……
+[name="阿米娅"]   那条围巾是米莎的。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   为什么会在这里？
+[name="陈"]   我去拿一下。
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   等等，陈长官，那极有可能是个陷阱。
+[name="阿米娅"]   我记得你说过，W习惯使用炸药。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   她是想告诉我们“你们关心的人现在任由我摆布”？
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   陈长官，注意四周的动静。
+[name="阿米娅"]   有人在活动。
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=-1)]
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_010_chen_1#2")]
+
+[name="陈"]   我也注意到了。
+[name="陈"]   阿米娅，吩咐罗德岛干员保持警惕。
+[name="陈"]   我要去那边废墟看一下。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   请务必小心。
+
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+
+[Character(name="char_010_chen_1#2")]
+
+[name="陈"]   ……
+[name="陈"]   有人。
+[name="陈"]   ……想尝试跟踪我？
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+
+[Character(name="char_1504_cqbw")]
+
+[name="？？？"]   ……
+[name="？？？"]   可以啊……被发现了？
+
+
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

@@ -1,0 +1,73 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+[name="米莎"]   接下来一定要把我交给近卫局吗……
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   如果可以的话，我也希望你能来罗德岛看看……
+[name="阿米娅"]   只是从找到密钥的情报开始，我们就没有太多主动权了。
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   我这样……会不会非常可耻。
+
+[Character(name="char_002_amiya_1#6", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   可耻在哪儿？
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   我可能会背叛感染者同胞。
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   ……我们没有在做任何非正义的事情。这一切都是整合运动尝试塑造的对立心理。
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+[name="米莎"]   从一开始我就觉得很奇怪了……
+[name="米莎"]   你们也是矿石病感染者吧，阿米娅？
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   大部分都是。
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   你们应该很了解感染者的境遇……
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   所以我们在努力改变这种情况。
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   不反抗……要怎么改变？
+[name="米莎"]   你打算……怎么做？
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   当然，如果矿石病的研究有了突破性进展，可以被治疗的话……会产生天翻地覆的改变。
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=2)]
+[name="米莎"]   ……
+[name="米莎"]   不可能的，矿石病根本没有任何治疗方法。父亲告诉我对源石的研究多年来都停留在工业使用的阶段。
+[name="米莎"]   大家甚至不知道这种病本身是什么。
+[name="米莎"]   最关键的是……你觉得源石给感染者中那些带来“便利”的人……会坐视不管吗？
+
+[name="阿米娅"]   不，这才应该是我们应该选择的道路。
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

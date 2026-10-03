@@ -1,0 +1,195 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第十二关（前）
+
+
+
+// Comments
+
+
+
+[Background(image="bg_cher_3", width=1, height=1, fadetime=1, screenadapt="coverall")]
+
+[stopmusic(fadetime=1)]
+
+[PlayMusic(intro="$darkness01_intro", key="$darkness01_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+
+
+[Delay(time=1)]
+
+
+
+
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  大家快看......
+
+[name="阿米娅"]  那个好像就是......出口。马上，我们就能离开切尔诺伯格城了！
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  通讯设备已经恢复，我联系上了接应小队，他们正准备与我们汇合——！
+
+[Character(name="char_002_amiya_1#1",name2="char_130_doberm_ex",focus=1)]
+
+[name="阿米娅"]  那......其他城内的小组呢？
+
+[Character(name="char_002_amiya_1#1",name2="char_130_doberm_ex",focus=2)]
+
+[name="杜宾"]  还是联系不上他们......
+
+[Character(name="char_148_nearl_1")]
+
+[name="临光"]  我觉得，即使走到了这里......
+
+[name="临光"]  整合运动也未必会轻易放我们出城。
+
+[Character(name="char_1504_cqbw#2")]
+
+[name="？？？"]  你猜的很准呢。确实是这样没错。
+
+[Character(name="char_002_amiya_1#5")]
+
+[name="阿米娅"]  ——是谁？
+
+[Character(name="char_1504_cqbw#2")]
+
+[Character(name="char_1504_cqbw",fadetime=1)]
+
+[name="？？？"]  你不认识我很正常——
+
+[name="？？？"]  不过，你们有点眼熟，尤其是你身边的那个人。
+
+
+
+[Character(name="char_002_amiya_1#7", name2="char_1504_cqbw", focus=1)]
+
+[name="阿米娅"]  ——整合运动......
+
+[Character(name="char_002_amiya_1#7", name2="char_130_doberm_ex", focus=1)]
+
+[name="杜宾"]  我们只是局外人，也都是感染者，现在也没有心思阻止你们造反。
+
+[name="杜宾"]  你们的反抗运动已经胜利了，切城也已经沦陷了，现在也更没有必要和你们战斗。
+
+[Character(name="char_002_amiya_1#7", name2="char_1504_cqbw", focus=2)]
+
+[name="？？？"]  局外人？唉唉，别这样。
+
+[name="？？？"]  我和那个塔露拉龙女可合不来。毕竟我并不是专职守门的人啊。做完了自己的工作赶过来也是很累的！
+
+[name="？？？"]  为了搞好关系，我们互换姓名吧？
+
+[name="？？？"]  你可以叫我——W。
+
+[name="W"]  为了见你身边那个人，我在这里可是等了好久呢。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  ——博士？
+
+[Character(name="char_002_amiya_1#7", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]  Dr.{@Nickname}......
+
+[name="W"]  我有些问题想要问问{@Nickname}，能不能请各位把他......直接送给我呢？
+
+[stopmusic(fadetime=1)]
+
+[Character(name="char_148_nearl_1#8")]
+
+[name="临光"]  你在浪费你自己的时间。
+
+
+
+[Character(name="char_148_nearl_1#8", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]  ——别急嘛。我也有些你们会感兴趣的情报哦。
+
+[name="W"]  其实，我们刚刚遇到了不少身手很利落的家伙......和你们的穿着打扮差不多。
+
+[name="W"]  虽然做过伪装，但也就是骗骗乌萨斯人的程度，这点小把戏，可是难不倒我的~
+
+[Character(name="char_002_amiya_1#2", name2="char_1504_cqbw", focus=1)]
+
+[name="阿米娅"]  E4侦察小队的各位吗......？
+
+[name="阿米娅"]  太好了......他们平安无——
+
+[Character(name="char_002_amiya_1#2", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]  小兔子，你就是他们的组织者吧？
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  ？！
+
+[Character(name="char_002_amiya_1#1", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]  我很想知道，你究竟有什么魔力......能让他们都心甘情愿，毫无价值地为你送命？
+
+[Character(name="char_002_amiya_1#7", name2="char_1504_cqbw", focus=2)]
+
+[name="阿米娅"]  你想说什么？
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]  没错，他们——没有一个人能跟着你回去哦。
+
+[name="W"]  你真的......配得上别人的牺牲吗？
+
+
+
+[PlayMusic(intro="$m_bat_game02_intro", key="$m_bat_game02_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  ————
+
+
+
+[Decision(options="阿米娅......", values="1")]
+
+[Predicate(references="1")]
+
+
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]  ————你。生气了吗？
+
+[name="W"]  好啊，好啊......来吧。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  ......你不该说这种话。
+
+[name="阿米娅"]  我......
+
+[name="阿米娅"]  ......
+
+[name="阿米娅"]  出口就在前方。
+
+[name="阿米娅"]  博士。
+
+
+
+[Decision(options="准备战斗！", values="1")]
+
+[Predicate(references="1")]
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]  ......哈哈。
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

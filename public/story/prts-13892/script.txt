@@ -1,0 +1,147 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   如果我当初没有带着“密钥”逃走，就不会被卷入这么多事情了……
+
+[Character(name="char_002_amiya_1#6", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   你为什么会带着密钥离开切尔诺伯格呢？
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   仅仅是因为……害怕……
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   我不知道“密钥”究竟是什么……有人让我带着“密钥”一起逃走，我照办了……
+[name="米莎"]   只是他没有逃出那场天灾……
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]   我很遗憾。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   我不知道该怎么办。
+[name="米莎"]   一路上很多人都消失了……有普通人……有感染者……
+[name="米莎"]   我怕这东西会造成更多的牺牲……所以我本不想交给任何人……
+[name="米莎"]   我谁都拯救不了……最后我连保护自己都非常艰难……
+[name="米莎"]   于是我把密钥藏了起来……它让我陷入了太多麻烦……
+[name="米莎"]   还有碎骨……就是你们遇到的那个在不断追踪我的整合运动的人。
+[name="米莎"]   他一直在怂恿我加入整合运动。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   米莎，你已经很勇敢了。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   不……我很没用。
+[name="米莎"]   我没有你想象的那么高尚。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   你做了你能做到的一切。
+[name="阿米娅"]   这些努力绝不是白费力气。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+[Delay(time=1)]
+[name="米莎"]   其实……我们的病真的会让人变得疯狂。
+
+[Character(name="char_002_amiya_1#6", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   怎么忽然这样说？
+
+[Character(name="char_002_amiya_1#6", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   你觉得……会有矿石病的治疗方法？
+[name="米莎"]   每个人都告诉我，矿石病感染者没有希望……
+[name="米莎"]   但是我有一个弟弟……他也是感染者。
+[name="米莎"]   所以……我还是希望能有治疗方法……虽然一直没能找到。
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   阿米娅，罗德岛又是为什么而存在的呢？
+
+[Character(name="char_002_amiya_1")]
+[Dialog]
+[Delay(time=1)]
+
+[name="阿米娅"]   存在理由的话……
+[name="阿米娅"]   我向一个人承诺过，一定要找到拯救我们……拯救所有矿石病感染者的办法。
+[name="阿米娅"]   我和你一样，你能看到我手腕上的感染痕迹。
+[name="阿米娅"]   每当感染发作时，我的手腕，肩膀，身体就像马上就要裂开……
+[name="阿米娅"]   无法做事，无法思考，没有药物能缓解这种痛苦。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   我能理解……
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]   后来我遇到了一些同伴，有的人现在还留在罗德岛。
+[name="阿米娅"]   我们相互扶持，彼此鼓励，不断寻找能彻底治愈我们的办法。
+[name="阿米娅"]   因为每个人都想活下去。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   活下去……
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]   我想这就是我们与整合运动最大的不同。
+[name="阿米娅"]   整合运动接受了矿石病剥夺自身生命的现实，并把一切都归咎于普通人。
+[name="阿米娅"]   而我们从未放弃过继续存活。
+[name="阿米娅"]   我们没有任何奢侈的愿望……
+[name="阿米娅"]   仅仅想夺回本该属于我们的，被剥夺的生命时间。
+[name="阿米娅"]   这是我……创建罗德岛的初衷吧。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……我明白了。
+[name="米莎"]   ……拯救……真的能做到吗？
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   会有办法的，我一直这样坚信。
+
+[Character(name="char_012_misa_1")]
+
+
+[name="米莎"]   我不知道该不该相信你的话。
+[name="米莎"]   这些事情……一定没有这么简单。
+[name="米莎"]   那些通过源石获得了法术天赋的感染者，一定会成为你们的阻力。
+
+[Dialog]
+
+[name="米莎"]   但我现在能感到……安心。
+[name="米莎"]   因为至少我知道了……不是所有人都那么的冷漠……
+[name="米莎"]   还有人在尝试着……拯救我们……
+[name="米莎"]   阿米娅……谢谢你……
+[name="米莎"]   我期盼着……你能做到……
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]   米莎，等这些事情都结束后，欢迎来罗德岛看一看。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   我会的……
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

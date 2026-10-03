@@ -1,0 +1,95 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第四关（前）
+
+
+
+// Comments
+
+
+
+[Background(screenadapt="coverall", image="bg_cher_5", width=1, height=1, fadetime=1)]
+
+[PlayMusic(intro="$mist_loop", key="$mist_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+
+
+[Delay(time=1)]
+
+
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]  杜宾！
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+
+
+[name="杜宾"]  怎么了，阿米娅？
+
+
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  快看，前面的高楼附近。
+
+[name="阿米娅"]  有东西在飞行？
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  ......
+
+[name="杜宾"]  无人机？
+
+
+
+[Character(name="char_014_riope", name2="char_130_doberm_ex", focus=1)]
+
+[name="Ace"]  刚才的行动中我们曾遇到过类似的无人机。
+
+[Character(name="char_014_riope", name2="char_130_doberm_ex", focus=1)]
+
+[name="Ace"]  有些比这样的型号要复杂，甚至配置了精密的武器。不过因为损毁太严重，并没有保留完整残骸。
+
+[name="Ace"]  附近还遇到了整合运动的队伍，而那些也基本可以确定是敌方的术师无人机。
+
+[name="Ace"]  甚至有些看得出是从切城的军备库里缴获后改造的。
+
+[Character(name="char_014_riope", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  ......
+
+[name="杜宾"]  简单的暴乱可是用不了这么大数量的无人机。他们是有备而来的。
+
+
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  警戒！
+
+[name="杜宾"]  前方有新的整合运动小队。
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  我们的踪迹被发现了？
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  可能还没有。不过如果他们往这边来的话，我们只能快速解决他们继续前进。
+
+[name="杜宾"]  小心他们的侦查无人机。
+
+[name="杜宾"]  得早点结束他们愚蠢的闹剧才行。
+
+[name="杜宾"]  寻找位置，准备作战！
+
+
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

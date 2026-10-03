@@ -1,0 +1,267 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第七关（后）
+
+
+
+// Comments
+
+
+
+[Background(image="bg_cher_1", width=1, height=1, fadetime=1)]
+
+[Delay(time=1)]
+
+[PlayMusic(intro="$mist_loop", key="$mist_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+
+
+
+
+
+
+[Character(name="char_013_riop")]
+
+[CameraShake(duration=1, xstrength=6, ystrength=10, vibrato=50, randomness=20, fadeout=true)]
+
+[name="近卫干员"]  唔......！
+
+[Character(name="char_013_riop",name2="char_016_medic",focus=2)]
+
+[name="医疗干员"]  诶！你的腿怎么了？
+
+[name="医疗干员"]  先别动，让我来处理一下......
+
+[Character(name="char_013_riop",name2="char_016_medic",focus=1)]
+
+[name="近卫干员"]  刚急着赶路，一直没注意到。抱歉，麻烦你了......
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  想起来......都怪那个感染者诊所，叫什么......阿撒兹勒。
+
+[name="近卫干员"]  明明掌握着整个切尔诺伯格的地下情报网，却不肯和我们合作！和整合运动的关系还模棱两可......
+
+[name="近卫干员"]  至少，如果他们当时肯向我们分享情报，或者仅仅是给个提示......
+
+[name="近卫干员"]  我们也许就早点能离开这里......
+
+[Character(name="char_002_amiya_1", name2="char_013_riop", focus=1)]
+
+[name="阿米娅"]  也不全是这样......
+
+[Character(name="char_002_amiya_1", name2="char_013_riop", focus=2)]
+
+[name="近卫干员"]  阿米娅，当时和他们交涉时你也在场吧？
+
+[name="近卫干员"]  他们那傲慢冷漠的态度，我真是......
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  不能怪罪他们。
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  头儿......
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[Character(fadetime=0)]
+
+[Background(fadetime=0)]
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+[Image(image="bg_0_ori",x=-100, y=0, xScale=1.2, yScale=1.2, fadetime=1)]
+
+[ImageTween(xFrom=-100, yFrom=0, xTo=0, yTo=0, xScaleFrom=1.2, yScaleFrom=1.2, xScaleTo=1.2, yScaleTo=1.2, duration=10, block=false)]
+
+[name="Ace"]  感染者本就很难相信别人。
+
+[name="Ace"]  经历过那么多苦难，当然会变得保守与顽固。
+
+[name="阿米娅"]  至少他们那样做......我能理解，也愿意原谅他们。不提防他人，就会被他人伤害。
+
+[name="阿米娅"]  何况，就连感染者之间，也是没法轻易互相信任的。而且并不是每个人都愿意像我们一样冒险......
+
+
+
+[Blocker(a=1, r=0, g=0, b=0, block=true)]
+
+[Image]
+
+[Blocker(a=0, r=0, g=0, b=0, block=true)]
+
+[Background(image="bg_cher_1", width=1, height=1, fadetime=1)]
+
+
+
+[Decision(options="感染者诊所？;......", values="1;2")]
+
+[Predicate(references="1;2")]
+
+
+
+[Character(name="char_002_amiya_1#1")]
+
+
+
+[name="阿米娅"]  我们感染者，一旦被抓住，大多数的城邦都会把我们关起来隔离，或者统一“处理”掉。
+
+[name="阿米娅"]  最幸运的情况，也要被逐出城市。
+
+[name="阿米娅"]  因为被源石感染时的症状，简单来说就是被源石侵占了身体，并且不断蔓延，而在死后也会扩散传播。
+
+[name="阿米娅"]  因此，大家把这种病叫做“矿石病”。
+
+
+
+
+
+[name="阿米娅"]  这种疾病会使感染者孕育出不同于普通人的奇异力量，使他们不使用被严格管理的法杖就能使用法术。
+
+[name="阿米娅"]  而且，也不知道为什么，感染后多数人也变得和以前不太一样。
+
+
+
+[name="阿米娅"]  最终，因为这些所有原因同时，也会把他们......
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]  ......
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  逼入绝路。
+
+[name="杜宾"]  ——真到了亲口说出自己的结局的时候，还挺讽刺的。
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  杜宾教官......
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  没事的，阿米娅，继续说吧。
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  ......嗯。
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  矿石病是无药可医的。至少此时此刻，感染者只能在绝望中......痛苦地失去生命。
+
+[name="阿米娅"]  而后他们的遗体......
+
+[name="阿米娅"]  ......也会成为新的传染源。
+
+[name="阿米娅"]  不同于常人的特殊力量——
+
+[name="阿米娅"]  以及染上之后就必然会死去的可怕传染病——
+
+[name="阿米娅"]  这两点使得感染者......被这片大地上的多数人所恐惧。
+
+[name="阿米娅"]  ——
+
+[name="阿米娅"]  光是这么两三句话，博士大概也没法切身体会吧。
+
+[name="阿米娅"]  但当你面对这些问题导致的后果时......你会明白的。
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]  你会明白，感染者的处境，究竟有多现实。
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  像罗德岛这样不分彼此，或是整合运动那样狂热的排外拥内的感染者组织，都很少见。
+
+[name="杜宾"]  我能理解你的怒气，但我也能理解那个小诊所的苦衷。
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  ......我明白了。
+
+[Character(name="char_013_riop")]
+
+
+
+[name="近卫干员"]  可能，他们是真的碰上了什么问题吧......
+
+[Character(name="char_014_riope",name2="char_013_riop",focus=1)]
+
+[name="Ace"]  在要求别人做什么事情之前，应该先证明自己能够做到。
+
+[Character(name="char_014_riope",name2="char_013_riop",focus=2)]
+
+[name="近卫干员"]  头儿......
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]  咻，处理完毕了！
+
+[name="医疗干员"]  感觉怎么样？
+
+[Character(name="char_013_riop",name2="char_016_medic",focus=1)]
+
+[name="近卫干员"]  啊，已经没什么问题了，谢谢你。
+
+[Character(name="char_013_riop",name2="char_016_medic",focus=2)]
+
+[name="医疗干员"]  没什么没什么，这是我该做的。
+
+[name="医疗干员"]  嗯？那边的伤员——喂，等等！别想跑！先让我给你包扎！
+
+[Delay(time=1,block=true)]
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  她......真的让人很安心。
+
+[name="近卫干员"]  明明年纪不大，胆子也挺小......甚至只是个普通人而不是感染者。
+
+[Character(name="char_002_amiya_1#1",name2="char_013_riop",focus=1)]
+
+[name="阿米娅"]  但是，她十分信任大家，也一直在为了大家坚持着。虽然时常表现出害怕的神情......
+
+[name="阿米娅"]  但在面对呻吟的伤员和残酷的创口时，她连眼睛都不会眨一下。
+
+[name="阿米娅"]  每次看到她努力的样子，就觉得......
+
+[Character(name="char_002_amiya_1#1",name2="char_013_riop",focus=2)]
+
+[name="近卫干员"]  嗯......
+
+[name="近卫干员"]  有种“自己还没到驻足休憩的时候”般的感觉。
+
+[Character(name="char_002_amiya_1#1",name2="char_013_riop",focus=1)]
+
+[name="阿米娅"]  是的。我们不仅仅是在为了自己战斗。
+
+[name="阿米娅"]  罗德岛的大家都是好人。也许很多人因畏惧与敌意，相互间产生了种种隔阂......
+
+[name="阿米娅"]  但只要在罗德岛，大家一定能解开误会。
+
+[Character(name="char_002_amiya_1#1",name2="char_013_riop",focus=2)]
+
+[name="近卫干员"]  ......你说得对，阿米娅。
+
+[name="近卫干员"]  嘿......
+
+
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  走吧博士。
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

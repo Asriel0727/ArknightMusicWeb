@@ -1,0 +1,11 @@
+//!torch
+[HEADER(is_tutorial=true, deny_auto_switch_scene=true)] 引导2到主界面
+
+[Character(name="char_002_amiya_1")]
+[Blocker(afrom=1, a=0, fadetime=1, block=true)]
+
+[name="阿米娅"]   能听到我的声音吗？
+
+[Blocker(afrom=0, a=1, fadetime=1, block=true)]
+[Goto(dest="home")]}}
+{{内测剧情导航}}

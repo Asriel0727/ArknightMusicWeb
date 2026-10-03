@@ -1,0 +1,62 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="Battle/bgm_epic_intro", key="Battle/bgm_epic_loop", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   围住这里。
+[name="碎骨"]   不要让他们有任何求生的机会……
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+
+[Delay(time=1)]
+
+[Character(name="char_107_liskam_1")]
+
+[name="雷蛇"]   阿米娅，第二轮进攻。
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   他们很快清理了我们布置的路障和铁丝网。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   罗德岛还能坚持多久？
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   损耗处于可承受范围内。
+
+[name="阿米娅"]   医疗小组在以最快的速度治疗伤员。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   伤员还能继续投入战场？
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   没问题……我们感染者的恢复总是会比普通人更有效率一些……
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   看来碎骨一心想要置我们于死地。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   不会让他称心如意的。
+[name="阿米娅"]   医疗小组，保护好治疗中的伤员。
+[name="阿米娅"]   其他所有干员，做好战斗准备。
+[name="阿米娅"]   博士，作战部署就交给您了！
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

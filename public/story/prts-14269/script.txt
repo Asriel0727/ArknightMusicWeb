@@ -1,0 +1,363 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第四关（后）
+
+
+
+// Comments
+
+
+
+[Background(image="bg_cher_5", width=1, height=1, fadetime=1)]
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Delay(time=1)]
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   呼......呼......刚才大家都没有受伤吧？
+
+[Character(name="char_002_amiya_1", name2="char_013_riop", focus=2)]
+
+[name="近卫干员"]   还好，战斗比想象中的要轻松。
+
+[name="近卫干员"]   甚至不用头儿出手，我就能解决。
+
+[Character(name="char_016_medic", name2="char_013_riop", focus=1)]
+
+[name="医疗干员"]   别逞强啦！你的武器不适合攻击无人机，明明都是Ace他们的狙击手搞定的。
+
+[Character(name="char_016_medic", name2="char_013_riop", focus=2)]
+
+[name="近卫干员"]   哎别认真，我只是开个玩笑！我感觉有点紧张，想缓和一下气氛。
+
+[name="近卫干员"]   毕竟这几天一直在移动和战斗，大家都板着脸......
+
+[Delay(time=0.6)]
+
+[Character(name="char_002_amiya_1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  不要大意，随时都还可能有敌袭。
+
+
+
+//////////////插入cg///////////////////
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="avg_map_2",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+
+
+[name="杜宾"]  依照既定路线，我们已经很接近切城南边的中城区了。
+
+[name="杜宾"]  汇合点就在前面的广场，不出意外的话临光和E2小队应该在那里等我们了。
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]   要是通讯设备还能使用的话，我们就能提前联络上临光了。
+
+
+
+
+
+//对话内容此处填入
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Image(fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+///////////////////////////
+
+
+
+[name="近卫干员"]   不过......万一临光和E2小队已经从南门正常离开了怎么办......
+
+
+
+
+
+[Character(name="char_014_riope",name2="char_013_riop",focus=1)]
+
+[name="Ace"]   没用的家伙，说什么丧气话！
+
+[name="Ace"]   不要被周围蒙蔽了判断力，信任你的同伴！
+
+[name="Ace"]   临光考虑到我们的处境，一定会回头支援我们的。
+
+[Character(name="char_014_riope",name2="char_013_riop",focus=2)]
+
+[name="近卫干员"]   ......对，对不起。
+
+[Character(name="char_014_riope",name2="char_013_riop",focus=1)]
+
+[name="Ace"]   平安回去之后，要是临光因为你这些发言揍你，我可不会帮你求情。
+
+[Character(name="char_002_amiya_1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]   失去联络手段所带来的恐慌，会比想象中蔓延的快得多......
+
+[name="杜宾"]   特别是......在这个天灾仿佛近在眼前的时候。
+
+[name="杜宾"]   我们得赶紧加快速度了。
+
+[Character(name="char_002_amiya_1#6")]
+
+[Delay(time=0.3)]
+
+[name="阿米娅"]   ......
+
+[Character]
+
+[dialog]
+
+
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+[stopmusic(fadetime=1)]
+
+
+
+
+
+[Character(name="char_002_amiya_1#6")]
+
+[name="阿米娅"]   诶......？
+
+[Character(name="char_1502_crowns#1",fadetime=1)]
+
+[name="？？？"]  你们很快就用不着担心天灾了。
+
+[Delay(time=1)]
+
+[Character(name="char_1502_crowns#1")]
+
+[name="？？？"]  干掉他们。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]   小心！！
+
+[dialog]
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+[PlayMusic(intro="$escapebattle_intro", key="$escapebattle_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  这是陷阱......！
+
+[Character(fadetime=0)]
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Character(name="char_1002_nsabr_2",name2="char_empty",focus=1,fadetime=1)]
+
+[name="整合运动成员"]  ——快！他们就躲在那边！
+
+[Character(name="char_1002_nsabr_2",name2="char_1002_nsabr_2",focus=2,fadetime=1)]
+
+[name="整合运动成员"]  ————！！
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  不好，后面也......！
+
+[Character(fadetime=0)]
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Character(name="char_empty",name2="char_1002_nsabr_2",focus=2,fadetime=1)]
+
+[name="整合运动成员"]  ——攻击！
+
+[Character(name="char_1002_nsabr_2",name2="char_1002_nsabr_2",focus=1,fadetime=1)]
+
+[name="整合运动成员"]  ——！
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  这个夸张的数量......可恶刚才怎么完全没有发现他们！
+
+[name="近卫干员"]  切尔诺伯格里，究竟藏匿了多少整合运动啊？！
+
+[Character(name="char_1502_crowns#1")]
+
+[name="？？？"]  ——一个都别放跑他们。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  杜宾！
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  狙击干员！压制敌人的冲锋！
+
+[name="杜宾"]  重装干员，防御姿态，随时准备向前顶上！
+
+[name="杜宾"]  Ace，准备————
+
+[Character(fadetime=0)]
+
+[PlaySound(key="$d_gen_walk_n")]
+
+[Character(name="char_1507_Mephisto_1#6",fadetime=2)]
+
+[stopmusic(fadetime=2)]
+
+[name="？？？"]  等一下，等一下——
+
+[Delay=0.5]
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  ？！
+
+[delay(time=0.4)]
+
+[Character(name="char_1507_Mephisto_1#6",name2="char_1502_crowns#1",focus=1)]
+
+[name="？？？"]  在清剿了东边的杂碎之后，我一听到你的消息，可是立刻就赶过来了。
+
+[name="？？？"]  这里已经是我的处理范围咯。
+
+[Character(name="char_1507_Mephisto_1#6",name2="char_1502_crowns#1",focus=2)]
+
+[name="？？？"]  ......
+
+[name="？？？"]  你来做什么。
+
+[Character(name="char_1507_Mephisto_1#6",name2="char_1502_crowns#1",focus=1)]
+
+[name="？？？"]  该交给我了吧，弑君者？
+
+[Character(name="char_1507_Mephisto_1#6",name2="char_1502_crowns#1",focus=2)]
+
+[name="弑君者"]  少做点些多余的事。
+
+[Character(name="char_1507_Mephisto_1#6",name2="char_1502_crowns#1",focus=1)]
+
+[name="？？？"]  你有什么拒绝的理由？一些不小心飞进来的小虫子......值得亲自追击这么远吗？
+
+[name="？？？"]  毕竟这也不是你负责的区域——到了这里，已经是我的狩猎场了哦？
+
+[name="？？？"]  你还有其他的事情要做，对吧？
+
+[Character(name="char_1507_Mephisto_1#6",name2="char_1502_crowns#1",focus=2)]
+
+[name="弑君者"]  哼，狩猎场......
+
+[name="弑君者"]  随便你。
+
+[name="弑君者"]  我已经等不及观赏你的惨败了。
+
+[Character(name="char_1507_Mephisto_1#6",name2="char_1502_crowns#1",focus=1)]
+
+[name="？？？"]  嘿。
+
+[Character(name="char_1502_crowns#1")]
+
+[name="弑君者"]  撤。
+
+[PlaySound(key="$d_gen_walk_n")]
+
+[Character(fadetime=0.6)]
+
+[Character(name="char_1002_nsabr_2")]
+
+[name="整合运动成员"]  ——
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Character(fadetime=0.6)]
+
+[delay(time=1)]
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Character(name="char_002_amiya_1#6")]
+
+
+
+[name="阿米娅"]  ......为什么......那个人带着一部分人撤离了？
+
+
+
+[Character(name="char_1002_nsabr_2",name2="char_1002_nsabr_2")]
+
+[name="整合运动成员"]  ......
+
+
+
+
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  别放松警惕。
+
+[name="Ace"]  即使是这样，我们和他们的人数差距还是没有变小，现在还是被包围了。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  看来我们完全被看扁了。那个人完全是想捉弄我们......
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  整合运动究竟想做什么......
+
+[PlaySound(key="$d_gen_walk_n")]
+
+[Character(name="char_1507_Mephisto_1#6")]
+
+[name="？？？"] 唉唉，弑君者的口气一直不是很礼貌，请允许我代她道歉。
+
+[Character]
+
+[delay=1]
+
+[Character(name="char_1507_Mephisto_1#1",fadetime=1)]
+
+[Delay(time=1)]
+
+[name="？？？"] 既然你们来到了这里，不亲自好好打个招呼怎么行。
+
+[name="？？？"] 我叫梅菲斯特，是整合运动的领袖之一——
+
+
+
+[Delay(time=0.3)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

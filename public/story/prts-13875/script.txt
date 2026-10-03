@@ -1,0 +1,65 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   啧，我刚刚看上去可能不太像一个搜救人员。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   你的表演能力比我想象的还差……
+[name="德克萨斯"]   如果没遇到这些整合运动，我们应该追上她了。
+
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   敌人不是很多，而且组织松散，德克萨斯，该上了。
+
+[Character(name="char_102_texas_1")]
+
+[name="德克萨斯"]   等等。
+[name="德克萨斯"]   …………
+
+[Delay(time=1)]
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   ……怎么了？你的零食掉了吗？
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   不是。这里有个钱包。
+[name="德克萨斯"]   可能是刚才那个女孩子掉落的，先收好。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=-1)]
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   从敌人前进的方向看，他们应该也在找刚才的孩子。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   我们把她救出来吧。
+[name="能天使"]   这种数量我们自己就能搞定。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   根据契约，我们目前所有行为都是由罗德岛负责的。
+[name="德克萨斯"]   看这个状况，让阿米娅过来一趟吧。
+[name="德克萨斯"]   出什么意外就不好了。
+[name="德克萨斯"]   顺便告诉她，分出点人力搜索刚才的乌萨斯族女孩。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

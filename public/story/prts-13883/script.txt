@@ -1,0 +1,92 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_void_intro", key="UI/bgm_void_loop", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   谢谢你愿意告诉我们密钥箱子的地点。虽然可能和实际状况有些不同……
+[name="阿米娅"]   接下来我们可能会返回近卫局辖区。
+[name="阿米娅"]   如果一切都对的话，整合运动应该不会停止动作。
+[name="阿米娅"]   现在的局势非常紧张，龙门各处都需要人手。因此我们被委托帮龙门一些忙。
+[name="阿米娅"]   我们通过情报得知你可能知道某项机要物品的下落，我们称之为“密钥”的东西。因此找到了你。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……我不会相信的。
+[name="米莎"]   我不会相信任何……当权者的承诺……
+[name="米莎"]   这是矿石病人在切尔诺伯格的牺牲换来的教训。
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   这是两回事，米莎。
+[name="阿米娅"]   龙门没有必要欺骗你，只要你提供密钥的线索。你一定知道什么对吗？
+[name="阿米娅"]   现在所有人都很害怕。
+[name="阿米娅"]   如果“密钥”会涉及到一些重要的安全问题，他们没有理由不去关心。
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   龙门……害怕？
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   害怕切尔诺伯格事件在龙门重演。
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……我只是……不太懂。
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=-1)]
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   你认同整合运动摧毁切尔诺伯格的行为吗？
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+[name="米莎"]   我并不认同……但……
+[name="米莎"]   但我也理解整合运动的做法。
+[name="米莎"]   整合运动只是在帮我们……切尔诺伯格的矿石病感染者反抗。
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   可他们凭什么要帮你们？
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   接下来我要说的可能会让你感到难过，很抱歉。
+[name="阿米娅"]   切尔诺伯格人口接近百万，逃到龙门的难民却只有五万多人。
+[name="阿米娅"]   这就是龙门会感到恐惧的原因。
+[name="阿米娅"]   那些切尔诺伯格人都去哪里了，米莎？
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   他们都……
+
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   无数人还未意识到发生了什么。
+[name="阿米娅"]   天灾就夺走了他们的生命。
+[Character(name="char_002_amiya_1#4", name2="char_012_misa_1", focus=-1)]
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   我无意为曾经欺压我们的人开脱。但所有的一切，都是切尔诺伯格为了代表我们感染者伸张所谓的正义。
+[name="阿米娅"]   这是……一种病态。
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

@@ -1,0 +1,239 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第五关（后）
+
+
+
+// Comments
+
+
+
+[Background(image="bg_cher_5", width=1, height=1, fadetime=1)]
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Delay(time=1)]
+
+
+
+[Character(name="char_1002_nsabr_2")]
+
+[PlaySound(key="Sound_Beta_2/Enemy/e_skill/e_skill_skulsrsword", volume=0.6)]
+
+[CameraShake(duration=1, xstrength=6, ystrength=10, vibrato=50, randomness=90, fadeout=true)]
+
+[Blocker(a=1, r=1, g=1, b=1,fadetime=0.2, block=true)]
+
+[Blocker(a=0, r=0, g=0, b=0,fadetime=0.2, block=true)]
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Character(fadetime=0)]
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]   咿——！
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=1)]
+
+[name="近卫干员"]   小心！！
+
+[Character(name="char_013_riop", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]  我没事，只是擦伤而已，不要紧......
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  还不够......再这样下去，包围圈会越来越小。
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  南边那个十字路口就是往汇合点的街道，我们必须要往那个方向突破。
+
+[name="杜宾"]  但是现在根本抽不出身......
+
+[Character(name="char_014_riope", name2="char_130_doberm_ex", focus=1)]
+
+[name="Ace"]  我来搞定正面。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  ......再坚持一下！我来帮你！
+
+[Character(name="char_014_riope", name2="char_002_amiya_1#7", focus=1)]
+
+[name="Ace"]  没关系，我能解决，阿米娅你尽量保留体力。
+
+[character]
+
+[Dialog]
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+[Blocker(a=0.7, r=0.95, g=0.95, b=0.95, fadetime=0.02, block=true)]
+
+[PlaySound(key="$d_sp_ballista")]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=0.6, xstrength=5, ystrength=8, vibrato=30, randomness=90, block=true)]
+
+[Delay(time=0.5)]
+
+[Character(name="char_1507_Mephisto_1#1")]
+
+[name="梅菲斯特"]  没错！再让我多看一会儿你们挣扎的样子。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  咕——
+
+[Character(name="char_1507_Mephisto_1#1")]
+
+[name="梅菲斯特"]  然后就去死吧，就像雨夜中的火星一样！
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]  整合运动还没法彻底压制住我们......
+
+[name="阿米娅"]  可是......后面源源不断......
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  不要让整合运动打开哪怕一丁点缺口！
+
+[name="杜宾"]  可恶，时间不多了。
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]  不能再让整合运动拖延我们的脚步了！
+
+[name="阿米娅"]  有什么，有什么办法能迅速打开局面吗......！
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[name="阿米娅"]  如果再继续拖下去，就算没有被整合运动抓住，等到天灾降临，博士和大家就......！
+
+[Character(fadetime=0)]
+
+[stopmusic(fadetime=1)]
+
+[Dialog]
+
+
+
+[playsound(key="$p_imp_blunt_h")]
+
+[Blocker(a=1, r=0.95, g=0.95, b=0.95, fadetime=0.2, block=true)]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=1, xstrength=10, ystrength=12, vibrato=30, randomness=90, fadeout=true, block=true)]
+
+
+
+[name="整合运动成员"]  唔唔唔唔唔啊啊啊！！！
+
+[Character(name="char_1507_Mephisto_1#2")]
+
+[name="梅菲斯特"]  什么？废物们被......撞飞起来了？
+
+[name="梅菲斯特"]  这......什么啊......今天怎么这么多麻烦事？
+
+[Character(name="char_148_nearl_1#5")]
+
+[name="？？？"]   你们的速度比我估算的慢上太多了，我可是连平民都顺手安顿好了。
+
+[Character(name="char_002_amiya_1#6")]
+
+[name="阿米娅"]  ——？！！
+
+[Character(name="char_148_nearl_1#5")]
+
+[name="？？？"]   别挡道！
+
+[Character(fadetime=0)]
+
+[playsound(key="$p_imp_blunt_h")]
+
+[Blocker(a=1, r=0.95, g=0.95, b=0.95, fadetime=0.2, block=true)]
+
+[Blocker(a=0, r=0.95, g=0.95, b=0.95, fadetime=0.25, block=true)]
+
+[CameraShake(duration=1, xstrength=10, ystrength=12, vibrato=30, randomness=90, fadeout=true, block=true)]
+
+[PlayMusic(intro="$m_bat_game02_intro", key="$m_bat_game02_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Character(name="char_1002_nsabr_2",name2="char_1002_nsabr_2")]
+
+[name="整合运动成员"]  呜啊！
+
+[Character(name="char_148_nearl_1#5")]
+
+[name="？？？"]   快冲出去，别给敌人重整阵形的机会！
+
+[PlaySound(key="$d_sp_ballista", volume=0.5)]
+
+
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.8)]
+
+
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]  临光小姐！！
+
+[Character(name="char_148_nearl_1#5")]
+
+[Character(name="char_148_nearl_1#1",fadetime=1,block=true)]
+
+[Delay(time=0.3)]
+
+[name="临光"]  我在。
+
+[PlaySound(key="$d_sp_ballista", volume=0.3)]
+
+[name="临光"]  你没事就好，阿米娅。快撤。
+
+
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.8)]
+
+[Character(name="char_130_doberm_ex", name2="char_148_nearl_1", focus=1)]
+
+
+
+[name="杜宾"]   临光，真是雪中送炭。
+
+[Character(name="char_130_doberm_ex", name2="char_148_nearl_1", focus=2)]
+
+[name="临光"]  多亏你的信号弹。看来你们遇到的麻烦确实不小。
+
+[Character(name="char_148_nearl_1#1")]
+
+[name="临光"]  ——
+
+[name="临光"]  您就是{@nickname}博士吧？
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=0.5, block=true)]
+
+[Character(name="char_148_nearl_1#1")]
+
+[name="临光"]  耀骑士临光，前来迎接你们了。
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

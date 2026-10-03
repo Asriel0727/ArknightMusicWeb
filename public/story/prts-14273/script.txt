@@ -1,0 +1,199 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第六关（后）
+
+
+
+// Comments
+
+
+
+[Background(image="bg_cher_1", width=1, height=1, fadetime=1)]
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Delay(time=1)]
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  侦查完毕，确认敌追击部队已被击退。
+
+[name="近卫干员"]  已经成功离开那道包围了。
+
+[Character(name="char_014_riope", name2="char_013_riop", focus=1)]
+
+[name="Ace"]  不要松懈，那应该只是包围阵势中一小部分的兵力......
+
+[Character(name="char_014_riope", name2="char_148_nearl_1", focus=2)]
+
+[name="临光"]  谢谢你刚才的援助，我不会忘记这份恩情。
+
+[Character(name="char_014_riope", name2="char_148_nearl_1", focus=1)]
+
+[name="Ace"]  请别这么说。我可没资格让耀骑士还我人情。
+
+[name="Ace"]  任务上的事情，就别这么客气了。
+
+[name="Ace"]  刚才没受伤吧，临光。
+
+[Character(name="char_148_nearl_1#7")]
+
+[name="临光"]  我没事。
+
+[name="临光"]  火炮般的威力，行动敏捷的狙击手，精妙的射击技术————还有个难以吐槽的指挥官。
+
+[Character(name="char_148_nearl_1#1")]
+
+[name="临光"]  整合运动比我认知中更加危险。
+
+[Character(name="char_014_riope", name2="char_148_nearl_1#1", focus=1)]
+
+[name="Ace"]  不过那个孩子真的有在正常思考吗？那种情况下都不出手，看着手下一个个被打倒，让目标逃之夭夭。
+
+[name="Ace"]  我们当这个猎物也不容易啊。
+
+[Character(name="char_130_doberm_ex", name2="char_148_nearl_1#4", focus=1)]
+
+[name="杜宾"]  要么他是个废物，要么，还没到他展现实力的时候。
+
+[name="杜宾"]  文学创作里的反派会匪夷所思地作死、智商下线，这是一种源自某些人自我满足的扭曲心理。就像猫会玩弄老鼠。
+
+[name="杜宾"]  只不过现在世界已经变了，天灾都能一瞬间吞噬文明的产物，那老鼠也能轻易杀死猫。
+
+[Character(name="char_148_nearl_1#1")]
+
+[name="临光"]  确实。我那番话虽然不是为了激怒他而说......但他确实表现的十分激动。
+
+[name="临光"]  但至少因为他的愚蠢，我们脱离他的控制区域了，阿米娅。
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  临光......谢谢你。
+
+[name="阿米娅"]  没有你及时赶到的话，我们很可能就要深陷危机了。
+
+[Character(name="char_002_amiya_1#1", name2="char_148_nearl_1#1", focus=2)]
+
+[name="临光"]  阿米娅，自信一些。
+
+[name="临光"]  你足够信任我们，这就够了。
+
+[Character(name="char_002_amiya_1#1", name2="char_148_nearl_1#1", focus=1)]
+
+[name="阿米娅"]  临光小姐......
+
+[Character(name="char_002_amiya_1#1", name2="char_148_nearl_1#1", focus=2)]
+
+[name="临光"]  嘿嘿。
+
+[Character(name="char_148_nearl_1#1")]
+
+[name="临光"]  你身边这位，就是博士了吧。
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  是的。只是......
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  ——我们每遇到一个人就要和她说说博士失忆了的事，这也太麻烦了。
+
+[Character(name="char_148_nearl_1#1")]
+
+[name="临光"]  Dr.{@nickname}吗......
+
+[Character(name="char_148_nearl_1#1")]
+
+[name="临光"]  我的一个朋友同样也失去了记忆，你一定会和她很合得来的。
+
+[name="临光"]  毕竟对于你来说，没有什么比“现在”更重要了。
+
+[Character(name="char_130_doberm_ex", name2="char_148_nearl_1#1", focus=1)]
+
+[name="杜宾"]  不愧是临光，真会说话。
+
+[Character(name="char_130_doberm_ex", name2="char_148_nearl_1#1", focus=2)]
+
+[name="临光"]  你又在嘲笑我了，杜宾教官。
+
+[Character(name="char_130_doberm_ex", name2="char_148_nearl_1#1", focus=1)]
+
+[name="杜宾"]  没有。我只是觉得，在我们这些人里，也就你能说得出这种话。
+
+[name="杜宾"]  阿米娅，博士也没事吧。
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]  博士和我一直在最安全的位置，都好好的。对吧，博士。
+
+[name="阿米娅"]  接下来还有不少路，我们抓紧时间吧！
+
+
+
+[Dialog]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[Character(fadetime=0)]
+
+[Background(image="bg_cher_5", width=1, height=1, fadetime=0)]
+
+[Blocker(a=0, initr=2, r=0, g=0, b=0, fadetime=1, block=true)]
+
+
+
+
+
+[Character(name="char_1508_Faust_1",fadetime=2,block=true)]
+
+[name="浮士德"]   对不起......我失手了。
+
+
+
+[Character(name="char_1507_Mephisto_1#1",name2="char_1508_Faust_1",focus=1)]
+
+[name="梅菲斯特"]  不，不要道歉。是我的错，我太冲动了。
+
+[name="梅菲斯特"]  能帮我追踪罗德岛他们吗？我会去把情况通报给塔露拉姐姐。
+
+[name="梅菲斯特"]  她应该也已经压制住了切尔诺伯格的核心指挥塔。
+
+[name="梅菲斯特"]  ——就让她来决定这些虫子的生死吧。
+
+[Character(name="char_1507_Mephisto_1#1",name2="char_1508_Faust_1",focus=2)]
+
+[name="浮士德"]   ......明白了。
+
+[Character(name="char_1507_Mephisto_1#1",name2="char_1508_Faust_1",focus=1)]
+
+[name="梅菲斯特"]  小心点，优先保护好自己，好吗？
+
+[Character(name="char_1507_Mephisto_1#1",name2="char_1508_Faust_1",focus=2)]
+
+[name="浮士德"]   ......好。
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[Character(fadetime=0)]
+
+[Blocker(a=0, initr=2, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[Character(name="char_1507_Mephisto_1")]
+
+[name="梅菲斯特"]   ......
+
+[Delay(time=0.6)]
+
+[name="梅菲斯特"]   同胞们，该走了。
+
+[Character(name="char_1507_Mephisto_1#5")]
+
+[name="梅菲斯特"]   去迎接属于我们的时代吧！！
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

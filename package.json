@@ -18,12 +18,16 @@
     "activities:sync": "npm run activities:sync-pools && npm run activities:push-pools",
     "activities:audit-pools": "node scripts/audit-activity-pools.mjs",
     "story:sync": "node scripts/story/sync-stories.mjs",
+    "story:sync-prts": "node scripts/story/sync-prts-catalog.mjs",
+    "story:sync-thumbnails": "node scripts/story/sync-story-thumbnails.mjs",
+    "story:sync-archive": "node scripts/story/sync-archive-metadata.mjs",
     "story:sync-w2g": "node scripts/story/sync-stories.mjs --story w2g-beg",
     "character-eps:sync": "node scripts/character-ep-prts-bilibili.mjs --apply",
     "character-eps:dry-run": "node scripts/character-ep-prts-bilibili.mjs",
     "character-eps:apply": "node scripts/character-ep-prts-bilibili.mjs --apply",
     "test:character-eps": "node --test test/character-ep-matching.test.mjs",
-    "music:audit-audio": "node scripts/audit-music-audio.mjs"
+    "music:audit-audio": "node scripts/audit-music-audio.mjs",
+    "story:sync-localizations": "node scripts/story/sync-story-localizations.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",

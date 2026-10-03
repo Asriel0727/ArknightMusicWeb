@@ -1,0 +1,199 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第二关（前）
+
+
+
+// Comments
+
+
+
+//////////////插入cg///////////////////
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="avg_2_2",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+[name="整合运动"]   前进！这边的屋子里都搜干净！
+
+[name="整合运动"]   一个不留！
+
+[name="女性的声音"]   放开他......不！你们......
+
+[name="男性的声音"]   快跑！不要管......
+
+[dialog]
+
+//对话内容此处填入
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Image(fadetime=0)]
+
+[Background(image="bg_cher_1",fadetime=1,screenadapt="coverall")]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+///////////////////////////
+
+
+
+
+
+
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5)]
+
+
+
+[Blocker(a=1, r=0.93, g=0.75, b=0.32, fadetime=0, block=true)]
+
+[Blocker(a=1, r=1, g=1, b=1, fadetime=0.1, block=true)]
+
+[Blocker(a=0.2, r=1, g=0.3, b=0.3, fadetime=1, block=true)]
+
+[Blocker(a=0, r=1, g=0.3, b=0.3, fadetime=0.2, block=true)]
+
+[Dialog]
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  杜宾，我听到......
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  在另一个街区，已经赶不上了。
+
+[Character(name="char_002_amiya_1#4")]
+
+[Delay(time=1)]
+
+[name="阿米娅"]  呜......
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  整个城市大概都陷入了彻底混乱吧。军队与军警的抵抗也零零散散。
+
+[name="杜宾"]  电视上播放的却是军队已经控制住了骚乱源头......
+
+[name="杜宾"]  到了这种时候还在耍这些手段吗。
+
+[name="杜宾"]  无论是被暴徒砸碎还是断电，很快，这些自欺欺人也会跟着这里一起完蛋。
+
+[Character(name="char_013_riop", name2="char_130_doberm_ex", focus=1)]
+
+[name="近卫干员"]  很像是乌萨斯能干出来的事情。
+
+[name="近卫干员"]  就算是重新组织防卫力量，切尔诺伯格大概也需要很长的时间才能平息这些骚乱。
+
+//[Character(name="char_013_riop", name2="char_130_doberm_ex", focus=2)]
+
+//[name="杜宾"]  没有军警，没有士兵，没有合流反击的迹象，也没有固守。
+
+//[name="杜宾"]  切尔诺伯格的指挥系统，多半已经被整合运动彻底瘫痪了。
+
+
+
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]  杜宾教官......
+
+[name="阿米娅"]  我有点不甘心......
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  我明白，但这事情已经不是我们能够解决的了......
+
+[name="杜宾"]  我们入城时也太过顺利了，那些军警守卫似乎都完全没有进入状态。我甚至觉得......
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=1)]
+
+[name="阿米娅"]  杜宾教官？
+
+//[name="阿米娅"]  这事情一定有什么蹊跷。
+
+[Character(name="char_002_amiya_1#1", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  虽然天灾比预料的要早到来，但暴乱也比想象中严重。而那些整合运动较为整齐划一的武器装备，我怀疑......
+
+[name="杜宾"]  切尔诺伯格的那些军警之中已经混入了整合运动分子。
+
+[name="杜宾"]  最终，只有平民会成为争夺城市的牺牲品。
+
+[Character(name="char_002_amiya_1#4")]
+
+
+
+[name="阿米娅"]  ......虽然能感觉这一切，但我却无能为力。
+
+[name="阿米娅"]  有些时候，我非常想用自己的力量，全力去帮助大家......但是......
+
+
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]  别想太多，阿米娅！除了注意博士的健康状况，凯尔希医生可是特意嘱咐过我，要我尽量让你保留体力的。
+
+[Character(name="char_016_medic", name2="char_013_riop",focus=2)]
+
+[name="近卫干员"]  也别这么灰心呀！至少我们现在救回了博士。
+
+[name="近卫干员"]  再往前面应该就是汇合点了。到了那里，我们就离回家又近了一步。
+
+
+
+[Delay=0.6]
+
+[Character(name="char_130_doberm_ex", name2="char_013_riop",focus=2)]
+
+[name="近卫干员"]  杜宾教官，前面......
+
+[Character(name="char_130_doberm_ex", name2="char_013_riop",focus=1)]
+
+[name="杜宾"]  灰色的斗篷，面具，橙色袖标。也是整合运动......他们直接朝我们过来了！
+
+[name="杜宾"]  后面还有追兵，准备直接迎击。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  呼......
+
+[name="杜宾"]  虽然现在不太合适，但我还是要说两句。
+
+[name="杜宾"]  我从凯尔希那里听过你的名字，Dr.{@nickname}，很多次。
+
+[name="杜宾"]  阿米娅私下里把你当做老师和智囊，而凯尔希医生，虽然态度不怎么好，但至少也认可了你的实力。
+
+[Character(name="char_002_amiya_1#4")]
+
+[Delay=0.4]
+
+[name="阿米娅"]  别，别为难{@nickname}博士，杜宾......
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  这局势可不允许我们有所保留。
+
+[name="杜宾"]  来吧{@nickname}博士，现在，到了你证明自己的时候了。
+
+[name="杜宾"]  不要因为敌人只是杂鱼就放松警惕。
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

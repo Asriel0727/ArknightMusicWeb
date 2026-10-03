@@ -1,0 +1,78 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   解除所有武装，立刻投降。
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]   你得改一改强人所难的毛病，陈长官。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   ……
+[Delay(time=1)]
+
+[name="陈"]   你最擅长的只有逃跑吗？
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]   当然不是。我最擅长的，是将敌人最重要的东西……占为己有。
+
+[Character(name="char_010_chen_1", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   陈长官，你的部下的角可真是个不错的收藏品。
+[name="W"]   你可要替我谢谢她。
+
+[Character(name="char_010_chen_1#2", name2="char_1504_cqbw", focus=1)]
+
+[name="陈"]   你……
+[name="陈"]   在我面前说这种话可不怎么明智。
+
+[Character(name="char_010_chen_1#2", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   长期作战很枯燥的……我总得找点乐子。
+[name="W"]   我有一本字典，上面记载着一百种挑衅对方的方法。
+[name="W"]   如果有条件，我希望一条条试一下。
+[name="W"]   去和我单独打一场吧？无关战争胜负，来一场纯粹力量的对决？
+
+[Character(name="char_010_chen_1#2", name2="char_1504_cqbw", focus=1)]
+
+[name="陈"]   如果你马上投降，我可以考虑。
+
+[Character(name="char_010_chen_1", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   那可不行，还是让我把你“带”回切尔诺伯格，好好招待一番吧。
+
+[Character(name="char_002_amiya_1#6")]
+
+[name="阿米娅"]   陈长官！
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]   该到的人都到齐啦。
+[name="W"]   好久不见，阿米娅。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   你是……你就是W？
+[name="阿米娅"]   我并不认识你。
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]   那边的{@nickname}博士，你也好久不见。
+[name="W"]   嗯？你的表情好像在说“这个人是谁”？这么快就把我忘掉了？
+[name="W"]   太可惜了……看来你的恐惧还不足。
+[name="W"]   追上来吧，这次一定会让你………………好好记住的。
+
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

@@ -1,0 +1,76 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[name="？？？"]   罗德岛。
+[name="？？？"]   ……
+[name="？？？"]   我没想到你会和这些走狗在一起。
+[name="？？？"]   你父亲和你说的话……看来你根本没有记住……
+[Dialog]
+[Delay(time=1)]
+
+[Image(image="bg_1_firstcontact", fadetime=2, xScale=1.5, yScale=1.5, x=-300, y=200)]
+[ImageTween(xScaleTo=1, yScaleTo=1, duration=20, xTo=0, yTo=0, ease="InOutCubic", block=false)]
+[Delay(time=2)]
+
+[name="米莎"]   不……
+[name="米莎"]   我不认识这些人……
+[name="？？？"]   ……
+[name="？？？"]   那么，之前和你说的事，考虑得如何了。
+[name="米莎"]   这不重要……我还没想好……
+[name="？？？"]   除了加入我们，难道你还有别的什么选择？
+[name="米莎"]   我只是觉得……你不该这样做……
+[Dialog]
+
+[Dialog]
+[Image(fadetime=1, block=true)]
+[Delay(time=1)]
+
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   米莎，请离那个人远一点。他是整合运动的人。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   我……
+
+[Character(name="char_1500_skulsr")]
+
+[name="？？？"]   我和她的事与你们无关……
+[name="？？？"]   你们这些为了利益不惜投靠龙门，以同胞们的生命换取当权者赏赐的叛徒。
+[name="？？？"]   为什么要盯上她？
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   和你没有关系。
+[name="阿米娅"]   向无辜民众倾泻仇恨和暴虐的人可不是我的同胞。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……
+
+[Character(name="char_1500_skulsr")]
+
+[name="？？？"]   那些人对我们做同样事情的时候，怎么没有考虑过我们是否是无辜的？
+[name="？？？"]   你成功地再一次激怒了我。
+[name="？？？"]   我本来还打算，如果你们夹着尾巴从这里溜走，我就当做什么都没看到过……
+[name="？？？"]   现在，如果你们珍惜自己的生命，就马上把她放开。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   …………
+[name="阿米娅"]   做梦。
+[Dialog]
+[name="阿米娅"]   保护米莎。准备交战！
+
+[Character(name="char_1500_skulsr")]
+
+[name="？？？"]   记住你做出的错误选择……
+[name="？？？"]   在地狱中慢慢悔过吧……
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

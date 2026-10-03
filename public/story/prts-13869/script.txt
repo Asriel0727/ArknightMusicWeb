@@ -1,0 +1,101 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+
+[name=""]   (重复的广播声)
+[PlaySound(key="test/radio")]
+[Dialog]
+[Delay(time=1)]
+[Background(image="bg_lungmen_station", fadetime=2, xScale=1, yScale=1, delay=2)]
+[Delay(time=1)]
+
+
+[Delay(time=1)]
+[name="广播"]   请所有登船申请者注意——
+
+[name="广播"]   龙门2区登船窗口开放时间将于2小时后结束，请入境申请者不要拥挤，并配合近卫局进行矿石病感染检疫。
+[name="广播"]   已通过检疫关卡的申请者，请抓紧时间办理入境手续。
+[name="广播"]   根据《天灾处理法案》条款，体内结晶造影检测中诊断为疑似矿石病的携带者，将由近卫局全权进行处理。
+[name="广播"]   一旦发现任何与整合运动相关者，请立刻进行检举，近卫局将视情况依法处理，望各位申请者积极配合。
+[name="广播"]   请所有登船申请者注意——
+[name=""]   (重复的广播声)
+[PlaySound(key="test/radio")]
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_010_chen_1")]
+[Delay(time=1)]
+
+[name="陈"]   感谢你们的协助。这片区域刚发现的整合运动人员已经被肃清。这个关口也可以解除戒严开放使用了。
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1", focus=1)]
+
+[name="陈"]   整合运动的活动范围如果延伸到了检疫关口，不及时清除威胁，龙门内城遭到攻击也是时间问题。
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1#2", focus=2)]
+
+[name="阿米娅"]   谢谢，陈长官。这些都是合约条款里我们应该做的。
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1#1", focus=2)]
+
+[name="陈"]   以目前整合运动造成破坏的状况来说，龙门出入境的排查力度只会逐日提升。
+[name="陈"]   尤其对于感染者，以及疑似感染者，必须无条件服从隔离。
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1#1", focus=2)]
+[name="陈"]   任何可疑或者反抗隔离执行的行为将会被执以强制措施。
+[name="陈"]   在现在这个节点，已经不能像往常一样从普通感染者中一个个挑出破坏分子投入监狱了。
+
+[name="陈"]   对了……
+[Delay(time=0.5)]
+[name="陈"]   阿米娅，你旁边的陌生人是谁？
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1")]
+[name="阿米娅"]  抱歉……！忘记介绍了……他是Dr.{@nickname}。
+[name="阿米娅"]  {@nickname}博士暂时将会作为我们的领航员，接替我安排罗德岛的干员执行具体行动。
+
+[Character(name="char_010_chen_1")]
+[name="陈"]   博士？来罗德岛前，你是做什么的。
+
+[Character(name="char_010_chen_1", focus=-1)]
+[name=""]   ……
+[name=""]   ………………
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1#1", focus=2)]
+[name="阿米娅"]  …… {@nickname}是……来自哥伦比亚的神经工程方面的专家。
+[name="阿米娅"]  他刚脱离危险环境不久……可能需要一点时间适应。
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1#1", focus=1)]
+[name="陈"]   好的。我明白了。
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1#1", focus=2)]
+[name="阿米娅"]   {@nickname}博士，这位就是陈长官，龙门近卫局督察长。龙门近卫局是目前我们主要的委托方。
+
+[Character(name="char_010_chen_1", name2="char_002_amiya_1#1", focus=1)]
+[name="陈"]   我是陈。
+[name="陈"]   我的联络人一直由阿米娅担当，因此一直没能与罗德岛其他负责人实质接触。
+[name="陈"]   不过我刚才就有关注到你，{@nickname}。
+[name="陈"]   如果那场小规模冲突是由你指挥罗德岛处理的，那么我也就没有什么顾虑了。
+[Character(fadetime=1)]
+[Image(image="bg_0_rhodes2", fadetime=0.5, xScale=1, yScale=1)]
+[ImageTween(image="bg_0_rhodes2", xScaleTo=1.3, yScaleTo=1.3, duration=20)]
+[name="陈"]   至少到目前为止，罗德岛都表现得十分优秀。
+[name="陈"]   罗德岛在之前挫败感染者的第一次对龙门的进攻中作出的贡献，龙门的相关部门都看在眼里。
+[Dialog]
+
+
+[name="阿米娅"]   感谢陈长官的认可，那些都是在合约中我们应该做的……
+
+
+[name="陈"]   除此以外……
+[name="陈"]   我有一件额外的委托需要安排给你们……
+
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

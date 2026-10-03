@@ -1,0 +1,25 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   {@nickname}，我收到了侦查情报。
+
+[Dialog]
+[Delay(time=1)]
+
+[name="陈"]   碎骨被消灭后，整合运动迅速向切尔诺伯格方向撤退。
+[name="陈"]   有条不紊，完全不像是刚刚吃了败仗。
+[name="陈"]   这说明W正在代替碎骨发挥明确的指挥作用。
+[name="陈"]   切尔诺伯格方面也很有可能再次派出增援，支援她的部队。
+[name="陈"]   该动手了……
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

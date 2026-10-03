@@ -1,0 +1,161 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="Test/Loading", key="Test/Loading", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_wild_a", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=1)]
+
+[name="碎骨"]   这里是我们针对龙门的据点。
+[name="碎骨"]   为了找你，我们出动了大量人员，也遭受了很大损失。
+[name="碎骨"]   你这么做……太危险了。
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   我只是不想再看到牺牲……
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=1)]
+
+[name="碎骨"]   我能原谅你。
+[name="碎骨"]   但同胞们不会，你的行为等同于葬送他们所有的抗争成果。
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+[name="米莎"]   我理解大家的抗争手段……
+[name="米莎"]   但摧毁切尔诺伯格……
+[name="米莎"]   很多无辜的人为此白白牺牲，不是吗？
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=1)]
+
+[name="碎骨"]   这是罗德岛的人给你下的说词？
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   她提醒了我这一点……
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=1)]
+
+[name="碎骨"]   哦，是的，确实有很多人在天灾中死去了，说的没错。
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   所以——
+
+[Character(name="char_1500_skulsr", name2="char_012_misa_1", focus=1)]
+
+[name="碎骨"]   所以为什么在乎那些人？
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   为什么……？
+[Dialog]
+[Delay(time=1)]
+[name="米莎"]   难……难道我的想法很奇怪吗？
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   很奇怪。因为你好像忘了真正的受害者是谁。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……是……是我们。
+
+[Character(name="char_1500_skulsr")]
+[Dialog]
+[Delay(time=1)]
+[name="碎骨"]   最初切尔诺伯格公布隔离方案后我们就觉得不公平。
+[name="碎骨"]   尤其是……之后那座城市成为了那个样子。
+[Dialog]
+[name="碎骨"]   …………
+[name="碎骨"]   父亲曾不断抗议，希望让他们听到我们的声音。
+[name="碎骨"]   但我们没有收到任何支持。
+[name="碎骨"]   那些所谓的无辜者，一直在恐吓我们，唾弃我们。
+[name="碎骨"]   我们的努力在他们眼中只是在动摇社会的稳定基础。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   可我记得……有些人始终在帮我们说话……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   “有些人”是多少人？让我们统统去死的又是多少人？
+[name="碎骨"]   被强制隔离后我们又得到了什么？
+[name="碎骨"]   劣质的药物，肮脏发臭的病床，兽穴一样的病房，冰冷的隔离规定。
+[name="碎骨"]   刚刚去世的病人的病服，转眼就套在下一个病人身上。
+[name="碎骨"]   我们本该备受照料，却被统统丢进了垃圾场？
+[name="碎骨"]   最可怕的日子里，开始有人无端失踪，有人突然发疯，有人自我了断。
+[name="碎骨"]   这里面有多少侮辱和折磨……你能想象吗？
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   他们告诉我那是矿石病感染的症状发作……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   凡是治不好病患他们就会这么说。
+
+[Character(name="char_012_misa_1")]
+
+
+[name="米莎"]   难道……没有一个人……活下来？
+[name="米莎"]   ……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   甚至当矿石病感染者超过了隔离所能容纳的数量后……
+[name="碎骨"]   他们把所有重症病患转移至一处地下室。那个地下室是保密的。
+
+[image(image="bg_1_tv", fadetime=3)]
+
+[name="碎骨"]   所以她来了……
+[name="碎骨"]   整合运动……是我们所能凝聚在一起的唯一希望。
+[name="碎骨"]   直到我们摧毁切尔诺伯格，攻进去，才发现那是一片黑暗的墓地。
+[name="碎骨"]   为了避免我们死前把感染传播出去，他们让所有重症病患在那里等死。
+[name="碎骨"]   这就是我们所有合理的抗争，最终换来的结局。
+
+[Dialog]
+[Delay(time=1)]
+
+
+
+
+[name="碎骨"]   面对这些，你还会认同“不要让无辜者受难”之类的话吗？
+[name="碎骨"]   你愿意让他们把自己的幸福建立在我们的苦难之上吗？
+
+
+
+[name="米莎"]   我……
+[name="米莎"]   我不能……
+
+[name="碎骨"]   所以，你知道我们接下来该做出什么选择。
+
+[image(fadetime=0.5)]
+[Character(name="char_1500_skulsr")]
+
+
+[name="碎骨"]   好了，该说的我全部都说了，接下来，把“密钥”给我。
+[name="碎骨"]   我不知道你带走的“密钥”是什么，总之我们需要拿到它。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……
+[name="米莎"]   那是……我本想交换拯救的东西……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   我没有听懂你在说什么。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   我说……我本想用这样东西……换取治疗方法……
+
+[name="米莎"]   救你……救大家……
+[name="米莎"]   这是我父亲他唯一留存在世界上的东西……
+
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

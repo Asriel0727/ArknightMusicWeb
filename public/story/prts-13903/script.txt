@@ -1,0 +1,107 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_wild_a", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   矿场？
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   是的，米莎告诉我她把“密钥”埋在那里。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   稍等，我确认一下地图。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=-1)]
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   切尔诺伯格与龙门之间确实存在一座矿场。
+[name="陈"]   根据情报，这里曾作为切尔诺伯格逃亡者的中转站。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   现在……我们该怎么办？
+[name="阿米娅"]   如果相信米莎提供的线索，我们应该立即前往矿场搜索“密钥”。
+[name="阿米娅"]   毕竟她还告诉我们“密钥”所藏地点，或许说明整合运动还没有拿走……
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   近卫局派出了侦查小组，稍后他们会提供整合运动的动向。
+[name="陈"]   先来说说那个白发魔族的指挥者吧，她会是我们下个阶段的主要敌人。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   龙门是否有关于她的情报？
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   她的真名目前没有资料。整合运动称呼她为W，是一名魔族雇佣兵。
+[name="陈"]   至少在罗德岛成立前，她就已经在佣兵领域小有名气。
+[name="陈"]   从这几次交战来看，她拥有丰富的作战经验。
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=2)]
+
+[name="阿米娅"]   虽然她的名气某种意义上与战斗能力无关……
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   看来她给你们带来了很多麻烦，是个非常棘手的敌人。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   作战方面，W能够熟练操作枪支类轻武器，习惯携带一些炸药。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   听上去很疯狂……
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   如果可以，你们最好问一问能天使认不认识这号人物。
+[name="陈"]   拉特兰出产的枪械已经非法流出到这些危险的人手上了。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   还有很多线索需要理清，但眼下最优先的仍是得到“密钥”。
+[name="陈"]   由于形势对我们不利，米莎不再作为高优先级的目标了。
+[name="陈"]   得到近卫局侦查小组的情报后，我会马上来通知你们，商议后决定接下来的行动。
+[Dialog]
+[Character(fadetime=1)]
+
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   博士……
+[name="阿米娅"]   其实……
+[name="阿米娅"]   米莎最后说“让我去拯救无辜者”。
+[name="阿米娅"]   她也许，还想帮我？
+
+[Dialog]
+[Delay(time=1)]
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   不，不对，是我想多了。
+[name="阿米娅"]   她的语气中根本听不到希望。
+[name="阿米娅"]   只有悲伤……
+[name="阿米娅"]   她说她只会让火焰蔓延到想拯救的人身上……
+[name="阿米娅"]   ……
+
+[Character(name="char_002_amiya_1")]
+[name="阿米娅"]   或许……
+[name="阿米娅"]   我……
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

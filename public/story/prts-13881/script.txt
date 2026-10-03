@@ -1,0 +1,174 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   我还以为你会亲自上阵。好了，不要再躲了。
+[name="芙兰卡"]   看着手下送命，自己却暗中观察的领袖可不像话。
+
+[Character(name="char_1500_skulsr")]
+
+[name="？？？"]   ……有趣。和上次在切尔诺伯格遇到你们时又多了些新面孔。
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   呵呵……所以打算把这个当作你错误轻敌地理由吗？
+[name="芙兰卡"]   说完大话以后,灰溜溜逃走真是一个不错的选择呢。
+[name="芙兰卡"]   99%的反派都是这么做的。
+
+[Character(name="char_107_liskam_1")]
+[name="雷蛇"]   目标已保全。
+[name="雷蛇"]   如果你现在放弃的话还来得及捡回一条命。
+
+[Character(name="char_1500_skulsr")]
+
+[name="？？？"]   ……
+[Dialog]
+[Delay(time=1)]
+
+
+[name="？？？"]   多少年来，感染者都在寻求一个能够代表他们的正义的组织，为这片昏暗的末日之地带来新希望。
+[name="？？？"]   没想到除了整合运动之外，你们罗德岛作为另一个代表着感染者的组织……
+[name="？？？"]   却毫不犹豫将矛头指向了感染者自己。
+[name="？？？"]   你们终将遭到真正强大力量的惩罚。
+[name="？？？"]   今天就先到这里……我们会再见面的。
+[name="？？？"]   还有你，记住我说过的话……
+
+[name=""]   （声音逐渐远去）
+[Dialog]
+[Character(fadetime=1)]
+[Delay(time=1.5)]
+
+[Character(name="char_012_misa_1")]
+[name="女孩"]   ……
+
+[Character(name="char_107_liskam_1", name2="char_106_franka_1", focus=1)]
+
+[name="雷蛇"]   他逃跑了。
+
+[Character(name="char_107_liskam_1", name2="char_106_franka_1", focus=2)]
+
+[name="芙兰卡"]   地形不太有利于我们追击。先保护好无关人员吧。
+[name="芙兰卡"]   更何况他逃跑的路线上还被设了手工炸药。
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   好了，现在能告诉我—
+
+[Character(name="char_012_misa_1#2")]
+
+[name="米莎"]   别……别杀我……我和他们没有关系。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   冷静……我们是来保护你的，你现在很安全。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   我是阿米娅。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……
+[name="米莎"]   米莎。
+
+[Dialog]
+[Delay(time=1)]
+
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   谢谢……那么可以确认了。我们正在找你，以及刚才说的……这是你的钱包。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=-1)]
+
+[name=""]   （米莎夺走了钱包）
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   我们是罗德岛，我们是——
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   近卫局的部下吗……
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   并不是……如果这个词让你感觉到不适的话，我可以换个说法……
+[name="阿米娅"]   我不知道你对罗德岛了解多少，但是我们并不是像整合运动所宣传的那样。
+[name="阿米娅"]   我们一直在阻止这些混乱的事情发生。
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+[name="米莎"]   ……
+
+[name="米莎"]   请不要来找我……
+[name="米莎"]   我不知道什么罗德岛……反正你们和龙门有关系，对吧？
+[name="米莎"]   我们这些从切尔诺伯格……逃亡出来的矿石病感染者……
+[name="米莎"]   龙门会不定期派人巡查……强制拘捕……执行者就是近卫局……
+[name="米莎"]   你们和龙门是一伙的……
+[name="米莎"]   我……我知道接下来会发生什么……
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   我想问你的事情有很多，但是请相信我们不会伤害你。
+[name="阿米娅"]   任何无辜的人都不该被伤害……就像切尔诺伯格原本应该躲开那场灾难一样。
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……
+[name="米莎"]   所以，怎样才能让我离开。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   先别着急。这里还有些备用的食物补给，你一定饿了吧。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ……！
+[name="米莎"]   …………是的。
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=-1)]
+
+[name=""]   ——米莎打开了食品包装
+[Delay(time=1)]
+
+[Character(name="char_107_liskam_1")]
+
+[name="雷蛇"]   这里属于龙门外部城区，如果你现在出去，附近仍然到处是近卫局和普通平民。
+[name="雷蛇"]   你知道你正在被整合运动的人追踪吗？
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   为了你自身与龙门的安全，无论如何也希望你能配合——
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……
+[name="米莎"]   我不知道你在说什么……
+[name="米莎"]   我真的没有你要找的东西……
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   我想，坦承我们的目的，有利于你我进行沟通。
+[name="芙兰卡"]   你知道一批货物的去向吗，装在一个棘手的箱子里的——
+[name="芙兰卡"]   ——“密钥”。
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

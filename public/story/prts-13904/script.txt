@@ -1,0 +1,36 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+
+[name=""]   …………
+[Delay(time=1)]
+[PlayMusic(intro="battle/bgm_indust_intro", key="battle/bgm_indust_loop", volume=1, crossfade=1, delay=0.5)]
+[name=""]   切尔诺伯格 未知地点
+[name=""]   Base2/Basement4     4:13 a.m.
+[Image(image="item_tll", fadetime=2, xScale=1.3, yScale=1.3)]
+[ImageTween(image="bg_0_babel2", tiled=true, xScaleTo=1.0, yScaleTo=1.0, duration=25, block=false)]
+[name="？？？"]   Ne4……
+[name="？？？"]   Qa2 ,check。
+[name="？？？"]   Kc2……
+[name="？？？"]   Rc8 ,check。
+[name="？？？"]   ……
+[name="？？？"]   塔露拉你真是手下不留情……
+[name="塔露拉"]   …………
+[name="塔露拉"]   这不是你所希望的吗？
+[name="？？？"]   ……啧
+[name="？？？"]   ……你能这么想，我很高兴。
+[Delay(time=1)]
+[name="？？？"]   ……但是，你看上去生气了？
+[Delay(time=1)]
+[name="塔露拉"]   ……
+[name="塔露拉"]   有吗？
+[name="？？？"]   这是直觉……凭借我对你的了解。Rf6。
+[name="塔露拉"]   弑君者，爱国者，浮士德，靡菲托斯，霜星。
+[name="塔露拉"]   从现在开始，我们需要按照时间计划进行。
+[Dialog]
+[Delay(time=1)]
+[name="塔露拉"]   …………Qxf6, checkmate。
+[Dialog]
+[Stopmusic(fadetime=5)]
+[Blocker(block=true)]}}
+{{内测剧情导航}}

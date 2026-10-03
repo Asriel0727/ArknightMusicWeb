@@ -1,0 +1,194 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+
+[PlayMusic(intro="UI/bgm_void_intro", key="UI/bgm_void_loop", volume=0.8, crossfade=1, delay=0.5)]
+[Background(image="bg_ri", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   体表状况正常。
+[name="凯尔希"]   然后把手伸过来，阿米娅。
+[name="凯尔希"]   如果感觉到疼痛，就告诉我。
+[name="凯尔希"]   刚才的任务中，手腕有什么异样么？
+
+[Character(name="char_002_amiya_1#2", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   好像没有……
+[name="阿米娅"]   这段时间都很顺利，凯尔希医生。
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   博士代替你进行指挥之后，你会有更多机会进入战场尝试掌握你自己的技巧。
+[name="凯尔希"]   因此你的活动会愈加频繁，最好还是多——
+
+[Character(name="char_002_amiya_1#5", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   啊啊！！……痛。
+
+[Character(name="char_002_amiya_1#5", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   …………
+[name="凯尔希"]   ……
+[name="凯尔希"]   ——多休息。
+
+[Character(name="char_002_amiya_1#4", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   ……抱歉……
+
+[Character(name="char_002_amiya_1#5", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   你失眠了？
+
+[Character(name="char_002_amiya_1#4", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   有些……总感觉……自己在和她对话。
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   ……
+[name="凯尔希"]   总之这是些前兆，不过属于正常状况。
+[name="凯尔希"]   人总是会回想些过去的事情。这会警醒你，让你知道你自己是谁。
+[delay=0.5]
+[name="凯尔希"]   下周，你的检查时间需要提前。
+
+[Character(name="char_002_amiya_1#2", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+
+[name="阿米娅"]   谢谢，凯尔希医生。
+[name="阿米娅"]   辛苦你了……总是让你担心……
+
+[Character(name="char_002_amiya_1#2", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   ……我只是在履行自己的职责。
+[name="凯尔希"]   只要能照顾好你自己，一切就都还有希望。
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   对了，想问您一些问题……关于感染者的。
+[name="阿米娅"]   关于普通的感染者……和可利用体内矿石释放“法术”的感染者——
+[name="阿米娅"]   这两者是否有更加易于分辨的方法？
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   如果从实用角度出发的话，目前还没有。
+
+[Character(name="char_002_amiya_1#4", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   ……哦哦……
+[Character(name="char_002_amiya_1#4", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   为何突然问这样的问题？
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   之前陈长官问了我相同的问题。
+[Image(image="bg_0_ori1", fadetime=2, xScaleTo=1.3, yScaleTo=1.3)]
+[ImageTween(image="bg_0_ori1", fadetime=0.3, xScaleTo=1, yScaleTo=1, duration=15)]
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=1, fadetime=0)]
+[name="阿米娅"]   感染者是指所有感染矿石病的患者。
+[name="阿米娅"]   最大的问题在于……其中一部分感染者拥有的“法术天赋”……
+[name="阿米娅"]   原本法术等源石技艺作为一种具有强大效果的能力，不经过镶嵌源石的装置就无法释放，因此术师虽然强大，但也能受到约束。
+[Image(image="bg_0_ori2", fadetime=0.3, xScaleTo=1, yScaleTo=1)]
+[ImageTween(image="bg_0_ori2", fadetime=0.3, xScaleTo=1.3, yScaleTo=1.3, duration=15)]
+[Image(fadetime=0.3)]
+[blocker(block=true)]
+[cameraEffect(effect="Grayscale", keep=true, amount=1, fadetime=0)]
+[Background(image="bg_lungmen_station", width=1, height=1, fadetime=0)]
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=2, fadetime=0)]
+[Blocker(a=0, block=true, fadetime=0.5)]
+
+[name="陈"]   问题就在这里。源石工业化使用后……造成的大量感染……
+[name="陈"]   尤其是目前的状况打破了这种平衡。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   近卫局在实战中遇到了什么问题？
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=2, fadetime=0)]
+
+[name="陈"]   虽然能有所控制，但是棘手。
+[name="陈"]   按照检疫程序，检疫关卡需要对切尔诺伯格难民进行矿石病排查。
+[name="陈"]   一旦确诊为矿石病患，必须运送至隔离所。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   这过程一定很不顺利。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=2, fadetime=0)]
+
+[name="陈"]   暴力事件，多处并发。
+[name="陈"]   拒绝检疫隔离的矿石病暴徒使用简单的刀具，弩箭，甚至燃烧弹进行反抗。
+[name="陈"]   于是近卫局立刻派遣镇暴队前往事发地点。
+[name="陈"]   按照以往对策，对付持有简陋武装的暴徒原本不成问题。
+[name="陈"]   但抵达事发地点后镇暴队却遭到了意料之外的法术攻击，并且比想象中要难以抵抗。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=1, fadetime=0)]
+
+[name="阿米娅"]   我想近卫局一直沿用的是对抗普通暴徒的作战对策。
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1", fadetime=0)]
+
+[name="阿米娅"]   如果从我们自己的角度出发……没有感染者会愿意配合检查。
+
+[Character(name="char_010_chen_1", fadetime=0)]
+
+[name="陈"]   所以这一切是必定会发生的。
+[name="陈"]   而我和大部分人所能做的，就是充分利用手中的力量，让一切可能侵蚀生存空间的颠覆可能在温床中消失。
+
+[Character(name="char_002_amiya_1#7", fadetime=0)]
+
+[name="阿米娅"]   不过……并不是所有感染者都……
+
+[Character(name="char_010_chen_1", fadetime=0)]
+
+[name="陈"]   我明白。不要忘记你们的身份。
+[name="陈"]   虽然目前的节点上，你们拥有着我们所不能企及的优势。
+[name="陈"]   但是这种优势正在逐渐流逝，就像感染者的生命一样。
+[name="陈"]   近卫局找到罗德岛的出发点，是允许你实现你的那个目标。
+[name="陈"]   但是请记住，时间与耐心都不是无限的。否则到那个时候，决定权就不在我们手上了。
+
+[Character(name="char_002_amiya_1#7", fadetime=0)]
+
+[name="阿米娅"]   我没有忘记……
+
+[Character(name="char_010_chen_1", fadetime=0)]
+[Delay(time=1)]
+
+[name="陈"]   希望罗德岛能不辜负龙门的期待。
+[name="陈"]   另外……还有别忘了我们要找的东西。
+
+[name="陈"]   这对我们很重要。
+[name="陈"]   决不能让龙门成为下一个切尔诺伯格。
+
+[Blocker(block=true, fadetime=0.5)]
+[cameraEffect(effect="Grayscale", keep=true, amount=0, fadetime=0)]
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=-1, fadetime=0)]
+[Background(image="bg_ri", width=1, height=1, fadetime=0.5)]
+[Blocker(a=0, block=true, fadetime=0.5)]
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   关于这一点……你还是不要想太多了。
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=1, fadetime=0)]
+[name="阿米娅"]   嗯……
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=2, fadetime=0)]
+
+[name="凯尔希"]   找到他们让你找的“密钥”……然后，接下来继续前行。
+
+[Character(name="char_002_amiya_1", name2="char_003_kalts_1", focus=1, fadetime=0)]
+[name="阿米娅"]   我会的。
+[Blocker(block=true)]
+
+[name="凯尔希"]   这个世界已经离不开源石。
+[name="凯尔希"]   而龙门……只是我们漫长旅途中的一个过客。
+
+[name="阿米娅"]   嗯。
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

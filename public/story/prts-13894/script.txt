@@ -1,0 +1,108 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_wild_a", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[name=""]   ……交战现场一片混乱。
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_010_chen_1#2")]
+
+[name="陈"]   你们怎么来了……
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   陈长官，你受伤了？
+[name="阿米娅"]   情况怎么样？
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1#2", focus=2)]
+
+[name="陈"]   一名护卫牺牲，多人受伤。我没事……别担心我。
+[name="陈"]   敌人重点围剿米莎的护卫队，他们的目标十分明确。
+[name="陈"]   而且……遇到了几个棘手的人。
+
+[Character(name="char_003_kalts_1", name2="char_010_chen_1", focus=1)]
+
+[name="凯尔希"]   ……
+[name="凯尔希"]   医疗组已经开始转移伤员。
+
+[Character(name="char_003_kalts_1", name2="char_010_chen_1#2", focus=2)]
+
+[name="陈"]   你们马上做好准备，必须尽快夺回米莎。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1#2", focus=1)]
+
+[name="阿米娅"]   米莎被夺走了？
+[name="阿米娅"]   ……我们得知道米莎的位置。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1#2", focus=2)]
+
+[name="陈"]   看来是我食言了，不过我还有办法。
+[name="陈"]   详情没时间细说，我正在让情报专员输出米莎的定位信息。
+[name="陈"]   ……等我先去确认外围——
+
+[Character(name="char_003_kalts_1", name2="char_010_chen_1", focus=1)]
+
+[name="凯尔希"]   ——坐下。
+[name="凯尔希"]   留在这里，我给你包扎一下。
+
+[Character(name="char_003_kalts_1", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   啧……
+
+[Character(name="char_003_kalts_1", name2="char_010_chen_1", focus=1)]
+[name="凯尔希"]   要是伤口被感染了，就别想像之前那样生龙活虎了。
+[name="凯尔希"]   阿米娅，准备一下。你和博士带人继续前进。这里交给我来处理。
+
+[Dialog]
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=2)]
+[name="陈"]   ……星熊也正在追击他们，我把她的频道给你了……
+[name="陈"]   你可以联系她。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   对方是我们曾经击败过的整合运动指挥者吗？
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   不，是一名白发长角的魔族女人。
+[name="陈"]   敌人应该获得了一批增援，但近卫局对此根本没有侦查到位。
+[name="陈"]   不过更可疑的是……
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   ……
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   ………
+[name="陈"]   算了……
+[name="陈"]   时间不多了………该动手了。
+
+[Character(name="char_002_amiya_1#6", name2="char_010_chen_1", focus=-1)]
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   博士，拿好，这是米莎的定位信息。
+[name="陈"]   我会指挥近卫局持续与整合运动交火，吸引敌人的注意力。
+[name="陈"]   你们迅速推进至该据点，展开突袭。
+
+[Character(name="char_002_amiya_1#1")]
+
+[name="阿米娅"]   了解，我们立刻出发。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   交给你们了。
+[name="陈"]   注意行动隐蔽，确保万无一失。
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

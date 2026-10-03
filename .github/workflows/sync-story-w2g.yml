@@ -25,6 +25,12 @@ jobs:
       - run: npm ci
       - name: Refresh scripts and referenced media
         run: npm run story:sync -- --overwrite
+      - name: Discover and synchronize all PRTS stories
+        run: npm run story:sync-prts
+      - name: Cache optimized story cover thumbnails
+        run: npm run story:sync-thumbnails
+      - name: Refresh story lines and viewing order
+        run: npm run story:sync-archive
       - name: Verify story snapshots
         run: node --test test/story-script.test.mjs test/story-resources.test.mjs
       - name: Verify production build

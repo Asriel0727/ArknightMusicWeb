@@ -1,0 +1,47 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1", name2="char_010_chen_1", focus=2)]
+
+
+[name="陈"]   很明显，她在隐藏什么，演技比能天使要逊色一点。
+
+[Character(name="char_002_amiya_1#5", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   请不要这么说……至少米莎提到的一些线索还足够我们整理。只是她现在不愿意信任我们。
+
+[Character(name="char_002_amiya_1#5", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   之前你们遇到的整合运动成员我们已经开始进行调查了。
+[name="陈"]   你说的米莎，和我们收集到的身份情报有所不符。携带密钥的人另有其人。
+[name="陈"]   你应该采取强制手段，阿米娅。
+[name="陈"]   我希望看到的是之前在切尔诺伯格城外决不后退一步的罗德岛。
+[name="陈"]   还是说，你被什么困扰了？
+
+[Character(name="char_002_amiya_1#4", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   我希望尽可能避免强制的情况的发生。
+
+[Character(name="char_002_amiya_1#4", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   我可以为此向龙门申请一个矿石病感染者特赦名额。这在过去是不可能的。
+[name="陈"]   如果通过，她不会被隔离，可以获得有限制的人身自由。
+[name="陈"]   但这份好意仍然无法传达给她的话——
+
+[Character(name="char_002_amiya_1#4", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   我明白。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   我不会等你太久。
+[name="陈"]   希望在我接手前你能搞定一切。
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

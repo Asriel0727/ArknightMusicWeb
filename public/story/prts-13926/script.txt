@@ -1,0 +1,27 @@
+[HEADER(key="title_rhodes", is_skippable=true)] 基建对话
+
+// Comments
+[Background(image="bg_factory", fadetime=1)]
+[PlayMusic(intro="UI/bgm_flyinghigh_intro.ogg", key="UI/bgm_flyinghigh_loop.ogg", volume=0.6, delay=0.5)]
+[delay(time=1)]
+[name=""]   【机器作业的噪音】
+[Dialog]
+[delay(time=1)]
+[name="？？？"]   ……很不巧。
+[Dialog]
+[delay(time=1)]
+[Character(name="char_003_kalts_1", fadetime=0.5)]
+
+[name="凯尔希"]   ……你来的不是时候。
+[name="凯尔希"]   罗德岛的深渊正在维护和升级中，短期内无法访问。
+[name="凯尔希"]   不过你的植物神经应该能正常访问其他的基础设施。
+[name="凯尔希"]   总之，下次再来看一下吧。
+[Dialog]
+[Character(fadetime=0.5)]
+[Delay(time=1)]
+
+[name=""]   凯尔希离开了核心筒
+[Dialog]
+[Background(fadetime=1.0, block=true)]
+[PlayMusic(intro="UI/bgm_void_intro.ogg", key="UI/bgm_void_loop.ogg", delay=0.5)]}}
+{{内测剧情导航}}

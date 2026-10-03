@@ -1,0 +1,90 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_107_liskam_1")]
+
+[name="雷蛇"]   区域安全。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   芙兰卡，敌方情况如何？
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   敌人夺回了我们已清除的三个区域。
+[name="芙兰卡"]   但我们抵挡了这次总攻，也让敌人吃了很多苦头。
+[name="芙兰卡"]   因此整合运动暂时停止了进攻，只是我认为他们不会给我们太多时间。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   明白。请各位保持警惕，随时做好准备作战。
+[name="阿米娅"]   我会请博士尽快进行下一次部署。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   你赢下了漂亮的一役，{@nickname}。
+[name="陈"]   以前我曾经怀疑阿米娅一个人是否能够驾驭我给予的任务。
+[name="陈"]   不过现在无论如何，至少你能够很好得帮到她——
+[name="陈"]   ——在她难以顾及整个局势的时候。
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   好了阿米娅。现在我们需要讨论一下当前的情况。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   好的。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   米莎的密电并没有详细说明“密钥”埋在什么地方，对吗？
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   是这样。
+[name="阿米娅"]   我们必须彻底清除这个据点的整合运动，才能正式开始搜索密钥。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   ……
+[name="陈"]   不错的陷阱，就是粗糙了点。
+[name="陈"]   米莎居然也是这个陷阱的一环。
+[name="陈"]   阿米娅，你必须承认，米莎辜负了你的信任。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   ……或许吧。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   他再次出现了，甚至给我们造成了更大的麻烦。
+[name="阿米娅"]   ……这是我的责任，我没能完全消灭他。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   不，并不是要你揽责。只是总结情况并做出建议。
+[name="陈"]   无论碎骨出于什么原因再次出现。
+[name="陈"]   不要再给他挣扎和翻身的可能。
+[name="陈"]   今后也不要再给任何敌人，上演这种复活的奇迹戏的机会。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=1)]
+
+[name="阿米娅"]   你说的对。
+
+[Character(name="char_002_amiya_1#7", name2="char_010_chen_1", focus=2)]
+
+[name="陈"]   那么博士，我们接下来——
+[Dialog]
+[Delay(time=1)]
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

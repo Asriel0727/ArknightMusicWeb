@@ -1,0 +1,260 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_wild_a", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_107_liskam_1")]
+
+[name="雷蛇"]   阿米娅，碎骨对关口的攻势已经停下来了。
+[name="雷蛇"]   敌人的阵型已经混乱，如果龙门和我们这边不出意外的话……他们的进攻应该不会有太大效果。
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   但米莎还不知道在哪里……
+[name="芙兰卡"]   整合运动应该打算撤退，我们必须追上去。
+[name="芙兰卡"]   至少确定米莎在不在他们手上。
+
+[Character(name="char_002_amiya_1", name2="char_106_franka_1", focus=1)]
+
+[name="阿米娅"]   芙兰卡，碎骨脱离战场了吗？
+
+[Character(name="char_002_amiya_1", name2="char_106_franka_1", focus=2)]
+
+[name="芙兰卡"]   我们击败了他的主力之后，他就趁乱消失了。
+
+[Character(name="char_107_liskam_1", name2="char_106_franka_1", focus=1)]
+
+[name="雷蛇"]   不要放松警惕，芙兰卡。
+[name="雷蛇"]   这里的环境非常复杂，碎骨极有可能躲藏在暗处。
+
+[Character(name="char_107_liskam_1", name2="char_106_franka_1", focus=2)]
+
+[name="芙兰卡"]   …………
+[name="芙兰卡"]   好像发现了什么。
+
+[Character(name="char_107_liskam_1", name2="char_106_franka_1", focus=-1)]
+
+[Dialog]
+[Delay(time=1)]
+
+
+[Character( name="char_106_franka_1")]
+
+[name="芙兰卡"]   阿米娅， 芬发现了疑似米莎的身影。
+[name="芙兰卡"]   但由于整合运动的阻挠，她很快就跟丢了。
+
+[Character( name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   让芬和她的小队不要贸然行动，请让他们以自身安全最为优先。
+[name="阿米娅"]   战斗还没有结束，我们暂时没有多余的人力展开搜索。
+[name="阿米娅"]   让他们记录下米莎最后出现的位置后立刻归队。
+
+[Character( name="char_106_franka_1")]
+
+[name="芙兰卡"]   明白。
+
+[Character( name="char_002_amiya_1")]
+
+[name="阿米娅"]   呼……
+
+[Dialog]
+[Delay(time=1)]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   ……谁在哪里？
+[name="阿米娅"]   ……是……米莎吗？
+[name="阿米娅"]   等等！
+
+[StopMusic(fadetime=3)]
+[Dialog]
+[Delay(time=1)]
+
+[Character(fadetime=0.8)]
+[Background(fadetime=0.5, block=true)]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   ……米莎？
+[name="阿米娅"]   !!!
+[name="雷蛇"]   不对——
+[name="阿米娅"]  危险！快离开那里！！！
+[name="阿米娅"]   {@nickname}！！！
+
+
+[Image(image="bg_1_lastattack", fadetime=0, xScale=1, yScale=1)]
+[ImageTween(xScaleTo=1, yScaleTo=1, duration=0.3, ease="InOutCubic", block=true)]
+
+[CameraShake(duration=1, xstrength=20, ystrength=20, vibrato=30, randomness=90, fadeout=false, block=true)]
+
+[name="碎骨"]   结束了！
+
+[Image(image="bg_1_reflect", fadetime=0.4, xScale=1, yScale=1)]
+[ImageTween(xScaleTo=1, yScaleTo=1, duration=0.4, ease="InOutCubic", block=true)]
+
+[name="阿米娅"]   ……！
+[Dialog]
+
+[Image(fadetime=0.4, block=true)]
+
+[Character(name="char_012_misa_1#2")]
+
+[Delay(time=0.5)]
+[name="米莎"]   ……………………!
+[Dialog]
+[Character(fadetime=1)]
+
+[Delay(time=3)]
+
+
+[Image(image="avg_14_3", fadetime=2, xScale=1, yScale=1)]
+[ImageTween(xScaleTo=1, yScaleTo=1, duration=6, ease="InOutCubic", block=true)]
+
+[Delay(time=1)]
+
+[Image(fadetime=4, block=true)]
+
+[Image(image="bg_1_lastbreath", fadetime=2, xScale=1, yScale=1)]
+[ImageTween(xScaleTo=1, yScaleTo=1, duration=6, ease="InOutCubic", block=true)]
+
+[Delay(time=1)]
+[PlayMusic(intro="Darkness1", key="Darkness1")]
+[name="碎骨"]   ……………………
+[name="碎骨"]   不可……原谅………咳……咳……
+[name="碎骨"]   就差一点……就能把…………
+[name="碎骨"]   你明明……有这种力量……为什么不愿用来……重塑世界……？
+[name="阿米娅"]   不……
+[name="碎骨"]   摧毁……才是……突围之路……
+[name="碎骨"]   为什么……不懂……
+[name="阿米娅"]   …………
+[name="阿米娅"]   对不起……
+[name="阿米娅"]   但是这是那个人留给我的唯一愿望。
+[name="阿米娅"]   即使是腐烂的世界，我也不舍破坏。
+[name="碎骨"]   我的痛苦……你们看来根本不懂…………
+[name="碎骨"]   ……
+[name="阿米娅"]   不会再有痛苦了……
+[Dialog]
+[name="阿米娅"]   请好好休息吧……
+[name="阿米娅"]   ……
+[Dialog]
+[Image(fadetime=1, block=true)]
+
+[name="碎骨"]   ……和我一起走吧……！！
+[name="阿米娅"]   ……！！！
+[blocker(r=1, g=1, b=1, block=true)]
+[PlaySound(key="battle/general/impact/explosion_large_no_tail_01")]
+[PlaySound(key="battle/general/impact/explosion_large_no_tail_01", delay=0.3)]
+[Delay(time=1)]
+[Background(image="bg_wild_a", width=1, height=1, fadetime=2)]
+[blocker(r=1, g=1, b=1, a=1, fadetime=3, block=true)]
+[Delay(time=1)]
+[name="？？？"]   阿米娅…………
+[Dialog]
+[Delay(time=1)]
+[name="？？？"]   阿米娅！
+[blocker(r=1, g=1, b=1, a=0, fadetime=0, block=true)]
+
+[Delay(time=2)]
+
+[Character( name="char_002_amiya_1#4")]
+
+[name="阿米娅"]   ……
+[name="阿米娅"]   …………
+
+[Character(name="char_010_chen_1#2",name2="char_136_hsguma", focus=1)]
+
+[name="陈"]   阿米娅？你在发什么呆。
+
+[Character( name="char_002_amiya_1#4")]
+
+[name="阿米娅"]   没有，陈长官。
+[name="阿米娅"]   只是在思考一些事情……
+
+[Character(name="char_010_chen_1#2")]
+[name="陈"]   之前太危险了，如果不是德克萨斯救了你，你已经……
+
+[Character(name="char_102_texas_1")]
+[name="德克萨斯"]   ……没关系，我已经习惯做抱着人逃离危险区这种事了。谢谢你的盾，没事吧，星熊？
+
+[Character(name="char_010_chen_1#2",name2="char_136_hsguma", focus=2)]
+[name="星熊"]   ……没事。不过我也没想到碎骨居然引爆了其他的……榴弹？
+
+[Character(name="char_010_chen_1#1",name2="char_136_hsguma", focus=2)]
+[name="星熊"]   疯子。
+
+[Character(name="char_010_chen_1#2",name2="char_136_hsguma", focus=1)]
+[name="陈"]   ……总之……
+[name="陈"]   我们已经占领了这个整合运动的据点。
+[name="陈"]   根据芬目击报告，我们立刻搜索了所有米莎可能出现的地点，然而一无所获。
+[name="陈"]   恐怕她仍被整合运动裹挟着。
+
+[Character( name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   ……可恶。
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   整合运动也在迅速撤退。
+[name="陈"]   组织好你的干员，我们必须趁胜追击。
+[name="陈"]   另外…
+[name="陈"]   我们没有在现场发现碎骨的尸体……是的，他的尸体随着最后那次爆炸和造成的烟雾闪光，一起消失了。
+[name="陈"]   有可能被整合运动趁乱回收。总之，目前仍然无法判断他生死状况。
+[name="陈"]   我现在需要向高层汇报此次事件的完整过程，你和博士先休息一下吧。
+
+[Character( name="char_002_amiya_1")]
+
+[name="阿米娅"]   了解……
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+[PlaySound(key="test/phone.ogg", volume=1, block=true)]
+[Delay=2]
+[name=""]   接到了罗德岛总部发来的通讯。
+
+[Character(name="char_002_amiya_1#4", name2="char_empty", focus=1, fadetime=0.5 )]
+[name="阿米娅"]   凯尔希医生……
+[Dialog]
+
+
+[CharacterCutin(widgetID="texas1", name="char_003_kalts_1", style="cutin", fadestyle= "horiz_expand_left2right", fadetime=0.5, offsetx=200, width=200, block=true)]
+//[CharacterCutin(widgetID="texas1", name="char_003_kalts_1", style="cutin", fadetime=0.5, offsetx=200, width=200, block=true)]
+[name="凯尔希"]   阿米娅。
+[name="凯尔希"]   我已经听过有关这场战斗的报告……
+[name="阿米娅"]   ……抱歉，我——
+[name="凯尔希"]   现在，检查下你的指环。
+[name="阿米娅"]   ……好的。
+
+[Dialog]
+[Delay(time=1)]
+
+[name="阿米娅"]   好像没有任何异样。
+[name="凯尔希"]   裂纹，颜色？
+[name="阿米娅"]   没有……颜色……也还是老样子。
+[name="凯尔希"]   那就好。小心行事。
+[name="凯尔希"]   你还有机会……
+[name="阿米娅"]   抱歉，让您担心了……
+[name="凯尔希"]   你照顾好你自己。回见。
+[name="凯尔希"]   ……
+[Dialog]
+[CharacterCutin(widgetID="texas1", fadetime=0.5, block=true)]
+[Character(fadetime=1)]
+[Background(fadetime=1, block=true)]
+[Delay(time=1)]
+
+[CharacterCutin(widgetID="texas1", name="char_003_kalts_1", style="cutin", fadestyle= "horiz_expand_left2right", fadetime=0.5, offsetx=0, width=200, block=true)]
+//[CharacterCutin(widgetID="texas1", name="char_003_kalts_1", style="cutin", fadetime=0.5, offsetx=0, width=200, block=true)]
+[name="凯尔希"]   {@nickname}，还有你。
+[Delay(time=1)]
+[name="凯尔希"]   如果你希望阿米娅平安，那就要同时注意下自己的安全。
+[name="凯尔希"]   别把自己暴露在危险的地方。
+[name="凯尔希"]   那样只会让阿米娅分更多心来保护你。
+[name="凯尔希"]   不光是她需要，我们也需要你。
+[CharacterCutin(widgetID="texas1", fadetime=0.5, block=true)]
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

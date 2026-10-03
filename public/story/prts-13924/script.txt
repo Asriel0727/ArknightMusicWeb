@@ -1,0 +1,154 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="Battle/bgm_epic_intro", key="Battle/bgm_epic_loop", volume=1, crossfade=1, delay=0.5)]
+[Delay(time=1)]
+
+
+[name=""]   (猛烈的枪声)
+[name=""]   整合运动忽然陷入混乱。
+[name="碎骨"]   是你……
+[Dialog]
+
+
+[Background(image="bg_cher_3", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   可能连弹雨也无法熄灭你们的苦痛。
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   ……你逃不了。
+
+[CameraShake(xstrength=5, ystrength=3, vibrato=30, randomness=90)]
+[Playsound(key="Battle/General/Gun/GunsMachineGuns_BBC_EC1G2b")]
+[Playsound(key="Battle/General/Gun/GunsMachineGuns_BBC_EC1G2b")]
+[Delay(time=1)]
+[CameraShake(stop=true)]
+
+[Character(name="char_103_angel_1")]
+[name="能天使"]   一个建议，下次你最好用些更精准点的武器！
+
+[Character(fadetime=0)]
+
+[name="整合运动成员"]   追上去！
+[name="整合运动成员"]   等等，有人在——
+[name="整合运动成员"]   谁、谁在哪里？
+
+[Character(name="char_102_texas_1")]
+
+[name="德克萨斯"]   ……留下遗言吧。
+
+[Blocker(r=0.4, a=1, fadetime=0.02, block=true)]
+[Blocker(r=0.4, a=0, fadetime=3, block=true)]
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Delay(time=1)]
+
+[Blocker(r=0, b=0, g=0, a=1, fadetime=2, block=true)]
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=0)]
+[Blocker(r=0, b=0, g=0, a=0, fadetime=3, block=true)]
+
+[Character(name="char_010_chen_1")]
+
+[name="陈"]   他们已经开始慌乱了。
+[name="陈"]   已经知道碎骨藏身的位置了。
+[name="陈"]   阿米娅。
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(r=0, b=0, g=0, a=1, fadetime=2, block=true)]
+[Blocker(r=0, b=0, g=0, a=0, fadetime=3, block=true)]
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   ……就这样结束了吗？
+[name="碎骨"]   我们的交谈。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   结束了。
+[name="阿米娅"]   放下武器……
+[name="阿米娅"]   我明白，这场战斗只会造成更多牺牲。
+
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=1)]
+[name="阿米娅"]   希望这不是我们最后一次交流，碎骨。
+
+[Dialog]
+[Delay(time=1)]
+
+[name="阿米娅"]   我们都是感染者，本来不应该变成这样……
+
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr" , focus=2)]
+
+[name="碎骨"]   …………
+[Delay(time=1)]
+[name="碎骨"]   让你失望了。
+
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=1)]
+[name="阿米娅"]   ……
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=2)]
+[name="碎骨"]   就让一切……这样结束吧……
+[name="碎骨"]   你的这些话，留给有未来的人去说吧。
+[name="碎骨"]   这些空洞的大道理，已经对我没有任何意义。
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=1)]
+[name="阿米娅"]   不，你还有……
+[Character(name="char_002_amiya_1", name2="char_1500_skulsr", focus=2)]
+[name="碎骨"]   够了！
+[Delay(time=1)]
+[name="碎骨"]   对我来说，我已经失去了一切。仅剩的……
+[name="碎骨"]   只有我的脑海中的那个声音。
+[name="碎骨"]   就让一切……这样结束吧……
+[name="碎骨"]   是时候离开了……
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+[Delay(time=1)]
+
+战场另一边……
+[Delay(time=1)]
+
+[Character(name="char_1504_cqbw",fadetime=1)]
+
+[name="w"]   序幕终于开始了……
+[name="w"]   从那个时候开始，就只有这样的战场才能让我感觉到自己的呼吸。
+[name="w"]   你会像那个懦夫一样吗，阿米娅？
+
+
+[Character(name="char_1504_cqbw", focus=-1)]
+
+[name="？？？"]   你的恶趣味，我至今无法接受。
+[name="？？？"]   目标已经保全，撤退了。
+[name="？？？"]   塔露拉下了命令，启动器需要尽快送到她手上。
+
+[Character(name="char_1504_cqbw")]
+
+[name="w"]   不去帮他一下，为序幕划上句号吗，弑君者？
+[name="w"]   这可是和你一样有着那一辈人血脉的人啊。
+
+[Character(name="char_1504_cqbw", focus=-1)]
+
+[name="弑君者"]   ……
+[name="弑君者"]   在听我说话吗。
+[name="弑君者"]   结束了。
+[name="弑君者"]   人。通常都死于好奇心。
+
+
+[Character(name="char_1504_cqbw")]
+[name="w"]   我晚些回去——
+
+[Character(fadetime=1)]
+[Background(fadetime=1, block=true)]
+
+[name="w"]   ——我要多看看，这个怪物。
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

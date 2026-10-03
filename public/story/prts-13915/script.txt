@@ -1,0 +1,93 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_lungmen_n", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   博士先生，如果行动顺利，此时近卫局小组应该已经安全离开了。
+[name="阿米娅"]   这样的话，米莎也彻底安心了吧。
+[name="阿米娅"]   “密钥”对她来说真的是一个沉重的负担。
+[name="阿米娅"]   至于我们，整备完毕后，大家应该能可以回到龙门好好休息一下——
+
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   阿米娅。我们刚刚收到陈的联络。
+[name="芙兰卡"]   近卫局小队遭到了整合运动的伏击。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   咦？发生了什么？
+[name="阿米娅"]   米莎怎么样了？他们是在提取“密钥”的途中遇袭？
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   陈长官来不及明确说明，近卫局和整合运动仍处于交战中。
+
+[Character(name="char_002_amiya_1#7")]
+
+[name="阿米娅"]   以龙门的实力，他们理应准备了被袭击的对策……究竟出了什么情况……
+[name="阿米娅"]   能确认他们的位置吗？
+
+[Character(name="char_106_franka_1")]
+
+[name="芙兰卡"]   没问题。
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   {@nickname}博士，我们动身吧。
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, initr=2, r=0, g=0, b=0, block=true)]
+[Blocker(a=0, fadetime=2)]
+
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=0)]
+[Delay(time=1)]
+
+[Character(name="char_1504_cqbw")]
+
+[name="？？？"]   这可是我第一次收集到龙族的角。
+[name="？？？"]   这光泽，这硬度，能有这样的收藏，真是幸运呀。
+[name="？？？"]   碎骨，你不觉得需要做点什么吗？
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   你是在暗示我帮你申请追加赏金吗，W。
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]   你愿意这么做我更高兴啦。
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   也好，这是你应得的。
+[name="碎骨"]   当我得知从切尔诺伯格派来的支援是你时……
+[name="碎骨"]   立刻知道将会上演一场怎样精彩的伏击战。
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]   只是可惜……没有抓到那位督查长。
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   无所谓，陈不是这次的目标。
+[name="碎骨"]   只要她在，就够了。
+[Dialog]
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   我说过，无论多少次，我都会找到你。
+[name="碎骨"]   我们原本就不应该分开。
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

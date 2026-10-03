@@ -189,7 +189,15 @@ async function main() {
   if (dryRun) return;
   await mkdir(publicRoot, { recursive: true });
   await writeFile(variablePath, bytes);
-  await writeFile(path.join(publicRoot, 'catalog.json'), `${JSON.stringify(config.map(({ id, title, page }) => ({ id, title, page })), null, 2)}\n`);
+  const catalogPath = path.join(publicRoot, 'catalog.json');
+  const catalog = JSON.parse(await readFile(catalogPath, 'utf8').catch(() => '[]'));
+  for (const { id, title, page } of stories) {
+    const index = catalog.findIndex((row) => row.id === id);
+    const row = { ...(catalog[index] || {}), id, title, page, available: true };
+    if (index < 0) catalog.push(row);
+    else catalog[index] = row;
+  }
+  await writeFile(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; });

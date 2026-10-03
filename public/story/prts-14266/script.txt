@@ -1,0 +1,225 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第三关（前）
+
+
+
+// Comments
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Background(screenadapt="coverall", image="bg_cher_5",fadetime=1,screenadapt="coverall")]
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+[Delay(time=1)]
+
+
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]  那边，那边是不是......
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]  是Ace带领的E3小队！
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  这Ace的动作还挺快的。
+
+[name="杜宾"]  我们过去跟他们汇合吧。
+
+[Dialog]
+
+[Character(fadetime=1)]
+
+[Blocker(a=1, r=0, g=0, b=0, fadetime=1, block=true)]
+
+[Blocker(a=0, fadetime=1, block=true)]
+
+[Dialog]
+
+
+
+[Character(name="char_002_amiya_1#2")]
+
+[name="阿米娅"]  Ace！
+
+[Character(fadetime=0.5)]
+
+[Character(name="char_014_riope" ,fadetime=0.6)]
+
+[delay=0.65]
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  杜宾，阿米娅！
+
+[name="Ace"]  你们平安无事真是太好了。
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  头儿！你们怎么在这里，没想到还没到汇合点就碰到你了！
+
+[name="近卫干员"]  一直联系不上，我有点担心。
+
+[Character(name="char_014_riope",name2="char_013_riop",focus=1)]
+
+[name="Ace"]  臭小子，我还轮不到你来担心。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  Ace，情况怎么样？
+
+[Character(name="char_014_riope" )]
+
+[name="Ace"]  一个好消息，我的行动组没有任何伤亡。
+
+[name="Ace"]  坏消息是，西边负责确认撤退路线的E4行动组，还是没有发来信号。
+
+[name="Ace"]  我暂时据守着现在的汇合点，顺便带人把周围“清理”了一下。
+
+[name="Ace"]  备用撤退路线的方向暂时通畅，顺便疏散了一下民众，等着接应你们。
+
+[Character(name="char_002_amiya_1#2", name2="char_014_riope", focus=1)]
+
+[name="阿米娅"]  不愧是Ace，这样的情况根本难不住你们小队。难怪这附近的整合运动的暴乱活动明显数量减少了。
+
+[Character(name="char_002_amiya_1#2", name2="char_014_riope", focus=2)]
+
+[name="Ace"]  那么————
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  这位，就是Dr.{@nickname}吧？
+
+[Character(name="char_002_amiya_1#2", name2="char_014_riope", focus=1)]
+
+[name="阿米娅"]  是的。这就是我跟你提过很多次的博士。
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  博士。我是这次行动的E3小队的队长，叫我Ace就可以了。
+
+[Dialog]
+
+[Decision(options="......（点头）;你好......", values="1;2")]
+
+[Predicate(references="1;2")]
+
+
+
+[Character(name="char_002_amiya_1#1", name2="char_014_riope", focus=1)]
+
+[name="阿米娅"]  博士在尝试帮助指挥作战，刚苏醒过来就一路跟我们到这里， 这一路也是辛苦他了。
+
+[Character(name="char_002_amiya_1#1", name2="char_014_riope", focus=2)]
+
+[name="Ace"]  我听阿米娅和凯尔希提到过不少你以前的事情，尤其是明明是一名科学家但是拥有不输给专业军人的指挥能力。
+
+[name="Ace"]  看来我可以亲身讨教一下博士战术指导了。
+
+[Character(name="char_002_amiya_1#4", name2="char_014_riope", focus=1)]
+
+[name="阿米娅"]  其实有些......小小的变故。博士......失去了记忆。
+
+[Character(name="char_002_amiya_1#4", name2="char_014_riope", focus=2)]
+
+[name="Ace"]  ......唉？
+
+[name="Ace"]  可是阿米娅你刚才还说博士在指挥战斗......？
+
+[Character(name="char_002_amiya_1#7", name2="char_014_riope", focus=1)]
+
+[name="阿米娅"]  ......虽然失忆了，但是和以前一样，博士对所有人能力的洞察和决策依然十分正确可靠，我保证！
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  既然阿米娅都这样说了，还有苛刻的杜宾教官也默许了，那我也没什么好说的了。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  ......原来我很苛刻吗。
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  失去的东西总能找回来。眼下有更紧急的问题等我们去解决。
+
+[Character(name="char_002_amiya_1#7", name2="char_014_riope", focus=2)]
+
+[name="Ace"]  回到刚才的话题。
+
+[name="Ace"]  我之所以只扫清了备用撤退路线方向的敌人，是因为刚才侦察发现我们回去的路上有之前没有预估到的整合运动破坏行动。
+
+[name="Ace"]  西门有一定可能遭到了整合运动的控制，并且也和切城的防卫力量在那块没有重要设施的片区发生了战斗。
+
+[name="Ace"]  除非我们现在收到E4小队的安全撤退信号，否则按原先计划的路线走很有可能是自投罗网。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_014_riope", focus=1)]
+
+[name="阿米娅"]  唔......
+
+[Character(name="char_002_amiya_1#1", name2="char_014_riope", focus=2)]
+
+[name="Ace"]  对了，你们也无法正常通讯吧？
+
+[Character(name="char_130_doberm_ex", name2="char_014_riope", focus=1)]
+
+[name="杜宾"]  没错。完全无法联系到其他组。只有博士和阿米娅可以用神经连接的频段发回信息。
+
+
+
+
+
+[Character(name="char_130_doberm_ex", name2="char_014_riope", focus=2)]
+
+[name="Ace"]  杜宾，看上去情况对我们很不利，再过两个小时左右天灾就要到达了，现在启用备用路线还来得及。你觉得呢？
+
+[Character(name="char_130_doberm_ex", name2="char_002_amiya_1#1", focus=1)]
+
+[name="杜宾"]  阿米娅？
+
+[Character(name="char_130_doberm_ex", name2="char_002_amiya_1#1", focus=2)]
+
+[name="阿米娅"]  （点头）
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  嗯......出发吧。
+
+[Delay=1]
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  啧。
+
+[name="Ace"]  杜宾，七点钟和十一点方向，好像已经来了一些老朋友。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  明显不是平民的未知部队靠近了。难道就是他们吗？
+
+[Character(name="char_014_riope")]
+
+[name="Ace"]  应该是来夹击我们的整合运动巡逻小队。
+
+[name="Ace"]  此地不宜久留。
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  真是穷追不舍......解决了这些人之后就撤吧。
+
+[name="杜宾"]  各小队，立刻戒备！快速解决掉他们！
+
+
+
+
+
+[Delay(time=0.6)]
+
+[Dialog]
+
+[Blocker(block=true)]
+
+[Image]

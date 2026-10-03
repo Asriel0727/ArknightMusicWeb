@@ -1,0 +1,79 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="test/Darkness1", key="test/Darkness1", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+
+
+[Character(name="char_002_amiya_1")]
+
+[name="阿米娅"]   我们已清除了全部敌人。
+[name="阿米娅"]   你可以出来了。
+
+[Character(name="char_012_misa_1")]
+
+[name="目标5"]   ……
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=1)]
+[name="阿米娅"]   ……可能我们的行为会让你困惑，但是请相信，我们没有恶意。
+[name="阿米娅"]   我们捡到了这个钱包，如果没有错的话……
+[name="阿米娅"]   你的名字是米莎？
+
+[Character(name="char_002_amiya_1", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]    ……
+[name="米莎"]    ……你们是谁？
+
+[Character(name="char_002_amiya_1#2", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   罗德岛。也许你之前听过这个名字。
+[name="阿米娅"]   请别害怕，我们在保护你。
+[name="阿米娅"]   我们是一个大部分由感染者组成的组织……为有能力的感染者提供——
+
+
+[Character(name="char_002_amiya_1#5", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   ——为什么要保护我？
+[name="米莎"]   我……我并不认识你！
+[name="米莎"]   ……
+[name="米莎"]   你们最好赶紧离开…
+[name="米莎"]   快离开……
+
+[Character(name="char_002_amiya_1#5", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   这里太危险了……！
+[name="阿米娅"]   整合运动随时都会再次进攻这里。
+[name="阿米娅"]   就算有些唐突，我们也必须将你置于罗德岛的保护之下。请跟我们离开这里……
+
+[Character(name="char_002_amiya_1#5", name2="char_012_misa_1", focus=2)]
+
+[name="米莎"]   不要……
+[name="米莎"]   我不接受你们的保护……
+
+[Character(name="char_002_amiya_1#5", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   抱歉，现在还不是时候向你解释具体细节。
+[name="阿米娅"]   现在我们——
+[Dialog]
+[Delay(time=1)]
+[Character(name="char_002_amiya_1#5", name2="char_012_misa_1", focus=-1)]
+
+[name="？？？"]   你……在和谁说话？
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=1)]
+
+[name="阿米娅"]   ……是谁的声音？
+
+[Character(name="char_002_amiya_1#7", name2="char_012_misa_1", focus=-1)]
+[Image(image="bg_1_firstcontact", fadetime=2, xScale=1, yScale=1)]
+[name="？？？"]   我见过你的面孔。
+[name="？？？"]   你是年轻的罗德岛负责人…………以及可憎的叛徒。
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

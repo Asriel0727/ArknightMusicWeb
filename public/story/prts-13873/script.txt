@@ -1,0 +1,151 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+
+
+// Comments
+[PlayMusic(intro="UI/bgm_mist", key="UI/bgm_mist", volume=0.8, crossfade=1, delay=0.5)]
+[Background(image="bg_indoor_2", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[name="能天使"]   在这样一个时代活着，任何人都很艰难。
+[name="能天使"]   愿全能的主赐福于你。
+[Dialog]
+[Delay(time=1)]
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   离开拉特兰这么久了，你还是保留着这个习惯。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   毕竟整合运动的感染者也有自己的生命呀。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   如果祈祷就能拯救感染者，我们就不会这么麻烦了。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   总会有办法的。
+[name="能天使"]   好了——你要躲到什么时候？
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=-1)]
+
+[name="？？？"]   ……
+[Delay(time=1)]
+
+[Character(name="char_012_misa_1")]
+[Delay(time=1)]
+
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   你就是第五个线人？
+
+[Character(name="char_012_misa_1")]
+
+[name="？？？"]   我不知道你在说什么……
+
+[Character(name="char_102_texas_1")]
+
+[name="德克萨斯"]   冷静点，我们不会伤害你，你现在已经安全了。
+[name="德克萨斯"]   你叫……什么名字？
+
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   看你的耳朵，你应该是乌萨斯人吧？从切尔诺伯格来的吗？
+
+[Character(name="char_012_misa_1")]
+
+[name="？？？"]   ……谢谢你们的关心。
+[name="？？？"]   再见。
+
+[Dialog]
+[Character(fadetime=0.5)]
+[Delay(time=1)]
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   等等……
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   ……她跑了。
+[name="能天使"]   这么多乌萨斯人都涌过来了，怪不得黑市酒水价格连涨三番。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   把她和线人情报对照过了吗？
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=2)]
+
+[name="能天使"]   当然，我给你总结一下。
+[name="能天使"]   乌萨斯人，女孩，白发，身穿黑衣，年纪在十二岁到十六岁左右。
+[name="能天使"]   “个子不高，身材偏瘦，以及——腿部有明显结晶感染。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=1)]
+
+[name="德克萨斯"]   让伊斯盯着点。她很有可能带来我们所需的新情报。
+[name="德克萨斯"]   如果是感染者，也有可能是整合运动的相关人员。
+
+[Character(name="char_102_texas_1", name2="char_103_angel_1", focus=-1)]
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_102_texas_1")]
+
+[name="德克萨斯"]   等下……我看到外面有人影。
+[name="德克萨斯"]   ……是整合运动？
+
+[Character(name="char_103_angel_1")]
+
+[name="能天使"]   他们追过来了？
+
+[Character(name="char_102_texas_1")]
+
+[name="德克萨斯"]   ……
+[name="德克萨斯"]   似乎不是冲着我们来……
+[name="德克萨斯"]   寻找藏身处，观察下情况。
+
+[Dialog(time=0)]
+[Character(fadetime=0)]
+
+[Blocker(a=1, block=true)]
+[Blocker(a=0, fadetime=2)]
+
+[Delay(time=1)]
+
+[name="流民"]   ——嘿，那边的小女孩，我们没见过你。
+[name="流民"]   ——从那个全是乌萨斯人的地方来？
+[name="流民"]   ——你们那边怎么样了？你是感染者？
+
+[Character(name="char_012_misa_1")]
+[name="？？？"]   别过来……
+
+[Character(name="char_012_misa_1", focus=-1)]
+[name="流民"]   ——我们有话想问你。
+[name="流民"]   ——是感染者，没错，你看她的腿。
+[name="流民"]   ——
+[name="流民"]   ——。
+[name="流民"]   ——是整合运动，他们每次来都要抢我们的东西……
+[name="流民"]   ——嘘，闭嘴……
+[name="流民"]   ——夺走无辜生命的人迟早付出代价……！
+
+[Character(name="char_012_misa_1#2")]
+[name="？？？"]   ……!
+[name="？？？"]   不要过来……！对不起！！！
+
+[Character(name="char_012_misa_1", focus=-1)]
+[name="流民"]   ——离开这里！你们这些感染者！就连死的那一刻都要牵连别人！
+[Character(name="char_012_misa_1#2")]
+[name="？？？"]   ……不，我不是……
+[Dialog]
+[Character(fadetime=0.5)]
+[Delay(time=1)]
+
+[name="流民"]   她跑了？
+[name="流民"]   整合运动向这边来了……我们快走。
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}

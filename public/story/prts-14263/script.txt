@@ -1,0 +1,395 @@
+[HEADER(key="title_test", is_skippable=true, fit_mode="BLACK_MASK")] 第一关（后）
+
+
+
+// Comments
+
+// 从室内走向室外白光
+
+[Blocker(a=1, r=1, g=1, b=1, fadetime=0.5, block=true)]
+
+[Background(width=1, height=1, fadetime=0)]
+
+[Delay=1]
+
+[Background(image="bg_cherbefore_1",fadetime=2,screenadapt="coverall")]
+
+
+
+[Blocker(a=1, r=0.81, g=0.85, b=0.86, afrom=1,rfrom=1, gfrom=1, bfrom=1, fadetime=0.5, block=true)]
+
+[Blocker(a=0, fadetime=2, block=true)]
+
+
+
+[PlayMusic(intro="$escape_intro", key="$escape_loop", volume=0.8, crossfade=1.5, delay=0.5)]
+
+
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  终于甩开了刚才那波人！
+
+[name="近卫干员"]  这样一来，我们就暂时安......
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  停止前进。隐蔽！
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  诶，怎么了！
+
+
+
+[dialog]
+
+
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[character(name="char_1002_nsabr_1")]
+
+[name="整合运动成员"]  快！
+
+[name="整合运动成员"]  别漏了这个街区的任何一栋房子！
+
+[PlaySound(key="$d_gen_soldiersrun",volume=0.5)]
+
+[character]
+
+[dialog]
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  啧，怎么到处都是他们......
+
+[name="近卫干员"]  感觉这一路上没有想象的这么轻松啊。我还以为能开着车离开这里呢。
+
+[Character(name="char_013_riop", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  别想了。
+
+[name="杜宾"]  我们潜入时用的车也和其他路边的车一样被整合运动烧成了铁壳。
+
+[name="杜宾"]  而且————这里还好，但再往外的冲突地区，到处都有整合运动设置的障碍。开着车根本无法安全通过，还会成为目标。
+
+[name="杜宾"]  我可不希望博士和我们一起被当成铁做的靶子。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=1)]
+
+
+
+[name="阿米娅"]  我有种很不好的预感。杜宾教官.....
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  不发生冲突已经不可能了......等他们过去我们就继续赶路，先争取和其他人汇合吧。
+
+
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]  那些人看上去已经失去了理智，仿佛要把看到的一切都破坏掉。
+
+
+
+[Character(name="char_016_medic", name2="char_130_doberm_ex", focus=2)]
+
+
+
+[name="杜宾"]  那是当然的。这些整合运动的人，原本就是一个感染者组织的抵抗运动。
+
+
+
+
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="bg_0_ori",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+
+
+[name="杜宾"]  作为感染者，从被感染的那一刻开始，就代表着失去了自由，只要被发现，就没有好下场，尤其是乌萨斯这样的强权国家。
+
+[name="杜宾"]  据说感染无法被治好，甚至死亡的时候会传染，也可能会使人变得更加危险————至少一般的人都是这么认为的。
+
+
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="avg_01",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+
+
+[name="杜宾"]  这么多年来，无数感染者收到压迫，所以他们中参与运动的人也渐渐变多，最终变成了这个危险的团体。
+
+
+
+//////////////插入cg///////////////////
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="bg_0_tv",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+
+
+[name="杜宾"]  在这几天，他们开始攻击切城的所有重要设施，简直就是破坏者的狂欢。
+
+[name="杜宾"]  他们的目标......也许就是想要摧毁这座城市，来对所有压迫感染者的人宣战吧......
+
+
+
+[dialog]
+
+[character]
+
+//对话内容此处填入
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Image(fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+///////////////////////////
+
+
+
+[Character(name="char_013_riop")]
+
+[name="近卫干员"]  其实......我在想有没有办法不让人被感染呢？
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]  别天真啦，要是能这么轻松我们就不用这么辛苦啦！
+
+
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="bg_0_ori1",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+[name="医疗干员"]  虽然有很多办法可以防止被感染，但是只要“源石”还在使用......
+
+[name="医疗干员"]  虽然“源石”这种矿物，虽然有一定的可能会使人感染成为感染者，但————
+
+[name="医疗干员"]  城市的供能、以及释放法术都需要源石。没有了他们的话可能大部分人都无法正常生活了。
+
+[dialog]
+
+
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Image(fadetime=0)]
+
+[Character(name="char_130_doberm_ex")]
+
+
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[name="杜宾"]  只有和其他小组尽早汇合才能应对接下来的情况，即使前方可能有陷阱，我们也只能硬着头皮前进。
+
+[name="杜宾"]  总之，能行动的时候就不要停下。敌人一定会重新组织追击的。
+
+
+
+
+
+/////////////插入cg///////////////////
+
+
+
+
+
+[Character(name="char_016_medic")]
+
+
+
+[name="医疗干员"]  不过杜宾教官......为什么我们出来的路上已经看不见那些军警了......
+
+[name="医疗干员"]  现在，只有没有人的街道和整合运动......还有无辜的平民。
+
+[name="医疗干员"]  闹出这么大动静，切尔诺伯格当局为什么会坐视不管啊！
+
+
+
+[Character(name="char_016_medic", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  虽然现在我们还不用这么快陷入绝望。
+
+[name="杜宾"]  不过，我猜现在已经......没有什么切尔诺伯格当局了。
+
+
+
+[Character(name="char_016_medic", name2="char_130_doberm_ex", focus=1)]
+
+[name="医疗干员"]  ......怎么会这样......
+
+
+
+
+
+[Decision(options="......;那我们应该帮助切尔诺伯格吗？",values="1;2")]
+
+[Predicate(references="1;2")]
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=1)]
+
+
+
+[name="阿米娅"]  想救切尔诺伯格，也已经......来不及了。
+
+
+
+[Character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  看到这片天空了吗，博士？
+
+
+
+
+
+//////////////插入cg///////////////////
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Character(fadetime=0)]
+
+//修改此处的image来切换cg
+
+[Image(image="avg_9_2",x=0, y=0, xScale=1, yScale=1, fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+[ImageTween(xFrom=0, yFrom=0, xTo=0, yTo=-20, xScaleFrom=1, yScaleFrom=1, xScaleTo=1.1, yScaleTo=1.1, duration=15, block=false)]
+
+//对话内容此处填入
+
+
+
+[Character(name="char_016_medic")]
+
+[name="医疗干员"]  感觉就连天空都在慢慢地下坠，想要把这个城市压碎......
+
+[Character(name="char_130_doberm_ex")]
+
+[name="杜宾"]  一般城市是通过移动去躲避天灾的。现在暴乱破坏了城市的移动设施，这个方案已经不可能了。
+
+[name="杜宾"]  届时，这片城市就会被这片灾云带来的源石所吞没，对作为感染者的整合运动将会更有利，最后夺取城市。
+
+
+
+//对话内容此处填入
+
+[Blocker(a=1, r=0,g=0, b=0, fadetime=0.6, block=true)]
+
+[Image(fadetime=0)]
+
+[Blocker(a=0, fadetime=0.6, block=false)]
+
+///////////////////////////
+
+
+
+
+
+[name="杜宾"]  即使我们留下来，也无法面对这么大规模的暴乱，而且......即使是感染者，也会被天灾所波及。
+
+[name="杜宾"]  别忘了我们的唯一目标，就是安全送博士你回到罗德岛号上。
+
+
+
+
+
+[Character(name="char_002_amiya_1#4")]
+
+[name="阿米娅"]  博士，留给我们的时间并不是多。
+
+[name="阿米娅"]  也许......我们必须快点找到剩下的人然后离开这里。
+
+
+
+[Character(name="char_002_amiya_1#7", name2="char_016_medic", focus=1)]
+
+[name="阿米娅"]  医生，检查一下E0小队的状况吧。
+
+[Character(name="char_002_amiya_1#7", name2="char_016_medic", focus=2)]
+
+[name="医疗干员"]  阿米娅，伤情已经检查完毕，不用停下来，等敌人过去就出发吧！
+
+
+
+
+
+[Decision(options="那我们还剩多少时间？;......",values="1;2")]
+
+[Predicate(references="1;2")]
+
+
+
+[character(name="char_002_amiya_1#4", name2="char_130_doberm_ex", focus=2)]
+
+[name="杜宾"]  在一周前，原本预测切城有至少10天时间，可以逃离出天灾经过的路径。
+
+[name="杜宾"]  但是这么多年来，无论用什么方法，从来都没有人能够精确掌握天灾到来的时间。

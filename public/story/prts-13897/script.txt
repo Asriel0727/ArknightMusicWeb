@@ -1,0 +1,135 @@
+[HEADER(key="title_test", is_skippable=true)] 测试脚本
+
+// Comments
+[PlayMusic(intro="Test/Loading", key="Test/Loading", volume=1, crossfade=1, delay=0.5)]
+[Background(image="bg_wild_a", width=1, height=1, fadetime=2)]
+[Delay(time=2)]
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   你可能发疯了。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   我没有……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   救我？救大家？你疯了吗？我拜托过你救我？
+[name="碎骨"]   如果你只是因为害怕逃走，我能理解，但你说要找治疗方法……
+[name="碎骨"]   你知不知道为了找回你，有多少同胞失去了生命？
+[name="碎骨"]   而你居然要用“密钥”换取一个……我该说些什么？
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   可……阿米娅说……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   阿米娅……那个罗德岛的首领？
+[name="碎骨"]   听着，无论她和你说了什么，你都——
+[Dialog]
+[Delay(time=1)]
+[name="碎骨"]   ……警报？
+
+[Character(name="char_1504_cqbw")]
+[name="W"]   是的，警报。
+[name="W"]   就在你们争论孰是孰非时，敌人已经找上门来了。
+[name="W"]   碎骨，准备好武器。
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=1)]
+
+[name="碎骨"]   ……是谁？
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   当然是罗德岛。
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=1)]
+
+[name="碎骨"]   为什么这么快就能找到这里？
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   这我不清楚，我刚从切尔诺伯格调来不久。
+[name="W"]   不过，倒是有一种可能……
+[name="W"]   米莎，过来。让我稍稍检查下。
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=-1)]
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_1504_cqbw")]
+
+[name="W"]   在钱包里。
+[name="W"]   这个小东西就是定位装置。
+
+[Character(name="char_012_misa_1")]
+
+[name="米莎"]   ……！
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   不是你的错，敌人的狡诈超乎你的预料。
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   我们该马上撤退。然后享受战术性胜利的快乐——
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=1)]
+
+[name="碎骨"]   出击。
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   喂！
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=1)]
+
+[name="碎骨"]   敌人不过是近卫局饲养的走狗，有什么可怕的？
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   ………
+[name="W"]   ………你又轻敌了，大部分的人都死于盲目自信。别忘了他们击败过你一次。
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=1)]
+
+[name="碎骨"]   有趣……你这种没有信仰的人好像没有资格说我……
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=2)]
+
+[name="W"]   ………
+
+[Character(name="char_1500_skulsr", name2="char_1504_cqbw", focus=1)]
+
+[name="碎骨"]   还有，这次他们手上可没有足以要挟我的人质。
+[name="碎骨"]   我必须要让那个罗德岛的人……为他们的错误付出代价。
+
+[Dialog]
+[Delay(time=1)]
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   我会让她负责保护你，牢牢保护。她不会出什么差错。
+[name="碎骨"]   只要有我在，就再也没有人会欺负你，再没有人能让你受苦。
+
+[Character(name="char_012_misa_1")]
+
+
+[name="米莎"]   说真的……我并不在乎这些……
+[name="米莎"]   我只是不想看到你伤害别人……
+[name="米莎"]   更害怕你会被伤害……
+
+[Character(name="char_1500_skulsr")]
+
+[name="碎骨"]   ……
+[name="碎骨"]   不，你必须在乎。
+[name="碎骨"]   未来某个时刻，你会了解……
+[name="碎骨"]   我们之所以坚持的理由……
+
+[Dialog]
+[Blocker(block=true)]
+[Image]}}
+{{内测剧情导航}}
