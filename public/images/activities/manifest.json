@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T22:22:37.380Z",
+  "generatedAt": "2026-10-03T16:32:42.088Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3687,6 +3687,15 @@
       "size": 1105010,
       "hash": "23454b3adb37054034444c4d12ea23318c8d4e764e84baeeba9ddd792e1d524e",
       "syncedAt": "2026-09-28T14:12:22.888Z"
+    },
+    "wiki-yet-another-wave": {
+      "publicPath": "/images/activities/wiki-yet-another-wave.jpg",
+      "relativePath": "public/images/activities/wiki-yet-another-wave.jpg",
+      "sourceUrl": "https://media.prts.wiki/9/90/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%98%A8%E6%97%A5%E6%B5%B7_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 458324,
+      "hash": "5470cceccb438b0099693249fa6c077733feb41941a0414e86b7751f1b3c7272",
+      "syncedAt": "2026-10-03T16:32:42.088Z"
     }
   }
 }
