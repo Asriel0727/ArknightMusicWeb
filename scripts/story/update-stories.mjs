@@ -4,6 +4,7 @@ import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { loadCustomizations, protectGlobal } from './story-customizations.mjs';
 
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
@@ -19,7 +20,7 @@ const root = new URL('../../', import.meta.url);
 async function run(file, options = []) {
   console.log(`\n[story:update] ${file} ${options.join(' ')}`);
   await new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [fileURLToPath(new URL(file, import.meta.url)), ...options], { cwd: fileURLToPath(root), stdio: 'inherit' });
+    const child = spawn(process.execPath, [fileURLToPath(new URL(file, import.meta.url)), ...options], { cwd: fileURLToPath(root), stdio: 'inherit', env: { ...process.env, STORY_SYNC_PIPELINE: '1' } });
     child.on('error', reject);
     child.on('exit', (code, signal) => code === 0 ? resolve() : reject(new Error(`${file} stopped (${signal || code}); existing snapshots are retained. Fix the error and rerun story:update.`)));
   });
@@ -34,10 +35,12 @@ const { stdout } = await promisify(execFile)(process.platform === 'win32' ? 'cur
 ], { maxBuffer: 10 * 1024 * 1024, timeout: 200000 });
 const characters = JSON.parse(stdout);
 if (Object.keys(characters).length < 100) throw new Error('Incomplete character index; keeping the existing file');
+const protectedCharacters = `${JSON.stringify(protectGlobal(await loadCustomizations(), 'characters', characters))}\n`;
 const characterFile = new URL('public/story/character-index.json', root);
-if (await readFile(characterFile, 'utf8').catch(() => null) !== stdout) await writeFile(characterFile, stdout);
+if (await readFile(characterFile, 'utf8').catch(() => null) !== protectedCharacters) await writeFile(characterFile, protectedCharacters);
 await run('sync-archive-metadata.mjs');
 await run('sync-story-thumbnails.mjs');
 await run('download-story-media.mjs', ['--new-only', `--max-file-mib=${maxFileMiB}`, ...args.filter(arg => !arg.startsWith('--max-file-mib='))]);
 await run('sync-story-localizations.mjs', ['--refresh']);
+await run('apply-customizations.mjs');
 console.log('\n[story:update] Complete. See public/story/sync-report.json and media-download-report.json for changes and missing sources.');

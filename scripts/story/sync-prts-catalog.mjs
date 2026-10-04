@@ -9,6 +9,7 @@ import path from 'node:path';
 import { collectStoryResources, extractStoryText, audioUrl } from './storyResources.mjs';
 import { classifyStory, storyCategories } from '../../src/utils/storyCatalog.js';
 import { selectStoryCover, fillStoryCoverFallbacks } from '../../src/utils/storyImages.js';
+import { initializeBaseline, loadCustomizations, captureLocalChanges, protectScript, protectManifest, protectRow, protectGlobal, finishCustomizations } from './story-customizations.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const output = path.join(root, 'public/story');
@@ -23,6 +24,9 @@ await mkdir(cache, { recursive: true });
 await mkdir(output, { recursive: true });
 const previousCatalog = JSON.parse(await readFile(path.join(output, 'catalog.json'), 'utf8').catch(() => '[]'));
 const previousRows = new Map(previousCatalog.map(row => [row.id, row]));
+await initializeBaseline();
+const customizations = await loadCustomizations();
+await captureLocalChanges(customizations, previousCatalog);
 const syncState = JSON.parse(await readFile(path.join(output, 'sync-state.json'), 'utf8').catch(() => '{"schemaVersion":1,"pages":{}}'));
 syncState.pages ||= {};
 let fetchedScripts = 0, reusedScripts = 0, changedFiles = 0;
@@ -98,7 +102,7 @@ for (const [key, url] of Object.entries(mediaMap(contents(charPage)))) {
   const base = key.replace(/-\d+\$\d+$/, '');
   if (!portraitDefaults[base] || /-1\$1$/.test(key)) portraitDefaults[base] = url;
 }
-const variables = JSON.parse(contents(audioPage));
+const variables = protectGlobal(customizations, 'variables', JSON.parse(contents(audioPage)));
 const mediaReport = JSON.parse(await readFile(path.join(output, 'media-sync-report.json'), 'utf8').catch(() => '{"resolved":[],"unresolved":[]}'));
 const verifiedMedia = new Map(mediaReport.resolved.map(item => [`${item.type}:${item.key}`, item.url]));
 const localMedia = JSON.parse(await readFile(path.join(output, 'media/local-index.json'), 'utf8').catch(() => '{"entries":{},"references":{}}'));
@@ -122,6 +126,7 @@ for (let offset = 0; offset < pages.length; offset += 50) {
   const changed = batch.filter(page => {
     const saved = syncState.pages[page.pageid];
     const id = page.title === 'W2G/BEG' ? 'w2g-beg' : `prts-${page.pageid}`;
+    if (customizations.allowUpstream.has(id)) return true;
     if (!incremental || !saved || !revisionIds.get(page.pageid) || saved.revision !== revisionIds.get(page.pageid) || saved.title !== page.title) return true;
     if (saved.dependencyTitle && saved.dependencyRevision !== dependencyIds.get(saved.dependencyTitle)) return true;
     return !previousRows.get(id)?.available || !existsSync(path.join(output, id, 'script.txt')) || !existsSync(path.join(output, id, 'manifest.json'));
@@ -149,7 +154,7 @@ for (let offset = 0; offset < pages.length; offset += 50) {
         dependencyRevision = dataPage.query.pages[0]?.revisions?.[0]?.revid;
         raw = raw.replace('{{:{{PAGENAME}}/data}}', contents(dataPage.query.pages[0]));
       }
-      const script = extractStoryText(raw);
+      const script = await protectScript(customizations, id, extractStoryText(raw));
       const resources = collectStoryResources(script, variables);
       const assets = {};
       const audio = {};
@@ -188,18 +193,25 @@ for (let offset = 0; offset < pages.length; offset += 50) {
           if (needed.has(key) && entry.path && existsSync(path.resolve(folder, entry.path))) entries[key] = entry;
         }
       }
+      const protectedManifest = await protectManifest(customizations, id, { ...existing, schemaVersion: 3, storyId: item.title, title, sourcePage: row.sourcePage, script: { ...existing.script, path: 'script.txt', sourceUrl: row.sourcePage, bytes: Buffer.byteLength(script), sha256: createHash('sha256').update(script).digest('hex') }, commandCount: resources.commands.length, firstVisual, assets, audio, videos, mediaMode: 'local-preferred' });
       await mkdir(folder, { recursive: true });
-      await saveChanged(path.join(folder, 'script.txt'), script);
-      await saveChanged(path.join(folder, 'manifest.json'), `${JSON.stringify({ ...existing, schemaVersion: 3, storyId: item.title, title, sourcePage: row.sourcePage, script: { ...existing.script, path: 'script.txt', sourceUrl: row.sourcePage, bytes: Buffer.byteLength(script), sha256: createHash('sha256').update(script).digest('hex') }, commandCount: resources.commands.length, firstVisual, assets, audio, videos, mediaMode: 'local-preferred' })}\n`);
+      const scriptFile = path.resolve(folder, protectedManifest.script.path);
+      if (!scriptFile.startsWith(folder + path.sep)) throw new Error(`Custom script must stay inside its story directory: ${id}`);
+      await saveChanged(scriptFile, script);
+      await saveChanged(path.join(folder, 'manifest.json'), `${JSON.stringify(protectedManifest)}\n`);
       syncState.pages[item.pageid] = { title: item.title, revision: page?.revisions?.[0]?.revid, ...(dependencyTitle ? { dependencyTitle, dependencyRevision } : {}) };
     } catch (error) {
       row.available = false;
       failures.push({ page: item.title, reason: error.message });
     }
-    catalog.push(!row.available && previousRows.get(id)?.available ? previousRows.get(id) : classifyStory(row));
+    catalog.push(await protectRow(customizations, !row.available && previousRows.get(id)?.available ? previousRows.get(id) : classifyStory(row)));
   }
   console.log(`Synced ${Math.min(offset + 50, pages.length)} / ${pages.length}`);
 }
+
+// Keep locally added stories and old entries even if PRTS no longer lists them.
+const synchronizedIds = new Set(catalog.map(row => row.id));
+for (const row of previousCatalog) if (!synchronizedIds.has(row.id)) catalog.push(await protectRow(customizations, row));
 
 const groupOrder = new Map();
 for (const row of catalog) if (!groupOrder.has(row.group)) groupOrder.set(row.group, groupOrder.size);
@@ -212,6 +224,7 @@ if (tutorial > 0) catalog.unshift(...catalog.splice(tutorial, 1));
 await saveChanged(path.join(output, 'prts-variables.json'), `${JSON.stringify(variables)}\n`);
 await saveChanged(path.join(output, 'catalog.json'), `${JSON.stringify(fillStoryCoverFallbacks(catalog), null, 2)}\n`);
 await saveChanged(path.join(output, 'sync-state.json'), `${JSON.stringify(syncState, null, 2)}\n`);
-await writeFile(path.join(output, 'sync-report.json'), `${JSON.stringify({ syncedAt: new Date().toISOString(), source: apiRoot, mode: incremental ? 'incremental' : 'full', discovered: pages.length, fetchedScripts, reusedScripts, changedFiles, playable: catalog.filter((row) => row.available).length, failures, missingMedia: [...missingMedia] }, null, 2)}\n`);
+await finishCustomizations(customizations, { checkpoint: process.env.STORY_SYNC_PIPELINE !== '1' });
+await writeFile(path.join(output, 'sync-report.json'), `${JSON.stringify({ syncedAt: new Date().toISOString(), source: apiRoot, mode: incremental ? 'incremental' : 'full', discovered: pages.length, fetchedScripts, reusedScripts, changedFiles, customContentConflicts: customizations.report, playable: catalog.filter((row) => row.available).length, failures, missingMedia: [...missingMedia] }, null, 2)}\n`);
 console.log(`Finished: ${catalog.length - failures.length} playable stories; ${failures.length} unavailable scripts; ${missingMedia.size} unresolved media IDs (see sync-report.json)`);
 if (failures.length) process.exitCode = 1;

@@ -88,3 +88,6 @@ export function compressStoryVideo(input, source, limitBytes) {
   pending = result.catch(() => {});
   return result;
 }
+export async function validateModifiedMedia(file) {
+  await exec(await ffmpeg(), ['-v', 'error', '-xerror', '-i', file, '-map', '0:v?', '-map', '0:a?', '-f', 'null', '-'], { timeout: 30 * 60 * 1000, maxBuffer: 2 * 1024 * 1024 });
+}

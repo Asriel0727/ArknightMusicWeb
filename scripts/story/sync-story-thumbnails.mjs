@@ -8,10 +8,15 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { prtsThumbnailUrl, isEmptyStoryCover, selectStoryCover, fillStoryCoverFallbacks } from '../../src/utils/storyImages.js';
 import { syncOperatorCovers } from './operator-covers.mjs';
+import { initializeBaseline, loadCustomizations, captureLocalChanges, finishCustomizations } from './story-customizations.mjs';
 
 const root = fileURLToPath(new URL('../../public/story/', import.meta.url));
 const directory = path.join(root, 'thumbnails');
 const catalogPath = path.join(root, 'catalog.json');
+await initializeBaseline();
+const customizations = await loadCustomizations();
+if (process.env.STORY_SYNC_PIPELINE !== '1') await captureLocalChanges(customizations, JSON.parse(await readFile(catalogPath, 'utf8')));
+await finishCustomizations(customizations);
 const originalCatalog = JSON.parse(await readFile(catalogPath, 'utf8'));
 let repaired = 0;
 for (const story of originalCatalog) {
@@ -74,4 +79,5 @@ await writeFile(indexPath, `${JSON.stringify(index, null, 2)}\n`);
 await writeFile(path.join(root, 'thumbnail-report.json'), `${JSON.stringify({ sources: urls.length, cached: Object.keys(index).length, bytes: totalBytes, failures }, null, 2)}\n`);
 await syncOperatorCovers(catalog, root);
 await writeFile(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
+await finishCustomizations(customizations, { checkpoint: process.env.STORY_SYNC_PIPELINE !== '1' });
 console.log(`Cached ${Object.keys(index).length} covers in ${(totalBytes / 1024 / 1024).toFixed(2)} MiB; ${failures.length} remote fallbacks`);

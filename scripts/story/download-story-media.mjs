@@ -7,8 +7,9 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { collectStoryResources, audioUrl, videoUrl } from './storyResources.mjs';
-import { compressStoryVideo } from './compress-story-video.mjs';
+import { compressStoryVideo, validateModifiedMedia } from './compress-story-video.mjs';
 import { renameWithRetry, writeAtomic } from './atomic-file.mjs';
+import { initializeBaseline, loadCustomizations, captureLocalChanges, finishCustomizations, isProtectedMedia } from './story-customizations.mjs';
 
 const exec = promisify(execFile);
 const root = new URL('../../public/story/', import.meta.url);
@@ -29,6 +30,10 @@ const officialVideoUrls = new Set(officialVideoPlan.entries.map(entry => entry.u
 const slow = process.argv.includes('--slow');
 const concurrency = slow ? 2 : 4;
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
+await initializeBaseline();
+const customizations = await loadCustomizations();
+if (process.env.STORY_SYNC_PIPELINE !== '1') await captureLocalChanges(customizations, await read('catalog.json'));
+await finishCustomizations(customizations);
 const catalog = await read('catalog.json');
 const variables = await read('prts-variables.json');
 const remoteReport = await read('media-sync-report.json').catch(() => ({ resolved: [], unresolved: [] }));
@@ -51,13 +56,15 @@ for (const story of catalog.filter(row => row.available)) {
   const references = [];
   for (const type of ['audio', 'videos']) for (const key of new Set([...resources[type], ...Object.keys(manifest[type] || {})])) {
     const entry = manifest[type]?.[key];
+    const pinned = isProtectedMedia(customizations, story.id, type, key);
+    if (pinned && entry?.path) continue;
     // The original tutorial's downloaded snapshot is already local.
     if (entry?.path && !entry.path.startsWith('../media/')) continue;
     const id = `${type}:${key}`;
-    const candidates = [index.references?.[id], communitySources.get(id)?.url, entry?.sourceUrl, entry?.url, resolved.get(id), ...(missing.get(id) || [])].map(safeUrl).filter(Boolean);
-    if (!candidates.length) { try { candidates.push(type === 'audio' ? audioUrl(key, variables) : videoUrl(key, variables)); } catch {} }
+    const candidates = (pinned ? [entry?.url || entry?.sourceUrl] : [index.references?.[id], communitySources.get(id)?.url, entry?.sourceUrl, entry?.url, resolved.get(id), ...(missing.get(id) || [])]).map(safeUrl).filter(Boolean);
+    if (!pinned && !candidates.length) { try { candidates.push(type === 'audio' ? audioUrl(key, variables) : videoUrl(key, variables)); } catch {} }
     const urls = [...new Set(candidates)];
-    references.push({ type, key, urls });
+    references.push({ type, key, urls, pinned });
     for (const url of urls) if (!jobs.has(url)) jobs.set(url, { url, type, path: urlPath(url, type), result: null });
   }
   manifests.push({ story, manifest, references });
@@ -67,6 +74,7 @@ await mkdir(new URL('media/videos/', root), { recursive: true });
 await mkdir(downloads, { recursive: true });
 let downloaded = 0, reused = 0, skippedKnownMissing = 0, bytesDownloaded = 0, done = 0;
 const compressedSources = [];
+const preservedModifiedSources = [];
 const failures = [];
 let checkpoint = Promise.resolve();
 function saveIndex({ required = false } = {}) {
@@ -103,11 +111,19 @@ async function worker() {
     const file = new URL(job.path, root);
     const part = new URL(`${createHash('sha256').update(job.url).digest('hex')}.part`, downloads);
     const saved = index.entries[job.url];
-    let existingMedia, compressed;
+    let existingMedia, compressed, preserveOnly = false;
     try {
       const expected = communityUrls.get(job.url);
-      let media = await inspect(file, job.type, saved?.conversion ? null : expected).catch(() => null);
-      const validExisting = media && (!saved || media.sha256 === saved.sha256);
+      let media = await inspect(file, job.type, saved ? null : expected).catch(() => null);
+      const locallyModified = Boolean(media && saved && media.sha256 !== saved.sha256);
+      if (locallyModified) {
+        existingMedia = media;
+        preserveOnly = true;
+        await validateModifiedMedia(fileURLToPath(file));
+        preserveOnly = false;
+        preservedModifiedSources.push({ sourceUrl: job.url, path: job.path, sha256: media.sha256 });
+      }
+      const validExisting = Boolean(media);
       if (validExisting) existingMedia = media;
       let conversion = validExisting ? saved?.conversion : null;
       let sourceFile;
@@ -145,12 +161,12 @@ async function worker() {
         await renameWithRetry(part, file);
       }
       if (!validExisting) { downloaded++; bytesDownloaded += compressed?.conversion.sourceBytes || media.bytes; }
-      job.result = { path: job.path, sourceUrl: job.url, ...media, ...(conversion ? { conversion } : {}) };
+      job.result = { path: job.path, sourceUrl: job.url, ...media, ...(conversion ? { conversion } : {}), ...(locallyModified || saved?.custom ? { custom: true } : {}) };
       index.entries[job.url] = job.result;
     } catch (error) {
       // Never remove a valid existing file or its index on compression/download failure.
       if (existingMedia) {
-        if (existingMedia.bytes <= 100 * 1048576) job.result = { path: job.path, sourceUrl: job.url, ...existingMedia, ...(saved?.conversion ? { conversion: saved.conversion } : {}) };
+        if (!preserveOnly && existingMedia.bytes <= 100 * 1048576) job.result = { path: job.path, sourceUrl: job.url, ...existingMedia, ...(saved?.conversion ? { conversion: saved.conversion } : {}) };
         index.entries[job.url] = saved || { path: job.path, sourceUrl: job.url, ...existingMedia };
       } else delete index.entries[job.url];
       const previousFailure = (offline || communityOnly || error.message === 'known-missing-source') && previousFailures.get(job.url);
@@ -172,11 +188,11 @@ index.references ||= {};
 const unresolved = [];
 for (const { story, manifest, references } of manifests) {
   let changed = false;
-  for (const { type, key, urls } of references) {
+  for (const { type, key, urls, pinned } of references) {
     const downloadedEntry = urls.map(url => jobs.get(url)?.result).find(Boolean);
     if (!downloadedEntry) { unresolved.push({ storyId: story.id, type, key, candidates: urls }); continue; }
     const entry = { ...downloadedEntry, path: `../${downloadedEntry.path}` };
-    index.references[`${type}:${key}`] = downloadedEntry.sourceUrl;
+    if (!pinned) index.references[`${type}:${key}`] = downloadedEntry.sourceUrl;
     if (JSON.stringify(manifest[type]?.[key]) !== JSON.stringify(entry)) {
       manifest[type] ||= {}; manifest[type][key] = entry; changed = true;
     }
@@ -185,6 +201,7 @@ for (const { story, manifest, references } of manifests) {
   if (changed) { await writeFile(new URL(`${story.id}/manifest.json`, root), `${JSON.stringify(manifest)}\n`); changedStories++; }
 }
 await saveIndex({ required: true });
+await finishCustomizations(customizations, { checkpoint: process.env.STORY_SYNC_PIPELINE !== '1' });
 const localFiles = [...jobs.values()].filter(job => job.result);
 const totals = { audio: localFiles.filter(job => job.type === 'audio').length, videos: localFiles.filter(job => job.type === 'videos').length, bytes: localFiles.reduce((sum, job) => sum + job.result.bytes, 0) };
 const missingKeys = [...new Map(unresolved.map(item => [`${item.type}:${item.key}`, { type: item.type, key: item.key }])).values()];
@@ -195,7 +212,7 @@ for (const name of await readdir(new URL('media/videos/', root))) {
   const info = await stat(new URL(`media/videos/${name}`, root));
   if (info.size > 100 * 1048576) unsafeLocalFiles.push({ path: `media/videos/${name}`, bytes: info.size });
 }
-const report = { downloadedAt: new Date().toISOString(), mode: newOnly ? 'incremental-local-files' : 'local-files', stories: manifests.length, uniqueUrls: jobs.size, downloaded, reused, skippedKnownMissing, bytesDownloaded, compressed: compressedSources.length, compressedSources, unsafeLocalFiles, totals, missingTotals, localReferences, changedStories, failures, unresolved };
+const report = { downloadedAt: new Date().toISOString(), mode: newOnly ? 'incremental-local-files' : 'local-files', stories: manifests.length, uniqueUrls: jobs.size, downloaded, reused, skippedKnownMissing, bytesDownloaded, compressed: compressedSources.length, compressedSources, preservedModifiedSources, unsafeLocalFiles, totals, missingTotals, localReferences, changedStories, failures, unresolved };
 await writeFile(new URL('media-download-report.json', root), `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({ ...report, failures: failures.length, unresolved: unresolved.length }));
 if (unsafeLocalFiles.length) { console.error('Oversized local videos remain; publishing is blocked. See unsafeLocalFiles in media-download-report.json.'); process.exitCode = 1; }
