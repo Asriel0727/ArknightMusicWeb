@@ -2,12 +2,13 @@
 // Download shared media once, validate the actual bytes, then switch story manifests to local paths.
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, open, readFile, readdir, rename, stat, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, open, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { collectStoryResources, audioUrl, videoUrl } from './storyResources.mjs';
 import { compressStoryVideo } from './compress-story-video.mjs';
+import { renameWithRetry, writeAtomic } from './atomic-file.mjs';
 
 const exec = promisify(execFile);
 const root = new URL('../../public/story/', import.meta.url);
@@ -68,15 +69,16 @@ let downloaded = 0, reused = 0, skippedKnownMissing = 0, bytesDownloaded = 0, do
 const compressedSources = [];
 const failures = [];
 let checkpoint = Promise.resolve();
-function saveIndex() {
+function saveIndex({ required = false } = {}) {
   // Snapshot before queueing; serialized atomic replacement avoids concurrent checkpoint races.
   const text = `${JSON.stringify(index, null, 2)}\n`;
-  checkpoint = checkpoint.then(async () => {
-    const temp = new URL('media/local-index.json.part', root);
-    await writeFile(temp, text);
-    await rename(temp, new URL('media/local-index.json', root));
+  const operation = checkpoint.then(() => writeAtomic(new URL('media/local-index.json', root), text));
+  // A failed checkpoint must not poison the queue or interrupt other media downloads.
+  checkpoint = operation.catch(() => {});
+  return operation.catch(error => {
+    if (required) throw error;
+    console.warn(`Index checkpoint deferred: ${error.message}`);
   });
-  return checkpoint;
 }
 async function inspect(file, type, expected) {
   const info = await stat(file);
@@ -136,11 +138,11 @@ async function worker() {
         const before = media;
         media = await inspect(compressed.file, job.type);
         conversion = { ...compressed.conversion, sourceUrl: job.url, ...(conversion ? { previousConversion: conversion } : {}) };
-        await rename(compressed.file, file);
+        await renameWithRetry(compressed.file, file);
         compressedSources.push({ sourceUrl: job.url, bytesBefore: before.bytes, bytesAfter: media.bytes, sha256: media.sha256 });
       } else if (!validExisting) {
         if (media.bytes > publishLimit) throw new Error('media-exceeds-publish-limit');
-        await rename(part, file);
+        await renameWithRetry(part, file);
       }
       if (!validExisting) { downloaded++; bytesDownloaded += compressed?.conversion.sourceBytes || media.bytes; }
       job.result = { path: job.path, sourceUrl: job.url, ...media, ...(conversion ? { conversion } : {}) };
@@ -182,7 +184,7 @@ for (const { story, manifest, references } of manifests) {
   }
   if (changed) { await writeFile(new URL(`${story.id}/manifest.json`, root), `${JSON.stringify(manifest)}\n`); changedStories++; }
 }
-await saveIndex();
+await saveIndex({ required: true });
 const localFiles = [...jobs.values()].filter(job => job.result);
 const totals = { audio: localFiles.filter(job => job.type === 'audio').length, videos: localFiles.filter(job => job.type === 'videos').length, bytes: localFiles.reduce((sum, job) => sum + job.result.bytes, 0) };
 const missingKeys = [...new Map(unresolved.map(item => [`${item.type}:${item.key}`, { type: item.type, key: item.key }])).values()];

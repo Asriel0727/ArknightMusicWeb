@@ -124,3 +124,7 @@ CameraShake 支援劇本的時間、橫／縱強度、頻率與淡出，切換�
 壓縮使用 FFmpeg / libx264，先嘗試 CRF 20，仍超標時按影片長度和原音轨預算做兩次編碼，保留原解析度與影格時間戳，音軌直接複製。完成後確認長度、解析度、音軌數量，解碼完整影片並比對原音軌封包 SHA-256，再次確認成品大小；通過後才替換檔案並更新本地索引與劇情 manifest。`media-download-report.json` 的 compressed / compressedSources 記錄壓縮數量及前後大小，conversion 保留轉換來源校驗資訊。
 
 本機優先使用 `FFMPEG_PATH` 指定的執行檔，未指定時沿用 `tmp/video-compression/ffmpeg.exe` 或 PATH 的 ffmpeg；目前這台電腦已有工具。GitHub 排程會檢查並安裝 FFmpeg。多部大影片排隊壓縮，避免同時大量占用 CPU。壓縮或驗證失敗時不覆蓋既有素材，新下載的失敗檔案不進入 public；原因記錄在 failures，已知失敗可加 `--retry-unresolved` 重試。如果本地仍有超過 GitHub 100 MiB 限制的影片，命令回傳失敗、排程停止提交及發布，unsafeLocalFiles 列出問題檔案。官方 USM 原始影片仍需專門解包，本流程只處理已可讀的 MP4。
+
+## Windows 索引鎖檔處理
+
+素材索引先寫入同目錄的獨立 `.part` 檔案，關閉檔案控制代碼後再替換原索引；EPERM / EACCES / EBUSY 會短暫重試。中途 checkpoint 失敗會保留完整暫存快照並繼續處理影音，不會讓後續儲存佇列永久失敗。最後一次索引保存必須成功，否則命令仍回傳失敗並停止後續發布。持續被占用時，錯誤會列出原索引與可恢復的暫存檔位置；不刪除或直接截斷原索引。影片檔案替換也沿用相同重試。修正後重跑原同步命令，既有檔案仍會先驗證與重用。
