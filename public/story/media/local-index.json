@@ -9196,8 +9196,23 @@
     "https://static.prts.wiki/video/cfa_02.mp4": {
       "path": "media/videos/5951ddee5a1f23799b7cacd250a050b9b43d0d6b93276d54af673a1890232f5e.mp4",
       "sourceUrl": "https://static.prts.wiki/video/cfa_02.mp4",
-      "bytes": 103578864,
-      "sha256": "1f2e894b97275cfa7b3b5a90347697d04453c924b73a851675f9b976dbba748a"
+      "bytes": 26802167,
+      "sha256": "901590d4d080e498a91fc999461d6f68863b9c5f5c3729faa84e09404125583d",
+      "conversion": {
+        "tool": "FFmpeg / libx264",
+        "sourceFormat": "MP4",
+        "sourceBytes": 103578864,
+        "sourceSha256": "1f2e894b97275cfa7b3b5a90347697d04453c924b73a851675f9b976dbba748a",
+        "videoCodec": "H.264",
+        "pixelFormat": "yuv420p",
+        "strategy": "crf-20",
+        "audio": "copy",
+        "audioVerified": true,
+        "durationSeconds": 69.96000000000001,
+        "width": 1560,
+        "height": 720,
+        "sourceUrl": "https://static.prts.wiki/video/cfa_02.mp4"
+      }
     },
     "https://static.prts.wiki/video/cfa_01.mp4": {
       "path": "media/videos/546a048ebd3522abbdf7c624c21eb1db661fb37fec48b206e8b3e991c42f6958.mp4",
