@@ -25,6 +25,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Prepare video compression
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install --no-install-recommends -y ffmpeg
+          fi
       - name: Synchronize changed stories and new media
         run: npm run story:update -- --max-file-mib=95
       - name: Verify production build

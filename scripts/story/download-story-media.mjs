@@ -2,14 +2,16 @@
 // Download shared media once, validate the actual bytes, then switch story manifests to local paths.
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, open, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, open, readFile, readdir, rename, stat, unlink, writeFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { collectStoryResources, audioUrl, videoUrl } from './storyResources.mjs';
+import { compressStoryVideo } from './compress-story-video.mjs';
 
 const exec = promisify(execFile);
 const root = new URL('../../public/story/', import.meta.url);
+const downloads = new URL('../../tmp/story-media-downloads/', import.meta.url);
 const read = async name => JSON.parse(await readFile(new URL(name, root), 'utf8'));
 const offline = process.argv.includes('--offline');
 const communityOnly = process.argv.includes('--community');
@@ -17,6 +19,7 @@ const newOnly = process.argv.includes('--new-only');
 const retryUnresolved = process.argv.includes('--retry-unresolved');
 const maxFileMiB = Number(process.argv.find(arg => arg.startsWith('--max-file-mib='))?.split('=')[1] || 95);
 if (!Number.isFinite(maxFileMiB) || maxFileMiB <= 0 || maxFileMiB > 512) throw new Error('--max-file-mib must be between 0 and 512');
+const publishLimit = Math.min(maxFileMiB, 95) * 1048576;
 const communityPlan = JSON.parse(await readFile(new URL('community-media-sources.json', import.meta.url), 'utf8'));
 const communitySources = new Map(communityPlan.entries.map(entry => [`${entry.type}:${entry.key}`, entry]));
 const communityUrls = new Map(communityPlan.entries.map(entry => [entry.url, entry]));
@@ -60,7 +63,9 @@ for (const story of catalog.filter(row => row.available)) {
 }
 await mkdir(new URL('media/audio/', root), { recursive: true });
 await mkdir(new URL('media/videos/', root), { recursive: true });
+await mkdir(downloads, { recursive: true });
 let downloaded = 0, reused = 0, skippedKnownMissing = 0, bytesDownloaded = 0, done = 0;
+const compressedSources = [];
 const failures = [];
 let checkpoint = Promise.resolve();
 function saveIndex() {
@@ -94,12 +99,17 @@ async function worker() {
   while (queue.length) {
     const job = queue.shift();
     const file = new URL(job.path, root);
-    const part = new URL(`${job.path}.part`, root);
+    const part = new URL(`${createHash('sha256').update(job.url).digest('hex')}.part`, downloads);
+    const saved = index.entries[job.url];
+    let existingMedia, compressed;
     try {
       const expected = communityUrls.get(job.url);
-      let media = await inspect(file, job.type, expected).catch(() => null);
-      const saved = index.entries[job.url];
-      if (media && (!saved || media.sha256 === saved.sha256)) reused++;
+      let media = await inspect(file, job.type, saved?.conversion ? null : expected).catch(() => null);
+      const validExisting = media && (!saved || media.sha256 === saved.sha256);
+      if (validExisting) existingMedia = media;
+      let conversion = validExisting ? saved?.conversion : null;
+      let sourceFile;
+      if (validExisting) { reused++; sourceFile = file; }
       else {
         if (newOnly && !retryUnresolved && !saved && previousFailures.has(job.url)) {
           skippedKnownMissing++;
@@ -112,22 +122,40 @@ async function worker() {
           '-4', '--fail', '--location', '--silent', '--show-error', '--proto', '=https', '--proto-redir', '=https',
           '-A', userAgent, '-e', 'https://prts.wiki/', '--retry', '1', '--retry-delay', '2',
           '--connect-timeout', '10', '--max-time', job.type === 'audio' ? '90' : '300',
-          '--max-filesize', String(Math.min(job.type === 'audio' ? 32 : 512, maxFileMiB) * 1024 * 1024),
+          // Large videos are allowed only in the ignored temp directory, never directly in public.
+          '--max-filesize', String((job.type === 'audio' ? Math.min(32 * 1048576, publishLimit) : 512 * 1048576)),
           '--output', fileURLToPath(part), '--write-out', '%{http_code}|%{content_type}', job.url,
         ], { maxBuffer: 128 * 1024, timeout: job.type === 'audio' ? 200000 : 620000 });
         if (!/^200\|(?:audio\/|video\/|application\/octet-stream)/i.test(stdout.trim())) throw new Error(`non-media-response: ${stdout.trim()}`);
         media = await inspect(part, job.type, expected);
-        await rename(part, file);
-        downloaded++; bytesDownloaded += media.bytes;
+        sourceFile = part;
       }
-      job.result = { path: job.path, sourceUrl: job.url, ...media, ...(saved?.conversion ? { conversion: saved.conversion } : {}) };
+      if (job.type === 'videos' && media.bytes > publishLimit) {
+        console.log(`Compressing ${job.url} (${(media.bytes / 1048576).toFixed(1)} MiB)`);
+        compressed = await compressStoryVideo(fileURLToPath(sourceFile), media, publishLimit);
+        const before = media;
+        media = await inspect(compressed.file, job.type);
+        conversion = { ...compressed.conversion, sourceUrl: job.url, ...(conversion ? { previousConversion: conversion } : {}) };
+        await rename(compressed.file, file);
+        compressedSources.push({ sourceUrl: job.url, bytesBefore: before.bytes, bytesAfter: media.bytes, sha256: media.sha256 });
+      } else if (!validExisting) {
+        if (media.bytes > publishLimit) throw new Error('media-exceeds-publish-limit');
+        await rename(part, file);
+      }
+      if (!validExisting) { downloaded++; bytesDownloaded += compressed?.conversion.sourceBytes || media.bytes; }
+      job.result = { path: job.path, sourceUrl: job.url, ...media, ...(conversion ? { conversion } : {}) };
       index.entries[job.url] = job.result;
     } catch (error) {
-      // The .part path is derived only from a URL hash under this project's media directory.
-      await unlink(part).catch(() => {});
-      delete index.entries[job.url];
+      // Never remove a valid existing file or its index on compression/download failure.
+      if (existingMedia) {
+        if (existingMedia.bytes <= 100 * 1048576) job.result = { path: job.path, sourceUrl: job.url, ...existingMedia, ...(saved?.conversion ? { conversion: saved.conversion } : {}) };
+        index.entries[job.url] = saved || { path: job.path, sourceUrl: job.url, ...existingMedia };
+      } else delete index.entries[job.url];
       const previousFailure = (offline || communityOnly || error.message === 'known-missing-source') && previousFailures.get(job.url);
-      failures.push(previousFailure || { url: job.url, type: job.type, status: Number(String(error.stdout || '').match(/^(\d{3})\|/)?.[1]) || null, reason: error.code === 22 ? 'http-error' : String(error.message).slice(0, 400) });
+      failures.push(previousFailure || { url: job.url, type: job.type, status: Number(String(error.stdout || '').match(/^(\d{3})\|/)?.[1]) || null, reason: error.code === 22 ? 'http-error' : String(error.message).slice(0, 400), retainedExisting: Boolean(existingMedia) });
+    } finally {
+      await unlink(part).catch(() => {});
+      await compressed?.cleanup();
     }
     if (++done % 25 === 0 || done === jobs.size) {
       await saveIndex();
@@ -159,6 +187,13 @@ const localFiles = [...jobs.values()].filter(job => job.result);
 const totals = { audio: localFiles.filter(job => job.type === 'audio').length, videos: localFiles.filter(job => job.type === 'videos').length, bytes: localFiles.reduce((sum, job) => sum + job.result.bytes, 0) };
 const missingKeys = [...new Map(unresolved.map(item => [`${item.type}:${item.key}`, { type: item.type, key: item.key }])).values()];
 const missingTotals = { audio: missingKeys.filter(item => item.type === 'audio').length, videos: missingKeys.filter(item => item.type === 'videos').length };
-const report = { downloadedAt: new Date().toISOString(), mode: newOnly ? 'incremental-local-files' : 'local-files', stories: manifests.length, uniqueUrls: jobs.size, downloaded, reused, skippedKnownMissing, bytesDownloaded, totals, missingTotals, localReferences, changedStories, failures, unresolved };
+const unsafeLocalFiles = [];
+for (const name of await readdir(new URL('media/videos/', root))) {
+  if (!name.endsWith('.mp4')) continue;
+  const info = await stat(new URL(`media/videos/${name}`, root));
+  if (info.size > 100 * 1048576) unsafeLocalFiles.push({ path: `media/videos/${name}`, bytes: info.size });
+}
+const report = { downloadedAt: new Date().toISOString(), mode: newOnly ? 'incremental-local-files' : 'local-files', stories: manifests.length, uniqueUrls: jobs.size, downloaded, reused, skippedKnownMissing, bytesDownloaded, compressed: compressedSources.length, compressedSources, unsafeLocalFiles, totals, missingTotals, localReferences, changedStories, failures, unresolved };
 await writeFile(new URL('media-download-report.json', root), `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({ ...report, failures: failures.length, unresolved: unresolved.length }));
+if (unsafeLocalFiles.length) { console.error('Oversized local videos remain; publishing is blocked. See unsafeLocalFiles in media-download-report.json.'); process.exitCode = 1; }
