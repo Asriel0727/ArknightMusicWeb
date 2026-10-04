@@ -3,10 +3,12 @@ name: Sync story snapshots
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 18 1 * *'
+    # Daily 02:30 in Asia/Taipei (UTC+8).
+    - cron: '30 18 * * *'
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: sync-story-snapshots
@@ -15,7 +17,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,23 +25,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Refresh scripts and referenced media
-        run: npm run story:sync -- --overwrite
-      - name: Discover and synchronize all PRTS stories
-        run: npm run story:sync-prts
-      - name: Cache optimized story cover thumbnails
-        run: npm run story:sync-thumbnails
-      - name: Refresh story lines and viewing order
-        run: npm run story:sync-archive
-      - name: Verify story snapshots
-        run: node --test test/story-script.test.mjs test/story-resources.test.mjs
+      - name: Synchronize changed stories and new media
+        run: npm run story:update -- --max-file-mib=95
       - name: Verify production build
         run: npm run build
       - name: Commit complete snapshot
         id: commit
         shell: bash
         run: |
-          git add public/story
+          git add public/story scripts/story/localization-paths.json
           if git diff --cached --quiet; then
             exit 0
           fi
@@ -47,3 +41,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore: sync story snapshots"
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      # GITHUB_TOKEN pushes do not trigger the Pages workflow's push event.
+      - name: Publish updated snapshots
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref "$GITHUB_REF_NAME"

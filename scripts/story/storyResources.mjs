@@ -41,7 +41,7 @@ export function collectStoryResources(source, variables = {}) {
       }
     }
     if (kind === 'playvideo' || kind === 'video') {
-      const id = resolve(a.key || a.name || a.video || a.res);
+      const id = String(a.url || a.key || a.name || a.video || a.res || '').replace(/^\$/, '');
       if (id) videos.add(id);
     }
   }
@@ -59,11 +59,21 @@ export function imageCandidates(id) {
 }
 
 export function audioUrl(key, variables) {
-  const resource = key.startsWith('Sound_Beta_2/') ? key : variables[key];
-  if (typeof resource !== 'string' || !resource.startsWith('Sound_Beta_2/')) {
+  key = String(key).replace(/^\$/, '');
+  const alias = Object.keys(variables).find((name) => name.toLowerCase() === key.toLowerCase());
+  const resource = alias ? variables[alias] : key;
+  if (typeof resource !== 'string') {
     throw new Error(`No PRTS audio mapping for ${key}`);
   }
-  const relative = resource.slice('Sound_Beta_2/'.length);
-  if (!/^[A-Za-z0-9_/-]+$/.test(relative)) throw new Error(`Unsafe audio path for ${key}`);
-  return `https://torappu.prts.wiki/assets/audio/${relative.toLowerCase()}.mp3`;
+  const relative = resource.replace(/^Sound_Beta_2\//i, '').replace(/\.(ogg|mp3)$/i, '');
+  if (!relative.includes('/') || !/^[A-Za-z0-9_/'#-]+$/.test(relative) || relative.includes('..')) throw new Error(`No PRTS audio mapping for ${key}`);
+  return `https://torappu.prts.wiki/assets/audio/${relative.toLowerCase().split('/').map(part => encodeURIComponent(part).replaceAll("'", '%27')).join('/')}.mp3`;
+}
+
+export function videoUrl(key, variables = {}) {
+  const alias = String(key).replace(/^\$/, '');
+  const resource = variables[alias] || alias;
+  if (!/^video\/[A-Za-z0-9_/-]+\.mp4$/i.test(resource)) throw new Error(`Unsafe video path: ${key}`);
+  // Story movies remain on the original PRTS CDN, not torappu's audio/AVG host.
+  return `https://static.prts.wiki/${resource.toLowerCase()}`;
 }

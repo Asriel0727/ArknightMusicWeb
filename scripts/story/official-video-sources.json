@@ -1,0 +1,21 @@
+{
+  "resVersion": "26-09-22-07-47-20_6c71fa",
+  "entries": [
+    {
+      "type": "videos",
+      "key": "video/03.mp4",
+      "url": "https://ak.hycdn.cn/assetbundle/official/Android/assets/26-09-22-07-47-20_6c71fa/raw_video_03.dat",
+      "rawPath": "raw/video/03.usm",
+      "md5": "83b4701f993c01587fac7913cf6a9783",
+      "bytes": 16923296
+    },
+    {
+      "type": "videos",
+      "key": "video/act49side/TA02.mp4",
+      "url": "https://ak.hycdn.cn/assetbundle/official/Android/assets/26-09-22-07-47-20_6c71fa/raw_video_act49side_ta02.dat",
+      "rawPath": "raw/video/act49side/ta02.usm",
+      "md5": "a0057a27c7a885a74b6be8e730fb0d46",
+      "bytes": 21004672
+    }
+  ]
+}

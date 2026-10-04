@@ -17,6 +17,7 @@
     "activities:push-pools": "node scripts/push-activity-pools-to-supabase.mjs",
     "activities:sync": "npm run activities:sync-pools && npm run activities:push-pools",
     "activities:audit-pools": "node scripts/audit-activity-pools.mjs",
+    "story:update": "node scripts/story/update-stories.mjs",
     "story:sync": "node scripts/story/sync-stories.mjs",
     "story:sync-prts": "node scripts/story/sync-prts-catalog.mjs",
     "story:sync-thumbnails": "node scripts/story/sync-story-thumbnails.mjs",
@@ -27,7 +28,9 @@
     "character-eps:apply": "node scripts/character-ep-prts-bilibili.mjs --apply",
     "test:character-eps": "node --test test/character-ep-matching.test.mjs",
     "music:audit-audio": "node scripts/audit-music-audio.mjs",
-    "story:sync-localizations": "node scripts/story/sync-story-localizations.mjs"
+    "story:sync-localizations": "node scripts/story/sync-story-localizations.mjs",
+    "story:sync-media": "node scripts/story/sync-story-media.mjs",
+    "story:download-media": "node scripts/story/download-story-media.mjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",

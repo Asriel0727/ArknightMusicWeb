@@ -26,7 +26,7 @@ export function createStoryRunner(commands) {
   let cursor = 0;
   let selectedValue = null;
   let predicateActive = true;
-  let state = { background: '', image: '', portraits: [], focus: 0, grayscale: false, shade: null, speaker: '', music: null };
+  let state = { background: '', image: '', portraits: [], focus: 0, grayscale: false, shade: null, speaker: '', music: null, sounds: {} };
   let history = [];
   let historyIndex = -1;
 
@@ -39,8 +39,29 @@ export function createStoryRunner(commands) {
     if (kind === 'background') state.background = a.image || '';
     if (kind === 'image') state.image = a.image || '';
     if (kind === 'character') {
-      state.portraits = [a.name, a.name2, a.name3].filter(Boolean).map((name) => name.split('#')[0]);
+      const names = [a.name, a.name2, a.name3];
+      const slots = a.name2 ? ['l', 'r', 'm'] : ['m', 'r', 'l'];
+      state.portraits = names.flatMap((name, index) => name ? [{ name, slot: slots[index], dimmed: Number(a.focus) > 0 && Number(a.focus) !== index + 1 }] : []);
       state.focus = Number(a.focus) || 0;
+    }
+    if (kind === 'charslot') {
+      const aliases = { l: 'l', left: 'l', char_left: 'l', r: 'r', right: 'r', char_right: 'r', m: 'm', c: 'm', middle: 'm', center: 'm', char_middle: 'm' };
+      if (!a.slot) { state.portraits = []; return; }
+      const slot = aliases[a.slot.toLowerCase()];
+      if (!slot) return;
+      if (a.name === 'char_empty' || Number(a.ato) === 0) state.portraits = state.portraits.filter(p => p.slot !== slot);
+      else if (a.name) {
+        const portrait = { name: a.name, slot, dimmed: false };
+        state.portraits = [...state.portraits.filter(p => p.slot !== slot), portrait];
+      }
+      if (a.focus !== undefined) {
+        const focused = a.focus.toLowerCase().split(',').map(x => aliases[x.trim()]).filter(Boolean);
+        for (const portrait of state.portraits) portrait.dimmed = a.focus !== 'all' && !focused.includes(portrait.slot);
+      }
+      if (a.bend !== undefined) {
+        const portrait = state.portraits.find(p => p.slot === slot);
+        if (portrait) portrait.dimmed = Number(a.bend) >= .5;
+      }
     }
     if (kind === 'cameraeffect' && a.effect?.toLowerCase() === 'grayscale') {
       state.grayscale = Number(a.amount) > 0;
@@ -55,9 +76,10 @@ export function createStoryRunner(commands) {
       } : null;
     }
     if (kind === 'playmusic') {
-      state.music = { key: (a.key || '').replace(/^\$/, ''), intro: (a.intro || '').replace(/^\$/, ''), volume: Number(a.volume ?? 1) };
+      state.music = { key: (a.key || '').replace(/^\$/, ''), intro: (a.intro || '').replace(/^\$/, ''), volume: Number(a.volume ?? 1), instance: command.line };
     }
     if (kind === 'stopmusic') state.music = null;
+    if (kind === 'musicvolume' && state.music) state.music.volume = Number(a.volume ?? 1);
   }
 
   function scan() {
@@ -70,8 +92,27 @@ export function createStoryRunner(commands) {
         continue;
       }
       if (!predicateActive) continue;
+      if (kind === 'camerashake') {
+        events.push({ type: 'cameraShake', duration: Number(a.duration ?? .5), x: Number(a.xstrength ?? 1), y: Number(a.ystrength ?? 0), vibrato: Number(a.vibrato ?? 10), fadeout: /^(true|1)$/i.test(a.fadeout || ''), stop: /^(true|1)$/i.test(a.stop || '') });
+        continue;
+      }
       if (kind === 'playsound') {
-        events.push({ type: 'sound', key: (a.key || '').replace(/^\$/, ''), volume: Number(a.volume ?? 1) });
+        const key = (a.key || '').replace(/^\$/, '');
+        const sound = { type: 'sound', key, channel: a.channel || key, loop: /^(true|1)$/i.test(a.loop || ''), delay: Math.max(0, Number(a.delay) || 0), volume: Number(a.volume ?? 1), instance: command.line };
+        if (sound.loop) state.sounds[sound.channel] = sound;
+        else { delete state.sounds[sound.channel]; events.push(sound); }
+        continue;
+      }
+      if (kind === 'stopsound') {
+        const channel = a.channel || (a.key || '').replace(/^\$/, '');
+        if (channel) delete state.sounds[channel]; else state.sounds = {};
+        events.push({ type: 'stopSound', channel });
+        continue;
+      }
+      if (kind === 'soundvolume') {
+        const channel = a.channel || (a.key || '').replace(/^\$/, '');
+        for (const sound of Object.values(state.sounds)) if (!channel || sound.channel === channel) sound.volume = Number(a.volume ?? 1);
+        events.push({ type: 'soundVolume', channel, volume: Number(a.volume ?? 1) });
         continue;
       }
       if (kind === 'decision') {
@@ -83,7 +124,7 @@ export function createStoryRunner(commands) {
         state.speaker = a.name || '';
         return capture(command, events, { type: 'dialogue', speaker: state.speaker, text: command.text });
       }
-      if (kind === 'playvideo' || kind === 'video') return capture(command, events, { type: 'video', videoId: a.key || a.name || a.video || a.res });
+      if (kind === 'playvideo' || kind === 'video') return capture(command, events, { type: 'video', videoId: a.url || a.key || a.name || a.video || a.res });
       if (kind === 'startbattle') return capture(command, events, { type: 'end' });
       apply(command);
     }

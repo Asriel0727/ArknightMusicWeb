@@ -1,0 +1,1102 @@
+{
+  "downloadedAt": "2026-10-04T15:36:30.977Z",
+  "mode": "local-files",
+  "stories": 2270,
+  "uniqueUrls": 2177,
+  "downloaded": 0,
+  "reused": 2086,
+  "bytesDownloaded": 0,
+  "totals": {
+    "audio": 2074,
+    "videos": 12,
+    "bytes": 1173036689
+  },
+  "missingTotals": {
+    "audio": 27,
+    "videos": 0
+  },
+  "localReferences": 37355,
+  "changedStories": 2,
+  "failures": [
+    {
+      "url": "https://static.prts.wiki/video/03.mp4",
+      "type": "videos",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_happy_alt01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_alt_talk_message_menu_alt01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_attack_alt01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_damage_max_alt01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_discontent_alt03.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_happy_alt03.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_flapwing_2.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_angervoice_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_hit_slash_kan_metal_small.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_grip_alt_02.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_mvmt_a_alt_01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_jump_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_fireball.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_e_imp_mhfireball.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_fireballvoice_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_skill_whoosh_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_p_imp_mhkatana_2.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_walk_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_atk_whoosh.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_bitevoice.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_bite.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_bitehit_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_sweeptailvoice_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_sweeptail.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_e_imp_mhsweeptail.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_ot_we011_up_size05_alt01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_p_imp_mhkatana_3.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_flapwing_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_shootdown_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_good_size05_alt01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_p_skill_mhdualswords_on.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_sleepbreathe_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_sleepbreathe_2.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_straightfire_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_p_imp_mhdualswords_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_p_imp_mhdualswords_2.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_p_imp_mhdualswords_3.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_101_mvmt_out.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_straightfirevoice.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_mvmt_a_alt_02.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_jumpfireballvoice.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_jumpfireball_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_jumpfireball.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_p_imp_mhkatana_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_epvsp_kizinn_short.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_skill_whoosh_2.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_skill_whoosh_3.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_epvsp_kizinn_st.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_bigswing.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_counter_heavy.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_counter_wait.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_counter_success_heavy_st.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_iai_zanzou_st.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_aircutting_jump.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_epv_att_ground_hit_lv2_land_alt_01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_swo_aircutting_whoosh.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_severtailvoice.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_severtail.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_e_atk_mhdragonblind.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_strugglevoice.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_strugglefoley_1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_recovervoice.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_sou_kizinn_whoosh_a_alt_01v3.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_wp_sou_kizinn_whoosh_a_alt_02v3.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_prop_sharpen_a_alt_01.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_prop_sharpen_a_alt_02.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_prop_sharpen_a_alt_03.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_pl_epv_wp_sharp_end.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/customse/act24side%23retro/act24side_mhrors_straightfire.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://static.prts.wiki/video/act49side/ta02.mp4",
+      "type": "videos",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/test/slideshow1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/test/loading.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/ui/bgm_void_intro.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/ui/bgm_void_loop.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/test/darkness1.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_normal01_intro.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_normal01_loop.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_intro.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_loop.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/general/gun/gunsmachineguns_bbc_ec1g2b.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_boss01_intro.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_boss01_loop.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/general/impact/explosion_large_no_tail_02.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/general/impact/explosion_large_no_tail_03.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/test/darkness2.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/ui/bgm_flyinghigh_intro.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/ui/bgm_flyinghigh_loop.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_indust_intro.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    },
+    {
+      "url": "https://torappu.prts.wiki/assets/audio/battle/bgm_indust_loop.mp3",
+      "type": "audio",
+      "status": 404,
+      "reason": "http-error"
+    }
+  ],
+  "unresolved": [
+    {
+      "storyId": "prts-47739",
+      "type": "audio",
+      "key": "p_atk_smg_n",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-47756",
+      "type": "audio",
+      "key": "p_atk_smg_n",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-13868",
+      "type": "audio",
+      "key": "Test/slideshow1",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/test/slideshow1.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13870",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13872",
+      "type": "audio",
+      "key": "Test/Loading",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/test/loading.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13875",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13877",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13879",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13914",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13871",
+      "type": "audio",
+      "key": "UI/bgm_void_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13871",
+      "type": "audio",
+      "key": "UI/bgm_void_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13873",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13876",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13878",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13880",
+      "type": "audio",
+      "key": "test/Darkness1",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/test/darkness1.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13881",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13882",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13889",
+      "type": "audio",
+      "key": "UI/bgm_void_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13889",
+      "type": "audio",
+      "key": "UI/bgm_void_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13891",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13893",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13894",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13896",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13899",
+      "type": "audio",
+      "key": "battle/bgm_battle_normal01_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_normal01_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13899",
+      "type": "audio",
+      "key": "battle/bgm_battle_normal01_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_normal01_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13883",
+      "type": "audio",
+      "key": "UI/bgm_void_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13883",
+      "type": "audio",
+      "key": "UI/bgm_void_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13890",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13892",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13895",
+      "type": "audio",
+      "key": "Test/Loading",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/test/loading.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13897",
+      "type": "audio",
+      "key": "Test/Loading",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/test/loading.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13901",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13901",
+      "type": "audio",
+      "key": "Darkness1",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-13915",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13902",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13916",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13918",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13920",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13922",
+      "type": "audio",
+      "key": "Battle/bgm_epic_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13922",
+      "type": "audio",
+      "key": "Battle/bgm_epic_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13924",
+      "type": "audio",
+      "key": "Battle/bgm_epic_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13924",
+      "type": "audio",
+      "key": "Battle/bgm_epic_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13924",
+      "type": "audio",
+      "key": "Battle/General/Gun/GunsMachineGuns_BBC_EC1G2b",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/general/gun/gunsmachineguns_bbc_ec1g2b.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13903",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13917",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13919",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13919",
+      "type": "audio",
+      "key": "battle/bgm_battle_boss01_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_boss01_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13919",
+      "type": "audio",
+      "key": "battle/bgm_battle_boss01_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_battle_boss01_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13919",
+      "type": "audio",
+      "key": "battle/general/impact/explosion_large_no_tail_02",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/general/impact/explosion_large_no_tail_02.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13919",
+      "type": "audio",
+      "key": "battle/general/impact/explosion_large_no_tail_03",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/general/impact/explosion_large_no_tail_03.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13921",
+      "type": "audio",
+      "key": "UI/bgm_mist",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_mist.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13923",
+      "type": "audio",
+      "key": "Battle/bgm_epic_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13923",
+      "type": "audio",
+      "key": "Battle/bgm_epic_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_epic_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13925",
+      "type": "audio",
+      "key": "test/Darkness1",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/test/darkness1.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13925",
+      "type": "audio",
+      "key": "test/Darkness2",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/test/darkness2.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-14229",
+      "type": "audio",
+      "key": "bg_indoor_2",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-13926",
+      "type": "audio",
+      "key": "UI/bgm_flyinghigh_intro.ogg",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_flyinghigh_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13926",
+      "type": "audio",
+      "key": "UI/bgm_flyinghigh_loop.ogg",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_flyinghigh_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13926",
+      "type": "audio",
+      "key": "UI/bgm_void_intro.ogg",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13926",
+      "type": "audio",
+      "key": "UI/bgm_void_loop.ogg",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/ui/bgm_void_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13904",
+      "type": "audio",
+      "key": "battle/bgm_indust_intro",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_indust_intro.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-13904",
+      "type": "audio",
+      "key": "battle/bgm_indust_loop",
+      "candidates": [
+        "https://torappu.prts.wiki/assets/audio/battle/bgm_indust_loop.mp3"
+      ]
+    },
+    {
+      "storyId": "prts-14238",
+      "type": "audio",
+      "key": "m_sys_base_intro",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-14238",
+      "type": "audio",
+      "key": "m_sys_base_loop",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-14234",
+      "type": "audio",
+      "key": "m_sys_base_intro",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-14234",
+      "type": "audio",
+      "key": "m_sys_base_loop",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-14237",
+      "type": "audio",
+      "key": "m_sys_base_intro",
+      "candidates": []
+    },
+    {
+      "storyId": "prts-14237",
+      "type": "audio",
+      "key": "m_sys_base_loop",
+      "candidates": []
+    }
+  ],
+  "compressedSources": [
+    {
+      "sourceUrl": "https://static.prts.wiki/video/cfa_03.mp4",
+      "bytesBefore": 147892197,
+      "bytesAfter": 44955584,
+      "sha256": "7a70edbb21179777df866f2d3a2726a7856158914495558ccef4f44826dc0290"
+    }
+  ]
+}

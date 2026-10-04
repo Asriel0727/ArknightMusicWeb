@@ -1,0 +1,489 @@
+{
+  "repository": "https://github.com/ArknightsAssets/ArknightsAssets2",
+  "commit": "6723a61db88b4c22ef5f5fcdfcd927183a61cb89",
+  "entries": [
+    {
+      "type": "audio",
+      "key": "MH_nekohappy01",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_happy_alt01.mp3",
+      "gitBlobSha": "f084d115832bb23780a84dd40b2397bae634d32c",
+      "bytes": 12525
+    },
+    {
+      "type": "audio",
+      "key": "MH_nekotalk",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_alt_talk_message_menu_alt01.mp3",
+      "gitBlobSha": "aefafe4a4f485cb18e540d5dd1d69d42892daf9c",
+      "bytes": 11373
+    },
+    {
+      "type": "audio",
+      "key": "MH_nekoangry",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_attack_alt01.mp3",
+      "gitBlobSha": "26299cfb9e96f714779bdfe4513b88f724ea4987",
+      "bytes": 15213
+    },
+    {
+      "type": "audio",
+      "key": "MH_nekoinjured",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_damage_max_alt01.mp3",
+      "gitBlobSha": "79a8936d70937f0275b1f6d44702cf6a3e904341",
+      "bytes": 16749
+    },
+    {
+      "type": "audio",
+      "key": "MH_nekolow",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_discontent_alt03.mp3",
+      "gitBlobSha": "8185150e14b061af426f44d58624d293f89c89df",
+      "bytes": 15213
+    },
+    {
+      "type": "audio",
+      "key": "MH_nekohappy02",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_happy_alt03.mp3",
+      "gitBlobSha": "113cb0acc920a1b2c866b2ecae7122d5f4b3240b",
+      "bytes": 19053
+    },
+    {
+      "type": "audio",
+      "key": "MH_flapwing_2",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_flapwing_2.mp3",
+      "gitBlobSha": "7ed590dd731b1d1e455d9cc218c1a0e1d068e762",
+      "bytes": 6957
+    },
+    {
+      "type": "audio",
+      "key": "MH_angervoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_angervoice_1.mp3",
+      "gitBlobSha": "80305150f7d87d6afa75041334c00e5e8b3c2854",
+      "bytes": 37293
+    },
+    {
+      "type": "audio",
+      "key": "MH_repel01",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_hit_slash_kan_metal_small.mp3",
+      "gitBlobSha": "d3d3f0b7d75bb4d085a79379e6dcc8a45c5f4e81",
+      "bytes": 6765
+    },
+    {
+      "type": "audio",
+      "key": "MH_grip2",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_grip_alt_02.mp3",
+      "gitBlobSha": "90e399dab70ba7e5c159c7277f01c0fc64c154f1",
+      "bytes": 2733
+    },
+    {
+      "type": "audio",
+      "key": "MH_swmvmt1",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_mvmt_a_alt_01.mp3",
+      "gitBlobSha": "11fae85589f5f8294369abe4aae4b549ffc07d1f",
+      "bytes": 7149
+    },
+    {
+      "type": "audio",
+      "key": "MH_jump",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_jump_1.mp3",
+      "gitBlobSha": "11b3a25f8d67a95a56d7467b79e007a360e87ed7",
+      "bytes": 10413
+    },
+    {
+      "type": "audio",
+      "key": "MH_fireball",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_fireball.mp3",
+      "gitBlobSha": "5aaad0ffae361dae5c94591664bf85d7dbe1f45b",
+      "bytes": 17901
+    },
+    {
+      "type": "audio",
+      "key": "MH_fireballhit",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_e_imp_mhfireball.mp3",
+      "gitBlobSha": "0d5ce84f658020bbf9c1c25e5a5761df1d2ee843",
+      "bytes": 35949
+    },
+    {
+      "type": "audio",
+      "key": "MH_fireballvoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_fireballvoice_1.mp3",
+      "gitBlobSha": "98dd4692fc0fc52762b3bdbfb72008190411c641",
+      "bytes": 12717
+    },
+    {
+      "type": "audio",
+      "key": "MH_skwhoosh01",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_skill_whoosh_1.mp3",
+      "gitBlobSha": "6efc737c1c6478891d762d2ed38f217e27c17f1d",
+      "bytes": 19821
+    },
+    {
+      "type": "audio",
+      "key": "MH_katana02",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_p_imp_mhkatana_2.mp3",
+      "gitBlobSha": "d82eb137d98de96975168cf39003fd1728561f6d",
+      "bytes": 12141
+    },
+    {
+      "type": "audio",
+      "key": "MH_foot",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_walk_1.mp3",
+      "gitBlobSha": "2ffe78f2112bac63fb0973e929de23a2ca2c6627",
+      "bytes": 8493
+    },
+    {
+      "type": "audio",
+      "key": "MH_whoosh",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_atk_whoosh.mp3",
+      "gitBlobSha": "55c24932822392b5b7e0fa68d602422c5f7e7606",
+      "bytes": 24621
+    },
+    {
+      "type": "audio",
+      "key": "MH_bitevoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_bitevoice.mp3",
+      "gitBlobSha": "7783c061b8f10e695fc1bdc85125ba9e7ec9d896",
+      "bytes": 7917
+    },
+    {
+      "type": "audio",
+      "key": "MH_bite",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_bite.mp3",
+      "gitBlobSha": "f5a7ea3eec69dcd5e63ce97562310220c2ee3bf3",
+      "bytes": 11949
+    },
+    {
+      "type": "audio",
+      "key": "MH_bitehit",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_bitehit_1.mp3",
+      "gitBlobSha": "3032de5181a96fac6c90060abfc98b35f3263a6e",
+      "bytes": 4845
+    },
+    {
+      "type": "audio",
+      "key": "MH_sweeptailvoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_sweeptailvoice_1.mp3",
+      "gitBlobSha": "fd556e4a5ca0181a2fcd56cbe14db2fba7f63104",
+      "bytes": 19629
+    },
+    {
+      "type": "audio",
+      "key": "MH_sweeptail",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_sweeptail.mp3",
+      "gitBlobSha": "68b65dd24c540f66ebeaedd2647331d1ab154fff",
+      "bytes": 8877
+    },
+    {
+      "type": "audio",
+      "key": "MH_sweeptailhit",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_e_imp_mhsweeptail.mp3",
+      "gitBlobSha": "8d4267b87f6e4dbc8ab202621be85ab9d1a9e35e",
+      "bytes": 22893
+    },
+    {
+      "type": "audio",
+      "key": "MH_nekoattack",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_ot_we011_up_size05_alt01.mp3",
+      "gitBlobSha": "f173a8d328e56ddc8c24adfb47d3c82550d0dd94",
+      "bytes": 15213
+    },
+    {
+      "type": "audio",
+      "key": "MH_katana03",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_p_imp_mhkatana_3.mp3",
+      "gitBlobSha": "138c2491b3444c9ca812e67377077fd53b11af50",
+      "bytes": 10605
+    },
+    {
+      "type": "audio",
+      "key": "MH_flapwing_1",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_flapwing_1.mp3",
+      "gitBlobSha": "b50e163ca3b6382797ca71f9a8f1b9001b506c85",
+      "bytes": 9453
+    },
+    {
+      "type": "audio",
+      "key": "MH_shootdown",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_shootdown_1.mp3",
+      "gitBlobSha": "60d9871500999ae458a42178b93e59dc7913ce70",
+      "bytes": 12525
+    },
+    {
+      "type": "audio",
+      "key": "MH_nekogood",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_otomo000_vo_type01_pitch0_good_size05_alt01.mp3",
+      "gitBlobSha": "5136470001ca9ed057a447c09c1ef369e469520d",
+      "bytes": 18669
+    },
+    {
+      "type": "audio",
+      "key": "MH_dualswordson",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_p_skill_mhdualswords_on.mp3",
+      "gitBlobSha": "7567e2e3fc644fdb58307387278a63a1861678fe",
+      "bytes": 27501
+    },
+    {
+      "type": "audio",
+      "key": "MH_sleepbreathe1",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_sleepbreathe_1.mp3",
+      "gitBlobSha": "a0cd9945c6c6d0ceb2df23e8c775f448bc80abf1",
+      "bytes": 14445
+    },
+    {
+      "type": "audio",
+      "key": "MH_sleepbreathe2",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_sleepbreathe_2.mp3",
+      "gitBlobSha": "2ee953ce8d6b1a5686421d0f06dc1bcf31196175",
+      "bytes": 12141
+    },
+    {
+      "type": "audio",
+      "key": "MH_sfireball",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_straightfire_1.mp3",
+      "gitBlobSha": "11b3a25f8d67a95a56d7467b79e007a360e87ed7",
+      "bytes": 10413
+    },
+    {
+      "type": "audio",
+      "key": "MH_dualswords01",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_p_imp_mhdualswords_1.mp3",
+      "gitBlobSha": "efce415d8f56f9a0471a9bf6f5754007e483ed08",
+      "bytes": 10989
+    },
+    {
+      "type": "audio",
+      "key": "MH_dualswords02",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_p_imp_mhdualswords_2.mp3",
+      "gitBlobSha": "c063063378f50a38829219c80d64d991f596c841",
+      "bytes": 12141
+    },
+    {
+      "type": "audio",
+      "key": "MH_dualswords03",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_p_imp_mhdualswords_3.mp3",
+      "gitBlobSha": "6ec79b4b0281cfbd62807242bfd05bc7dedd508f",
+      "bytes": 10605
+    },
+    {
+      "type": "audio",
+      "key": "MH_epvspinout",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_101_mvmt_out.mp3",
+      "gitBlobSha": "b9bb859ddf16a722ae2968a6345ebe5b1bfe0d0e",
+      "bytes": 7533
+    },
+    {
+      "type": "audio",
+      "key": "MH_sfireballvoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_straightfirevoice.mp3",
+      "gitBlobSha": "77c6859665ecda9cae88c56d7c25870082f58d4d",
+      "bytes": 29229
+    },
+    {
+      "type": "audio",
+      "key": "MH_swmvmt2",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_mvmt_a_alt_02.mp3",
+      "gitBlobSha": "3f1eec7451cf5b5a025d6ca3d663471bdadb744b",
+      "bytes": 8109
+    },
+    {
+      "type": "audio",
+      "key": "MH_jfireballvoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_jumpfireballvoice.mp3",
+      "gitBlobSha": "77c6859665ecda9cae88c56d7c25870082f58d4d",
+      "bytes": 29229
+    },
+    {
+      "type": "audio",
+      "key": "MH_jfireball",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_jumpfireball_1.mp3",
+      "gitBlobSha": "11b3a25f8d67a95a56d7467b79e007a360e87ed7",
+      "bytes": 10413
+    },
+    {
+      "type": "audio",
+      "key": "MH_jfireballhit",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_jumpfireball.mp3",
+      "gitBlobSha": "64c089174043c77600b17d3ea1ad8aa699edd901",
+      "bytes": 54957
+    },
+    {
+      "type": "audio",
+      "key": "MH_katana01",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_p_imp_mhkatana_1.mp3",
+      "gitBlobSha": "3a50d4e3e1d029bc9dc5ca136a45b1f0aaf0de30",
+      "bytes": 10989
+    },
+    {
+      "type": "audio",
+      "key": "MH_kizinnshort",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_epvsp_kizinn_short.mp3",
+      "gitBlobSha": "796a84ffe111a42ee9896395f95dbd634d35c0c8",
+      "bytes": 6957
+    },
+    {
+      "type": "audio",
+      "key": "MH_skwhoosh02",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_skill_whoosh_2.mp3",
+      "gitBlobSha": "df42eb28d4791b49370d011d51732f98ebd059f9",
+      "bytes": 22893
+    },
+    {
+      "type": "audio",
+      "key": "MH_skwhoosh03",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_skill_whoosh_3.mp3",
+      "gitBlobSha": "ffac34dc5b2f61ea8dcf54295b3574c516cf9b55",
+      "bytes": 31341
+    },
+    {
+      "type": "audio",
+      "key": "MH_kizinnst",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_epvsp_kizinn_st.mp3",
+      "gitBlobSha": "b8139c5e9b5bfc5a31eecfbca7d102df3b7e637d",
+      "bytes": 19821
+    },
+    {
+      "type": "audio",
+      "key": "MH_bigswing",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_bigswing.mp3",
+      "gitBlobSha": "cc127d7d065a2ee256de7d8a34cfd3d127501ce2",
+      "bytes": 22317
+    },
+    {
+      "type": "audio",
+      "key": "MH_ctheavy",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_counter_heavy.mp3",
+      "gitBlobSha": "f41b4e745bc2db2fd8bf2543879e65d1ebfb5da5",
+      "bytes": 23277
+    },
+    {
+      "type": "audio",
+      "key": "MH_counterwait",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_counter_wait.mp3",
+      "gitBlobSha": "a38730a4684ec397715e6f054064c026c90ff28b",
+      "bytes": 12909
+    },
+    {
+      "type": "audio",
+      "key": "MH_ctsuccess",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_counter_success_heavy_st.mp3",
+      "gitBlobSha": "88ffcef2437f85c17fd2c9525239dc64f42a1b16",
+      "bytes": 34797
+    },
+    {
+      "type": "audio",
+      "key": "MH_czanzou",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_l_swd_epv_iai_zanzou_st.mp3",
+      "gitBlobSha": "0e3e008f66648226781b582dac56fdc1cc35489c",
+      "bytes": 30573
+    },
+    {
+      "type": "audio",
+      "key": "MH_aircuttingjump",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_aircutting_jump.mp3",
+      "gitBlobSha": "6749f0e94b2bc743dfe184ed9761066117ade2ce",
+      "bytes": 10989
+    },
+    {
+      "type": "audio",
+      "key": "MH_groundhit",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_epv_att_ground_hit_lv2_land_alt_01.mp3",
+      "gitBlobSha": "dcfc6e9ed87871c5cd6e4e4957c0433840704f11",
+      "bytes": 13869
+    },
+    {
+      "type": "audio",
+      "key": "MH_airwhoosh",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_swo_aircutting_whoosh.mp3",
+      "gitBlobSha": "cc0bd01e642de4a1e871afc2a863fa6ccffeb4f9",
+      "bytes": 18093
+    },
+    {
+      "type": "audio",
+      "key": "MH_severtailvoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_severtailvoice.mp3",
+      "gitBlobSha": "d99571f6def3117fc224bd46c1745992f1244aec",
+      "bytes": 20781
+    },
+    {
+      "type": "audio",
+      "key": "MH_severtail",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_severtail.mp3",
+      "gitBlobSha": "856c62b412c58601fb41b805b052a5a4e2582e2f",
+      "bytes": 22125
+    },
+    {
+      "type": "audio",
+      "key": "MH_dragonblind",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_e_atk_mhdragonblind.mp3",
+      "gitBlobSha": "1962ceced0c399020a16b71b99eadf1a3c80ffc3",
+      "bytes": 22125
+    },
+    {
+      "type": "audio",
+      "key": "MH_strugglevoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_strugglevoice.mp3",
+      "gitBlobSha": "e3c0ec73daf23413f28a04efbe92fdec8e0d4da2",
+      "bytes": 7533
+    },
+    {
+      "type": "audio",
+      "key": "MH_strugglefoley",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_strugglefoley_1.mp3",
+      "gitBlobSha": "70b4c5d68806b84068d875b9d9adbf08558b6668",
+      "bytes": 6381
+    },
+    {
+      "type": "audio",
+      "key": "MH_recovervoice",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_recovervoice.mp3",
+      "gitBlobSha": "fd556e4a5ca0181a2fcd56cbe14db2fba7f63104",
+      "bytes": 19629
+    },
+    {
+      "type": "audio",
+      "key": "MH_soukizinn01",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_sou_kizinn_whoosh_a_alt_01v3.mp3",
+      "gitBlobSha": "a32bf06e5578ee691c468667de188c34b51c5067",
+      "bytes": 4077
+    },
+    {
+      "type": "audio",
+      "key": "MH_soukizinn02",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_wp_sou_kizinn_whoosh_a_alt_02v3.mp3",
+      "gitBlobSha": "007a89e2d5767023ae795904fa2814f0ae6155cf",
+      "bytes": 4269
+    },
+    {
+      "type": "audio",
+      "key": "MH_sharpen01",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_prop_sharpen_a_alt_01.mp3",
+      "gitBlobSha": "1a4890da7e597b736dbae71ec1c2c2f0d076c49d",
+      "bytes": 4077
+    },
+    {
+      "type": "audio",
+      "key": "MH_sharpen02",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_prop_sharpen_a_alt_02.mp3",
+      "gitBlobSha": "33fe6476ef6937674c1588a0caa1f539b5285115",
+      "bytes": 4845
+    },
+    {
+      "type": "audio",
+      "key": "MH_sharpen03",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_prop_sharpen_a_alt_03.mp3",
+      "gitBlobSha": "d73f38f45e4e3a80f44bdb8644b644195b2825a4",
+      "bytes": 5037
+    },
+    {
+      "type": "audio",
+      "key": "MH_sharpenend",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_pl_epv_wp_sharp_end.mp3",
+      "gitBlobSha": "b1442f54e40918e99c27cebb15f5a91d489a8456",
+      "bytes": 11757
+    },
+    {
+      "type": "audio",
+      "key": "MH_sfireballhit",
+      "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/6723a61db88b4c22ef5f5fcdfcd927183a61cb89/assets/dyn/audio/sound_beta_2/customse/act24side%23retro/act24side_mhrors_straightfire.mp3",
+      "gitBlobSha": "64c089174043c77600b17d3ea1ad8aa699edd901",
+      "bytes": 54957
+    }
+  ]
+}

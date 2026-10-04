@@ -50,7 +50,7 @@
     </template>
 
     <template v-else-if="currentPage === 'story'">
-      <StoryStage />
+      <StoryStage @sign-in="handlePageChange('auth')" />
     </template>
 
     <template v-else-if="currentPage === 'library'">

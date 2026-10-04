@@ -2133,6 +2133,10 @@ async function handleUserApiRequest(request, env, url) {
     return handleFavoriteSongsRequest(request, env, auth.user, url);
   }
 
+  if (url.pathname === '/api/user/story-reads') {
+    return handleStoryReadsRequest(request, env, auth.user, url);
+  }
+
   const playlistMatch = url.pathname.match(/^\/api\/user\/playlists(?:\/([^/]+))?(?:\/songs)?$/);
   if (playlistMatch) {
     const playlistId = playlistMatch[1] ? decodeURIComponent(playlistMatch[1]) : '';
@@ -2434,6 +2438,58 @@ async function getAuthRateLimitKey(action, identifier) {
 async function clearAuthRateLimits(env, action, identifiers) {
   const keys = await Promise.all(identifiers.map((identifier) => getAuthRateLimitKey(action, identifier)));
   await Promise.all(keys.map((key) => env.ARKNIGHTS_DATA.delete(key)));
+}
+
+async function handleStoryReadsRequest(request, env, user, url) {
+  const validId = value => typeof value === 'string' && /^[a-z0-9][a-z0-9_-]{0,99}$/.test(value);
+  if (!['GET', 'POST'].includes(request.method)) return methodNotAllowed('GET, POST');
+  try {
+    if (request.method === 'GET') {
+      const after = url.searchParams.get('after');
+      if (after !== null && !validId(after)) return json({ ok: false, error: 'Invalid story cursor' }, 400);
+      const params = new URLSearchParams({ user_id: `eq.${user.id}`, select: 'story_id,completed_at', order: 'story_id.asc', limit: '500' });
+      if (after) params.set('story_id', `gt.${after}`);
+      const rows = await supabaseRestRequest(env, 'user_story_reads', { query: `?${params}` });
+      if (!Array.isArray(rows)) throw new Error('Invalid story progress response');
+      return json({ ok: true, userId: user.id, reads: rows, nextCursor: rows.length === 500 ? rows[rows.length - 1].story_id : null });
+    }
+    if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) {
+      return json({ ok: false, error: 'JSON body required' }, 415);
+    }
+    // Count actual bytes as well as Content-Length, which a client can omit.
+    const maxBytes = 24 * 1024;
+    if (Number(request.headers.get('content-length')) > maxBytes) return json({ ok: false, error: 'Request too large' }, 413);
+    const reader = request.body?.getReader();
+    let text = '', bytes = 0;
+    const decoder = new TextDecoder();
+    if (reader) {
+      try {
+        while (true) {
+          const chunk = await reader.read();
+          if (chunk.done) break;
+          bytes += chunk.value.byteLength;
+          if (bytes > maxBytes) { await reader.cancel(); return json({ ok: false, error: 'Request too large' }, 413); }
+          text += decoder.decode(chunk.value, { stream: true });
+        }
+        text += decoder.decode();
+      } finally { reader.releaseLock(); }
+    }
+    let body;
+    try { body = JSON.parse(text); } catch { return json({ ok: false, error: 'Invalid JSON' }, 400); }
+    if (!Array.isArray(body?.storyIds) || !body.storyIds.length || body.storyIds.length > 200 || !body.storyIds.every(validId)) {
+      return json({ ok: false, error: 'Provide between 1 and 200 valid story IDs' }, 400);
+    }
+    const storyIds = [...new Set(body.storyIds)];
+    await supabaseRestRequest(env, 'user_story_reads', {
+      method: 'POST', query: '?on_conflict=user_id,story_id',
+      prefer: 'resolution=ignore-duplicates,return=minimal',
+      // Ownership comes only from the verified Worker session, never the body.
+      body: storyIds.map(storyId => ({ user_id: user.id, story_id: storyId })),
+    });
+    return json({ ok: true, userId: user.id, storyIds });
+  } catch {
+    return json({ ok: false, error: 'Story progress sync is temporarily unavailable', code: 'STORY_SYNC_UNAVAILABLE' }, 503);
+  }
 }
 
 async function handleFavoriteSongsRequest(request, env, user, url) {

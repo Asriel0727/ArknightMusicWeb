@@ -1,13 +1,19 @@
 <template>
-  <main class="story-page">
+  <main class="story-page" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
     <header class="story-heading">
       <div>
         <p class="eyebrow">{{ screen === 'player' ? `STORY / ${manifest?.storyId || selectedStory?.page || 'PRTS'}` : 'TERRA / FILM ARCHIVE' }}</p>
         <h1 ref="screenHeading" tabindex="-1">{{ screen === 'player' ? localize(manifest?.title || selectedStory?.title) : screen === 'episodes' ? localize(activeCollection?.label) : labels.archive }}</h1>
         <p>{{ screen === 'player' ? labels.subtitle : screen === 'episodes' ? labels.chooseEpisode : labels.chooseCollection }}</p>
       </div>
-      <div class="heading-actions"><button v-if="screen === 'player'" type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button><button v-else-if="screen === 'episodes'" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button><a :href="screen === 'player' ? manifest?.sourcePage || selectedStory?.sourcePage : 'https://prts.wiki/w/剧情一览'" target="_blank" rel="noopener noreferrer">PRTS ↗</a></div>
+      <div class="heading-actions"><div v-if="screen !== 'player'" class="archive-audio"><button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button><label>{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label></div><button v-if="screen === 'player'" type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button><button v-else-if="screen === 'episodes'" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button><a :href="screen === 'player' ? manifest?.sourcePage || selectedStory?.sourcePage : 'https://prts.wiki/w/剧情一览'" target="_blank" rel="noopener noreferrer">PRTS ↗</a></div>
     </header>
+    <section class="story-progress-sync" :aria-label="t('storyProgress.title')">
+      <div><strong v-if="progressOwner">{{ t('storyProgress.account', { name: authState.session?.user?.loginKey || progressOwner }) }}</strong><span role="status">{{ t('storyProgress.' + progressStatus) }}</span><span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span></div>
+      <button v-if="!progressOwner || progressStatus === 'expired'" type="button" @click="emit('sign-in')">{{ t('storyProgress.signIn') }}</button>
+      <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)">{{ t('storyProgress.retry') }}</button>
+      <button v-if="progressImportCount" type="button" :disabled="progressSyncing" @click="importGuestProgress">{{ t('storyProgress.import', { count: progressImportCount }) }}</button>
+    </section>
 
     <Transition name="archive-screen" mode="out-in">
     <div :key="screen" class="archive-screen">
@@ -27,8 +33,13 @@
         <select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select>
       </div>
       <div v-else class="reading-plan-heading">
-        <label v-if="screen === 'collections'">{{ labels.readingPath }}<select v-model="readingLineId"><option v-for="line in archiveMetadata.lines || []" :key="line.id" :value="line.id">{{ localize(line.name) }}</option></select></label>
-        <p>{{ screen === 'collections' ? labels.routeBasis : groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</p>
+        <label v-if="screen === 'collections'">{{ labels.readingPath }}<select v-model="readingLineId" @change="guideTrail = []"><option v-for="line in archiveMetadata.lines || []" :key="line.id" :value="line.id">{{ localize(line.name) }}</option></select></label>
+        <details class="compact-note"><summary>{{ mediaLabels.context }}</summary><p>{{ screen === 'collections' ? localize(readingGuideIntro(readingLineId)) : groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</p></details>
+      </div>
+      <div v-if="viewMode === 'sequence'" class="guide-tools">
+        <button v-if="guideTrail.length" type="button" @click="returnToGuide">← {{ labels.returnGuide }} · {{ localize(guideTrail[guideTrail.length - 1].group) }}</button>
+        <button v-if="screen === 'collections' && readingResumeIndex >= 0" type="button" @click="seekRack(readingResumeIndex)">{{ labels.resumeGuide }} → {{ localize(readingRoute[readingResumeIndex]?.label) }}</button>
+        <details class="compact-note"><summary>{{ mediaLabels.details }}</summary><p>{{ labels.routeBasis }}</p></details>
       </div>
       <div class="archive-toolbar">
         <div class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
@@ -37,8 +48,9 @@
       </div>
       <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" class="library-filters advanced-filters"><select v-if="sections.length > 1" v-model="selectedSection" :aria-label="labels.section"><option value="">{{ labels.allSections }}</option><option v-for="section in sections" :key="section" :value="section">{{ localize(section) }}</option></select><select v-model="collectionSort" :aria-label="labels.sort"><option value="line">{{ labels.lineOrder }}</option><option value="release">{{ labels.releaseOrder }}</option><option value="name">{{ labels.nameOrder }}</option></select></div></Transition>
       <div v-if="screen === 'episodes' && viewMode === 'sequence'" class="reading-route">
+        <p v-if="activeGuideNode"><button type="button" class="guide-context" @click="showGuide(readingLineId, activeCollection.group)">{{ labels.currentGuide }}：{{ localize(readingLineName) }} · {{ localize(activeCollection.label) }} ↗</button></p>
         <p>{{ labels.orderNote }} <span>{{ groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</span></p>
-        <details v-if="activeRoute.length > 1"><summary>{{ labels.storyLines }} / {{ labels.order }}</summary><nav :aria-label="labels.lineOrder"><template v-for="(node, index) in activeRoute" :key="`${index}-${node.group}`"><span v-if="index" class="route-arrow" aria-hidden="true">→</span><button type="button" :disabled="!findCollection(node.group)" :class="{ current: node.group === activeCollection.group, intersection: node.intersection }" @click="openCollection(findCollection(node.group))">{{ localize(node.group) }}<small v-if="node.intersection">{{ labels.intersection }}</small></button></template></nav></details>
+        <details v-if="activeRoute.length > 1"><summary>{{ labels.storyLines }} / {{ labels.order }}</summary><nav :aria-label="labels.lineOrder"><template v-for="(node, index) in activeRoute" :key="`${index}-${node.group}`"><span v-if="index" class="route-arrow" aria-hidden="true">{{ node.independent ? '·' : '→' }}</span><button type="button" :disabled="!findCollection(node.group)" :class="{ current: node.group === activeCollection.group, intersection: node.intersection }" @click="openCollection(findCollection(node.group))">{{ localize(node.group) }}<small v-if="node.intersection">{{ labels.intersection }}</small></button></template></nav></details>
       </div>
       <p v-if="viewMode !== 'sequence'" class="archive-breadcrumb">{{ screen === 'episodes' ? categoryLabel(activeCollection?.category) : selectedCategory ? categoryLabel(selectedCategory) : labels.allCategories }}<template v-if="screen === 'collections' && selectedSection"> / {{ localize(selectedSection) }}</template><template v-if="screen === 'episodes'"> / {{ localize(activeCollection?.label) }}</template><template v-if="screen === 'episodes' && selectedPhase"> / {{ labels.phases[selectedPhase] }}</template></p>
       <div v-if="rackEntries.length" class="story-rack-shell">
@@ -55,14 +67,41 @@
           </button>
         </div>
         <section v-if="viewMode === 'sequence' && rackActive" class="reading-detail" aria-live="polite">
-          <template v-if="screen === 'collections'"><div class="reading-detail-title"><span>{{ localize(rackActive.role) }}</span><strong>{{ localize(rackActive.act) }}</strong></div><p>{{ localize(rackActive.note) }}</p><div class="reading-neighbors"><span>{{ labels.readBefore }}：{{ localize(rackActive.previous) || labels.routeStart }}</span><span>{{ labels.readAfter }}：{{ localize(rackActive.next) || labels.routeEnd }}</span></div><button v-if="rackActive.relatedLine" type="button" @click="openRelatedRoute(rackActive.relatedLine)">{{ labels.relatedRoute }}：{{ localize(archiveMetadata.lines?.find(line => line.id === rackActive.relatedLine)?.name) }} →</button></template>
+          <template v-if="screen === 'collections'">
+            <div class="reading-detail-title"><span>{{ localize(rackActive.role) }}</span><strong>{{ localize(rackActive.act) }}</strong><small>{{ labels.routeStation }} {{ rackIndex + 1 }} / {{ rackEntries.length }}</small></div>
+            <details class="compact-note guide-description"><summary>{{ mediaLabels.context }}</summary><p>{{ localize(rackActive.note) }}</p></details>
+            <div v-if="rackActive.prerequisites.length" class="guide-connections">
+              <h3>{{ labels.readFirst }}</h3>
+              <div v-for="link in rackActive.prerequisites" :key="link.group" class="guide-connection">
+                <button type="button" :disabled="link.missing || !link.routeId" @click="visitGuide(link.routeId, link.group)">{{ localize(link.group) }} ↗ <small>{{ collectionReadLabel(link.group) }}</small></button>
+                <p>{{ localize(link.note) }}<span v-if="link.missing"> {{ labels.notCollected }}</span></p>
+              </div>
+            </div>
+            <div v-if="rackActive.supplements.length" class="guide-connections guide-supplements">
+              <h3>{{ labels.extraContext }}</h3>
+              <div v-for="link in rackActive.supplements" :key="link.group" class="guide-connection">
+                <button type="button" :disabled="link.missing || !link.routeId" @click="visitGuide(link.routeId, link.group)">{{ localize(link.group) }} ↗ <small>{{ collectionReadLabel(link.group) }}</small></button>
+                <p>{{ labels.extraContextNote }}</p>
+              </div>
+            </div>
+            <div class="reading-neighbors">
+              <button v-if="rackActive.previous" type="button" @click="moveRack(-1)">← {{ rackActive.independent ? labels.relatedReading : labels.readBefore }}：{{ localize(rackActive.previous) }}</button><span v-else>{{ labels.routeStart }}</span>
+              <button v-if="rackActive.next" type="button" @click="moveRack(1)">{{ rackActive.independent ? labels.relatedReading : labels.continueGuide }}：{{ localize(rackActive.next) }} →</button><span v-else>{{ labels.routeEnd }}</span>
+            </div>
+            <details v-if="rackActive.branches.length || rackActive.relatedLine" class="guide-branches">
+              <summary>{{ labels.branchReading }}</summary>
+              <button v-for="link in rackActive.branches" :key="link.group" type="button" :disabled="link.missing || !link.routeId" @click="visitGuide(link.routeId, link.group)">{{ localize(link.group) }} ↗</button>
+              <button v-if="rackActive.relatedLine" type="button" @click="visitGuide(rackActive.relatedLine, rackActive.group)">{{ labels.relatedRoute }}：{{ localize(archiveMetadata.lines?.find(line => line.id === rackActive.relatedLine)?.name) }} ↗</button>
+            </details>
+            <a class="guide-source" :href="readingGuideSource" target="_blank" rel="noopener noreferrer">{{ labels.guideSource }} ↗</a>
+          </template>
           <template v-else><p>{{ rackActive.phase === 'branch' ? labels.branchNote : labels.segmentNote }}</p><div class="reading-neighbors"><span>{{ labels.readBefore }}：{{ localize(groupStories[Number(episodeNumber(rackActive)) - 2]?.title) || labels.routeStart }}</span><span>{{ labels.readAfter }}：{{ localize(groupStories[Number(episodeNumber(rackActive))]?.title) || labels.routeEnd }}</span></div></template>
         </section>
         <div class="rack-navigation"><button type="button" :disabled="rackIndex === 0" :aria-label="labels.previousReel" @click="moveRack(-1)">←</button><span aria-live="polite">{{ rackIndex + 1 }} <small>/ {{ rackEntries.length }}</small></span><button type="button" :disabled="rackIndex + 1 >= rackEntries.length" :aria-label="labels.nextReel" @click="moveRack(1)">→</button></div>
         <div class="rack-scrubber"><span>{{ labels.swipeHint }}</span><input v-if="rackEntries.length > 1" :value="rackIndex" @input="scrubRack" type="range" min="0" :max="rackEntries.length - 1" :aria-label="labels.selectStory" :aria-valuetext="localize(rackActive?.label)"></div>
       </div>
       <p v-else class="library-empty">{{ labels.noResults }}</p>
-      <p class="progress-note">{{ labels.progressNote }}</p>
+      <p class="progress-note">{{ t('storyProgress.completionNote') }}</p>
     </section>
 
     <template v-if="screen === 'player'">
@@ -70,8 +109,9 @@
     <div v-if="error" class="story-message" role="alert">{{ error }}</div>
     <div v-else-if="!frame" class="story-message" role="status">{{ labels.loading }}</div>
     <section v-else class="story-shell" aria-label="Story stage">
-      <div class="stage-wrap">
+      <div class="stage-wrap" :class="{ 'video-mode': frame.type === 'video' }">
       <div class="story-stage" :class="{ grayscale: frame.state.grayscale }" @click="advance">
+        <div ref="sceneCamera" class="scene-camera">
         <img v-if="backgroundPreview(frame.state.background)" class="scene-backdrop scene-preview" :src="backgroundPreview(frame.state.background)" alt="" aria-hidden="true" decoding="async">
         <img v-if="frame.state.background && assetPath(frame.state.background)" class="scene-backdrop"
           :key="`background-${frame.state.background}`"
@@ -81,13 +121,16 @@
           :src="assetPath(frame.state.image)" :data-original-src="originalAssetPath(frame.state.image)" alt="" aria-hidden="true" fetchpriority="high" decoding="async" @error="handleSceneImageError">
         <div class="scene-vignette"></div>
         <div class="portrait-row" aria-hidden="true">
-          <img v-for="(portrait, index) in frame.state.portraits.filter(portrait => assetPath(portrait))" :key="`${portrait}-${index}`"
-            class="portrait" :class="{ subdued: frame.state.focus > 0 && frame.state.focus !== index + 1 }"
-            :src="assetPath(portrait)" :data-original-src="originalAssetPath(portrait)" alt="" fetchpriority="high" decoding="async" @error="handleSceneImageError">
+          <template v-for="portrait in frame.state.portraits" :key="portrait.slot">
+            <StoryPortrait v-if="portraitVisual(portrait.name)" class="portrait" :class="[`portrait-${portrait.slot}`, { subdued: portrait.dimmed }]" :visual="portraitVisual(portrait.name)"/>
+            <img v-else-if="assetPath(portrait.name)" class="portrait" :class="[`portrait-${portrait.slot}`, { subdued: portrait.dimmed }]" :src="assetPath(portrait.name)" :data-original-src="originalAssetPath(portrait.name)" alt="" draggable="false" decoding="async" @error="handleSceneImageError">
+          </template>
+        </div>
         </div>
         <div v-if="frame.state.shade" class="scene-shade" :style="shadeStyle"></div>
-        <video v-if="frame.type === 'video' && videoPath(frame.videoId)" class="scene-video"
-          :src="videoPath(frame.videoId)" controls autoplay playsinline @ended="advanceVideo"></video>
+        <video ref="sceneVideo" v-if="frame.type === 'video' && videoPath(frame.videoId)" :key="`${selectedStoryId}-${frame.command?.line}-${videoAttempt}`" class="scene-video"
+          :src="videoPath(frame.videoId)" :muted="!audioEnabled" controls autoplay playsinline preload="metadata"
+          @loadedmetadata="applyVideoVolume" @error="videoFailed = true" @playing="videoFailed = false" @ended="advanceVideo" @click.stop @keydown.stop></video>
       </div>
 
       <div class="story-dialogue-panel">
@@ -102,28 +145,31 @@
             @click="choose(option.value)">{{ localize(option.label) }}</button>
         </div>
         <div v-else-if="frame.type === 'video'" class="end-box">
-          <p>{{ videoPath(frame.videoId) ? labels.videoHint : labels.externalVideo }}</p>
-          <a v-if="!videoPath(frame.videoId)" :href="manifest.sourcePage" target="_blank" rel="noopener noreferrer">PRTS ↗</a>
+          <p>{{ videoFailed ? mediaLabels.videoFailed : videoPath(frame.videoId) ? mediaLabels.videoHint : mediaLabels.videoMissing }}</p>
+          <button v-if="videoFailed" type="button" @click="videoFailed = false; videoAttempt++">{{ mediaLabels.retry }}</button>
+          <a v-if="videoFailed || !videoPath(frame.videoId)" :href="manifest.sourcePage" target="_blank" rel="noopener noreferrer">PRTS ↗</a>
           <button type="button" @click="advanceVideo">{{ labels.next }} →</button>
         </div>
         <div v-else class="end-box">
           <h2>{{ labels.finished }}</h2>
-          <p>{{ labels.battle }}</p>
-          <button type="button" @click="restart">{{ labels.restart }}</button>
-          <button v-if="nextStory" type="button" @click="selectStoryId(nextStory.id)">{{ labels.nextStory }} → {{ localize(nextStory.title) }}</button>
-          <button type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button>
+          <button type="button" @click="openEnding">{{ mediaLabels.continueChoice }}</button>
         </div>
       </div>
       </div>
 
       <footer class="story-controls">
         <button type="button" :disabled="!canGoBack" @click="goBack">← {{ labels.previous }}</button>
-        <span>{{ frame.command?.line || commandCount }} / {{ commandCount }}</span>
+        <span class="story-line-progress">{{ frame.command?.line || commandCount }} / {{ commandCount }}</span>
         <button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button>
+        <label class="story-volume">{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label>
+        <button type="button" :aria-expanded="logOpen" aria-controls="story-log" @click="openLog">{{ mediaLabels.log }}</button>
         <button type="button" :disabled="frame.type !== 'dialogue'" @click="advance">{{ labels.next }} →</button>
       </footer>
+      <p v-if="audioEnabled && audioProblem" class="story-note" role="status">
+        {{ mediaLabels[audioProblem] }} <button type="button" @click="retryAudio">{{ audioProblem === 'blocked' ? mediaLabels.enable : mediaLabels.retry }}</button>
+      </p>
       <nav class="episode-navigation" :aria-label="labels.order"><button type="button" :disabled="!previousStory" @click="selectStoryId(previousStory.id)">← {{ labels.previousStory }}</button><span>{{ episodeNumber(selectedStory) }} / {{ groupStories.length }} · {{ localize(activeCollection?.label) }}</span><button type="button" :disabled="!nextStory" @click="selectStoryId(nextStory.id)">{{ labels.nextStory }} →</button></nav>
-      <p class="story-note">{{ labels.note }}</p>
+      <details class="story-note compact-note"><summary>{{ mediaLabels.credits }}</summary><p>{{ labels.note }}</p></details>
     </section>
     </template>
     <div v-else-if="catalogError" class="story-message" role="alert">{{ catalogError }}</div>
@@ -131,24 +177,56 @@
     </div>
     </Transition>
   </main>
+  <Teleport to="body">
+    <dialog ref="endingDialog" class="story-log-dialog story-ending-dialog" aria-labelledby="story-ending-title" @click.capture="guardEndingClick" @keydown.capture="guardEndingKey" @cancel.prevent="closeEnding" @close="resetEndingGuard">
+      <header><h2 id="story-ending-title" tabindex="-1">{{ labels.finished }}</h2><button type="button" :disabled="!endingArmed" @click="closeEnding">{{ mediaLabels.close }}</button></header>
+      <p class="story-log-title">{{ localize(manifest?.title || selectedStory?.title) }}</p>
+      <p>{{ mediaLabels.continueChoice }}</p>
+      <div class="ending-actions">
+        <button v-if="nextStory" class="ending-primary" type="button" :disabled="!endingArmed" @click="closeEnding(); selectStoryId(nextStory.id)">{{ labels.nextStory }} →<strong>{{ localize(nextStory.title) }}</strong></button>
+        <button v-else-if="nextGuideNode" class="ending-primary" type="button" :disabled="!endingArmed" @click="closeEnding(); showGuide(readingLineId, nextGuideNode.group)">{{ labels.continueGuide }} →<strong>{{ localize(nextGuideNode.label) }}</strong></button>
+        <button type="button" :disabled="!endingArmed" @click="closeEnding(); returnToEpisodes()">← {{ labels.backToEpisodes }}</button>
+        <button type="button" :disabled="!endingArmed" @click="closeEnding(); restart()">{{ labels.restart }}</button>
+      </div>
+    </dialog>
+    <dialog id="story-log" ref="logDialog" class="story-log-dialog" aria-labelledby="story-log-title" @cancel.prevent="closeLog" @close="logOpen = false" @click="dismissLogBackdrop">
+      <header><h2 id="story-log-title">{{ mediaLabels.log }}</h2><button type="button" @click="closeLog">{{ mediaLabels.close }}</button></header>
+      <p class="story-log-title">{{ localize(manifest?.title || selectedStory?.title) }}</p>
+      <div class="story-log-entries" tabindex="0" :aria-label="mediaLabels.log">
+        <p v-if="!storyLog.length">{{ mediaLabels.emptyLog }}</p>
+        <article v-for="(entry, index) in storyLog" :key="index" :class="{ choice: entry.kind === 'choice', current: entry.line === frame?.command?.line }">
+          <strong>{{ entry.kind === 'choice' ? mediaLabels.choice : localize(entry.speaker) || labels.narrator }}</strong>
+          <p>{{ localize(entry.text) }}</p>
+        </article>
+      </div>
+    </dialog>
+  </Teleport>
 </template>
 
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { authState } from '../services/auth.js';
+import { useStoryReadingProgress } from '../services/storyReadingProgress.js';
 import { normalizeChineseMusicText } from '../utils/s2tApiText.js';
 import { loadLocalizedStory } from '../services/storyLocalizations.js';
+import { storyMediaMessages } from '../i18n/storyMediaMessages.js';
+import { createMemorySound } from '../utils/storyMemorySound.js';
+import StoryPortrait from './StoryPortrait.vue';
+import { resolveStoryPortrait } from '../utils/storyPortraits.js';
 import { createStoryRunner, parseStoryScript } from '../utils/storyScript.js';
 import { classifyStory, storyCategories, storyGroupLabel } from '../utils/storyCatalog.js';
 import { prtsThumbnailUrl, fillStoryCoverFallbacks, storyCoverPlaceholder } from '../utils/storyImages.js';
 import { archiveStory, compareStoryOrder } from '../utils/storyArchive.js';
-import { collectionFamily, buildReadingRoute } from '../utils/storyReadingOrder.js';
+import { collectionFamily, buildReadingRoute, readingGuideIntro, readingGuideSource } from '../utils/storyReadingOrder.js';
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
+const mediaLabels = computed(() => storyMediaMessages[locale.value] || storyMediaMessages.en);
+const emit = defineEmits(['sign-in']);
 const copies = {
-  'zh-TW': { title: '劇情', subtitle: '明日方舟 · 劇情演出', loading: '正在載入本地劇情…', narrator: '旁白', continue: '點擊或按空白鍵繼續', choose: '選擇回應', finished: '劇情結束', battle: '可以重新播放或選擇其他劇情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效開啟', audioOff: '🔇 開啟音效', videoHint: '影片播放完畢後繼續。', selectStory: '選擇劇情', note: '劇情及素材出處：明日方舟／PRTS。素材由本地快照載入；部分表情與鏡頭指令仍未完整重現。' },
-  'zh-CN': { title: '剧情', subtitle: '明日方舟 · 剧情演出', loading: '正在载入本地剧情…', narrator: '旁白', continue: '点击或按空格键继续', choose: '选择回应', finished: '剧情结束', battle: '可以重新播放或选择其他剧情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效开启', audioOff: '🔇 开启音效', videoHint: '视频播放完毕后继续。', selectStory: '选择剧情', note: '剧情及素材出处：明日方舟／PRTS。素材由本地快照加载；部分表情与镜头指令仍未完整重现。' },
-  en: { title: 'Story', subtitle: 'Arknights · story stage', loading: 'Loading local story…', narrator: 'Narration', continue: 'Click or press Space to continue', choose: 'Choose a response', finished: 'Story complete', battle: 'Restart or choose another story.', restart: 'Restart', previous: 'Previous', next: 'Next', audioOn: '🔊 Audio on', audioOff: '🔇 Enable audio', videoHint: 'Continue after the video.', selectStory: 'Select story', note: 'Story and art: Arknights / PRTS. Media is loaded from a local snapshot; some expression and camera commands are not yet reproduced.' },
+  'zh-TW': { title: '劇情', subtitle: '明日方舟 · 劇情演出', loading: '正在載入本地劇情…', narrator: '旁白', continue: '點擊或按空白鍵繼續', choose: '選擇回應', finished: '劇情結束', battle: '可以重新播放或選擇其他劇情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效開啟', audioOff: '🔇 開啟音效', videoHint: '影片播放完畢後繼續。', selectStory: '選擇劇情', note: '劇情及素材出處：明日方舟／PRTS。劇本與已匯入影音由本站載入，未匯入素材可能連線至 PRTS；部分表情與鏡頭指令仍未完整重現。' },
+  'zh-CN': { title: '剧情', subtitle: '明日方舟 · 剧情演出', loading: '正在载入本地剧情…', narrator: '旁白', continue: '点击或按空格键继续', choose: '选择回应', finished: '剧情结束', battle: '可以重新播放或选择其他剧情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效开启', audioOff: '🔇 开启音效', videoHint: '视频播放完毕后继续。', selectStory: '选择剧情', note: '剧情及素材出处：明日方舟／PRTS。剧本与已导入影音由本站加载，未导入素材可能连接至 PRTS；部分表情与镜头指令仍未完整重现。' },
+  en: { title: 'Story', subtitle: 'Arknights · story stage', loading: 'Loading local story…', narrator: 'Narration', continue: 'Click or press Space to continue', choose: 'Choose a response', finished: 'Story complete', battle: 'Restart or choose another story.', restart: 'Restart', previous: 'Previous', next: 'Next', audioOn: '🔊 Audio on', audioOff: '🔇 Enable audio', videoHint: 'Continue after the video.', selectStory: 'Select story', note: 'Story and art: Arknights / PRTS. Scripts and imported media load locally; remaining media may stream from PRTS; some expression and camera commands are not yet reproduced.' },
 };
 const labels = computed(() => copies[locale.value] || copies.en);
 Object.assign(copies['zh-TW'], { archive: '劇情典藏', search: '搜尋劇情、章節、干員…', category: '劇情類型', chapter: '章節', allCategories: '全部類型', allChapters: '全部章節', stories: '篇劇情', pauseReel: 'Ⅱ 暫停膠捲', playReel: '▶ 播放膠捲', previousReel: '上一卷', nextReel: '下一卷', noResults: '沒有符合條件的劇情。', unavailable: '這篇劇情暫時無法載入，可由上方連結前往 PRTS 閱讀。', note: '劇情及素材出處：明日方舟／PRTS。劇本文本由本地快照載入，新增劇情的圖片與音訊依需要從 PRTS 載入；部分影片、表情與鏡頭演出尚未完整重現。' });
@@ -184,6 +262,10 @@ copies.en.swipeHint = 'Short drags or mouse wheel · Open the center cover';
 Object.assign(copies['zh-TW'], { refine: '進階篩選', playStory: '開始觀看' });
 Object.assign(copies['zh-CN'], { refine: '进阶筛选', playStory: '开始观看' });
 Object.assign(copies.en, { refine: 'Refine', playStory: 'Watch story' });
+
+Object.assign(copies['zh-TW'], { routeBasis: '左右依站閱讀；跨線前置另列。章內依段落順序，系列選讀不強制先後。', extraContext: '建議補充', extraContextNote: '先補充相關人物背景，再接本篇；這是導讀建議，不是必須完成的解鎖條件。', returnGuide: '回到原閱讀位置', resumeGuide: '接續未讀', routeStation: '閱讀站', readFirst: '讀這篇之前，先補齊', continueGuide: '接下來讀', branchReading: '讀完後可延伸的故事線', relatedReading: '同系列選讀', currentGuide: '目前閱讀路徑', guideSource: '關聯來源：PRTS 曲譜；導讀文字為本站編排' });
+Object.assign(copies['zh-CN'], { routeBasis: '左右按站阅读；跨线前置另列。章内按段落顺序，系列选读不强制先后。', extraContext: '建议补充', extraContextNote: '先补充相关人物背景，再接本篇；这是导读建议，不是必须完成的解锁条件。', returnGuide: '回到原阅读位置', resumeGuide: '接续未读', routeStation: '阅读站', readFirst: '读这一篇之前，先补齐', continueGuide: '接下来读', branchReading: '读完后可延伸的故事线', relatedReading: '同系列选读', currentGuide: '当前阅读路径', guideSource: '关联来源：PRTS 曲谱；导读文字为本站编排' });
+Object.assign(copies.en, { routeBasis: 'Follow the route sideways. Cross-line prerequisites are listed separately; anthology entries are optional.', extraContext: 'Recommended background', extraContextNote: 'Read this for additional character context. This is reading advice, not an unlock requirement.', returnGuide: 'Return to reading position', resumeGuide: 'Continue unread stories', routeStation: 'Route stop', readFirst: 'Read these before starting', continueGuide: 'Read next', branchReading: 'Related routes to explore afterward', relatedReading: 'Another standalone story', currentGuide: 'Current reading route', guideSource: 'Connections: PRTS Score; reading guidance curated by this site' });
 const advancedFilters = ref(false);
 copies['zh-TW'].allCollections = '全部活動／章節／干員';
 copies['zh-CN'].allCollections = '全部活动／章节／干员';
@@ -198,8 +280,7 @@ const selectedCollectionFilter = ref('');
 const readingLineId = ref('MS');
 const readingOffset = ref(0);
 const archiveMetadata = ref({});
-const savedRead = storedPreference('story-archive-read', {});
-const completedStories = ref(savedRead && typeof savedRead === 'object' && !Array.isArray(savedRead) ? savedRead : {});
+const { completed: completedStories, owner: progressOwner, status: progressStatus, syncing: progressSyncing, storageFailed: progressStorageFailed, importCount: progressImportCount, markCompleted, importGuest: importGuestProgress, sync: syncReadingProgress } = useStoryReadingProgress();
 watch(viewMode, value => savePreference('story-archive-view-v2', value));
 const screen = ref('collections');
 const activeCollection = ref(null);
@@ -242,8 +323,40 @@ const availableLines = computed(() => {
   }
   return [...families.values()];
 });
-const readingRoute = computed(() => buildReadingRoute(archiveMetadata.value.lines?.find(line => line.id === readingLineId.value), allCollections.value));
-function openRelatedRoute(id) { readingLineId.value = id; }
+const readingRoute = computed(() => buildReadingRoute(archiveMetadata.value.lines?.find(line => line.id === readingLineId.value), allCollections.value, archiveMetadata.value.lines || []));
+const guideTrail = ref([]);
+const readingLineName = computed(() => archiveMetadata.value.lines?.find(line => line.id === readingLineId.value)?.name || '');
+const activeGuideNode = computed(() => readingRoute.value.find(node => node.group === activeCollection.value?.group));
+const nextGuideNode = computed(() => {
+  if (viewMode.value !== 'sequence' || !activeGuideNode.value || activeGuideNode.value.independent) return null;
+  return readingRoute.value[readingRoute.value.indexOf(activeGuideNode.value) + 1] || null;
+});
+const readingResumeIndex = computed(() => readingRoute.value.findIndex(node => !node.missing && node.stories?.some(story => !completedStories.value[story.id])));
+function collectionReadLabel(group) {
+  const collection = findCollection(group);
+  if (!collection) return labels.value.notCollected;
+  const count = collection.stories.filter(story => completedStories.value[story.id]).length;
+  return count + ' / ' + collection.stories.length + ' ' + labels.value.read;
+}
+async function showGuide(id, group) {
+  if (screen.value === 'player') clearPlayback();
+  viewMode.value = 'sequence';
+  screen.value = 'collections';
+  await nextTick();
+  readingLineId.value = id;
+  await nextTick();
+  readingOffset.value = Math.max(0, readingRoute.value.findIndex(node => node.group === group));
+  focusScreenHeading();
+}
+function visitGuide(id, group) {
+  if (!id) return;
+  guideTrail.value.push({ line: readingLineId.value, group: rackActive.value?.group || activeCollection.value?.group });
+  showGuide(id, group);
+}
+function returnToGuide() {
+  const previous = guideTrail.value.pop();
+  if (previous) showGuide(previous.line, previous.group);
+}
 const groups = computed(() => {
   const keys = new Set(sectionStories.value.map(groupKey));
   const lineIndex = id => (archiveMetadata.value.lines || []).findIndex(line => line.id === id);
@@ -264,7 +377,7 @@ const completedCount = computed(() => groupStories.value.filter(story => complet
 function episodeNumber(story) { return String(groupStories.value.findIndex(entry => entry.id === story?.id) + 1).padStart(3, '0'); }
 const previousStory = computed(() => groupStories.value[groupStories.value.findIndex(story => story.id === selectedStoryId.value) - 1]);
 const nextStory = computed(() => groupStories.value[groupStories.value.findIndex(story => story.id === selectedStoryId.value) + 1]);
-const activeRoute = computed(() => archiveMetadata.value.lines?.find(line => line.id === activeCollection.value?.storyLine)?.route || []);
+const activeRoute = computed(() => readingRoute.value);
 function findCollection(group) { return allCollections.value.find(collection => collection.group === group); }
 const phases = computed(() => ['before', 'after', 'node', 'branch', 'entry'].filter(phase => groupStories.value.some(story => story.phase === phase)));
 const filteredStories = computed(() => {
@@ -340,11 +453,13 @@ function seekRack(index) {
   rackMotionFrame = requestAnimationFrame(animate);
 }
 function moveRack(direction, focus = false) {
+  unlockMemorySound();
   seekRack((rackAnimating.value ? rackMotionTarget : rackIndex.value) + direction);
   if (focus) rackElement.value?.focus({ preventScroll: true });
 }
-function scrubRack(event) { cancelRackDrag(); setRackPosition(clampRack(Number(event.target.value))); }
+function scrubRack(event) { unlockMemorySound(); cancelRackDrag(); setRackPosition(clampRack(Number(event.target.value))); }
 function activateRackCard(index) {
+  unlockMemorySound();
   if (suppressRackClick) return;
   if (index !== rackIndex.value) { seekRack(index); return; }
   const entry = rackActive.value;
@@ -353,6 +468,7 @@ function activateRackCard(index) {
   else selectStoryId(entry.id);
 }
 function beginRackDrag(event) {
+  unlockMemorySound();
   if (!event.isPrimary || event.button !== 0) return;
   stopRackMotion();
   clearTimeout(rackClickTimer);
@@ -433,7 +549,13 @@ watch(rackElement, element => {
 }, { flush: 'post' });
 watch([screen, search, episodeSearch, selectedCategory, selectedSection, selectedLine, selectedCollectionFilter, collectionSort, selectedPhase, readingLineId, viewMode], cancelRackDrag);
 watch(readingLineId, () => { readingOffset.value = 0; });
-watch(viewMode, () => { reelOffset.value = 0; if (viewMode.value === 'sequence' && selectedLine.value.startsWith('line:')) readingLineId.value = selectedLine.value.slice(5); });
+watch(viewMode, () => {
+  reelOffset.value = 0;
+  if (viewMode.value === 'sequence') {
+    if (screen.value !== 'collections' && activeCollection.value?.storyLine) readingLineId.value = activeCollection.value.storyLine;
+    else if (selectedLine.value.startsWith('line:')) readingLineId.value = selectedLine.value.slice(5);
+  }
+});
 let prtsVariables = {};
 const thumbnailIndex = ref({});
 const originalImages = new Set();
@@ -475,7 +597,98 @@ const error = ref('');
 const visibleText = ref('');
 const isTyping = ref(false);
 const canGoBack = ref(false);
-const audioEnabled = ref(false);
+const audioEnabled = ref(storedPreference('story-audio-enabled', true) === true);
+const savedAudioVolume = Number(storedPreference('story-audio-volume', .5));
+const audioVolume = ref(Number.isFinite(savedAudioVolume) ? Math.min(1, Math.max(0, savedAudioVolume)) : .5);
+const sceneVideo = ref(null);
+const sceneCamera = ref(null);
+const characterIndex = ref({});
+const endingDialog = ref(null);
+const endingOpen = ref(false);
+const endingArmed = ref(false);
+let endingGuardTimer;
+let endingReturnFocus;
+let cameraAnimation;
+let cameraRequest = 0;
+const portraitVisual = name => resolveStoryPortrait(name, characterIndex.value, prtsVariables);
+function stopCameraMotion() { cameraRequest++; cameraAnimation?.cancel(); cameraAnimation = null; }
+async function playCameraMotion(currentFrame) {
+  stopCameraMotion();
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || currentFrame?.type === 'video') return;
+  const token = cameraRequest;
+  await nextTick();
+  for (const event of currentFrame?.events || []) {
+    if (event.type !== 'cameraShake' || !sceneCamera.value || token !== cameraRequest) continue;
+    if (event.stop) { cameraAnimation?.cancel(); continue; }
+    const duration = Math.max(0, Math.min(10, event.duration));
+    if (!duration) continue;
+    const steps = Math.max(2, Math.min(300, Math.round(duration * Math.max(1, event.vibrato))));
+    const keyframes = Array.from({ length: steps + 1 }, (_, index) => {
+      const strength = index === 0 || index === steps ? 0 : event.fadeout ? 1 - index / steps : 1;
+      const x = Math.sin(index * 2.4) * Math.min(40, Math.abs(event.x)) * strength;
+      const y = Math.cos(index * 1.7) * Math.min(40, Math.abs(event.y)) * strength;
+      return { transform: `translate(${x}px, ${y}px)` };
+    });
+    cameraAnimation = sceneCamera.value.animate(keyframes, { duration: duration * 1000 });
+    try { await cameraAnimation.finished; } catch { return; }
+  }
+}
+async function openEnding() {
+  if (endingOpen.value) return;
+  closeLog();
+  endingReturnFocus = document.activeElement;
+  endingOpen.value = true;
+  await nextTick();
+  if (endingOpen.value && frame.value?.type === 'end' && !endingDialog.value?.open) {
+    endingDialog.value?.showModal();
+    endingDialog.value?.querySelector('#story-ending-title')?.focus({ preventScroll: true });
+    endingGuardTimer = setTimeout(() => { if (endingOpen.value) endingArmed.value = true; }, 700);
+  }
+}
+function resetEndingGuard() { clearTimeout(endingGuardTimer); endingArmed.value = false; endingOpen.value = false; }
+function guardEndingClick(event) {
+  if (!endingArmed.value || event.detail > 1) { event.preventDefault(); event.stopPropagation(); }
+}
+function guardEndingKey(event) {
+  if (['Enter', 'Space'].includes(event.code) && (!endingArmed.value || event.repeat)) { event.preventDefault(); event.stopPropagation(); }
+}
+function closeEnding() { endingDialog.value?.close(); resetEndingGuard(); endingReturnFocus?.focus?.({ preventScroll: true }); }
+const logDialog = ref(null);
+const logOpen = ref(false);
+const storyLog = ref([]);
+let loggedFrames = new WeakSet();
+let logReturnFocus;
+const memorySound = createMemorySound();
+let memoryInteractionAt = -Infinity;
+function unlockMemorySound() { memoryInteractionAt = performance.now(); if (audioEnabled.value) memorySound.unlock(); }
+watch(rackIndex, (index, previous) => {
+  if (index !== previous && audioEnabled.value && performance.now() - memoryInteractionAt < 1500) memorySound.play(audioVolume.value);
+});
+function applyVideoVolume() { if (sceneVideo.value) { sceneVideo.value.volume = audioVolume.value; sceneVideo.value.muted = !audioEnabled.value; } }
+function applyAudioSettings(audio) { audio.volume = volumeOf(audio.storyVolume ?? 1) * audioVolume.value; audio.muted = !audioEnabled.value; }
+watch([audioVolume, audioEnabled], () => {
+  savePreference('story-audio-volume', audioVolume.value);
+  for (const audio of [introAudio, musicAudio, ...soundEffects]) if (audio) applyAudioSettings(audio);
+  applyVideoVolume();
+});
+async function openLog() {
+  logReturnFocus = document.activeElement;
+  logOpen.value = true;
+  await nextTick();
+  if (!logOpen.value) return;
+  if (!logDialog.value?.open) logDialog.value?.showModal();
+  logDialog.value?.querySelector('.story-log-entries')?.lastElementChild?.scrollIntoView({ block: 'nearest' });
+}
+function closeLog() { logDialog.value?.close(); logOpen.value = false; logReturnFocus?.focus?.({ preventScroll: true }); }
+function dismissLogBackdrop(event) {
+  if (event.target !== logDialog.value) return;
+  const box = logDialog.value.getBoundingClientRect();
+  if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) closeLog();
+}
+
+const audioProblem = ref('');
+const videoFailed = ref(false);
+const videoAttempt = ref(0);
 const commandCount = ref(0);
 let runner = null;
 let timer = null;
@@ -509,6 +722,8 @@ function localize(text) {
 }
 
 function originalAssetPath(id) {
+  const portrait = portraitVisual(id);
+  if (portrait?.baseUrl) return portrait.baseUrl;
   const raw = String(id || '').split('#')[0];
   const key = raw.startsWith('$') ? prtsVariables[raw.slice(1)] || raw : raw;
   const entry = manifest.value?.assets?.[key];
@@ -526,11 +741,12 @@ function backgroundPreview(id) {
   return thumbnail ? `${root}${thumbnail}` : '';
 }
 
-function audioPath(entry) { return entry?.url || (entry?.path ? `${base.value}${entry.path}` : ''); }
+function audioPath(entry) { return entry?.path ? `${base.value}${entry.path}` : entry?.url || ''; }
 
 function videoPath(id) {
-  const entry = manifest.value?.videos?.[String(id || '').replace(/^\$/, '')];
-  return entry ? `${base.value}${entry.path}` : '';
+  const key = String(id || '').replace(/^\$/, '');
+  const entry = manifest.value?.videos?.[key] || manifest.value?.videos?.[prtsVariables[key]];
+  return audioPath(entry);
 }
 const shadeStyle = computed(() => {
   const shade = frame.value?.state?.shade;
@@ -590,7 +806,7 @@ function drainPreloadQueue() {
 
 function preloadUpcoming() {
   if (!frame.value || screen.value !== 'player') return;
-  for (const id of [frame.value.state.background, frame.value.state.image, ...frame.value.state.portraits].filter(Boolean)) preloadVisual(id, 'high');
+  for (const id of [frame.value.state.background, frame.value.state.image, ...frame.value.state.portraits.map(p => p.name)].filter(Boolean)) preloadVisual(id, 'high');
   const line = frame.value?.command?.line || 0;
   let count = 0;
   let scanned = 0;
@@ -607,70 +823,119 @@ function preloadUpcoming() {
   }
 }
 
+function audioEntry(key) {
+  const entries = manifest.value?.audio || {};
+  return entries[key] || entries[Object.keys(entries).find(name => name.toLowerCase() === String(key).toLowerCase())];
+}
+const volumeOf = value => Number.isFinite(Number(value)) ? Math.min(1, Math.max(0, Number(value))) : 1;
+function reportAudio(error) { audioProblem.value = error?.name === 'NotAllowedError' ? 'blocked' : 'failed'; }
 function stopMusic() {
-  if (introAudio) { introAudio.pause(); introAudio.onended = null; introAudio = null; }
-  if (musicAudio) { musicAudio.pause(); musicAudio = null; }
+  for (const audio of [introAudio, musicAudio]) if (audio) { audio.onended = null; audio.onerror = null; audio.pause(); audio.removeAttribute('src'); audio.load(); }
+  introAudio = musicAudio = null;
   currentMusicKey = '';
 }
-
-function syncMusic() {
-  const music = frame.value?.state?.music;
-  const key = audioEnabled.value ? music?.key || '' : '';
-  if (key === currentMusicKey) return;
-  stopMusic();
-  const loopEntry = manifest.value?.audio?.[key];
-  if (!loopEntry) return;
-  currentMusicKey = key;
-  const volume = Math.min(1, Math.max(0, music.volume));
-  const playLoop = () => {
-    if (currentMusicKey !== key) return;
-    musicAudio = new Audio(audioPath(loopEntry));
-    musicAudio.loop = true;
-    musicAudio.volume = volume;
-    musicAudio.play().catch(() => {});
-  };
-  const introEntry = manifest.value?.audio?.[music.intro];
-  if (introEntry && music.intro !== key) {
-    introAudio = new Audio(audioPath(introEntry));
-    introAudio.volume = volume;
-    introAudio.onended = playLoop;
-    introAudio.play().catch(() => playLoop());
-  } else playLoop();
-}
-
-function playFrameSounds() {
-  if (!audioEnabled.value) return;
-  for (const event of frame.value?.events || []) {
-    const entry = manifest.value?.audio?.[event.key];
-    if (event.type !== 'sound' || !entry) continue;
-    const effect = new Audio(audioPath(entry));
-    effect.volume = Math.min(1, Math.max(0, event.volume));
-    soundEffects.add(effect);
-    effect.onended = () => soundEffects.delete(effect);
-    effect.play().catch(() => soundEffects.delete(effect));
+function stopEffects(channel) {
+  for (const effect of soundEffects) {
+    if (channel && effect.storyChannel !== channel) continue;
+    clearTimeout(effect.storyTimer);
+    effect.onended = effect.onerror = null;
+    effect.pause(); effect.removeAttribute('src'); effect.load();
+    soundEffects.delete(effect);
   }
 }
-
+function syncMusic() {
+  const music = frame.value?.state?.music;
+  const playable = !['video', 'end'].includes(frame.value?.type);
+  const key = playable && music?.key ? music.key + ':' + music.instance : '';
+  const volume = volumeOf(music?.volume);
+  if (key === currentMusicKey) {
+    for (const audio of [introAudio, musicAudio]) if (audio) { audio.storyVolume = volume; applyAudioSettings(audio); }
+    return;
+  }
+  stopMusic();
+  if (!key) return;
+  const loopEntry = audioEntry(music.key);
+  if (!loopEntry) { audioProblem.value = 'missing'; return; }
+  currentMusicKey = key;
+  const playLoop = () => {
+    if (currentMusicKey !== key || musicAudio) return;
+    if (introAudio) { introAudio.onended = introAudio.onerror = null; introAudio.pause(); introAudio.removeAttribute('src'); introAudio.load(); introAudio = null; }
+    const audio = musicAudio = new Audio(audioPath(loopEntry));
+    audio.loop = true; audio.storyVolume = volumeOf(frame.value?.state?.music?.volume); applyAudioSettings(audio);
+    audio.onerror = () => { if (musicAudio === audio) reportAudio(); };
+    audio.play().catch(error => { if (musicAudio === audio) reportAudio(error); });
+  };
+  const introEntry = audioEntry(music.intro);
+  if (introEntry && music.intro !== music.key) {
+    const audio = introAudio = new Audio(audioPath(introEntry));
+    audio.storyVolume = volume; applyAudioSettings(audio); audio.onended = playLoop; audio.onerror = playLoop;
+    audio.play().catch(error => { if (introAudio !== audio || currentMusicKey !== key) return; if (error.name === 'NotAllowedError') reportAudio(error); else playLoop(); });
+  } else playLoop();
+}
+function startEffect(event) {
+  const entry = audioEntry(event.key);
+  if (!entry) { audioProblem.value = 'missing'; return; }
+  stopEffects(event.channel);
+  const effect = new Audio(audioPath(entry));
+  effect.storyChannel = event.channel; effect.storyInstance = event.instance;
+  effect.loop = event.loop; effect.storyVolume = volumeOf(event.volume); applyAudioSettings(effect);
+  soundEffects.add(effect);
+  effect.onended = () => soundEffects.delete(effect);
+  effect.onerror = () => { if (soundEffects.has(effect)) { soundEffects.delete(effect); reportAudio(); } };
+  const play = () => effect.play().catch(error => { if (soundEffects.has(effect)) { soundEffects.delete(effect); reportAudio(error); } });
+  if (event.delay) effect.storyTimer = setTimeout(() => { effect.storyTimer = null; play(); }, event.delay * 1000); else play();
+}
+function playFrameSounds(replayEvents = true) {
+  if (!frame.value || ['video', 'end'].includes(frame.value.type)) { stopEffects(); return; }
+  if (replayEvents) for (const event of frame.value.events || []) {
+    if (event.type === 'stopSound') stopEffects(event.channel);
+    else if (event.type === 'soundVolume') {
+      for (const effect of soundEffects) if (!event.channel || effect.storyChannel === event.channel) { effect.storyVolume = volumeOf(event.volume); applyAudioSettings(effect); }
+    } else if (event.type === 'sound') startEffect(event);
+  }
+  const loops = frame.value.state.sounds || {};
+  for (const effect of [...soundEffects]) if (effect.loop && loops[effect.storyChannel]?.instance !== effect.storyInstance) stopEffects(effect.storyChannel);
+  for (const event of Object.values(loops)) {
+    const existing = [...soundEffects].find(effect => effect.loop && effect.storyChannel === event.channel && effect.storyInstance === event.instance);
+    if (existing) { existing.storyVolume = volumeOf(event.volume); applyAudioSettings(existing); } else startEffect(event);
+  }
+}
+function retryAudio() {
+  audioProblem.value = '';
+  stopMusic(); stopEffects();
+  syncMusic(); playFrameSounds(false);
+}
 function toggleAudio() {
   audioEnabled.value = !audioEnabled.value;
-  if (audioEnabled.value) syncMusic();
-  else {
-    stopMusic();
-    for (const effect of soundEffects) effect.pause();
-    soundEffects.clear();
+  savePreference('story-audio-enabled', audioEnabled.value);
+  audioProblem.value = '';
+  if (audioEnabled.value) {
+    memorySound.unlock();
+    for (const audio of [introAudio, musicAudio, ...soundEffects]) if (audio && audio.paused && !audio.ended && !audio.storyTimer) audio.play().catch(reportAudio);
   }
 }
 
 let suppressSound = false;
 watch([frame, locale], ([nextFrame], [previousFrame]) => {
+  if (nextFrame !== previousFrame) {
+    if (suppressSound) stopCameraMotion(); else playCameraMotion(nextFrame);
+    if (screen.value === 'player' && nextFrame?.type === 'end') openEnding(); else closeEnding();
+  }
+  if (nextFrame?.type === 'dialogue' && !loggedFrames.has(nextFrame)) {
+    loggedFrames.add(nextFrame);
+    storyLog.value.push({ kind: 'dialogue', speaker: nextFrame.speaker, text: nextFrame.text, line: nextFrame.command?.line });
+  }
   if (screen.value === 'player' && nextFrame?.type === 'end' && selectedStoryId.value) {
-    completedStories.value = { ...completedStories.value, [selectedStoryId.value]: true };
-    savePreference('story-archive-read', completedStories.value);
+    markCompleted(selectedStoryId.value);
   }
   clearTyping();
   preloadUpcoming();
   syncMusic();
-  if (nextFrame !== previousFrame && !suppressSound) playFrameSounds();
+  if (nextFrame !== previousFrame) {
+    videoFailed.value = false;
+    if (suppressSound) stopEffects();
+    playFrameSounds(!suppressSound);
+  }
   suppressSound = false;
   if (frame.value?.type !== 'dialogue') {
     visibleText.value = '';
@@ -705,6 +970,8 @@ function advance() {
 
 function choose(value) {
   if (!runner) return;
+  const choice = frame.value?.options?.find(option => option.value === value);
+  if (choice) storyLog.value.push({ kind: 'choice', text: choice.label, line: frame.value.command?.line });
   frame.value = runner.choose(value);
   canGoBack.value = runner.canPrevious();
 }
@@ -724,25 +991,31 @@ function advanceVideo() {
 
 function restart() {
   if (!manifest.value || !sourceText) return;
+  stopMusic(); stopEffects(); audioProblem.value = '';
+  closeLog(); storyLog.value = []; loggedFrames = new WeakSet();
   runner = createStoryRunner(commands);
   frame.value = runner.next();
   canGoBack.value = false;
 }
 
 function handleKeydown(event) {
-  if (screen.value !== 'player') return;
-  if (event.target instanceof HTMLElement && ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)) return;
+  if (screen.value !== 'player' || logOpen.value || endingOpen.value) return;
+  if (event.target instanceof HTMLElement && ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'VIDEO'].includes(event.target.tagName)) return;
   if (event.code === 'Space' || event.code === 'Enter') { event.preventDefault(); advance(); }
   if (event.code === 'ArrowLeft') goBack();
 }
 
 async function loadStory() {
   const token = ++loadingToken;
+  closeEnding(); stopCameraMotion();
+  closeLog();
+  storyLog.value = [];
+  loggedFrames = new WeakSet();
   clearImagePreloads();
   stopMusic();
   clearTyping();
-  for (const effect of soundEffects) effect.pause();
-  soundEffects.clear();
+  stopEffects();
+  audioProblem.value = '';
   manifest.value = null;
   frame.value = null;
   error.value = '';
@@ -782,6 +1055,10 @@ function selectStoryId(id) {
 function openCollection(collection) {
   if (!collection) return;
   activeCollection.value = collection;
+  if (viewMode.value === 'sequence') {
+    const index = readingRoute.value.findIndex(node => node.group === collection.group);
+    if (index >= 0) readingOffset.value = index;
+  }
   selectedGroup.value = collection.key;
   episodeSearch.value = '';
   selectedPhase.value = '';
@@ -795,8 +1072,8 @@ function clearPlayback() {
   clearImagePreloads();
   clearTyping();
   stopMusic();
-  for (const effect of soundEffects) effect.pause();
-  soundEffects.clear();
+  stopEffects();
+  audioProblem.value = '';
   runner = null;
   frame.value = null;
   manifest.value = null;
@@ -835,12 +1112,13 @@ onMounted(async () => {
     document.head.append(preconnectLink);
   }
   try {
-    const [response, variables, thumbnails, metadata, titles] = await Promise.all([
+    const [response, variables, thumbnails, metadata, titles, characters] = await Promise.all([
       fetch(`${root}catalog.json`),
       fetch(`${root}prts-variables.json`).then(response => response.ok ? response.json() : {}).catch(() => ({})),
       fetch(`${root}thumbnail-index.json`).then(response => response.ok ? response.json() : {}).catch(() => ({})),
       fetch(`${root}archive-metadata.json`).then(response => response.ok ? response.json() : {}).catch(() => ({})),
       fetch(`${root}localizations/titles.json`).then(response => response.ok ? response.json() : {}).catch(() => ({})),
+      fetch(`${root}character-index.json`).then(response => response.ok ? response.json() : {}).catch(() => ({})),
     ]);
     if (!response.ok) throw new Error('Story catalog unavailable');
     const nextCatalog = await response.json();
@@ -849,6 +1127,7 @@ onMounted(async () => {
     thumbnailIndex.value = thumbnails;
     archiveMetadata.value = metadata;
     localizedTitles.value = titles;
+    characterIndex.value = characters;
     catalog.value = fillStoryCoverFallbacks(nextCatalog.map(story => archiveStory(classifyStory(story), metadata)));
     if (!catalog.value.length) throw new Error('Story catalog is empty');
   } catch (cause) { if (!disposed) catalogError.value = cause.message || String(cause); }
@@ -857,12 +1136,15 @@ onUnmounted(() => {
   cancelRackDrag();
   rackObserver?.disconnect();
   clearTimeout(rackClickTimer);
+  memorySound.close();
+  stopCameraMotion(); closeEnding();
+  closeLog();
   disposed = true;
   loadingToken += 1;
   clearTyping();
   stopMusic();
-  for (const effect of soundEffects) effect.pause();
-  soundEffects.clear();
+  stopEffects();
+  audioProblem.value = '';
   clearImagePreloads();
   preconnectLink?.remove();
   window.removeEventListener('keydown', handleKeydown);
@@ -890,7 +1172,7 @@ onUnmounted(() => {
 .stage-wrap{position:relative;padding-block:26px;background:#07090c;border-block:1px solid #655846}
 .stage-wrap::before{top:7px;z-index:4}.stage-wrap::after{bottom:7px;z-index:4}
 .story-stage{position:relative;aspect-ratio:16/9;overflow:hidden;cursor:pointer;background:#06090e}
-.story-stage.grayscale>.scene-backdrop,.story-stage.grayscale>.scene-image,.story-stage.grayscale>.portrait-row{filter:grayscale(1)}
+.story-stage.grayscale .scene-backdrop,.story-stage.grayscale .scene-image,.story-stage.grayscale .portrait-row{filter:grayscale(1)}
 .scene-backdrop,.scene-image,.scene-vignette,.scene-shade{position:absolute;inset:0;width:100%;height:100%}
 .scene-backdrop,.scene-image{object-fit:contain}
 .scene-preview{filter:blur(2px)}
@@ -901,6 +1183,8 @@ onUnmounted(() => {
 .portrait:not(:first-child){margin-left:-6%}.portrait.subdued{filter:brightness(.38) saturate(.45);opacity:.78}
 .scene-shade{pointer-events:none;transition:background-color .25s}
 .story-dialogue-panel{position:absolute;inset:26px 0;pointer-events:none}
+.video-mode .story-dialogue-panel{position:relative;inset:auto;min-height:0}
+.video-mode .end-box{position:relative;inset:auto;margin:12px 5% 0}
 .dialogue-box,.decision-box,.end-box{position:absolute;z-index:2;left:5%;right:5%;bottom:4%;background:#08121bdc;border-top:2px solid #7ccde5;box-shadow:0 10px 30px #000a;backdrop-filter:blur(7px)}
 .dialogue-box,.decision-box,.end-box{pointer-events:auto}
 .dialogue-box{min-height:132px;padding:22px 30px 24px;cursor:pointer}.speaker{display:inline-block;color:#9eddf0;font-weight:700;letter-spacing:.08em}
@@ -980,4 +1264,28 @@ onUnmounted(() => {
 .story-rack.moving .rack-card,.story-rack.dragging .rack-card{transition:none;will-change:transform}
 .story-rack.moving .film-perforations{transition:none}
 .translation-notice{padding:10px 16px;border-left:2px solid #c1a773;background:#131d23;color:#c7d4da;font-size:.8rem;line-height:1.6}
+.guide-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:0 20px 12px;color:#94aab6;font-size:.72rem}.guide-tools button,.guide-context{border:1px solid #596963;background:#16242b;color:#dfcfaa;padding:7px 10px;font:inherit;cursor:pointer}.guide-tools>span{flex-basis:100%;line-height:1.6}.reading-detail-title>small{margin-left:auto;color:#9fb1bb;font-size:.65rem}.guide-connections{border-left:2px solid #c0a56f;padding-left:12px;margin:14px 0}.guide-connections h3{font-size:.78rem;color:#e8d2a4;font-weight:500;margin:0}.guide-connection p{font-size:.72rem;margin:4px 0 12px}.guide-connection button small{margin-left:8px;color:#b9c8ce}.reading-detail button:disabled{opacity:.5;cursor:default}.guide-branches{margin-top:12px;border-top:1px solid #35484d;padding-top:12px;font-size:.72rem}.guide-branches summary{cursor:pointer;color:#a9c4cd}.guide-branches button{display:block}.guide-source{display:inline-block;margin-top:14px;color:#849ba8;font-size:.65rem;text-decoration:underline}.reading-neighbors button{max-width:48%;text-align:left}.guide-tools button:focus-visible,.guide-context:focus-visible,.guide-branches summary:focus-visible{outline:2px solid #a5e5f6;outline-offset:3px}
+.story-progress-sync{display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px;margin:0 0 18px;padding:12px 16px;border:1px solid #344952;background:#101d24;color:#abc4cf;font-size:.75rem;line-height:1.6}.story-progress-sync>div{display:grid;gap:3px;flex:1;min-width:220px}.story-progress-sync strong{color:#e1d0ad;font-weight:500}.story-progress-sync button{border:1px solid #68765f;padding:7px 10px;background:#1c2d32;color:#ead9b6;font:inherit;cursor:pointer}.story-progress-sync button:disabled{opacity:.5;cursor:default}.story-progress-sync button:focus-visible{outline:2px solid #a5e5f6;outline-offset:3px}.progress-storage-warning{color:#ebc388}
+
+/* Keep explanatory text secondary to the memories and scene. */
+.story-heading{gap:12px;margin-bottom:14px}.story-heading h1{font-size:clamp(1.3rem,2.5vw,2rem)}.story-heading>div>p:last-child{font-size:.75rem;margin-top:5px}
+.story-progress-sync{padding:7px 12px;margin-bottom:12px;font-size:.68rem;gap:6px 12px}.story-progress-sync>div{display:flex;flex-wrap:wrap;gap:4px 10px}.story-progress-sync button{padding:4px 8px}
+.compact-note{font-size:.7rem;color:#92aab6;line-height:1.6}.compact-note summary{cursor:pointer;width:fit-content;color:#a9c4cd}.compact-note p{margin:6px 0;max-width:75ch}.reading-plan-heading{padding-block:8px;gap:18px}.guide-tools .compact-note{margin-left:auto}
+.reading-detail{padding:10px 18px}.reading-detail-title{gap:8px;flex-wrap:wrap}.reading-detail p{font-size:.73rem;margin:6px 0}.guide-description{margin-top:8px}.guide-connections{margin:8px 0;padding-left:10px}.guide-connection p{font-size:.68rem;margin:2px 0 5px}.reading-detail button{margin-top:5px}.guide-source{margin-top:6px}.guide-branches{padding-top:7px;margin-top:7px}.reading-neighbors{gap:12px}
+.archive-audio,.archive-audio label,.story-volume{display:flex;align-items:center;gap:7px;font-size:.7rem;color:#aac4cf}.archive-audio{flex-wrap:wrap}.archive-audio input,.story-volume input{width:90px;accent-color:#9bd9e8;cursor:pointer}.archive-audio output,.story-volume output{width:3ch;font-variant-numeric:tabular-nums}.heading-actions{flex-wrap:wrap;justify-content:flex-end}.story-controls{flex-wrap:wrap;gap:8px;font-family:inherit}.story-controls .story-volume{margin-left:auto}.story-note>p{font-size:.7rem}.story-note summary:focus-visible,.compact-note summary:focus-visible{outline:2px solid #a5e5f6;outline-offset:3px}
+.story-log-dialog{width:min(760px,calc(100vw - 32px));max-height:80dvh;padding:20px;box-sizing:border-box;border:1px solid #627d89;background:#0b171fee;color:#e3edf2;box-shadow:0 20px 80px #000a}.story-log-dialog::backdrop{background:#02070cc9;backdrop-filter:blur(5px)}.story-log-dialog>header{display:flex;align-items:center;justify-content:space-between;gap:12px}.story-log-dialog h2{font-size:1rem;margin:0}.story-log-dialog button{background:#17323f;color:#d5eaf3;border:1px solid #668793;padding:7px 12px;cursor:pointer}.story-log-title{font-size:.75rem;color:#8faebd;margin:8px 0 16px}.story-log-entries{max-height:55dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#638596 #13242e;padding-right:8px}.story-log-entries article{padding:12px 14px;margin:0 0 8px;border-left:2px solid #284451;background:#10212b}.story-log-entries article.current{border-color:#a0dced;background:#18313f}.story-log-entries article.choice{border-color:#cbb079}.story-log-entries strong{font-size:.75rem;color:#abdbec}.story-log-entries article.choice strong{color:#dcc49a}.story-log-entries p{margin:6px 0 0;font-size:.9rem;line-height:1.7;white-space:pre-wrap}.story-log-dialog button:focus-visible,.story-log-entries:focus-visible{outline:2px solid #a5e5f6;outline-offset:3px}
+@media(max-width:700px){.story-controls{display:flex}.story-controls button,.story-controls span{grid-area:auto}.story-controls .story-volume{margin-left:0;flex:1;justify-content:center}.story-controls button:last-child{margin-left:auto}.heading-actions{justify-content:flex-start}.archive-audio label{font-size:.65rem}.story-log-dialog{padding:14px}.reading-plan-heading{gap:8px}.guide-tools .compact-note{margin-left:0}}
+
+
+.scene-camera{position:absolute;inset:0;transform-origin:center;pointer-events:none;user-select:none;-webkit-user-select:none}
+.portrait-row .portrait{position:absolute;bottom:0;left:50%;width:46%;height:100%;margin-left:0;transform:translateX(-50%)}
+.portrait-row .portrait-l{left:27%}.portrait-row .portrait-r{left:73%}.portrait-row .portrait-m{left:50%}
+.story-log-dialog{position:fixed;inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto}
+.story-ending-dialog{width:min(580px,calc(100vw - 32px));padding:28px;border-top:3px solid #9cdde9}
+.story-ending-dialog h2{font-size:1.35rem}.ending-actions{display:grid;gap:12px;margin-top:20px}
+.ending-actions button{padding:13px 16px;text-align:left}.ending-actions .ending-primary{background:#234c5a;border-color:#a5dce8;color:#fff;font-size:.95rem}
+.ending-primary strong{display:block;margin-top:7px;font-size:1.1rem}.ending-actions button:focus-visible{outline:2px solid #c2edf5;outline-offset:3px}
+.story-ending-dialog button:disabled{opacity:.45;cursor:default}.story-ending-dialog h2:focus{outline:none}
+@media(max-width:700px){.portrait-row .portrait{width:53%}.story-ending-dialog{padding:20px}}
+
 </style>

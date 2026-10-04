@@ -1,3 +1,4 @@
+import { storyProgressMessages } from './storyProgressMessages.js';
 import { createI18n } from 'vue-i18n';
 import zhTW from './locales/zh-TW.json';
 import zhCN from './locales/zh-CN.json';
@@ -30,10 +31,10 @@ export const i18n = createI18n({
   locale: initialLocale,
   fallbackLocale: 'en',
   messages: {
-    'zh-TW': { ...zhTW, ...userLibraryMessages['zh-TW'] },
-    'zh-CN': { ...zhCN, ...userLibraryMessages['zh-CN'] },
-    en: { ...en, ...userLibraryMessages.en },
-    ja: { ...ja, ...userLibraryMessages.ja },
-    ko: { ...ko, ...userLibraryMessages.ko },
+    'zh-TW': { ...zhTW, ...userLibraryMessages['zh-TW'], ...storyProgressMessages['zh-TW'] },
+    'zh-CN': { ...zhCN, ...userLibraryMessages['zh-CN'], ...storyProgressMessages['zh-CN'] },
+    en: { ...en, ...userLibraryMessages.en, ...storyProgressMessages.en },
+    ja: { ...ja, ...userLibraryMessages.ja, ...storyProgressMessages.ja },
+    ko: { ...ko, ...userLibraryMessages.ko, ...storyProgressMessages.ko },
   },
 });

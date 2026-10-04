@@ -8,7 +8,10 @@ const exec = promisify(execFile);
 const root = new URL('../../', import.meta.url);
 const read = async file => readFile(new URL(file, root), 'utf8');
 const json = async file => JSON.parse(await read(file));
-const save = async (file, data) => writeFile(new URL(file, root), JSON.stringify(data, null, 2) + '\n');
+const saveText = async (file, text) => {
+  if (await read(file).catch(() => null) !== text) await writeFile(new URL(file, root), text);
+};
+const save = async (file, data) => saveText(file, JSON.stringify(data, null, 2) + '\n');
 const hash = text => createHash('sha256').update(text).digest('hex');
 const offline = process.argv.includes('--offline');
 const locales = { en: 'en_US', ja: 'ja_JP', ko: 'ko_KR' };
@@ -64,13 +67,15 @@ function assets(commands) {
   return result;
 }
 const catalog = await json('public/story/catalog.json');
+const previousIndex = await json('public/story/localizations/index.json').catch(() => ({ locales: {} }));
 for (const story of catalog) if (!paths.has(story.page) && savedPaths[story.id]) paths.set(story.page, savedPaths[story.id]);
 await save('scripts/story/localization-paths.json', Object.fromEntries(catalog.map(story => [story.id, story.scriptPath || paths.get(story.page)]).filter(([, value]) => value)));
 const sourceReview = await sourceJson('tmp/story-research/game-story-review.json', 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/story_review_table.json');
 const sourceSegments = new Map(Object.values(sourceReview).flatMap(group => group.infoUnlockDatas || []).filter(story => story.storyTxt).map(story => [story.storyTxt.toLowerCase(), story]));
-const titles = {};
-const index = { schemaVersion: 1, provider: 'game-localization', source: 'https://github.com/Kengxxiao/ArknightsGameData_YoStar', tree: tree.sha, locales: {} };
-const report = { totalStories: catalog.length, locales: {} };
+const titles = await json('public/story/localizations/titles.json').catch(() => ({}));
+const index = { schemaVersion: 1, provider: 'game-localization', source: 'https://github.com/Kengxxiao/ArknightsGameData_YoStar', tree: tree.sha, locales: { ...previousIndex.locales } };
+const previousReport = await json('public/story/localizations/report.json').catch(() => ({ locales: {} }));
+const report = { totalStories: catalog.length, locales: { ...previousReport.locales } };
 for (const [locale, folder] of Object.entries(locales)) {
   const review = await sourceJson(`tmp/story-research/review-${folder}.json`, `${repo}${folder}/gamedata/excel/story_review_table.json`);
   const segments = new Map(Object.values(review).flatMap(group => group.infoUnlockDatas || []).filter(story => story.storyTxt).map(story => [story.storyTxt.toLowerCase(), story]));
@@ -89,7 +94,7 @@ for (const [locale, folder] of Object.entries(locales)) {
   }
   await mkdir(new URL(`public/story/localizations/${locale}/`, root), { recursive: true });
   const entries = index.locales[locale] = {};
-  const stats = report.locales[locale] = { imported: 0, missing: [], failed: [], incompatibleAssets: [] };
+  const stats = report.locales[locale] = { imported: 0, reused: 0, missing: [], failed: [], incompatibleAssets: [] };
   const queue = [...catalog];
   await Promise.all(Array.from({ length: 8 }, async () => {
     while (queue.length) {
@@ -99,19 +104,30 @@ for (const [locale, folder] of Object.entries(locales)) {
       if (!entry) { stats.missing.push({ id: story.id, page: story.page, scriptPath }); continue; }
       try {
         const original = await read(`public/story/${story.id}/script.txt`);
-        const translated = await download(entry);
+        const previous = previousIndex.locales[locale]?.[story.id];
+        const localPath = `public/story/localizations/${locale}/${story.id}.txt`;
+        const localText = previous && await read(localPath).catch(() => null);
+        if (previous?.blob === entry.sha && previous.sourceHash === hash(original) && localText !== null && hash(localText) === previous.translationHash) {
+          entries[story.id] = previous;
+          stats.imported++; stats.reused++;
+          continue;
+        }
+        const translated = previous?.blob === entry.sha && localText !== null && hash(localText) === previous.translationHash ? localText : await download(entry);
         const parsed = parseStoryScript(translated);
         if (!parsed.some(command => (command.kind === 'dialogue' && command.text) || ['video', 'playvideo'].includes(command.kind))) throw new Error('Empty translated script');
         const originalAssets = assets(parseStoryScript(original));
         const unknown = [...assets(parsed)].filter(asset => !originalAssets.has(asset));
         if (unknown.length) { stats.incompatibleAssets.push({ id: story.id, page: story.page, assets: unknown }); continue; }
-        await writeFile(new URL(`public/story/localizations/${locale}/${story.id}.txt`, root), translated);
+        await saveText(localPath, translated);
         entries[story.id] = { sourceHash: hash(original), translationHash: hash(translated), blob: entry.sha, source: repo + entry.path, path: `localizations/${locale}/${story.id}.txt` };
         stats.imported++;
         if (stats.imported % 100 === 0) console.log(`${locale}: ${stats.imported} imported`);
       } catch (error) { stats.failed.push({ id: story.id, error: error.message.slice(0, 200) }); }
     }
   }));
+  // Parallel workers may finish in a different order; keep unchanged snapshots stable.
+  index.locales[locale] = Object.fromEntries(Object.entries(entries).sort(([a], [b]) => a.localeCompare(b)));
+  for (const key of ['missing', 'failed', 'incompatibleAssets']) stats[key].sort((a, b) => a.id.localeCompare(b.id));
   console.log(`${locale}: ${stats.imported} imported; ${stats.missing.length} unavailable; ${stats.incompatibleAssets.length} asset mismatches; ${stats.failed.length} failed`);
   await save('public/story/localizations/index.json', index);
   await save('public/story/localizations/report.json', report);

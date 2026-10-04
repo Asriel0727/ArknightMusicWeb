@@ -12,6 +12,7 @@ node_modules
 dist/
 dist-portable/
 tmp/
+public/story/media/**/*.part
 build/
 coverage/
 *.local
