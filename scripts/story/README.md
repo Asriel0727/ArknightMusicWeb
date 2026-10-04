@@ -128,3 +128,32 @@ CameraShake 支援劇本的時間、橫／縱強度、頻率與淡出，切換�
 ## Windows 索引鎖檔處理
 
 素材索引先寫入同目錄的獨立 `.part` 檔案，關閉檔案控制代碼後再替換原索引；EPERM / EACCES / EBUSY 會短暫重試。中途 checkpoint 失敗會保留完整暫存快照並繼續處理影音，不會讓後續儲存佇列永久失敗。最後一次索引保存必須成功，否則命令仍回傳失敗並停止後續發布。持續被占用時，錯誤會列出原索引與可恢復的暫存檔位置；不刪除或直接截斷原索引。影片檔案替換也沿用相同重試。修正後重跑原同步命令，既有檔案仍會先驗證與重用。
+
+## 手動內容保護
+
+`public/story/custom-content-state.json` 保存目前劇本、目錄欄位、素材引用、角色表情對照與音訊變數的保護基準。同步開始時先比對本機，將偵測到的手動變更記錄為 automatic / automaticGlobals，之後即使上游改版仍優先套用。已為目前 2270 篇劇情建立基準，沒有執行上游同步，也沒有修改既有劇本或影音檔案。這份狀態需和程式一起提交，GitHub 的每日排程才能沿用同一份保護紀錄。首次在沒有基準的舊專案上執行時，以當時本機內容建立基準；無法追溯判定之前的每項修改是人工作業或同步產生。
+
+手動新增的劇情目錄項目不會因 PRTS 未列出而被刪除。劇本衝突時保留本機版本，上游新稿保存在 `public/story/upstream-changes/<id>.txt`，詳情記錄於 `custom-content-report.json` 和 sync-report.json。相同素材鍵的手動網址／本地路徑、新增引用與刪除設定會持續保留；下載器不會用另一篇劇情的全域素材對照蓋掉該篇的覆寫。本機影音檔案若與索引校驗不同，先完整解碼驗證，再保留該檔案並更新校驗碼，preservedModifiedSources 列出保留項目；不可讀或工具不可用時不直接覆蓋該檔案。既有的大影片壓縮政策仍適用。
+
+建議把長期自訂內容明確寫在 `scripts/story/local-overrides.json`，不用每次去改生成資料。stories 以目錄中的 id 為鍵；catalog 可以覆寫名稱、分組與封面，assets / audio / videos 可以覆寫各素材鍵的 URL 或本地 path。path 相對該篇 `public/story/<id>/`，只能指向 public/story 內的素材。scriptFile 相對專案根目錄，必須放在 scripts/story/custom-scripts/；先建立實際檔案。characters 與 variables 可按鍵覆寫角色表情資料或音訊變數。null 代表移除相應欄位／引用。明確設定的優先級高於自動偵測的手動修改。
+
+例如：
+
+```json
+{
+  "schemaVersion": 1,
+  "allowUpstream": [],
+  "stories": {
+    "prts-10401": {
+      "catalog": { "title": "自訂顯示名稱" },
+      "audio": { "my_bgm": { "path": "../custom-media/my-bgm.mp3" } },
+      "assets": { "my_bg": { "path": "../custom-media/my-background.png" } },
+      "videos": { "my_video": { "path": "../custom-media/my-video.mp4" } }
+    }
+  }
+}
+```
+
+自訂新劇情需先建立對應資料夾、manifest.json 與劇本，再在 stories[id].catalog 填入 title、page、group、category、archiveCategory、available 等目錄資訊。如果決定讓某篇完全跟回 PRTS，把 id 加到 allowUpstream，並刪除 stories 裡該篇的明確覆寫；下一次會重新取得該篇上游劇本並解除自動保護，原本本地素材檔案不會被刪除。
+
+`story:update` 會在最後重新套用自訂設定並更新保護基準。單獨執行 story:sync-prts、story:sync-thumbnails 或 story:download-media 也會套用保護。暫存下載、壓縮工具、檔案校驗與版本紀錄仍由同步器管理；音樂庫、共用幹員資料不在這個同步流程的寫入範圍內。
