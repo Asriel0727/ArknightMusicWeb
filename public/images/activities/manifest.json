@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-04T06:04:12.418Z",
+  "generatedAt": "2026-10-04T12:37:45.930Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -120,13 +120,13 @@
       "syncedAt": "2026-07-17T03:49:54.718Z"
     },
     "wiki-critical-phase-transition": {
-      "publicPath": "/images/activities/wiki-critical-phase-transition.jpg",
-      "relativePath": "public/images/activities/wiki-critical-phase-transition.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/fa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%B8%83%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_02.jpg",
-      "contentType": "image/jpeg",
-      "size": 300849,
-      "hash": "5c780614bf405e1b1f478e8b08680776f49361e9fd889c1b71423941814098cf",
-      "syncedAt": "2026-10-04T06:04:08.643Z"
+      "publicPath": "/images/activities/wiki-critical-phase-transition.webp",
+      "relativePath": "public/images/activities/wiki-critical-phase-transition.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Critical_Phase_Transition_banner.png?ad1099",
+      "contentType": "image/webp",
+      "size": 897002,
+      "hash": "20b351dda8bbcd3177410533a397d01331e8bc251e4823ae2fff96ff2e967364",
+      "syncedAt": "2026-10-04T12:34:05.519Z"
     },
     "prts-4ig3b4": {
       "publicPath": "/images/activities/prts-4ig3b4.jpg",
@@ -2894,11 +2894,11 @@
     "wiki-medjehtiqedti-bound": {
       "publicPath": "/images/activities/wiki-medjehtiqedti-bound.webp",
       "relativePath": "public/images/activities/wiki-medjehtiqedti-bound.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Medjehtiqedti_Bound_banner.png?7edb09",
+      "sourceUrl": "https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9",
       "contentType": "image/webp",
-      "size": 820454,
-      "hash": "f4bfbd8959f044238e6741d8c7135e610b0c83669cbae72d3eed12b3eded4d4f",
-      "syncedAt": "2026-10-02T22:22:31.324Z"
+      "size": 937618,
+      "hash": "976f271280b33315706608a217db8cc5144ce5a28f99752c525657a164a323fb",
+      "syncedAt": "2026-10-04T12:34:05.545Z"
     },
     "wiki-trials-for-navigator-6": {
       "publicPath": "/images/activities/wiki-trials-for-navigator-6.png",
@@ -3270,13 +3270,13 @@
       "syncedAt": "2026-10-04T06:04:10.903Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.webp",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
-      "contentType": "image/webp",
-      "size": 704954,
-      "hash": "d4f64bc65b796d6e53f800a1feafb3434dc356a274df765273d8b40923415f4c",
-      "syncedAt": "2026-10-04T06:04:10.933Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 268285,
+      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
+      "syncedAt": "2026-10-04T12:37:45.930Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
