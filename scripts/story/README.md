@@ -111,8 +111,16 @@ CameraShake 支援劇本的時間、橫／縱強度、頻率與淡出，切換�
 
 影音沿用 `media/local-index.json` 與既有下載報告：驗證本地檔案後重用，只下載尚未取得的新來源，不重抓全部；已知失效來源保留缺檔紀錄而不每天重試。要重新嘗試已知缺檔，可執行 `npm run story:update -- --retry-unresolved`。官方 USM 影片仍需專用轉換，來源缺檔不會被這個排程憑空補齊。譯文按上游 Git blob、原文 SHA-256 和本地譯文 SHA-256 重用，原文修改時重新檢查素材相容性；此流程匯入既有遊戲翻譯，沒有新增機器翻譯。
 
-`.github/workflows/sync-story-w2g.yml` 每日台灣時間凌晨 02:30 執行同一個入口，亦可在 GitHub Actions 手動 Run workflow。排程需推送到 GitHub 預設分支後才生效，可能因 GitHub 排隊延後；本機命令不會自動提交或發布。本機手動更新與工作流程都對新下載檔案預設 95 MiB 上限，避免 GitHub 單檔限制，已有本地檔案照常重用。同步成功並通過編譯後，提交快照並明確呼叫 deploy.yml，避免 GITHUB_TOKEN 推送不觸發另一個 push 工作流程的限制。
+`.github/workflows/sync-story-w2g.yml` 每日台灣時間凌晨 02:30 執行同一個入口，亦可在 GitHub Actions 手動 Run workflow。排程需推送到 GitHub 預設分支後才生效，可能因 GitHub 排隊延後；本機命令不會自動提交或發布。本機手動更新與工作流程預設讓影片成品保持在 95 MiB 內；超標影片會先自動壓縮，既有未超標檔案直接重用。同步成功並通過編譯後，提交快照並明確呼叫 deploy.yml，避免 GITHUB_TOKEN 推送不觸發另一個 push 工作流程的限制。
 
 `sync-report.json` 的 fetchedScripts / reusedScripts / changedFiles 表示此次下載與重用的劇情數；`media-download-report.json` 的 downloaded / reused / skippedKnownMissing 表示影音下載、重用與略過已知缺檔數。檢查仍會刷新這些報告，即使沒有劇本內容變動。
 
 `cfa_03.mp4` 已轉為 H.264、yuv420p 與 faststart，維持 1560×720、25 fps、完整 76.68 秒，AAC 音軌直接複製；檔案由 147,892,197 bytes 降為 44,955,584 bytes。`local-index.json` 和對應 manifest 已更新大小、SHA-256 與轉換来源；同步器會沿用這份本地影片。原檔備份位於被 Git 忽略的 `tmp/video-compression/cfa_03-original.mp4`。
+
+## 大影片自動壓縮
+
+`story:update` 與 `story:download-media` 都會自動處理超過成品上限的影片。原始影片先下載到被 Git 忽略的 `tmp/story-media-downloads/`，原始下載上限為 512 MiB；音訊仍受 32 MiB 上限保護。成品上限預設 95 MiB，設定更小的 `--max-file-mib` 也會套用；即使指定更大的值，影片成品仍不超過 95 MiB。
+
+壓縮使用 FFmpeg / libx264，先嘗試 CRF 20，仍超標時按影片長度和原音轨預算做兩次編碼，保留原解析度與影格時間戳，音軌直接複製。完成後確認長度、解析度、音軌數量，解碼完整影片並比對原音軌封包 SHA-256，再次確認成品大小；通過後才替換檔案並更新本地索引與劇情 manifest。`media-download-report.json` 的 compressed / compressedSources 記錄壓縮數量及前後大小，conversion 保留轉換來源校驗資訊。
+
+本機優先使用 `FFMPEG_PATH` 指定的執行檔，未指定時沿用 `tmp/video-compression/ffmpeg.exe` 或 PATH 的 ffmpeg；目前這台電腦已有工具。GitHub 排程會檢查並安裝 FFmpeg。多部大影片排隊壓縮，避免同時大量占用 CPU。壓縮或驗證失敗時不覆蓋既有素材，新下載的失敗檔案不進入 public；原因記錄在 failures，已知失敗可加 `--retry-unresolved` 重試。如果本地仍有超過 GitHub 100 MiB 限制的影片，命令回傳失敗、排程停止提交及發布，unsafeLocalFiles 列出問題檔案。官方 USM 原始影片仍需專門解包，本流程只處理已可讀的 MP4。
