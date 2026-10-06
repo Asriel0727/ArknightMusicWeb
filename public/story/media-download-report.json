@@ -1,5 +1,5 @@
 {
-  "downloadedAt": "2026-10-04T21:53:48.192Z",
+  "downloadedAt": "2026-10-06T00:19:36.312Z",
   "mode": "incremental-local-files",
   "stories": 2270,
   "uniqueUrls": 2177,
@@ -7,15 +7,8 @@
   "reused": 2086,
   "skippedKnownMissing": 91,
   "bytesDownloaded": 0,
-  "compressed": 1,
-  "compressedSources": [
-    {
-      "sourceUrl": "https://static.prts.wiki/video/cfa_02.mp4",
-      "bytesBefore": 103578864,
-      "bytesAfter": 26802167,
-      "sha256": "901590d4d080e498a91fc999461d6f68863b9c5f5c3729faa84e09404125583d"
-    }
-  ],
+  "compressed": 0,
+  "compressedSources": [],
   "preservedModifiedSources": [],
   "unsafeLocalFiles": [],
   "totals": {
@@ -28,7 +21,7 @@
     "videos": 0
   },
   "localReferences": 37355,
-  "changedStories": 1,
+  "changedStories": 0,
   "failures": [
     {
       "url": "https://static.prts.wiki/video/03.mp4",
