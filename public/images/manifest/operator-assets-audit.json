@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-07T23:10:15.612Z",
+  "generatedAt": "2026-10-08T23:25:14.691Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -51,9 +51,9 @@
       "missing": 0
     },
     "modules": {
-      "total": 499,
+      "total": 501,
       "existing": 474,
-      "missing": 25
+      "missing": 27
     }
   },
   "missing": {
@@ -88,7 +88,9 @@
       "public/images/modules/uniequip_002_makoto.png",
       "public/images/modules/uniequip_002_aigis.png",
       "public/images/modules/uniequip_002_yukari.png",
-      "public/images/modules/uniequip_003_qiubai.png"
+      "public/images/modules/uniequip_003_qiubai.png",
+      "public/images/modules/uniequip_003_ulpia.png",
+      "public/images/modules/uniequip_003_shu.png"
     ]
   },
   "errors": {
@@ -89312,6 +89314,7 @@
         "relativePath": "public/images/modules/uniequip_002_ines.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/1f/%E6%A8%A1%E7%BB%84_%E8%A7%92%E9%83%A8%E2%80%9C%E6%8A%A4%E7%90%86%E2%80%9D%E5%A5%97%E7%BB%84.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_ines.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_ines.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_ines.png",
@@ -89330,6 +89333,7 @@
         "relativePath": "public/images/modules/uniequip_002_ctable.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/21/%E6%A8%A1%E7%BB%84_%E2%80%9C%E4%B8%8D%E5%8F%91%E5%A3%B0%E8%80%85%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_ctable.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_ctable.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_ctable.png",
@@ -89348,6 +89352,7 @@
         "relativePath": "public/images/modules/uniequip_002_surfer.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/4/4a/%E6%A8%A1%E7%BB%84_%E4%BD%B3%E8%82%B4.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_surfer.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_surfer.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_surfer.png",
@@ -89366,6 +89371,7 @@
         "relativePath": "public/images/modules/uniequip_002_alanna.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/b/b6/%E6%A8%A1%E7%BB%84_%E2%80%9C%E9%9A%8F%E8%BA%AB%E4%BF%9D%E9%99%A9%E6%9D%A0%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_alanna.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_alanna.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_alanna.png",
@@ -89384,6 +89390,7 @@
         "relativePath": "public/images/modules/uniequip_003_logos.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/2e/%E6%A8%A1%E7%BB%84_%E3%80%8A%E8%AF%AD%E4%B9%89%E8%8C%83%E5%BC%8F%E7%99%BE%E7%A7%91%E3%80%8B.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_logos.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_logos.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_logos.png",
@@ -89402,6 +89409,7 @@
         "relativePath": "public/images/modules/uniequip_003_mudrok.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/f/fd/%E6%A8%A1%E7%BB%84_%E6%B2%83%E5%9C%9F%E7%9A%84%E6%84%BF%E6%99%AF.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_mudrok.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_mudrok.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_mudrok.png",
@@ -89420,6 +89428,7 @@
         "relativePath": "public/images/modules/uniequip_002_puzzle.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/7b/%E6%A8%A1%E7%BB%84_%E9%A6%96%E8%A6%81%E4%BB%BB%E5%8A%A1.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_puzzle.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_puzzle.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_puzzle.png",
@@ -89438,6 +89447,7 @@
         "relativePath": "public/images/modules/uniequip_003_slent2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/b/b0/%E6%A8%A1%E7%BB%84_%E5%8F%AF%E6%8E%A7%E5%8A%A8%E9%87%8F.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_slent2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_slent2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_slent2.png",
@@ -89456,6 +89466,7 @@
         "relativePath": "public/images/modules/uniequip_002_mlynar.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/a/a0/%E6%A8%A1%E7%BB%84_%E2%80%9C%E9%9E%98%E4%B8%AD%E4%BA%BA%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_mlynar.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_mlynar.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_mlynar.png",
@@ -89474,6 +89485,7 @@
         "relativePath": "public/images/modules/uniequip_002_takila.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/20/%E6%A8%A1%E7%BB%84_%E2%80%9C%E5%8F%8C%E9%87%8D%E8%BA%AB%E4%BB%BD%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_takila.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_takila.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_takila.png",
@@ -89492,6 +89504,7 @@
         "relativePath": "public/images/modules/uniequip_002_wscoot.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/56/%E6%A8%A1%E7%BB%84_%E4%B9%89.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_wscoot.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_wscoot.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_wscoot.png",
@@ -89510,6 +89523,7 @@
         "relativePath": "public/images/modules/uniequip_003_mlyss.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/1e/%E6%A8%A1%E7%BB%84_%E8%90%BD%E5%8F%B6%E5%9B%9B%E5%AD%A3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_mlyss.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_mlyss.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_mlyss.png",
@@ -89528,6 +89542,7 @@
         "relativePath": "public/images/modules/uniequip_003_thorns.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/6/63/%E6%A8%A1%E7%BB%84_%E6%B2%99%E8%9A%80.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_thorns.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_thorns.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_thorns.png",
@@ -89546,6 +89561,7 @@
         "relativePath": "public/images/modules/uniequip_004_mizuki.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/73/%E6%A8%A1%E7%BB%84_%E6%B0%B4%E6%9C%88%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_mizuki.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_004_mizuki.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_mizuki.png",
@@ -89564,6 +89580,7 @@
         "relativePath": "public/images/modules/uniequip_004_archet.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/3/36/%E6%A8%A1%E7%BB%84_%E7%A9%BA%E5%BC%A6%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_archet.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_004_archet.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_archet.png",
@@ -89582,6 +89599,7 @@
         "relativePath": "public/images/modules/uniequip_003_crosly.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/7f/%E6%A8%A1%E7%BB%84_%E6%9C%A8%E7%82%AD%E7%94%BB.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_crosly.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_crosly.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_crosly.png",
@@ -89600,6 +89618,7 @@
         "relativePath": "public/images/modules/uniequip_002_angel2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/9c/%E6%A8%A1%E7%BB%84_%E6%96%B0%E6%9C%8B%E5%8F%8B%E5%9C%A3%E5%9F%8E%E7%94%9F%E6%B4%BB%E5%A5%97%E7%BB%84.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_angel2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_angel2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_angel2.png",
@@ -89618,6 +89637,7 @@
         "relativePath": "public/images/modules/uniequip_002_lemuen.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/99/%E6%A8%A1%E7%BB%84_%E2%80%9C%E5%BC%B9%E5%8C%A3%E4%B8%8E%E8%8A%B1%E7%AA%97%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_lemuen.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_lemuen.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_lemuen.png",
@@ -89636,6 +89656,7 @@
         "relativePath": "public/images/modules/uniequip_002_rmixer.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/5e/%E6%A8%A1%E7%BB%84_%E6%AF%9B%E5%88%B7%E5%A5%97%E8%A3%85.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_rmixer.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_rmixer.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_rmixer.png",
@@ -89654,6 +89675,7 @@
         "relativePath": "public/images/modules/uniequip_002_phatm2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/f/fb/%E6%A8%A1%E7%BB%84_%E9%85%92%E7%A5%9E%E4%B9%8B%E5%BF%83.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_phatm2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_phatm2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_phatm2.png",
@@ -89672,6 +89694,7 @@
         "relativePath": "public/images/modules/uniequip_002_necras.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/6/60/%E6%A8%A1%E7%BB%84_%E6%9C%AA%E5%A4%84%E7%90%86%E7%9A%84%E9%81%97%E4%BA%A7.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_necras.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_necras.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_necras.png",
@@ -89690,6 +89713,7 @@
         "relativePath": "public/images/modules/uniequip_002_tecno.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/d/df/%E6%A8%A1%E7%BB%84_%E7%83%A7%E7%83%A4%E5%BA%97%E5%AE%98%E6%96%B9%E4%BC%98%E6%83%A0%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_tecno.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_tecno.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_tecno.png",
@@ -89708,6 +89732,7 @@
         "relativePath": "public/images/modules/uniequip_003_ascln.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/2b/%E6%A8%A1%E7%BB%84_%E2%80%9C%E9%98%BF%E6%96%AF%E5%8D%A1%E7%BA%B6%E7%9A%84%E7%9C%BC%E7%9D%9B%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_ascln.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_ascln.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_ascln.png",
@@ -89726,6 +89751,7 @@
         "relativePath": "public/images/modules/uniequip_003_f12yin.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/3/31/%E6%A8%A1%E7%BB%84_%E2%80%9C%E5%A4%9C%E6%B7%B1%E4%BA%BA%E9%9D%99%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_f12yin.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_f12yin.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_f12yin.png",
@@ -89744,6 +89770,7 @@
         "relativePath": "public/images/modules/uniequip_003_doroth.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/0/04/%E6%A8%A1%E7%BB%84_%E6%A2%A6%E4%B8%AD%E4%BA%BA.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_doroth.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_doroth.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_doroth.png",
@@ -89762,6 +89789,7 @@
         "relativePath": "public/images/modules/uniequip_002_radian.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/74/%E6%A8%A1%E7%BB%84_%E7%94%B5%E5%BC%A7%E7%89%B9%E5%8B%A4%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_radian.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_radian.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_radian.png",
@@ -89780,6 +89808,7 @@
         "relativePath": "public/images/modules/uniequip_002_reckpr.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/5a/%E6%A8%A1%E7%BB%84_%E6%9C%AA%E5%AE%8C%E6%88%90%E7%9A%84%E5%BD%95%E6%AD%A6%E7%B0%BF.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_reckpr.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_reckpr.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_reckpr.png",
@@ -89798,6 +89827,7 @@
         "relativePath": "public/images/modules/uniequip_002_leizi2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/b/b6/%E6%A8%A1%E7%BB%84_%E2%80%9C%E4%B8%80%E5%BF%B5%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_leizi2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_leizi2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_leizi2.png",
@@ -89816,6 +89846,7 @@
         "relativePath": "public/images/modules/uniequip_003_typhon.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/0/04/%E6%A8%A1%E7%BB%84_%E5%86%B0%E5%8E%9F%E7%9A%84%E5%BD%B1%E5%AD%90.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_typhon.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_typhon.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_typhon.png",
@@ -89834,6 +89865,7 @@
         "relativePath": "public/images/modules/uniequip_003_gdglow.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/f/ff/%E6%A8%A1%E7%BB%84_%E6%A2%A6%E6%83%B3%E7%BB%88%E5%B0%86%E5%AE%9E%E7%8E%B0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_gdglow.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_gdglow.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_gdglow.png",
@@ -89852,6 +89884,7 @@
         "relativePath": "public/images/modules/uniequip_003_gvial2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/b/bd/%E6%A8%A1%E7%BB%84_%E5%A5%BD%E9%94%AF%E5%A4%9A%E7%A3%A8.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_gvial2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_gvial2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_gvial2.png",
@@ -89870,6 +89903,7 @@
         "relativePath": "public/images/modules/uniequip_002_kichi.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/e/e7/%E6%A8%A1%E7%BB%84_%E5%8F%AF%E7%96%91%E7%9A%84%E5%AE%A3%E4%BC%A0%E9%A1%B5.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_kichi.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_kichi.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_kichi.png",
@@ -89888,6 +89922,7 @@
         "relativePath": "public/images/modules/uniequip_002_nymph.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/9a/%E6%A8%A1%E7%BB%84_%E5%BF%83%E5%A3%B0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_nymph.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_nymph.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_nymph.png",
@@ -89906,6 +89941,7 @@
         "relativePath": "public/images/modules/uniequip_002_blaze2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/3/39/%E6%A8%A1%E7%BB%84_%E7%83%AD%E5%88%87%E7%9A%84%E6%9C%9F%E7%9B%BC.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_blaze2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_blaze2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_blaze2.png",
@@ -89924,6 +89960,7 @@
         "relativePath": "public/images/modules/uniequip_002_christ.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/4/47/%E6%A8%A1%E7%BB%84_%E2%80%9C%E9%BB%91%E8%89%B2%E2%80%9D%E8%B4%A9%E5%8D%96%E6%9C%BA.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_christ.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_christ.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_christ.png",
@@ -89942,6 +89979,7 @@
         "relativePath": "public/images/modules/uniequip_002_kaitou.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/98/%E6%A8%A1%E7%BB%84_%E5%87%A1%E7%9F%B3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_kaitou.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_kaitou.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_kaitou.png",
@@ -89960,6 +89998,7 @@
         "relativePath": "public/images/modules/uniequip_002_warmy.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/4/49/%E6%A8%A1%E7%BB%84_%E8%B5%A0%E5%88%AB%E4%B9%8B%E5%91%B3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_warmy.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_warmy.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_warmy.png",
@@ -89978,6 +90017,7 @@
         "relativePath": "public/images/modules/uniequip_003_chen2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/1f/%E6%A8%A1%E7%BB%84_%E5%81%87%E6%9C%9F%E7%9A%84%E6%9C%80%E5%90%8E%E4%B8%80%E5%A4%A9.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_chen2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_chen2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_chen2.png",
@@ -89996,6 +90036,7 @@
         "relativePath": "public/images/modules/uniequip_004_swire2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/0/0b/%E6%A8%A1%E7%BB%84_%E7%90%B3%E7%90%85%E8%AF%97%E6%80%80%E9%9B%85%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_swire2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_004_swire2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_swire2.png",
@@ -90014,6 +90055,7 @@
         "relativePath": "public/images/modules/uniequip_003_pepe.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/c/c5/%E6%A8%A1%E7%BB%84_%E4%BD%A9%E4%BD%A9%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_pepe.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_pepe.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_pepe.png",
@@ -90032,6 +90074,7 @@
         "relativePath": "public/images/modules/uniequip_002_haruka.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/7e/%E6%A8%A1%E7%BB%84_%E8%BF%9F%E6%9D%A5%E7%9A%84%E7%BA%AA%E5%BF%B5.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_haruka.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_haruka.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_haruka.png",
@@ -90050,6 +90093,7 @@
         "relativePath": "public/images/modules/uniequip_002_oblvns.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/b/b0/%E6%A8%A1%E7%BB%84_%E6%97%A0%E8%A8%80%E7%9A%84%E7%BA%A6%E5%AE%9A.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_oblvns.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_oblvns.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_oblvns.png",
@@ -90068,6 +90112,7 @@
         "relativePath": "public/images/modules/uniequip_002_amoris.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/c/ce/%E6%A8%A1%E7%BB%84_%E5%B9%B4%E8%BD%BB%E7%9A%84%E9%BA%A6%E5%AD%90.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_amoris.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_amoris.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_amoris.png",
@@ -90086,6 +90131,7 @@
         "relativePath": "public/images/modules/uniequip_002_dolris.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/21/%E6%A8%A1%E7%BB%84_%E5%8D%A0%E5%8D%9C%E7%9A%84%E6%84%8F%E4%B9%89.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_dolris.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_dolris.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_dolris.png",
@@ -90104,6 +90150,7 @@
         "relativePath": "public/images/modules/uniequip_002_tmoris.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/0/0d/%E6%A8%A1%E7%BB%84_%E9%A2%9D%E5%A4%96%E8%AE%AD%E7%BB%83.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_tmoris.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_tmoris.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_tmoris.png",
@@ -90122,6 +90169,7 @@
         "relativePath": "public/images/modules/uniequip_002_mortis.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/99/%E6%A8%A1%E7%BB%84_%E7%9D%A6%E7%9A%84%E6%96%B0%E6%9C%8B%E5%8F%8B.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_mortis.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_mortis.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_mortis.png",
@@ -90140,6 +90188,7 @@
         "relativePath": "public/images/modules/uniequip_003_huang.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/1c/%E6%A8%A1%E7%BB%84_%E2%80%9C%E7%A8%8D%E5%90%8E%E5%9B%9E%E6%9D%A5%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_huang.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_huang.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_huang.png",
@@ -90158,6 +90207,7 @@
         "relativePath": "public/images/modules/uniequip_003_cello.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/15/%E6%A8%A1%E7%BB%84_%E9%9F%B3%E4%B9%90%E5%AE%B6%E7%9A%84%E6%97%85%E7%A8%8B.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_cello.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_cello.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_cello.png",
@@ -90176,6 +90226,7 @@
         "relativePath": "public/images/modules/uniequip_002_wintim.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/7d/%E6%A8%A1%E7%BB%84_%E7%BC%BA%E8%A7%92%E7%9A%84%E6%9D%83%E9%99%90.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_wintim.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_wintim.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_wintim.png",
@@ -90194,6 +90245,7 @@
         "relativePath": "public/images/modules/uniequip_002_branch.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/3/34/%E6%A8%A1%E7%BB%84_%E2%80%9C%E6%97%B6%E9%97%B4%E7%9A%84%E7%97%95%E8%BF%B9%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_branch.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_branch.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_branch.png",
@@ -90212,6 +90264,7 @@
         "relativePath": "public/images/modules/uniequip_002_mantra.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/24/%E6%A8%A1%E7%BB%84_%E4%B8%AD%E6%9E%A2%E7%A5%9E%E7%BB%8F%E6%8E%A2%E6%B5%8B%E6%A8%A1%E5%9D%97.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_mantra.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_mantra.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_mantra.png",
@@ -90230,6 +90283,7 @@
         "relativePath": "public/images/modules/uniequip_003_radian.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/9f/%E6%A8%A1%E7%BB%84_%E6%96%B0%E8%B5%B7%E7%82%B9.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_radian.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_radian.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_radian.png",
@@ -90248,6 +90302,7 @@
         "relativePath": "public/images/modules/uniequip_002_narant.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/4/40/%E6%A8%A1%E7%BB%84_%E2%80%9C%E5%90%B9%E5%B0%BD%E7%8B%82%E6%B2%99%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_narant.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_narant.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_narant.png",
@@ -90266,6 +90321,7 @@
         "relativePath": "public/images/modules/uniequip_002_brigid.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/c/c6/%E6%A8%A1%E7%BB%84_%E9%A3%8E%E7%9A%84%E9%A2%9C%E8%89%B2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_brigid.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_brigid.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_brigid.png",
@@ -90284,6 +90340,7 @@
         "relativePath": "public/images/modules/uniequip_002_caper.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/8/8d/%E6%A8%A1%E7%BB%84_%E6%9A%96%E6%84%8F%E7%9A%84%E5%BD%92%E5%AE%BF.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_caper.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_caper.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_caper.png",
@@ -90302,6 +90359,7 @@
         "relativePath": "public/images/modules/uniequip_003_excu2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/c/c9/%E6%A8%A1%E7%BB%84_%E5%B7%B2%E7%9F%A5%E6%82%89.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_excu2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_excu2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_excu2.png",
@@ -90320,6 +90378,7 @@
         "relativePath": "public/images/modules/uniequip_003_amgoat.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/4/4a/%E6%A8%A1%E7%BB%84_%E5%AE%A0%E7%89%A9%E5%A4%A7%E8%B5%9B%E7%AC%AC%E4%B8%80%E5%90%8D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_amgoat.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_amgoat.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_amgoat.png",
@@ -90338,6 +90397,7 @@
         "relativePath": "public/images/modules/uniequip_002_sbell2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/a/ad/%E6%A8%A1%E7%BB%84_%E5%8D%83%E5%88%86%E4%B9%8B%E4%B8%80%E7%9A%84%E5%BF%83.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_sbell2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_sbell2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_sbell2.png",
@@ -90356,6 +90416,7 @@
         "relativePath": "public/images/modules/uniequip_004_heyak.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/8/8b/%E6%A8%A1%E7%BB%84_%E9%9C%8D%E5%B0%94%E6%B5%B7%E9%9B%85%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_heyak.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_004_heyak.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_heyak.png",
@@ -90374,6 +90435,7 @@
         "relativePath": "public/images/modules/uniequip_004_gnosis.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/52/%E6%A8%A1%E7%BB%84_%E7%81%B5%E7%9F%A5%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_gnosis.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_004_gnosis.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_gnosis.png",
@@ -90392,6 +90454,7 @@
         "relativePath": "public/images/modules/uniequip_002_halo2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/7f/%E6%A8%A1%E7%BB%84_%E6%8E%A2%E7%B4%A2%E8%80%85%E7%9A%84%E6%94%B6%E8%97%8F.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_halo2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_halo2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_halo2.png",
@@ -90410,6 +90473,7 @@
         "relativePath": "public/images/modules/uniequip_002_akkord.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/79/%E6%A8%A1%E7%BB%84_%E7%A7%BB%E5%8A%A8%E5%85%AB%E9%9F%B3%E7%9B%92.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_akkord.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_akkord.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_akkord.png",
@@ -90428,6 +90492,7 @@
         "relativePath": "public/images/modules/uniequip_003_siege2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/90/%E6%A8%A1%E7%BB%84_%E7%A7%A9%E5%BA%8F%E5%9C%A3%E2%80%9C%E7%90%83%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_siege2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_siege2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_siege2.png",
@@ -90446,6 +90511,7 @@
         "relativePath": "public/images/modules/uniequip_002_durnar.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/6/67/%E6%A8%A1%E7%BB%84_%E5%AE%88%E6%8A%A4%E7%9A%84%E9%81%93%E8%B7%AF.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_durnar.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_durnar.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_durnar.png",
@@ -90464,6 +90530,7 @@
         "relativePath": "public/images/modules/uniequip_002_pianst.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/96/%E6%A8%A1%E7%BB%84_%E2%80%9C%E6%97%A5%E5%A4%8D%E4%B8%80%E6%97%A5%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_pianst.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_pianst.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_pianst.png",
@@ -90482,6 +90549,7 @@
         "relativePath": "public/images/modules/uniequip_002_asbest.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/2a/%E6%A8%A1%E7%BB%84_%E2%80%9C%E7%9F%B3%E6%A3%89%E5%A4%A7%E6%88%98%E5%8F%8C%E5%A4%B4%E9%92%B3%E5%85%BD%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_asbest.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_asbest.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_asbest.png",
@@ -90500,6 +90568,7 @@
         "relativePath": "public/images/modules/uniequip_002_aprot2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/51/%E6%A8%A1%E7%BB%84_%E7%A5%A8%E6%A0%B9%E6%94%B6%E7%BA%B3%E5%86%8C.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_aprot2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_aprot2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_aprot2.png",
@@ -90518,6 +90587,7 @@
         "relativePath": "public/images/modules/uniequip_002_hsgma2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/3/35/%E6%A8%A1%E7%BB%84_%E6%97%A0%E8%BF%B9.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_hsgma2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_hsgma2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_hsgma2.png",
@@ -90536,6 +90606,7 @@
         "relativePath": "public/images/modules/uniequip_002_snhunt.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/0/03/%E6%A8%A1%E7%BB%84_%E8%BF%87%E5%8E%BB%E7%9A%84%E7%8B%A9%E7%8C%8E.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_snhunt.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_snhunt.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_snhunt.png",
@@ -90554,6 +90625,7 @@
         "relativePath": "public/images/modules/uniequip_002_monstr.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/56/%E6%A8%A1%E7%BB%84_%E8%AE%B0%E5%BF%86%E5%AD%98%E6%A1%A3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_monstr.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_monstr.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_monstr.png",
@@ -90572,6 +90644,7 @@
         "relativePath": "public/images/modules/uniequip_002_peper.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/58/%E6%A8%A1%E7%BB%84_%E2%80%9C%E5%A4%9A%E5%BD%A9%E4%BA%BA%E7%94%9F%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_peper.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_peper.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_peper.png",
@@ -90590,6 +90663,7 @@
         "relativePath": "public/images/modules/uniequip_002_papyrs.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/6/63/%E6%A8%A1%E7%BB%84_%E5%B0%8F%E5%B0%8F%E7%9A%84%E7%A7%8D%E5%AD%90.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_papyrs.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_papyrs.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_papyrs.png",
@@ -90608,6 +90682,7 @@
         "relativePath": "public/images/modules/uniequip_002_nasti.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/7/7b/%E6%A8%A1%E7%BB%84_%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_nasti.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_nasti.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_nasti.png",
@@ -90626,6 +90701,7 @@
         "relativePath": "public/images/modules/uniequip_003_ray.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/20/%E6%A8%A1%E7%BB%84_%E8%AF%81%E6%98%8E%E4%BB%80%E4%B9%88%EF%BC%9F.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_ray.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_ray.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_ray.png",
@@ -90644,6 +90720,7 @@
         "relativePath": "public/images/modules/uniequip_002_titi.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/4/41/%E6%A8%A1%E7%BB%84_%E8%BF%9C%E6%96%B9%E7%9A%84%E7%A4%BC%E7%89%A9.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_titi.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_titi.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_titi.png",
@@ -90662,6 +90739,7 @@
         "relativePath": "public/images/modules/uniequip_002_flwr2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/e/e8/%E6%A8%A1%E7%BB%84_%E2%80%9C%E5%8F%8C%E6%9C%88%E7%9A%84%E5%91%BC%E5%90%B8%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_flwr2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_flwr2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_flwr2.png",
@@ -90680,6 +90758,7 @@
         "relativePath": "public/images/modules/uniequip_002_varkis.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/1c/%E6%A8%A1%E7%BB%84_%E5%9B%9E%E5%AE%B6%E7%9A%84%E8%B7%AF.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_varkis.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_varkis.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_varkis.png",
@@ -90698,6 +90777,7 @@
         "relativePath": "public/images/modules/uniequip_003_vvana.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/0/02/%E6%A8%A1%E7%BB%84_%E2%80%9C%E6%9C%80%E5%90%8E%E4%B8%80%E8%A1%8C%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_vvana.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_vvana.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_vvana.png",
@@ -90716,6 +90796,7 @@
         "relativePath": "public/images/modules/uniequip_003_etlchi.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/2c/%E6%A8%A1%E7%BB%84_%E7%8E%AB%E7%91%B0%E8%89%B2%E6%95%85%E4%BA%8B%E9%9B%86.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_etlchi.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_etlchi.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_etlchi.png",
@@ -90734,6 +90815,7 @@
         "relativePath": "public/images/modules/uniequip_003_poca.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/a/ab/%E6%A8%A1%E7%BB%84_%E2%80%9C%E5%BF%83%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_poca.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_poca.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_poca.png",
@@ -90752,6 +90834,7 @@
         "relativePath": "public/images/modules/uniequip_003_hodrer.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/e/e8/%E6%A8%A1%E7%BB%84_%E7%AC%94%E8%BF%B9.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_hodrer.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_hodrer.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_hodrer.png",
@@ -90770,6 +90853,7 @@
         "relativePath": "public/images/modules/uniequip_002_wang.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/11/%E6%A8%A1%E7%BB%84_%E5%85%BD%E5%BD%A2%E6%A3%8B%E7%9B%92.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_wang.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_wang.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_wang.png",
@@ -90788,6 +90872,7 @@
         "relativePath": "public/images/modules/uniequip_002_chen3.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/c/c4/%E6%A8%A1%E7%BB%84_%E8%AE%B0%E5%BF%86%E6%AE%8B%E9%A1%B5.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_chen3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_chen3.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_chen3.png",
@@ -90806,6 +90891,7 @@
         "relativePath": "public/images/modules/uniequip_002_ju.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/27/%E6%A8%A1%E7%BB%84_%E7%94%B0%E9%97%B4%E5%90%93%E5%85%BD%E4%BA%BA.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_ju.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_ju.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_ju.png",
@@ -90824,6 +90910,7 @@
         "relativePath": "public/images/modules/uniequip_002_yu.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/b/b0/%E6%A8%A1%E7%BB%84_%E4%BA%BA%E9%97%B4%E7%99%BE%E5%91%B3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_yu.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_yu.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_yu.png",
@@ -90842,6 +90929,7 @@
         "relativePath": "public/images/modules/uniequip_002_philae.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/97/%E6%A8%A1%E7%BB%84_%E8%A2%AB%E6%91%A9%E6%8C%B2%E7%9A%84%E6%97%A5%E5%AD%90.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_philae.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_philae.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_philae.png",
@@ -90860,6 +90948,7 @@
         "relativePath": "public/images/modules/uniequip_002_cairn.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/9/9f/%E6%A8%A1%E7%BB%84_%E2%80%9C%E9%99%8D%E8%90%BD%E4%BC%9E%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_cairn.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_cairn.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_cairn.png",
@@ -90878,6 +90967,7 @@
         "relativePath": "public/images/modules/uniequip_004_irene.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/53/%E6%A8%A1%E7%BB%84_%E8%89%BE%E4%B8%BD%E5%A6%AE%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_irene.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_004_irene.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_irene.png",
@@ -90896,6 +90986,7 @@
         "relativePath": "public/images/modules/uniequip_004_pasngr.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/8/89/%E6%A8%A1%E7%BB%84_%E5%BC%82%E5%AE%A2%E7%89%B9%E9%99%90%E8%AF%81%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_pasngr.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_004_pasngr.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_004_pasngr.png",
@@ -90914,6 +91005,7 @@
         "relativePath": "public/images/modules/uniequip_002_demetr.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/50/%E6%A8%A1%E7%BB%84_%E5%AE%9E%E7%94%A8%E7%9A%84%E5%B7%A5%E5%85%B7.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_demetr.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_demetr.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_demetr.png",
@@ -90932,6 +91024,7 @@
         "relativePath": "public/images/modules/uniequip_002_liesel.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/5e/%E6%A8%A1%E7%BB%84_%E2%80%9C%E6%9A%AE%E7%BA%A6%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_liesel.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_liesel.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_liesel.png",
@@ -90950,6 +91043,7 @@
         "relativePath": "public/images/modules/uniequip_003_agoat2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/c/c9/%E6%A8%A1%E7%BB%84_%E6%83%B3%E8%A6%81%E7%95%99%E4%B8%8B%E7%9A%84%E7%94%9F%E5%91%BD.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_agoat2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_agoat2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_agoat2.png",
@@ -90968,6 +91062,7 @@
         "relativePath": "public/images/modules/uniequip_003_haak.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/3/38/%E6%A8%A1%E7%BB%84_%E6%AF%92%E5%8C%BB%E6%AE%8B%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_haak.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_haak.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_haak.png",
@@ -90986,6 +91081,7 @@
         "relativePath": "public/images/modules/uniequip_003_jesca2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/5/5b/%E6%A8%A1%E7%BB%84_%E6%9C%AA%E6%9B%BE%E9%A3%8E%E5%8C%96.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_jesca2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_jesca2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_jesca2.png",
@@ -91004,6 +91100,7 @@
         "relativePath": "public/images/modules/uniequip_002_headb2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/1/19/%E6%A8%A1%E7%BB%84_%E8%BF%9F%E5%88%B0%E7%9A%84%E5%8B%8B%E7%AB%A0.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_headb2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_headb2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_headb2.png",
@@ -91022,6 +91119,7 @@
         "relativePath": "public/images/modules/uniequip_002_turdus.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/e/e3/%E6%A8%A1%E7%BB%84_%E2%80%9C%E7%9D%A1%E5%89%8D%E6%95%85%E4%BA%8B%E2%80%9D.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_turdus.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_turdus.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_turdus.png",
@@ -91040,6 +91138,7 @@
         "relativePath": "public/images/modules/uniequip_002_botany.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/0/05/%E6%A8%A1%E7%BB%84_%E6%98%A8%E6%97%A5%E3%80%81%E4%BB%8A%E6%97%A5%E3%80%81%E6%98%8E%E6%97%A5.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_botany.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_002_botany.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_002_botany.png",
@@ -91058,6 +91157,7 @@
         "relativePath": "public/images/modules/uniequip_003_surtr.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/a/a6/%E6%A8%A1%E7%BB%84_%E6%97%85%E6%B8%B8%E5%BF%85%E9%9C%80%E5%93%81.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_surtr.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_surtr.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_surtr.png",
@@ -91076,6 +91176,7 @@
         "relativePath": "public/images/modules/uniequip_003_nymph.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/2/24/%E6%A8%A1%E7%BB%84_%E7%83%A6%E6%81%BC%E9%97%AE%E8%AF%8A%E5%8C%A3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_nymph.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_nymph.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_nymph.png",
@@ -91094,6 +91195,7 @@
         "relativePath": "public/images/modules/uniequip_003_skadi2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/d/dc/%E6%A8%A1%E7%BB%84_%E6%96%B0%E7%94%9F%E4%BB%A3.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_skadi2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_skadi2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_skadi2.png",
@@ -91292,6 +91394,7 @@
         "relativePath": "public/images/modules/uniequip_003_yato2.png",
         "exists": true,
         "sourceUrls": [
+          "https://media.prts.wiki/a/a3/%E6%A8%A1%E7%BB%84_%E7%BD%97%E5%BE%B7%E5%B2%9B%E5%88%B6%E5%BC%8F%E5%89%91.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_yato2.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_yato2.png",
           "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_yato2.png",
@@ -91571,6 +91674,42 @@
         "iconId": "uniequip_003_qiubai",
         "charId": "char_4082_qiubai",
         "story": "船在鬼门滩溜了四次，末了终于上了滩。眼见着山那边一寸寸暗下去，众人顾不上喘气，便又纷纷扎进水里去捞货。冬日的江水刺骨剜心，一张张脸上却不见半点难色——有了这批货，年关算是不用愁了。\n“当家的在船尾，姑娘仔细脚下，莫撞着箱子。”\n喊话的是个白胡子老头，七老八十了还在这江上做着杀人的营生。\n“二爷可见着徐师傅？”\n女孩挤过喧嚷的人群，神色慌忙地往昏暗的河滩上寻。\n“姑娘找小徐？嘶，白天在船上见过，这会儿恐怕——”\n“姑娘快别找啦！那家伙跟那帮走镖的一同掉水里了！”\n身旁，几个衣着单薄的水匪正攥着一头驮兽的角往岸上拖。领头的撂下这句话，便又转头和弟兄们盘算起畜生的斤两。\n女孩呆在原地，和那头落水的驮兽四目相对。\n\n“来，干！”\n黑夜侵占了整个江面，水寨里却灯火煌煌。台上台下笑倒一片，酒空了一坛又一坛。明明燃着篝火，她却只觉得冷。\n那柄剑她近来仔细磨过，此刻就躺在母亲缝衣剩下的一方白布里。\n可那教剑的却回不来了！明明说好等到过年，他就教她剑法的下一式——\n“姑娘怎么愁成这样？”\n二爷酒气正浓，脸也红了个透。\n“嗝。不怕，不怕。瞧瞧这火，再瞧瞧这货，纵是大雪封了门，也保准过个肥年！”\n他拍了拍女孩的肩膀，要拉她同到这热闹里去。她望着众人眼里映出的火，雾蒙蒙的，却比入冬以来的任何一蓬火都要亮堂。笑声、鼓声、猜拳声吞没了整座寨子，独无人提起那个被江水吞了的年轻人。可是，她想，可是......\n大伙如此热烈地生，怎么就不救人，怎么就绝口不提那个“死”字？\n她走出大堂，一直走到了寨东的竹楼下。忽见着一团白影，定睛看去，竟是那早先被拖上岸的驮兽，喂过了草，吹干了毛，此刻正安安稳稳地卧在棚里，心满意足地朝她哞哞叫。那叫声柔软而绵长，她的心里却莫名泛起一阵苦意。算算时日，冬至已过，年关就在眼前，这驮兽怕也活不了几天了。\n......它大概还不知道吧？\n可是这生、这死，生得何如、死为何故、死后种种......莫说是兽，便是这水边的人，又有谁是真正清楚的？\n\n翌日早晨，天已落了雪。两岸壁立的黛色山头转眼便罩上了一袭肃霜。大堂冷寂，人已散尽，杯盘碗盏歪斜一地。女孩低下头，见那残酒里凝了一朵浑浊的冰花，像极了那日雨后被她一剑打进泥里的白梅。她于是端起那只碗，走到江边，将碗底的酒并那方裹剑的白布一齐投进了水里。\n酒液和白布顺水而去......\n白色的，不仅是雪，也不仅是花。"
+      },
+      {
+        "type": "module",
+        "id": "uniequip_003_ulpia",
+        "label": "“前路”",
+        "publicPath": "/images/modules/uniequip_003_ulpia.png",
+        "relativePath": "public/images/modules/uniequip_003_ulpia.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_ulpia.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_ulpia.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_ulpia.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_ulpia.png"
+        ],
+        "equipId": "uniequip_003_ulpia",
+        "iconId": "uniequip_003_ulpia",
+        "charId": "char_4145_ulpia",
+        "story": "此处漆黑一片，海沟四周，岩石长得一模一样。他远离城市太久，遥远辉煌的阿戈尔在他身后，已经变成了渺小的光点。身前的海嗣散发着微弱的荧光，它鼓胀液泡，伸出柔软的触肢，想要抓住他的手臂，却被他躲了过去。它似乎不知道该往哪里走了，浮动在原地，微弱的荧光以固定的频率闪烁。它张开多褶的翼膜，感受海水里大群的方向。而后海嗣转向他，吐出模糊不清的字句，像是蹩脚的阿戈尔语，呼唤着他，让他一起感受大群的方向。它咕噜了几声，缓慢地唤他……“同胞”。\n“我不懂你们的沟通方式。”他回答，“我并非你们的一员。”\n海嗣晃动了几下肢体，大群的指引不甚清晰，它的光芒黯淡了几分。他轻叹，下意识地摸了摸衣服内袋，摸出一块圆形的金属——一枚水脉仪，那是他亲手设计的，纯机械构造，能够避免海嗣的一切干扰。它专为深海猎人而设，功能简单得近乎朴素——无论何时，都能忠实地指引家的方向。\n而本应快速摆动，辨识方位的灵敏指针却滞涩不动，沉默、固执地指着一个方向。\n\n“怎么碎的？砸在岩石的凸起上了？”布兰都斯盯着手里的水脉仪，“你当初应该选用强度更高的树脂材料。”老友无奈地摊开手，“深海猎人特供，这小东西坏一个少一个。”\n他抹了下衣服上溅到的海嗣组织液。“不用修了。”他伸出手，将水脉仪收进衣服内袋，露出了小臂上未完全愈合的旧伤。布兰都斯盯着他的旧伤，沉默了一会，而后开口：“……‘研究员本人总是和他们的成果相似。’有人这么说过你吗？”\n他不动声色地擦去了伤口裂开后的血迹，“你真该去当个诗人。”\n布兰都斯挑眉，收下这句回敬的话，继续整理猎人们的身体数据。半晌，向来寡言的人难得地打破了寂静。\n“……至少我现在还能动。”他说。\n\n海嗣似乎明白该去哪了。它的触肢缠绕上他的手臂，把他往下拖拽。他将手臂抽出来，依旧原地不动，最后一次打开了那枚水脉仪。它早已损坏，破裂，合金老旧，没了最开始的色泽，依稀能够辨认上面刻着的他的名字，而指针却永远固执地指着阿戈尔。它随他出过太多次任务，指引过太多次阿戈尔的方向，尽管他的方向感足够好——无论在多么遥远的地方，都可以找到回家的路。\n如果我们的命运真心相似至此……乌尔比安合上水脉仪的盖子，将它放回内袋。他拢了拢衣襟，跟上前方的海嗣，往更深的海沟行去。"
+      },
+      {
+        "type": "module",
+        "id": "uniequip_003_shu",
+        "label": "好时节",
+        "publicPath": "/images/modules/uniequip_003_shu.png",
+        "relativePath": "public/images/modules/uniequip_003_shu.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_shu.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_shu.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimgsmall/uniequip_003_shu.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/ui/uniequipimg/uniequip_003_shu.png"
+        ],
+        "equipId": "uniequip_003_shu",
+        "iconId": "uniequip_003_shu",
+        "charId": "char_2025_shu",
+        "story": "黍走进那颗已经静止了许久的“心脏”。\n造就这个巨大的机器耗费了她们姐妹不少功夫，但最终它没有成为那名棋手谋算中最坏情况之下不得已的后手。如今它像是变成了一颗真正的心脏，一头连着这片耕耘千年的土地，一头连着千里外陵墓中幽微的意识——黍感觉得到这种联系。\n黍想要让这颗心脏继续生长、跳动。不仅在这里劳作的人们需要它——她有一种强烈的预感，抑或是自己的一厢情愿——她的那位“兄长”，有朝一日也会需要它。\n她小心翼翼地为“心脏”灌注自己的力量，而后，她做了一个溢满了稻花香气的梦。\n鸣虫低声地叫着，她听见万物的声音——稻苗嫩叶生长时的窸窣声，根茎扎进土壤中的沉闷响声，就连雨云聚集起来的声音也如在耳畔。\n雨很快砸了下来，一个模糊的身影拿着锄头，走过来牵起她的手，带她一起去挖出一条水渠，就像是第一次教她时那样。积在田中的水泄走了，雨水还是将种子冲得七零八落，好在余下的种子奋力长出稚嫩但有力的根，绽出新芽。\n可很快，风席卷而过，砸下快有拳头大小的冰雹，瘦弱的禾苗被连根拔起，又被摔进土里。在让人睁不开眼的狂风中，一个人递给了她一匹布料。她扯开布匹拢住摇摇欲坠的禾苗，又用树枝加固了棚架，不知疲倦地忙碌着。终于，风停了下来。她一抬眼，禾苗已经开出清香的稻花。白而细小的花看得人心里涌上浓浓的欣喜，可虫子振翅的声音不祥地出现了。\n虫灾铺天盖地而来，黍只在几乎漆黑一片的视野里瞧见了一个背影在前面走着。一簇火焰在那人的身边燃起，驱赶着不断涌来的虫群。那火越烧越旺，直到眼前的漆黑变成了赤红。\n黍看着那些零落的禾苗，仍旧扛着锄头，悉心地照料着，为它们除草、浇水、施肥。日复一日，年复一年，风霜雨雪，旱涝虫雹，时间像河水一般从女人的脚边流淌而过。她的头发越长越长，融入河流的苍蓝；她的裙摆被青草染青，被泥土染褐。她重复着这样的劳作，直到土地里响起一个沉闷的声音。\n“你累了。”\n“难得出现在别人的梦里，没什么话好说，反而要变作一个个灾异的模样吓唬人？”\n“我只是想告诉你，事到如今，这些努力不过是徒劳。”\n“你独自一人，去搏那个希望飘渺的命数的时候，我又何曾说过你的努力是徒劳？”\n土地中那沉闷的声音还想再说点什么，黍只是转身用手抚过青青稻苗，稻花落下时身边已有了两个奇异的酒盏。天空的色彩如水墨般变换，身旁石头上金属食盒里的饭菜还在冒着热气，背篓里的几株药草上带着新鲜的露珠。清风如绸缎般吹过，草木发出乐曲一般的声响，稻谷们沙沙摇晃仿佛相和，忽而风声又劲如拳脚，百转千回，方才一切都随着天空降下的细小雨滴，落入了酒盏之中。\n“这是令姐今年新酿的酒，用的是我们几人的梦，共同的梦。”\n没有人说话，但另一盏酒缓缓地消失，像是有人将它饮尽了一样。他品得出酒中那些梦的香气，他也知道这盏酒的意思，希望的味道总是更清香些。\n“我给你那把种子，可不是为了让你最后只得出一个‘以命换命’的结果。我还等着那个丰收时节，还是一家人同赏，一个都不要缺席为好……\n“那应当是个好时节。”"
       }
     ]
   }
