@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-08T13:48:06.164Z",
+  "generatedAt": "2026-10-09T06:22:10.630Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -120,13 +120,13 @@
       "syncedAt": "2026-07-17T03:49:54.718Z"
     },
     "wiki-critical-phase-transition": {
-      "publicPath": "/images/activities/wiki-critical-phase-transition.webp",
-      "relativePath": "public/images/activities/wiki-critical-phase-transition.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Critical_Phase_Transition_banner.png?ad1099",
-      "contentType": "image/webp",
-      "size": 897002,
-      "hash": "20b351dda8bbcd3177410533a397d01331e8bc251e4823ae2fff96ff2e967364",
-      "syncedAt": "2026-10-04T12:34:05.519Z"
+      "publicPath": "/images/activities/wiki-critical-phase-transition.jpg",
+      "relativePath": "public/images/activities/wiki-critical-phase-transition.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/fa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E4%B8%83%E5%91%A8%E5%B9%B4%E5%BA%86%E5%85%B8_02.jpg",
+      "contentType": "image/jpeg",
+      "size": 300849,
+      "hash": "5c780614bf405e1b1f478e8b08680776f49361e9fd889c1b71423941814098cf",
+      "syncedAt": "2026-10-09T06:22:09.553Z"
     },
     "prts-4ig3b4": {
       "publicPath": "/images/activities/prts-4ig3b4.jpg",
@@ -237,13 +237,13 @@
       "syncedAt": "2026-07-17T03:49:58.701Z"
     },
     "wiki-first-of-a-thousand-autumns": {
-      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.jpg",
-      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.jpg",
-      "sourceUrl": "https://media.prts.wiki/d/d4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BE%9E%E5%B2%81%E8%A1%8C_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 432667,
-      "hash": "121524b8cb3c3aab55cfd041ce5ecc002389f0f67307440eee0206e5b66480c7",
-      "syncedAt": "2026-07-17T03:49:58.982Z"
+      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.webp",
+      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_First_of_A_Thousand_Autumns_banner.png?72d32f",
+      "contentType": "image/webp",
+      "size": 1285088,
+      "hash": "a345cc93d50c3b7da92bfb9f20c64428e3e70169d2f735fa4e64ac16ff5c11dc",
+      "syncedAt": "2026-10-09T06:22:09.592Z"
     },
     "prts-1cqt5uv": {
       "publicPath": "/images/activities/prts-1cqt5uv.jpg",
@@ -327,13 +327,13 @@
       "syncedAt": "2026-07-17T03:50:01.170Z"
     },
     "wiki-unrealized-realities": {
-      "publicPath": "/images/activities/wiki-unrealized-realities.webp",
-      "relativePath": "public/images/activities/wiki-unrealized-realities.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Unrealized_Realities_banner.png?9f9744",
-      "contentType": "image/webp",
-      "size": 1007610,
-      "hash": "c9a3275c6d2f29cb4e43408dca9b93b50cc448b59c5bb6ac81f31b6fa7112741",
-      "syncedAt": "2026-10-08T13:48:05.052Z"
+      "publicPath": "/images/activities/wiki-unrealized-realities.jpg",
+      "relativePath": "public/images/activities/wiki-unrealized-realities.jpg",
+      "sourceUrl": "https://media.prts.wiki/d/de/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%9C%AA%E8%AE%B8%E4%B9%8B%E5%9C%B0_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 406684,
+      "hash": "d855af4d55d51b62e770c483e9ef340900e7a248bf76a38ebc20f839ac3de174",
+      "syncedAt": "2026-10-09T06:22:10.235Z"
     },
     "prts-1azz97l": {
       "publicPath": "/images/activities/prts-1azz97l.jpg",
@@ -3261,22 +3261,22 @@
       "syncedAt": "2026-10-04T21:40:11.016Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
-      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 280529,
-      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
-      "syncedAt": "2026-10-04T21:40:11.942Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.png",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ending_a_Grand_Overture_banner.png?e80c0c",
+      "contentType": "image/png",
+      "size": 1160360,
+      "hash": "6763499241dca134fad4b4e05a1ff7e53060033c9779ecf684c3740dd5c50a73",
+      "syncedAt": "2026-10-09T06:22:10.441Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 268285,
-      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
-      "syncedAt": "2026-10-04T12:37:45.930Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.png",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
+      "contentType": "image/png",
+      "size": 975196,
+      "hash": "668f9851d9abb0da55688a7ae4a929704ea5aa06cc53fb5d93a9bed3f8c31c7c",
+      "syncedAt": "2026-10-09T06:22:10.630Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
@@ -3696,6 +3696,15 @@
       "size": 458324,
       "hash": "5470cceccb438b0099693249fa6c077733feb41941a0414e86b7751f1b3c7272",
       "syncedAt": "2026-10-03T16:32:42.088Z"
+    },
+    "wiki-footprints": {
+      "publicPath": "/images/activities/wiki-footprints.webp",
+      "relativePath": "public/images/activities/wiki-footprints.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/Footprints_web_event.png?540588",
+      "contentType": "image/webp",
+      "size": 1478528,
+      "hash": "0a3eaac87187ec78b5446662020d1865b37b4341afdac55ed68da9ace08e3ef7",
+      "syncedAt": "2026-10-09T06:22:06.684Z"
     }
   }
 }
