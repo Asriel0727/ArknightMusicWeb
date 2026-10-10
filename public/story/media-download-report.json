@@ -1,27 +1,27 @@
 {
-  "downloadedAt": "2026-10-09T22:54:12.877Z",
+  "downloadedAt": "2026-10-10T22:03:10.819Z",
   "mode": "incremental-local-files",
-  "stories": 2270,
-  "uniqueUrls": 2177,
-  "downloaded": 0,
+  "stories": 2293,
+  "uniqueUrls": 2196,
+  "downloaded": 19,
   "reused": 2086,
   "skippedKnownMissing": 91,
-  "bytesDownloaded": 0,
+  "bytesDownloaded": 8535333,
   "compressed": 0,
   "compressedSources": [],
   "preservedModifiedSources": [],
   "unsafeLocalFiles": [],
   "totals": {
-    "audio": 2074,
+    "audio": 2093,
     "videos": 12,
-    "bytes": 1096259992
+    "bytes": 1104795325
   },
   "missingTotals": {
     "audio": 27,
     "videos": 0
   },
-  "localReferences": 37355,
-  "changedStories": 0,
+  "localReferences": 37829,
+  "changedStories": 12,
   "failures": [
     {
       "url": "https://static.prts.wiki/video/03.mp4",

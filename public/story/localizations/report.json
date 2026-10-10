@@ -1,5 +1,5 @@
 {
-  "totalStories": 2270,
+  "totalStories": 2293,
   "locales": {
     "en": {
       "imported": 1749,
@@ -2441,6 +2441,121 @@
           "id": "prts-96573",
           "page": "菲亚梅塔/干员密录/2",
           "scriptPath": "obt/memory/story_phenxi_2_1"
+        },
+        {
+          "id": "prts-98448",
+          "page": "YW-2 浮浮沉沉/BEG",
+          "scriptPath": "activities/act52side/level_act52side_02_beg"
+        },
+        {
+          "id": "prts-98449",
+          "page": "YW-1 互助会/END",
+          "scriptPath": "activities/act52side/level_act52side_01_end"
+        },
+        {
+          "id": "prts-98450",
+          "page": "YW-1 互助会/BEG",
+          "scriptPath": "activities/act52side/level_act52side_01_beg"
+        },
+        {
+          "id": "prts-98451",
+          "page": "YW-2 浮浮沉沉/END",
+          "scriptPath": "activities/act52side/level_act52side_02_end"
+        },
+        {
+          "id": "prts-98452",
+          "page": "YW-3 破手铐/END",
+          "scriptPath": "activities/act52side/level_act52side_03_end"
+        },
+        {
+          "id": "prts-98453",
+          "page": "YW-4 走上街道/BEG",
+          "scriptPath": "activities/act52side/level_act52side_04_beg"
+        },
+        {
+          "id": "prts-98454",
+          "page": "YW-4 走上街道/END",
+          "scriptPath": "activities/act52side/level_act52side_04_end"
+        },
+        {
+          "id": "prts-98455",
+          "page": "YW-5 三岔路口/BEG",
+          "scriptPath": "activities/act52side/level_act52side_05_beg"
+        },
+        {
+          "id": "prts-98456",
+          "page": "YW-3 破手铐/BEG",
+          "scriptPath": "activities/act52side/level_act52side_03_beg"
+        },
+        {
+          "id": "prts-98457",
+          "page": "YW-5 三岔路口/END",
+          "scriptPath": "activities/act52side/level_act52side_05_end"
+        },
+        {
+          "id": "prts-98458",
+          "page": "YW-6 大人物/BEG",
+          "scriptPath": "activities/act52side/level_act52side_06_beg"
+        },
+        {
+          "id": "prts-98459",
+          "page": "YW-6 大人物/END",
+          "scriptPath": "activities/act52side/level_act52side_06_end"
+        },
+        {
+          "id": "prts-98460",
+          "page": "YW-7 殉葬品/BEG",
+          "scriptPath": "activities/act52side/level_act52side_07_beg"
+        },
+        {
+          "id": "prts-98461",
+          "page": "YW-7 殉葬品/END",
+          "scriptPath": "activities/act52side/level_act52side_07_end"
+        },
+        {
+          "id": "prts-98462",
+          "page": "YW-8 鳞的记忆/BEG",
+          "scriptPath": "activities/act52side/level_act52side_08_beg"
+        },
+        {
+          "id": "prts-98463",
+          "page": "YW-8 鳞的记忆/END",
+          "scriptPath": "activities/act52side/level_act52side_08_end"
+        },
+        {
+          "id": "prts-98464",
+          "page": "YW-ST-1 羽兽盘旋/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st01"
+        },
+        {
+          "id": "prts-98465",
+          "page": "贝洛内/干员密录/1",
+          "scriptPath": "obt/memory/story_demetr_1_1"
+        },
+        {
+          "id": "prts-98466",
+          "page": "YW-ST-2 海声嘈杂/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st02"
+        },
+        {
+          "id": "prts-98467",
+          "page": "复奏/干员密录/1",
+          "scriptPath": "obt/memory/story_liesel_1_1"
+        },
+        {
+          "id": "prts-98468",
+          "page": "YW-ST-3 留给明天/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st03"
+        },
+        {
+          "id": "prts-98469",
+          "page": "夜烟/干员密录/2",
+          "scriptPath": "obt/memory/story_nights_2_1"
+        },
+        {
+          "id": "prts-98470",
+          "page": "深巡/干员密录/1",
+          "scriptPath": "obt/memory/story_udflow_1_1"
         }
       ],
       "failed": [],
@@ -4886,6 +5001,121 @@
           "id": "prts-96573",
           "page": "菲亚梅塔/干员密录/2",
           "scriptPath": "obt/memory/story_phenxi_2_1"
+        },
+        {
+          "id": "prts-98448",
+          "page": "YW-2 浮浮沉沉/BEG",
+          "scriptPath": "activities/act52side/level_act52side_02_beg"
+        },
+        {
+          "id": "prts-98449",
+          "page": "YW-1 互助会/END",
+          "scriptPath": "activities/act52side/level_act52side_01_end"
+        },
+        {
+          "id": "prts-98450",
+          "page": "YW-1 互助会/BEG",
+          "scriptPath": "activities/act52side/level_act52side_01_beg"
+        },
+        {
+          "id": "prts-98451",
+          "page": "YW-2 浮浮沉沉/END",
+          "scriptPath": "activities/act52side/level_act52side_02_end"
+        },
+        {
+          "id": "prts-98452",
+          "page": "YW-3 破手铐/END",
+          "scriptPath": "activities/act52side/level_act52side_03_end"
+        },
+        {
+          "id": "prts-98453",
+          "page": "YW-4 走上街道/BEG",
+          "scriptPath": "activities/act52side/level_act52side_04_beg"
+        },
+        {
+          "id": "prts-98454",
+          "page": "YW-4 走上街道/END",
+          "scriptPath": "activities/act52side/level_act52side_04_end"
+        },
+        {
+          "id": "prts-98455",
+          "page": "YW-5 三岔路口/BEG",
+          "scriptPath": "activities/act52side/level_act52side_05_beg"
+        },
+        {
+          "id": "prts-98456",
+          "page": "YW-3 破手铐/BEG",
+          "scriptPath": "activities/act52side/level_act52side_03_beg"
+        },
+        {
+          "id": "prts-98457",
+          "page": "YW-5 三岔路口/END",
+          "scriptPath": "activities/act52side/level_act52side_05_end"
+        },
+        {
+          "id": "prts-98458",
+          "page": "YW-6 大人物/BEG",
+          "scriptPath": "activities/act52side/level_act52side_06_beg"
+        },
+        {
+          "id": "prts-98459",
+          "page": "YW-6 大人物/END",
+          "scriptPath": "activities/act52side/level_act52side_06_end"
+        },
+        {
+          "id": "prts-98460",
+          "page": "YW-7 殉葬品/BEG",
+          "scriptPath": "activities/act52side/level_act52side_07_beg"
+        },
+        {
+          "id": "prts-98461",
+          "page": "YW-7 殉葬品/END",
+          "scriptPath": "activities/act52side/level_act52side_07_end"
+        },
+        {
+          "id": "prts-98462",
+          "page": "YW-8 鳞的记忆/BEG",
+          "scriptPath": "activities/act52side/level_act52side_08_beg"
+        },
+        {
+          "id": "prts-98463",
+          "page": "YW-8 鳞的记忆/END",
+          "scriptPath": "activities/act52side/level_act52side_08_end"
+        },
+        {
+          "id": "prts-98464",
+          "page": "YW-ST-1 羽兽盘旋/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st01"
+        },
+        {
+          "id": "prts-98465",
+          "page": "贝洛内/干员密录/1",
+          "scriptPath": "obt/memory/story_demetr_1_1"
+        },
+        {
+          "id": "prts-98466",
+          "page": "YW-ST-2 海声嘈杂/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st02"
+        },
+        {
+          "id": "prts-98467",
+          "page": "复奏/干员密录/1",
+          "scriptPath": "obt/memory/story_liesel_1_1"
+        },
+        {
+          "id": "prts-98468",
+          "page": "YW-ST-3 留给明天/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st03"
+        },
+        {
+          "id": "prts-98469",
+          "page": "夜烟/干员密录/2",
+          "scriptPath": "obt/memory/story_nights_2_1"
+        },
+        {
+          "id": "prts-98470",
+          "page": "深巡/干员密录/1",
+          "scriptPath": "obt/memory/story_udflow_1_1"
         }
       ],
       "failed": [],
@@ -7426,6 +7656,121 @@
           "id": "prts-96573",
           "page": "菲亚梅塔/干员密录/2",
           "scriptPath": "obt/memory/story_phenxi_2_1"
+        },
+        {
+          "id": "prts-98448",
+          "page": "YW-2 浮浮沉沉/BEG",
+          "scriptPath": "activities/act52side/level_act52side_02_beg"
+        },
+        {
+          "id": "prts-98449",
+          "page": "YW-1 互助会/END",
+          "scriptPath": "activities/act52side/level_act52side_01_end"
+        },
+        {
+          "id": "prts-98450",
+          "page": "YW-1 互助会/BEG",
+          "scriptPath": "activities/act52side/level_act52side_01_beg"
+        },
+        {
+          "id": "prts-98451",
+          "page": "YW-2 浮浮沉沉/END",
+          "scriptPath": "activities/act52side/level_act52side_02_end"
+        },
+        {
+          "id": "prts-98452",
+          "page": "YW-3 破手铐/END",
+          "scriptPath": "activities/act52side/level_act52side_03_end"
+        },
+        {
+          "id": "prts-98453",
+          "page": "YW-4 走上街道/BEG",
+          "scriptPath": "activities/act52side/level_act52side_04_beg"
+        },
+        {
+          "id": "prts-98454",
+          "page": "YW-4 走上街道/END",
+          "scriptPath": "activities/act52side/level_act52side_04_end"
+        },
+        {
+          "id": "prts-98455",
+          "page": "YW-5 三岔路口/BEG",
+          "scriptPath": "activities/act52side/level_act52side_05_beg"
+        },
+        {
+          "id": "prts-98456",
+          "page": "YW-3 破手铐/BEG",
+          "scriptPath": "activities/act52side/level_act52side_03_beg"
+        },
+        {
+          "id": "prts-98457",
+          "page": "YW-5 三岔路口/END",
+          "scriptPath": "activities/act52side/level_act52side_05_end"
+        },
+        {
+          "id": "prts-98458",
+          "page": "YW-6 大人物/BEG",
+          "scriptPath": "activities/act52side/level_act52side_06_beg"
+        },
+        {
+          "id": "prts-98459",
+          "page": "YW-6 大人物/END",
+          "scriptPath": "activities/act52side/level_act52side_06_end"
+        },
+        {
+          "id": "prts-98460",
+          "page": "YW-7 殉葬品/BEG",
+          "scriptPath": "activities/act52side/level_act52side_07_beg"
+        },
+        {
+          "id": "prts-98461",
+          "page": "YW-7 殉葬品/END",
+          "scriptPath": "activities/act52side/level_act52side_07_end"
+        },
+        {
+          "id": "prts-98462",
+          "page": "YW-8 鳞的记忆/BEG",
+          "scriptPath": "activities/act52side/level_act52side_08_beg"
+        },
+        {
+          "id": "prts-98463",
+          "page": "YW-8 鳞的记忆/END",
+          "scriptPath": "activities/act52side/level_act52side_08_end"
+        },
+        {
+          "id": "prts-98464",
+          "page": "YW-ST-1 羽兽盘旋/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st01"
+        },
+        {
+          "id": "prts-98465",
+          "page": "贝洛内/干员密录/1",
+          "scriptPath": "obt/memory/story_demetr_1_1"
+        },
+        {
+          "id": "prts-98466",
+          "page": "YW-ST-2 海声嘈杂/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st02"
+        },
+        {
+          "id": "prts-98467",
+          "page": "复奏/干员密录/1",
+          "scriptPath": "obt/memory/story_liesel_1_1"
+        },
+        {
+          "id": "prts-98468",
+          "page": "YW-ST-3 留给明天/NBT",
+          "scriptPath": "activities/act52side/level_act52side_st03"
+        },
+        {
+          "id": "prts-98469",
+          "page": "夜烟/干员密录/2",
+          "scriptPath": "obt/memory/story_nights_2_1"
+        },
+        {
+          "id": "prts-98470",
+          "page": "深巡/干员密录/1",
+          "scriptPath": "obt/memory/story_udflow_1_1"
         }
       ],
       "failed": [],
