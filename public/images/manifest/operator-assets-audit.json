@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-09T22:43:25.863Z",
+  "generatedAt": "2026-10-10T21:50:01.079Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -22,8 +22,8 @@
     "operators": 432,
     "avatars": {
       "total": 432,
-      "existing": 429,
-      "missing": 3
+      "existing": 432,
+      "missing": 0
     },
     "factions": {
       "total": 45,
@@ -37,8 +37,8 @@
     },
     "portraits": {
       "total": 1353,
-      "existing": 1344,
-      "missing": 9
+      "existing": 1353,
+      "missing": 0
     },
     "items": {
       "total": 87,
@@ -47,8 +47,8 @@
     },
     "skills": {
       "total": 896,
-      "existing": 889,
-      "missing": 7
+      "existing": 896,
+      "missing": 0
     },
     "modules": {
       "total": 503,
@@ -57,34 +57,12 @@
     }
   },
   "missing": {
-    "avatars": [
-      "public/images/operators/avatars/char_4231_clemnt.png",
-      "public/images/operators/avatars/char_393_toledo.png",
-      "public/images/operators/avatars/char_4232_hbound.png"
-    ],
+    "avatars": [],
     "factions": [],
     "classes": [],
-    "portraits": [
-      "public/images/operators/portraits/char_4231_clemnt_1.png",
-      "public/images/operators/portraits/char_4231_clemnt_2.png",
-      "public/images/operators/portraits/char_4204_mantra_sightseer_4-e4789cf9.png",
-      "public/images/operators/portraits/char_1042_phatm2_sightseer_4-6304c88d.png",
-      "public/images/operators/portraits/char_393_toledo_1.png",
-      "public/images/operators/portraits/char_393_toledo_2.png",
-      "public/images/operators/portraits/char_4232_hbound_1.png",
-      "public/images/operators/portraits/char_4232_hbound_2.png",
-      "public/images/operators/portraits/char_194_leto_sightseer_4-80af702b.png"
-    ],
+    "portraits": [],
     "items": [],
-    "skills": [
-      "public/images/skills/skchr_clemnt_1.png",
-      "public/images/skills/skchr_clemnt_2.png",
-      "public/images/skills/skchr_clemnt_3.png",
-      "public/images/skills/skchr_hbound_1.png",
-      "public/images/skills/skchr_hbound_2.png",
-      "public/images/skills/skchr_toledo_1.png",
-      "public/images/skills/skchr_toledo_2.png"
-    ],
+    "skills": [],
     "modules": [
       "public/images/modules/uniequip_002_veen.png",
       "public/images/modules/uniequip_002_tanya.png",
@@ -473,7 +451,7 @@
         "label": "克莱门莎",
         "publicPath": "/images/operators/avatars/char_4231_clemnt.png",
         "relativePath": "public/images/operators/avatars/char_4231_clemnt.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4231_clemnt.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4231_clemnt.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4231_clemnt.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4231_clemnt.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4231_clemnt.png",
@@ -4659,7 +4637,7 @@
         "label": "德·托莱多",
         "publicPath": "/images/operators/avatars/char_393_toledo.png",
         "relativePath": "public/images/operators/avatars/char_393_toledo.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_393_toledo.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_393_toledo.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_393_toledo.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_393_toledo.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_393_toledo.png",
@@ -5050,7 +5028,7 @@
         "label": "旅骨",
         "publicPath": "/images/operators/avatars/char_4232_hbound.png",
         "relativePath": "public/images/operators/avatars/char_4232_hbound.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4232_hbound.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4232_hbound.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4232_hbound.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4232_hbound.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4232_hbound.png",
@@ -12518,7 +12496,7 @@
         "label": "克莱门莎 - 克莱门莎 Elite 1",
         "publicPath": "/images/operators/portraits/char_4231_clemnt_1.png",
         "relativePath": "public/images/operators/portraits/char_4231_clemnt_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4231_clemnt_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4231_clemnt_1.png",
@@ -12563,7 +12541,7 @@
         "label": "克莱门莎 - 克莱门莎 Elite 2",
         "publicPath": "/images/operators/portraits/char_4231_clemnt_2.png",
         "relativePath": "public/images/operators/portraits/char_4231_clemnt_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4231_clemnt_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4231_clemnt_2.png",
@@ -20348,7 +20326,7 @@
         "label": "真言 - 真言 - 万籁俱寂",
         "publicPath": "/images/operators/portraits/char_4204_mantra_sightseer_4-e4789cf9.png",
         "relativePath": "public/images/operators/portraits/char_4204_mantra_sightseer_4-e4789cf9.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4204_mantra_sightseer%234.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4204_mantra_sightseer%234.png",
@@ -23543,7 +23521,7 @@
         "label": "酒神 - 酒神 - 真我自扼",
         "publicPath": "/images/operators/portraits/char_1042_phatm2_sightseer_4-6304c88d.png",
         "relativePath": "public/images/operators/portraits/char_1042_phatm2_sightseer_4-6304c88d.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1042_phatm2_sightseer%234.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1042_phatm2_sightseer%234.png",
@@ -31183,7 +31161,7 @@
         "label": "德·托莱多 - 德·托莱多 Elite 1",
         "publicPath": "/images/operators/portraits/char_393_toledo_1.png",
         "relativePath": "public/images/operators/portraits/char_393_toledo_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_393_toledo_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_393_toledo_1.png",
@@ -31228,7 +31206,7 @@
         "label": "德·托莱多 - 德·托莱多 Elite 2",
         "publicPath": "/images/operators/portraits/char_393_toledo_2.png",
         "relativePath": "public/images/operators/portraits/char_393_toledo_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_393_toledo_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_393_toledo_2.png",
@@ -32748,7 +32726,7 @@
         "label": "旅骨 - 旅骨 Elite 1",
         "publicPath": "/images/operators/portraits/char_4232_hbound_1.png",
         "relativePath": "public/images/operators/portraits/char_4232_hbound_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4232_hbound_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4232_hbound_1.png",
@@ -32793,7 +32771,7 @@
         "label": "旅骨 - 旅骨 Elite 2",
         "publicPath": "/images/operators/portraits/char_4232_hbound_2.png",
         "relativePath": "public/images/operators/portraits/char_4232_hbound_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4232_hbound_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4232_hbound_2.png",
@@ -36888,7 +36866,7 @@
         "label": "烈夏 - 烈夏 - 来日欢歌",
         "publicPath": "/images/operators/portraits/char_194_leto_sightseer_4-80af702b.png",
         "relativePath": "public/images/operators/portraits/char_194_leto_sightseer_4-80af702b.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_194_leto_sightseer%234.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_194_leto_sightseer%234.png",
@@ -59902,7 +59880,7 @@
         "label": "冲蚀",
         "publicPath": "/images/skills/skchr_clemnt_1.png",
         "relativePath": "public/images/skills/skchr_clemnt_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_clemnt_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_clemnt_1.png",
@@ -59934,7 +59912,7 @@
         "label": "风暴潮",
         "publicPath": "/images/skills/skchr_clemnt_2.png",
         "relativePath": "public/images/skills/skchr_clemnt_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_clemnt_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_clemnt_2.png",
@@ -59966,7 +59944,7 @@
         "label": "与海为敌",
         "publicPath": "/images/skills/skchr_clemnt_3.png",
         "relativePath": "public/images/skills/skchr_clemnt_3.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_clemnt_3.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_clemnt_3.png",
@@ -64830,7 +64808,7 @@
         "label": "触礁",
         "publicPath": "/images/skills/skchr_hbound_1.png",
         "relativePath": "public/images/skills/skchr_hbound_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_hbound_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_hbound_1.png",
@@ -64862,7 +64840,7 @@
         "label": "座浅",
         "publicPath": "/images/skills/skchr_hbound_2.png",
         "relativePath": "public/images/skills/skchr_hbound_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_hbound_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_hbound_2.png",
@@ -79422,7 +79400,7 @@
         "label": "以假乱真",
         "publicPath": "/images/skills/skchr_toledo_1.png",
         "relativePath": "public/images/skills/skchr_toledo_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_toledo_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_toledo_1.png",
@@ -79454,7 +79432,7 @@
         "label": "危言耸听",
         "publicPath": "/images/skills/skchr_toledo_2.png",
         "relativePath": "public/images/skills/skchr_toledo_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_toledo_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_toledo_2.png",
