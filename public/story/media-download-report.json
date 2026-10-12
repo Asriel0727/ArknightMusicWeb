@@ -1,22 +1,27 @@
 {
-  "downloadedAt": "2026-10-04T15:36:30.977Z",
-  "mode": "local-files",
-  "stories": 2270,
-  "uniqueUrls": 2177,
+  "downloadedAt": "2026-10-11T22:25:06.409Z",
+  "mode": "incremental-local-files",
+  "stories": 2293,
+  "uniqueUrls": 2196,
   "downloaded": 0,
-  "reused": 2086,
+  "reused": 2105,
+  "skippedKnownMissing": 91,
   "bytesDownloaded": 0,
+  "compressed": 0,
+  "compressedSources": [],
+  "preservedModifiedSources": [],
+  "unsafeLocalFiles": [],
   "totals": {
-    "audio": 2074,
+    "audio": 2093,
     "videos": 12,
-    "bytes": 1173036689
+    "bytes": 1104795325
   },
   "missingTotals": {
     "audio": 27,
     "videos": 0
   },
-  "localReferences": 37355,
-  "changedStories": 2,
+  "localReferences": 37829,
+  "changedStories": 0,
   "failures": [
     {
       "url": "https://static.prts.wiki/video/03.mp4",
@@ -1089,14 +1094,6 @@
       "type": "audio",
       "key": "m_sys_base_loop",
       "candidates": []
-    }
-  ],
-  "compressedSources": [
-    {
-      "sourceUrl": "https://static.prts.wiki/video/cfa_03.mp4",
-      "bytesBefore": 147892197,
-      "bytesAfter": 44955584,
-      "sha256": "7a70edbb21179777df866f2d3a2726a7856158914495558ccef4f44826dc0290"
     }
   ]
 }
