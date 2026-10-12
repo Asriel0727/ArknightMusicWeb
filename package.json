@@ -29,6 +29,7 @@
     "test:character-eps": "node --test test/character-ep-matching.test.mjs",
     "music:audit-audio": "node scripts/audit-music-audio.mjs",
     "story:sync-localizations": "node scripts/story/sync-story-localizations.mjs",
+    "story:sync-summaries": "node scripts/story/sync-story-summaries.mjs",
     "story:sync-media": "node scripts/story/sync-story-media.mjs",
     "story:download-media": "node scripts/story/download-story-media.mjs"
   },

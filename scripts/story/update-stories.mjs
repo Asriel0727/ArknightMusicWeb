@@ -8,7 +8,7 @@ import { loadCustomizations, protectGlobal } from './story-customizations.mjs';
 
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
-  console.log('npm run story:update [-- --retry-unresolved] [-- --max-file-mib=95]\nChecks fresh PRTS revisions; reuses unchanged scripts, translations and media.');
+  console.log('npm run story:update [-- --retry-unresolved] [-- --max-file-mib=95]\nChecks fresh PRTS revisions; reuses unchanged scripts, translations, summaries and media.');
   process.exit(0);
 }
 for (const arg of args) {
@@ -42,5 +42,6 @@ await run('sync-archive-metadata.mjs');
 await run('sync-story-thumbnails.mjs');
 await run('download-story-media.mjs', ['--new-only', `--max-file-mib=${maxFileMiB}`, ...args.filter(arg => !arg.startsWith('--max-file-mib='))]);
 await run('sync-story-localizations.mjs', ['--refresh']);
+await run('sync-story-summaries.mjs', ['--refresh']);
 await run('apply-customizations.mjs');
-console.log('\n[story:update] Complete. See public/story/sync-report.json and media-download-report.json for changes and missing sources.');
+console.log('\n[story:update] Complete. See public/story/sync-report.json, media-download-report.json and summaries/report.json for changes and missing sources.');

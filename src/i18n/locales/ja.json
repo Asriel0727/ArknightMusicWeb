@@ -215,6 +215,8 @@
     "default": "自動回復"
   },
   "searchBar": {
+    "trackPlaceholder": "このアルバムの曲やアーティストを検索…",
+    "noMatchingTracks": "一致する曲がありません。",
     "albumPlaceholder": "アルバムや曲を検索…"
   }
 }

@@ -5,8 +5,9 @@
       <span class="player-loading-dots" aria-hidden="true"><i></i><i></i><i></i></span>
       <span>{{ t('common.loading') }}</span>
     </div>
-    <div class="player-view-left">
-      <div class="player-container">
+    <div class="player-view-left" ref="playerLeftRef">
+      <div class="player-container" ref="playerContentRef"
+        :style="playerProps.embedded ? { transform: `scale(${embeddedContentScale})` } : undefined">
         <div class="player-header">
           <div class="player-cover" :class="{ playing: playerState.isPlaying }">
             <img v-if="playerState.currentSong && playerState.currentSong.coverUrl"
@@ -140,35 +141,37 @@
         <div v-if="isCharacterEpExpanded" class="character-ep-preview-backdrop" aria-hidden="true"
           @click.self="closeCharacterEpPreview"></div>
       </div>
-      <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-toolbar">
-        <span class="lyrics-toolbar-title"><i class="fas fa-align-left"></i> {{ t('player.lyrics') }}</span>
-        <div class="lyrics-translation-controls">
-          <label class="lyrics-translation-toggle">
-            <input v-model="playerState.showLyricTranslation" type="checkbox" @change="handleLyricTranslationToggle">
-            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-            <span class="toggle-label">{{ t('player.translationToggle') }}</span>
-          </label>
-          <span v-if="playerState.isTranslatingLyrics" class="lyrics-translation-status" role="status">
-            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> {{ t('common.loading') }}
-          </span>
-        </div>
-      </div>
-      <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationError" class="lyrics-translation-error" role="alert">
-        {{ playerState.lyricTranslationError }}
-      </p>
-      <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-container" ref="lyricsContainerRef"
-        @scroll="handleLyricsScroll">
-        <div v-for="(line, index) in playerState.lyrics" :key="index" class="lyrics-line"
-          :class="{ active: activeLyricIndex === index }" :data-time="line.time">
-          <div class="lyrics-original">
-            {{ line.text }}
-          </div>
-          <div v-if="playerState.showLyricTranslation && line.translation" class="lyrics-translation">
-            {{ line.translation }}
+      <section class="player-lyrics-panel" :aria-label="t('player.lyrics')">
+        <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-toolbar">
+          <span class="lyrics-toolbar-title"><i class="fas fa-align-left"></i> {{ t('player.lyrics') }}</span>
+          <div class="lyrics-translation-controls">
+            <label class="lyrics-translation-toggle">
+              <input v-model="playerState.showLyricTranslation" type="checkbox" @change="handleLyricTranslationToggle">
+              <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+              <span class="toggle-label">{{ t('player.translationToggle') }}</span>
+            </label>
+            <span v-if="playerState.isTranslatingLyrics" class="lyrics-translation-status" role="status">
+              <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> {{ t('common.loading') }}
+            </span>
           </div>
         </div>
-      </div>
-      <p v-else class="no-lyrics">{{ t('common.noLyrics') }}</p>
+        <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationError" class="lyrics-translation-error" role="alert">
+          {{ playerState.lyricTranslationError }}
+        </p>
+        <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-container" ref="lyricsContainerRef"
+          @scroll="handleLyricsScroll">
+          <div v-for="(line, index) in playerState.lyrics" :key="index" class="lyrics-line"
+            :class="{ active: activeLyricIndex === index }" :data-time="line.time">
+            <div class="lyrics-original">
+              {{ line.text }}
+            </div>
+            <div v-if="playerState.showLyricTranslation && line.translation" class="lyrics-translation">
+              {{ line.translation }}
+            </div>
+          </div>
+        </div>
+        <p v-else class="no-lyrics">{{ t('common.noLyrics') }}</p>
+      </section>
     </div>
   </div>
   <div v-if="isCreatePlaylistDialogOpen" class="playlist-dialog-backdrop" @click.self="closeCreatePlaylistDialog">
@@ -254,6 +257,21 @@ const playerProps = defineProps({
 const emit = defineEmits(['view-album', 'character-ep-expanded-change']);
 
 const lyricsContainerRef = ref(null);
+const playerLeftRef = ref(null);
+const playerContentRef = ref(null);
+const embeddedContentScale = ref(1);
+let embeddedLayoutObserver = null;
+
+function fitEmbeddedPlayerContent() {
+  const panel = playerLeftRef.value;
+  const content = playerContentRef.value;
+  if (!panel || !content || !content.offsetHeight || !content.offsetWidth) return;
+  embeddedContentScale.value = Math.min(
+    1,
+    Math.max(0, panel.clientHeight - 16) / content.offsetHeight,
+    Math.max(0, panel.clientWidth - 16) / content.offsetWidth,
+  );
+}
 const activeLyricIndex = ref(-1);
 const isCompactVolumeOpen = ref(false);
 const hasCopiedShareLink = ref(false);
@@ -1105,6 +1123,12 @@ watch(locale, () => {
 
 // 組件?��??��?如�?�?��?�放?��??��?�?
 onMounted(() => {
+  if (playerProps.embedded) {
+    embeddedLayoutObserver = new ResizeObserver(fitEmbeddedPlayerContent);
+    embeddedLayoutObserver.observe(playerLeftRef.value);
+    embeddedLayoutObserver.observe(playerContentRef.value);
+    fitEmbeddedPlayerContent();
+  }
   window.addEventListener('keydown', handleCharacterEpPreviewKeydown);
   window.addEventListener('focus', resyncCharacterEpAfterPageReturn);
   document.addEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
@@ -1117,6 +1141,7 @@ onMounted(() => {
 
 // 組件?��??��??��??�循?��?超�?
 onUnmounted(() => {
+  embeddedLayoutObserver?.disconnect();
   window.removeEventListener('keydown', handleCharacterEpPreviewKeydown);
   window.removeEventListener('focus', resyncCharacterEpAfterPageReturn);
   document.removeEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
@@ -1205,6 +1230,13 @@ defineExpose({ closeCharacterEpPreview });
 .player-view-right {
   justify-content: flex-start;
   gap: 15px;
+}
+
+.player-lyrics-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 12px;
 }
 
 .player-container {

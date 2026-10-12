@@ -123,6 +123,31 @@ import { fetchAlbumDetails, fetchAlbums, getProxyImageUrl, searchMusic } from '.
 
 const { t, locale } = useI18n();
 const containerRef = ref(null);
+const rackFit = ref(1);
+let rackSizeObserver = null;
+
+function fitRackToViewport() {
+  const rack = containerRef.value;
+  const card = rack?.querySelector('.album-slot');
+  if (!rack || !card || !card.offsetHeight || !card.offsetWidth) return;
+  const reservedHeight = Math.min(window.innerWidth >= 1000 ? 88 : 120, rack.clientHeight * 0.3);
+  rackFit.value = Math.min(
+    1,
+    Math.max(1, rack.clientHeight - reservedHeight) / card.offsetHeight,
+    Math.max(1, rack.clientWidth - 32) / card.offsetWidth,
+  );
+  rack.style.setProperty('--rack-card-rise', `${Math.min(30, reservedHeight * 0.25)}px`);
+}
+
+watch(containerRef, (rack) => {
+  rackSizeObserver?.disconnect();
+  if (!rack) return;
+  rackSizeObserver = new ResizeObserver(fitRackToViewport);
+  rackSizeObserver.observe(rack);
+  const card = rack.querySelector('.album-slot');
+  if (card) rackSizeObserver.observe(card);
+  fitRackToViewport();
+}, { flush: 'post' });
 const windowWidth = ref(window.innerWidth);
 const activeAlbumIndex = ref(0);
 const isDragging = ref(false);
@@ -264,13 +289,14 @@ const visibleAlbums = computed(() => {
 
 const getAlbumStep = () => {
   const width = windowWidth.value;
-  return width <= 600
+  const step = width <= 600
     ? 82
     : width <= 900
       ? Math.min(136, Math.max(86, width * 0.15))
       : width >= 1400
-        ? Math.min(250, Math.max(132, width * 0.1))
+        ? Math.min(300, Math.max(180, width * 0.15))
         : Math.min(196, Math.max(108, width * 0.135));
+  return step * rackFit.value;
 };
 
 const getAlbumStyle = (slotOffset) => {
@@ -283,7 +309,7 @@ const getAlbumStyle = (slotOffset) => {
     '--album-offset': offset,
     '--album-x': `${offset * albumStep + dragOffset.value}px`,
     '--album-depth': `${Math.max(-520, -distance * 68)}px`,
-    '--album-scale': Math.max(0.58, 1 - distance * 0.075),
+    '--album-scale': Math.max(0.58, 1 - distance * 0.075) * rackFit.value,
     '--album-rotate': `${Math.sign(offset) * -Math.min(64, distance * 23)}deg`,
     '--album-drag-rotate': `${dragRotation.value}deg`,
     '--album-parallax-x': `${parallaxX.value * parallaxStrength}px`,
@@ -823,6 +849,7 @@ watch(locale, async () => {
 });
 
 onUnmounted(() => {
+  rackSizeObserver?.disconnect();
   window.clearTimeout(clickResetTimer);
   resetOpeningAlbum();
   if (releaseFrame !== null) {
@@ -880,7 +907,7 @@ main .page-title {
   position: relative;
   --rack-card-rise: clamp(30px, 3vw, 36px);
   flex: 1;
-  min-height: max(calc(var(--rack-card-width) + 220px), calc(100dvh - 370px));
+  min-height: 0;
   margin: 12px -20px 0;
   overflow: hidden;
   isolation: isolate;
@@ -918,7 +945,7 @@ main .page-title {
     scale(var(--album-scale))
     rotateZ(var(--album-drag-rotate));
   transform-style: preserve-3d;
-  transform-origin: center bottom;
+  transform-origin: center;
   transition: transform 480ms cubic-bezier(0.16, 1.08, 0.3, 1), opacity 320ms ease;
   will-change: transform, opacity;
 }
@@ -1355,17 +1382,17 @@ main .page-title {
 @media (min-width: 1400px) {
   main {
     max-width: 1880px;
-    padding: 28px 32px;
+    padding: 16px 32px;
   }
 
   main .page-title {
-    margin-bottom: 22px;
+    margin-bottom: 12px;
     font-size: clamp(1.45rem, 1.5vw, 1.9rem);
   }
 
   .albums-container {
-    min-height: max(calc(var(--rack-card-width) + 230px), calc(100dvh - 370px));
-    margin: 16px -32px 0;
+    min-height: 0;
+    margin: 8px -32px 0;
   }
 
   .album-slot {
@@ -1394,7 +1421,7 @@ main .page-title {
 @media (max-width: 900px) {
   main { --rack-card-width: 220px; }
   .albums-container {
-    min-height: 390px;
+    min-height: 0;
     margin-right: -20px;
     margin-left: -20px;
   }
@@ -1411,7 +1438,7 @@ main .page-title {
 
 @media (max-width: 600px) {
   .albums-container {
-    min-height: 370px;
+    min-height: 0;
     margin-top: 4px;
   }
 

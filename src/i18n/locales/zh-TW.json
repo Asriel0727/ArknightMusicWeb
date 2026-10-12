@@ -215,6 +215,8 @@
     "default": "自動回復"
   },
   "searchBar": {
+    "trackPlaceholder": "搜尋這張專輯的歌曲或歌手…",
+    "noMatchingTracks": "沒有符合的曲目。",
     "albumPlaceholder": "搜尋專輯或歌曲…"
   }
 }

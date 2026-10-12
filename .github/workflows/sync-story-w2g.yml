@@ -31,7 +31,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install --no-install-recommends -y ffmpeg
           fi
-      - name: Synchronize changed stories and new media
+      - name: Synchronize changed stories, summaries and new media
         run: npm run story:update -- --max-file-mib=95
       - name: Verify production build
         run: npm run build

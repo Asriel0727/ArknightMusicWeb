@@ -215,6 +215,8 @@
     "default": "自动回复"
   },
   "searchBar": {
+    "trackPlaceholder": "搜索这张专辑的歌曲或歌手…",
+    "noMatchingTracks": "没有匹配的曲目。",
     "albumPlaceholder": "搜索专辑或歌曲…"
   }
 }

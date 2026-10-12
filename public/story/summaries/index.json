@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "provider": "game-story-info",
+  "locales": {
+    "zh-CN": {
+      "path": "summaries/zh-CN.json",
+      "count": 2023,
+      "sourceCommit": "17759cc8cdf37388414145d16262a3a06f3ab25e"
+    },
+    "en": {
+      "path": "summaries/en.json",
+      "count": 1694,
+      "sourceCommit": "57010cb5b2afea112cae57daa756b58676ba6850"
+    },
+    "ja": {
+      "path": "summaries/ja.json",
+      "count": 1694,
+      "sourceCommit": "57010cb5b2afea112cae57daa756b58676ba6850"
+    },
+    "ko": {
+      "path": "summaries/ko.json",
+      "count": 1675,
+      "sourceCommit": "57010cb5b2afea112cae57daa756b58676ba6850"
+    },
+    "zh-TW": {
+      "path": "summaries/zh-TW.json",
+      "count": 2023,
+      "sourceLocale": "zh-CN",
+      "conversion": "opencc-cn-twp",
+      "sourceCommit": "17759cc8cdf37388414145d16262a3a06f3ab25e"
+    }
+  }
+}

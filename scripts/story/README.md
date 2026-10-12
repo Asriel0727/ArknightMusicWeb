@@ -1,5 +1,19 @@
 # 劇情快照流程
 
+## 原版劇情大綱
+
+`npm run story:sync-summaries` 下載目前劇情目錄能精確對應的遊戲原版 SKIP 大綱，來源為 Kengxxiao/ArknightsGameData 與 ArknightsGameData_YoStar 的 `gamedata/story/[uc]info/`。依 `story_review_table.json` 的 `storyInfo` 配對，也檢查相同劇本路徑的獨立大綱檔案；不以相似名稱或其他段落的大綱填補缺失。
+
+每種語言集中保存於 `public/story/summaries/{locale}.json`，以網站 story ID 對應文字、固定 commit 來源、Git blob SHA-1 與本地 SHA-256。包含簡中、英文、日文、韓文；繁中由簡中透過 OpenCC `cn → twp` 轉換，標示 `derivedFrom`，不是台服原文。`index.json` 提供語言檔案位置與篇數；`report.json` 列出分類覆蓋、沒有上游大綱／缺少劇本路徑及下載失敗。部分原版文字只有一句提示或結語，匯入會保留原文，不另寫摘要。
+
+同步使用固定 commit 的來源快照，逐檔核對 Git blob 校驗碼並拒收空文字或 HTML。快取位於被忽略的 `tmp/story-summaries/`；重跑會續用已驗證的大綱，加 `--refresh` 更新上游目錄與版本，`--offline` 僅使用已保存的來源與文字。下載失敗會保留校驗有效的既有大綱、寫入失敗清單並回傳非零狀態。
+
+播放器的「SKIP」與閱讀途中點選「下一段劇情」會先顯示目前段落的大綱，選擇「繼續閱讀」留在原位置，確認跳過後接續下一段，沒有下一段時返回段落列表。跳過不會把未讀完的段落標為已讀。正常讀完的結尾視窗也顯示本段大綱。大綱依介面語言按需載入並快取，換段落或換語言時忽略舊請求；未收錄與載入失敗分別顯示提示，失敗可重試。視窗開啟時暫停影片與閱讀快捷鍵，關閉後可接續影片；Esc 或關閉按鈕等同繼續閱讀。
+
+既有 `story:update` 增量流程會在翻譯同步後執行 `sync-story-summaries.mjs --refresh`，因此每日台灣時間 02:30 的 `Sync story snapshots` 排程及手動執行 `npm run story:update` 都會一起更新大綱。既有 `git add public/story` 會包含全部大綱檔案及缺漏清單，編譯成功後隨快照提交並觸發發布；未變更的大綱依 Git blob 校驗碼重用現有文字，不重複下載。大綱同步遇到下載或校驗錯誤時，整體流程停止，不提交不完整的新快照。
+
+## 劇本與素材
+
 `StoryStage.vue` 只讀取 `public/story/catalog.json`、每篇的 `manifest.json` 與 `script.txt`，不直接依賴 PRTS 連線。新增劇情時在 `stories.json` 加一筆 `id`、`page`、`title`，必要時加 `fallbackScriptUrl`；接著執行 `npm run story:sync -- --story <id>`。成功後，故事會自動出現在同一個播放器的選單。
 
 同步器會從劇情指令收集背景、CG、立繪、配樂、音效、影片引用。圖片依 PRTS Wiki 檔名規則嘗試下載，並保留原始 PNG、另產生較小的 WebP 供網頁顯示；音訊依遊戲 `story_variables.json` 對照到 PRTS 音訊站。特殊 PNG 可用 `imageSources`、特殊音訊可用 `audioSources` 覆寫 URL。影片目前沒有通用的 PRTS 路徑規則，需在該筆設定提供 `videoSources`（影片 ID 對 HTTPS URL 的物件）。無法解析或下載的素材會使同步失敗，不會產生缺檔的新 manifest。

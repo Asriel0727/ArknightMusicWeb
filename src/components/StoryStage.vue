@@ -163,12 +163,13 @@
         <button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button>
         <label class="story-volume">{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label>
         <button type="button" :aria-expanded="logOpen" aria-controls="story-log" @click="openLog">{{ mediaLabels.log }}</button>
+        <button type="button" class="story-skip" :disabled="frame.type === 'end'" @click="openSkip()">{{ summaryLabels.skip }}</button>
         <button type="button" :disabled="frame.type !== 'dialogue'" @click="advance">{{ labels.next }} →</button>
       </footer>
       <p v-if="audioEnabled && audioProblem" class="story-note" role="status">
         {{ mediaLabels[audioProblem] }} <button type="button" @click="retryAudio">{{ audioProblem === 'blocked' ? mediaLabels.enable : mediaLabels.retry }}</button>
       </p>
-      <nav class="episode-navigation" :aria-label="labels.order"><button type="button" :disabled="!previousStory" @click="selectStoryId(previousStory.id)">← {{ labels.previousStory }}</button><span>{{ episodeNumber(selectedStory) }} / {{ groupStories.length }} · {{ localize(activeCollection?.label) }}</span><button type="button" :disabled="!nextStory" @click="selectStoryId(nextStory.id)">{{ labels.nextStory }} →</button></nav>
+      <nav class="episode-navigation" :aria-label="labels.order"><button type="button" :disabled="!previousStory" @click="selectStoryId(previousStory.id)">← {{ labels.previousStory }}</button><span>{{ episodeNumber(selectedStory) }} / {{ groupStories.length }} · {{ localize(activeCollection?.label) }}</span><button type="button" :disabled="!nextStory" @click="openSkip(nextStory.id)">{{ labels.nextStory }} →</button></nav>
       <details class="story-note compact-note"><summary>{{ mediaLabels.credits }}</summary><p>{{ labels.note }}</p></details>
     </section>
     </template>
@@ -178,10 +179,28 @@
     </Transition>
   </main>
   <Teleport to="body">
+    <dialog ref="skipDialog" class="story-log-dialog story-ending-dialog" aria-labelledby="story-skip-title" @cancel.prevent="closeSkip" @close="resetSkip" @click.capture="guardSkipClick" @keydown.capture="guardSkipKey">
+      <header><h2 id="story-skip-title" tabindex="-1">{{ summaryLabels.title }}</h2><button type="button" @click="closeSkip">{{ mediaLabels.close }}</button></header>
+      <p class="story-log-title">{{ localize(manifest?.title || selectedStory?.title) }}</p>
+      <div class="story-summary-text" aria-live="polite" :aria-busy="summaryStatus === 'loading'">
+        <p>{{ summaryStatus === 'ready' ? summaryText : summaryLabels[summaryStatus] }}</p>
+        <button v-if="summaryStatus === 'failed'" type="button" @click="loadCurrentSummary">{{ summaryLabels.retry }}</button>
+      </div>
+      <p>{{ summaryLabels.prompt }}</p>
+      <div class="ending-actions">
+        <button type="button" @click="closeSkip">{{ summaryLabels.resume }}</button>
+        <button class="ending-primary" type="button" @click="confirmSkip">{{ summaryLabels.confirm }}<strong>{{ skipTarget ? summaryLabels.next : summaryLabels.back }}</strong></button>
+      </div>
+    </dialog>
     <dialog ref="endingDialog" class="story-log-dialog story-ending-dialog" aria-labelledby="story-ending-title" @click.capture="guardEndingClick" @keydown.capture="guardEndingKey" @cancel.prevent="closeEnding" @close="resetEndingGuard">
       <header><h2 id="story-ending-title" tabindex="-1">{{ labels.finished }}</h2><button type="button" :disabled="!endingArmed" @click="closeEnding">{{ mediaLabels.close }}</button></header>
       <p class="story-log-title">{{ localize(manifest?.title || selectedStory?.title) }}</p>
       <p>{{ mediaLabels.continueChoice }}</p>
+      <section class="story-summary-text" aria-live="polite" :aria-busy="summaryStatus === 'loading'">
+        <h3>{{ summaryLabels.title }}</h3>
+        <p>{{ summaryStatus === 'ready' ? summaryText : summaryLabels[summaryStatus] }}</p>
+        <button v-if="summaryStatus === 'failed'" type="button" @click="loadCurrentSummary">{{ summaryLabels.retry }}</button>
+      </section>
       <div class="ending-actions">
         <button v-if="nextStory" class="ending-primary" type="button" :disabled="!endingArmed" @click="closeEnding(); selectStoryId(nextStory.id)">{{ labels.nextStory }} →<strong>{{ localize(nextStory.title) }}</strong></button>
         <button v-else-if="nextGuideNode" class="ending-primary" type="button" :disabled="!endingArmed" @click="closeEnding(); showGuide(readingLineId, nextGuideNode.group)">{{ labels.continueGuide }} →<strong>{{ localize(nextGuideNode.label) }}</strong></button>
@@ -210,6 +229,8 @@ import { authState } from '../services/auth.js';
 import { useStoryReadingProgress } from '../services/storyReadingProgress.js';
 import { normalizeChineseMusicText } from '../utils/s2tApiText.js';
 import { loadLocalizedStory } from '../services/storyLocalizations.js';
+import { loadStorySummary } from '../services/storySummaries.js';
+import { storySummaryMessages } from '../i18n/storySummaryMessages.js';
 import { storyMediaMessages } from '../i18n/storyMediaMessages.js';
 import { createMemorySound } from '../utils/storyMemorySound.js';
 import StoryPortrait from './StoryPortrait.vue';
@@ -222,6 +243,7 @@ import { collectionFamily, buildReadingRoute, readingGuideIntro, readingGuideSou
 
 const { locale, t } = useI18n();
 const mediaLabels = computed(() => storyMediaMessages[locale.value] || storyMediaMessages.en);
+const summaryLabels = computed(() => storySummaryMessages[locale.value] || storySummaryMessages.en);
 const emit = defineEmits(['sign-in']);
 const copies = {
   'zh-TW': { title: '劇情', subtitle: '明日方舟 · 劇情演出', loading: '正在載入本地劇情…', narrator: '旁白', continue: '點擊或按空白鍵繼續', choose: '選擇回應', finished: '劇情結束', battle: '可以重新播放或選擇其他劇情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效開啟', audioOff: '🔇 開啟音效', videoHint: '影片播放完畢後繼續。', selectStory: '選擇劇情', note: '劇情及素材出處：明日方舟／PRTS。劇本與已匯入影音由本站載入，未匯入素材可能連線至 PRTS；部分表情與鏡頭指令仍未完整重現。' },
@@ -608,6 +630,67 @@ const endingOpen = ref(false);
 const endingArmed = ref(false);
 let endingGuardTimer;
 let endingReturnFocus;
+const skipDialog = ref(null);
+const skipOpen = ref(false);
+const skipTarget = ref('');
+const summaryText = ref('');
+const summaryStatus = ref('loading');
+let summaryRequest = 0;
+let skipReturnFocus;
+let skipOpenedAt = 0;
+let resumeSkipVideo = false;
+async function loadCurrentSummary() {
+  const request = ++summaryRequest;
+  const storyId = selectedStoryId.value;
+  const language = locale.value;
+  summaryText.value = '';
+  summaryStatus.value = 'loading';
+  const result = await loadStorySummary({ root, storyId, locale: language });
+  if (disposed || request !== summaryRequest || storyId !== selectedStoryId.value || language !== locale.value) return;
+  summaryText.value = result.text;
+  summaryStatus.value = result.status;
+}
+async function openSkip(target) {
+  if (!frame.value || skipOpen.value) return;
+  if (frame.value.type === 'end') { openEnding(); return; }
+  closeLog();
+  skipReturnFocus = document.activeElement;
+  skipTarget.value = target || nextStory.value?.id || '';
+  skipOpen.value = true;
+  skipOpenedAt = performance.now();
+  resumeSkipVideo = !!sceneVideo.value && !sceneVideo.value.paused;
+  sceneVideo.value?.pause();
+  if (isTyping.value && frame.value.type === 'dialogue') {
+    clearTyping();
+    visibleText.value = localize(frame.value.text);
+    isTyping.value = false;
+  }
+  loadCurrentSummary();
+  await nextTick();
+  if (!skipOpen.value) return;
+  skipDialog.value?.showModal();
+  skipDialog.value?.querySelector('#story-skip-title')?.focus({ preventScroll: true });
+}
+function resetSkip() { skipOpen.value = false; skipTarget.value = ''; resumeSkipVideo = false; }
+function closeSkip(resume = true) {
+  const shouldPlay = resume && resumeSkipVideo;
+  skipDialog.value?.close();
+  resetSkip();
+  if (shouldPlay) sceneVideo.value?.play().catch(() => {});
+  if (resume) skipReturnFocus?.focus?.({ preventScroll: true });
+}
+function guardSkipClick(event) {
+  if (performance.now() - skipOpenedAt < 700 || event.detail > 1) { event.preventDefault(); event.stopPropagation(); }
+}
+function guardSkipKey(event) {
+  if (['Enter', 'Space'].includes(event.code) && (performance.now() - skipOpenedAt < 700 || event.repeat)) { event.preventDefault(); event.stopPropagation(); }
+}
+function confirmSkip() {
+  const target = skipTarget.value;
+  closeSkip(false);
+  // Skipping does not mark the unread remainder as completed.
+  if (target) selectStoryId(target); else returnToEpisodes();
+}
 let cameraAnimation;
 let cameraRequest = 0;
 const portraitVisual = name => resolveStoryPortrait(name, characterIndex.value, prtsVariables);
@@ -638,6 +721,7 @@ async function openEnding() {
   closeLog();
   endingReturnFocus = document.activeElement;
   endingOpen.value = true;
+  loadCurrentSummary();
   await nextTick();
   if (endingOpen.value && frame.value?.type === 'end' && !endingDialog.value?.open) {
     endingDialog.value?.showModal();
@@ -957,7 +1041,7 @@ watch([frame, locale], ([nextFrame], [previousFrame]) => {
 }, { flush: 'sync' });
 
 function advance() {
-  if (!runner || frame.value?.type !== 'dialogue') return;
+  if (!runner || skipOpen.value || frame.value?.type !== 'dialogue') return;
   if (isTyping.value) {
     clearTyping();
     visibleText.value = localize(frame.value.text);
@@ -984,7 +1068,7 @@ function goBack() {
 }
 
 function advanceVideo() {
-  if (!runner || frame.value?.type !== 'video') return;
+  if (!runner || skipOpen.value || frame.value?.type !== 'video') return;
   frame.value = runner.next();
   canGoBack.value = runner.canPrevious();
 }
@@ -999,7 +1083,7 @@ function restart() {
 }
 
 function handleKeydown(event) {
-  if (screen.value !== 'player' || logOpen.value || endingOpen.value) return;
+  if (screen.value !== 'player' || logOpen.value || endingOpen.value || skipOpen.value) return;
   if (event.target instanceof HTMLElement && ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'VIDEO'].includes(event.target.tagName)) return;
   if (event.code === 'Space' || event.code === 'Enter') { event.preventDefault(); advance(); }
   if (event.code === 'ArrowLeft') goBack();
@@ -1007,6 +1091,10 @@ function handleKeydown(event) {
 
 async function loadStory() {
   const token = ++loadingToken;
+  closeSkip(false);
+  summaryRequest++;
+  summaryText.value = '';
+  summaryStatus.value = 'loading';
   closeEnding(); stopCameraMotion();
   closeLog();
   storyLog.value = [];
@@ -1069,6 +1157,10 @@ function openCollection(collection) {
 
 function clearPlayback() {
   loadingToken += 1;
+  closeSkip(false);
+  summaryRequest++;
+  summaryText.value = '';
+  summaryStatus.value = 'loading';
   clearImagePreloads();
   clearTyping();
   stopMusic();
@@ -1133,6 +1225,8 @@ onMounted(async () => {
   } catch (cause) { if (!disposed) catalogError.value = cause.message || String(cause); }
 });
 onUnmounted(() => {
+  closeSkip(false);
+  summaryRequest++;
   cancelRackDrag();
   rackObserver?.disconnect();
   clearTimeout(rackClickTimer);
@@ -1282,6 +1376,7 @@ onUnmounted(() => {
 .portrait-row .portrait-l{left:27%}.portrait-row .portrait-r{left:73%}.portrait-row .portrait-m{left:50%}
 .story-log-dialog{position:fixed;inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto}
 .story-ending-dialog{width:min(580px,calc(100vw - 32px));padding:28px;border-top:3px solid #9cdde9}
+.story-summary-text{margin:18px 0;padding:16px 18px;border-left:2px solid #a5dce8;background:#132a35;line-height:1.8;overflow-wrap:anywhere}.story-summary-text h3{margin:0 0 8px;color:#a5dce8;font-size:.85rem}.story-summary-text p{margin:0;white-space:pre-wrap}.story-controls .story-skip{color:#efdab3;border-color:#a18b63;margin-left:8px}
 .story-ending-dialog h2{font-size:1.35rem}.ending-actions{display:grid;gap:12px;margin-top:20px}
 .ending-actions button{padding:13px 16px;text-align:left}.ending-actions .ending-primary{background:#234c5a;border-color:#a5dce8;color:#fff;font-size:.95rem}
 .ending-primary strong{display:block;margin-top:7px;font-size:1.1rem}.ending-actions button:focus-visible{outline:2px solid #c2edf5;outline-offset:3px}
