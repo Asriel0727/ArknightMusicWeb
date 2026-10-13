@@ -4,7 +4,7 @@
   "locales": {
     "zh-CN": {
       "path": "summaries/zh-CN.json",
-      "count": 2023,
+      "count": 2046,
       "sourceCommit": "17759cc8cdf37388414145d16262a3a06f3ab25e"
     },
     "en": {
@@ -24,7 +24,7 @@
     },
     "zh-TW": {
       "path": "summaries/zh-TW.json",
-      "count": 2023,
+      "count": 2046,
       "sourceLocale": "zh-CN",
       "conversion": "opencc-cn-twp",
       "sourceCommit": "17759cc8cdf37388414145d16262a3a06f3ab25e"

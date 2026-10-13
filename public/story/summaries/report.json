@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "totalStories": 2270,
+  "totalStories": 2293,
   "sources": {
     "cn": "17759cc8cdf37388414145d16262a3a06f3ab25e",
     "global": "57010cb5b2afea112cae57daa756b58676ba6850"
   },
   "locales": {
     "zh-CN": {
-      "imported": 2023,
-      "reused": 0,
+      "imported": 2046,
+      "reused": 2023,
       "preserved": 0,
       "missing": [
         {
@@ -1748,16 +1748,16 @@
           "imported": 428
         },
         "event": {
-          "total": 1062,
-          "imported": 1061
+          "total": 1081,
+          "imported": 1080
         },
         "vignette": {
           "total": 132,
           "imported": 132
         },
         "operator": {
-          "total": 390,
-          "imported": 390
+          "total": 394,
+          "imported": 394
         },
         "roguelike": {
           "total": 35,
@@ -1783,7 +1783,7 @@
     },
     "en": {
       "imported": 1694,
-      "reused": 0,
+      "reused": 1694,
       "preserved": 0,
       "missing": [
         {
@@ -5817,6 +5817,167 @@
           "category": "operator",
           "scriptPath": "obt/memory/story_phenxi_2_1",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98448",
+          "title": "YW-2 浮浮沉沉 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_02_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98449",
+          "title": "YW-1 互助会 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_01_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98450",
+          "title": "YW-1 互助会 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_01_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98451",
+          "title": "YW-2 浮浮沉沉 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_02_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98452",
+          "title": "YW-3 破手铐 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_03_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98453",
+          "title": "YW-4 走上街道 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_04_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98454",
+          "title": "YW-4 走上街道 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_04_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98455",
+          "title": "YW-5 三岔路口 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_05_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98456",
+          "title": "YW-3 破手铐 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_03_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98457",
+          "title": "YW-5 三岔路口 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_05_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98458",
+          "title": "YW-6 大人物 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_06_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98459",
+          "title": "YW-6 大人物 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_06_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98460",
+          "title": "YW-7 殉葬品 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_07_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98461",
+          "title": "YW-7 殉葬品 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_07_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98462",
+          "title": "YW-8 鳞的记忆 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_08_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98463",
+          "title": "YW-8 鳞的记忆 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_08_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98464",
+          "title": "YW-ST-1 羽兽盘旋",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st01",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98465",
+          "title": "贝洛内/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_demetr_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98466",
+          "title": "YW-ST-2 海声嘈杂",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st02",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98467",
+          "title": "复奏/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_liesel_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98468",
+          "title": "YW-ST-3 留给明天",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st03",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98469",
+          "title": "夜烟/干员密录/2",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_nights_2_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98470",
+          "title": "深巡/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_udflow_1_1",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -5826,7 +5987,7 @@
           "imported": 379
         },
         "event": {
-          "total": 1062,
+          "total": 1081,
           "imported": 871
         },
         "vignette": {
@@ -5834,7 +5995,7 @@
           "imported": 106
         },
         "operator": {
-          "total": 390,
+          "total": 394,
           "imported": 329
         },
         "roguelike": {
@@ -5861,7 +6022,7 @@
     },
     "ja": {
       "imported": 1694,
-      "reused": 0,
+      "reused": 1694,
       "preserved": 0,
       "missing": [
         {
@@ -9895,6 +10056,167 @@
           "category": "operator",
           "scriptPath": "obt/memory/story_phenxi_2_1",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98448",
+          "title": "YW-2 浮浮沉沉 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_02_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98449",
+          "title": "YW-1 互助会 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_01_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98450",
+          "title": "YW-1 互助会 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_01_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98451",
+          "title": "YW-2 浮浮沉沉 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_02_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98452",
+          "title": "YW-3 破手铐 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_03_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98453",
+          "title": "YW-4 走上街道 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_04_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98454",
+          "title": "YW-4 走上街道 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_04_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98455",
+          "title": "YW-5 三岔路口 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_05_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98456",
+          "title": "YW-3 破手铐 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_03_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98457",
+          "title": "YW-5 三岔路口 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_05_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98458",
+          "title": "YW-6 大人物 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_06_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98459",
+          "title": "YW-6 大人物 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_06_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98460",
+          "title": "YW-7 殉葬品 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_07_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98461",
+          "title": "YW-7 殉葬品 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_07_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98462",
+          "title": "YW-8 鳞的记忆 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_08_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98463",
+          "title": "YW-8 鳞的记忆 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_08_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98464",
+          "title": "YW-ST-1 羽兽盘旋",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st01",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98465",
+          "title": "贝洛内/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_demetr_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98466",
+          "title": "YW-ST-2 海声嘈杂",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st02",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98467",
+          "title": "复奏/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_liesel_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98468",
+          "title": "YW-ST-3 留给明天",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st03",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98469",
+          "title": "夜烟/干员密录/2",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_nights_2_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98470",
+          "title": "深巡/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_udflow_1_1",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -9904,7 +10226,7 @@
           "imported": 379
         },
         "event": {
-          "total": 1062,
+          "total": 1081,
           "imported": 871
         },
         "vignette": {
@@ -9912,7 +10234,7 @@
           "imported": 106
         },
         "operator": {
-          "total": 390,
+          "total": 394,
           "imported": 329
         },
         "roguelike": {
@@ -9939,7 +10261,7 @@
     },
     "ko": {
       "imported": 1675,
-      "reused": 0,
+      "reused": 1675,
       "preserved": 0,
       "missing": [
         {
@@ -14106,6 +14428,167 @@
           "category": "operator",
           "scriptPath": "obt/memory/story_phenxi_2_1",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98448",
+          "title": "YW-2 浮浮沉沉 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_02_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98449",
+          "title": "YW-1 互助会 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_01_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98450",
+          "title": "YW-1 互助会 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_01_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98451",
+          "title": "YW-2 浮浮沉沉 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_02_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98452",
+          "title": "YW-3 破手铐 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_03_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98453",
+          "title": "YW-4 走上街道 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_04_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98454",
+          "title": "YW-4 走上街道 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_04_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98455",
+          "title": "YW-5 三岔路口 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_05_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98456",
+          "title": "YW-3 破手铐 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_03_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98457",
+          "title": "YW-5 三岔路口 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_05_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98458",
+          "title": "YW-6 大人物 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_06_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98459",
+          "title": "YW-6 大人物 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_06_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98460",
+          "title": "YW-7 殉葬品 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_07_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98461",
+          "title": "YW-7 殉葬品 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_07_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98462",
+          "title": "YW-8 鳞的记忆 行动前",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_08_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98463",
+          "title": "YW-8 鳞的记忆 行动后",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_08_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98464",
+          "title": "YW-ST-1 羽兽盘旋",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st01",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98465",
+          "title": "贝洛内/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_demetr_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98466",
+          "title": "YW-ST-2 海声嘈杂",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st02",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98467",
+          "title": "复奏/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_liesel_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98468",
+          "title": "YW-ST-3 留给明天",
+          "category": "event",
+          "scriptPath": "activities/act52side/level_act52side_st03",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98469",
+          "title": "夜烟/干员密录/2",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_nights_2_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98470",
+          "title": "深巡/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_udflow_1_1",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -14115,7 +14598,7 @@
           "imported": 379
         },
         "event": {
-          "total": 1062,
+          "total": 1081,
           "imported": 852
         },
         "vignette": {
@@ -14123,7 +14606,7 @@
           "imported": 106
         },
         "operator": {
-          "total": 390,
+          "total": 394,
           "imported": 329
         },
         "roguelike": {

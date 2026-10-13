@@ -15988,11 +15988,107 @@
       "derivedFrom": "zh-CN",
       "conversion": "opencc-cn-twp"
     },
+    "prts-98448": {
+      "text": "克萊門莎為了讓打撈提案通過，曾與赫拉提婭打賭，押上了她在阿戈爾的一切身份。如今，她與調查島民的德魯莎合作，以確保打撈計劃順利進行。",
+      "blob": "3a5f4d187df832032f23f3453f90112efe13c1ca",
+      "sha256": "b15117e6c19b1fe1dd49eb41f2296ecf7a04d02edcee1cc86b82db122f0a6cb0",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_02_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98449": {
+      "text": "德魯莎懷疑技術工阿奎拉參與了非法行動，納喬與克萊門莎為其解圍。教堂內，阿奎拉的互助會導師露出真身，他正是深海主教奧盧斯。",
+      "blob": "579a888e549f3b82d3d9cfc9ace124c0072bf12c",
+      "sha256": "748b76916f70b11fa9cef3f014bc54f1cd17a534e0a9fe72072781c42157417f",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_01_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
     "prts-9845": {
       "text": "赫拉格指出，黑的身份恐怕不只是市長保鏢這麼簡單，而這番猜測被錫蘭聽到。\n錫蘭不禁對自己的家人產生了動搖。\n\n",
       "blob": "c73791a875e650382e6d5f5a3a52922c871ec6b6",
       "sha256": "301626bacfdb7d4eb8a9014d344ecfeeb5a1a6e1b845e1111b4d3cf413302991",
       "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act3d0/level_act3d0_04_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98450": {
+      "text": "懲戒軍德魯莎對打撈中心的技術工產生了懷疑。另一邊，新官上任的克萊門莎意識到島民與伊比利亞人之間的矛盾不容小覷。",
+      "blob": "4b6ef6fa3c7d78e92dff469458f5cc4288f96624",
+      "sha256": "e65d5ed5212271c3788ad84f717d6a6602e2c9a8f62e50a3e5aef755f6888f11",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_01_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98451": {
+      "text": "招搖撞騙的假貴族德·托萊多在同伴瓦列里奧的推薦下進入船廠工作。阿奎拉在人群中進行非法交易被德魯莎逮捕。",
+      "blob": "3f03346ff23fea17580a23f8a446da62d1eab35d",
+      "sha256": "4bbdce0634278a40eed1196e3e982946ecfa030926085eefe0038f073d9a6856",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_02_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98452": {
+      "text": "納喬得知阿奎拉死在獄中的訊息，決定加入互助會。艾麗妮奉卡門的命令，護送地牢中的海嗣到達船廠。",
+      "blob": "26b09538bfed8233404afe20e5ba389022f77223",
+      "sha256": "82a8ea5bcc96aadab10d7bae345cc6f4a11b34b96cdcfdb5c6de5d05ed99d430",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_03_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98453": {
+      "text": "阿奎拉的離世激起了互助會島民的怒火，襲擊計劃準備就緒。克萊門莎發現納喬狀態不對，她與調查互助會的德魯莎同步資訊，商議對策。",
+      "blob": "804ba940a7d4fd1a2413e8a3fe82e416371f3513",
+      "sha256": "00f8225c98cdfbade4ca5d8d636435acef2c3b4a2e978596f6ecf9d008f0b66a",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_04_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98454": {
+      "text": "互助會的島民劫持了通訊訊號，襲擊為打撈起重機供能的燈塔。船廠的一名船工失蹤，德·托萊多決意找人。德魯莎隻身前往互助會所在地。",
+      "blob": "b38a849b785f2a071e96dfb9e47fc15d71951e91",
+      "sha256": "328634b9253f269bd419c4d6835286c5eff5abc9f83ab0ecef25334996aa7bc1",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_04_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98455": {
+      "text": "奧盧斯陰謀初露，納喬救下的一位島民變為海嗣。卡門與克萊門莎同步資訊，告知她船廠才是對打撈計劃真正重要的地方。納喬向審判庭自首。",
+      "blob": "2e2c31b9990a94c65b46f596b97c25b64fc0ee57",
+      "sha256": "4b66e54fc0f4e1eb2cb8cd85c064ef7dee68505f941b2df5256e2ab35a44ff64",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_05_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98456": {
+      "text": "納喬為阿奎拉被捕一事向互助會求助，與奧盧斯相遇。克萊門莎決定與卡門商議島民問題的解決方法，而卡門也下定決心要改革審判庭。",
+      "blob": "81cc2087a5b344e52e8e75ba4b7e23cc107dc6a6",
+      "sha256": "2e745fd3f9cb49aba2c209eb3eab1aadfbe6b460a8b59d0403270f96abdb8153",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_03_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98457": {
+      "text": "納喬向克萊門莎直言，想用奧盧斯的情報換所有島民的命。港都中心城區打撈在即，斐戴拉重新安排船廠工作，德·托萊多想點亮海圖。",
+      "blob": "0f7f9ed04b0ce5551783f4cdb460a9e02cb26753",
+      "sha256": "5891c4bcb7526bdb2c34d084013c43251c3320e5d6e816eb46fc162806bfbb5c",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_05_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98458": {
+      "text": "打撈港都中心城區當晚，瓦列里奧為德·托萊多求來了點亮海圖的機會。另一邊，審判庭開展針對奧盧斯的抓捕行動。",
+      "blob": "af759fb00bc922d02c174821cf82d9e3ca03916d",
+      "sha256": "ce7aad31b9a013eb8f59553b0d2a16f7135d0e02f812aad032338d282e201886",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_06_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98459": {
+      "text": "瓦列里奧在海圖系統中抹去了港都的座標。審判庭抓捕奧盧斯失敗，而後奧盧斯出現在打撈中心，港都中心城區消失。",
+      "blob": "ca42f48c1aa6fb014e8b197efe60fcdabbc1e843",
+      "sha256": "5b08da7fc1ae16e0ce9a6a201b01c3eae0f241c6747092b54365fbca6b221f41",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_06_end.txt",
       "derivedFrom": "zh-CN",
       "conversion": "opencc-cn-twp"
     },
@@ -16004,11 +16100,99 @@
       "derivedFrom": "zh-CN",
       "conversion": "opencc-cn-twp"
     },
+    "prts-98460": {
+      "text": "卡門從德·托萊多的陳述中鎖定了抹去港都座標的真兇；克萊門莎在打撈中心與奧盧斯正面交鋒。",
+      "blob": "29a21613e130b0e47b29615dbf72e1abaa676560",
+      "sha256": "fb1d9a5ac90f6cc4beeb55ecf46312b19649a8d8e8de6bff5d335465ddde4f8d",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_07_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98461": {
+      "text": "克萊門莎希望通過奧盧斯得知港都中心城區的去向。曾經的聖徒瓦列里奧指責卡門的背叛，破壞港都中心城區的主引擎，想讓它永遠離開伊比利亞。",
+      "blob": "b0b0deea7d4e1edfa068fb7de6cfcb1f4efa8ee0",
+      "sha256": "1d699f8367e87f4d4ebc82485ed4d65957e1b82e32a256c9497dc9a17f3adb21",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_07_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98462": {
+      "text": "卡門向瓦列里奧說明審判庭改革的深意。納喬出現在打撈中心，想要變成海嗣找回港都中心城區。",
+      "blob": "0ae7c36d2c7c180a7903375c9208d8f92b7a7620",
+      "sha256": "f62fb932bf8fb452eed26c0513ff22895cee612e9410f19948ca993e25f42270",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_08_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98463": {
+      "text": "克萊門莎從納喬義肢的零件上獲得線索，雷亞-伊比利亞的座標被重新點亮。島民與伊比利亞人暫時團結，一同出海，打撈起港都中心城區。",
+      "blob": "32559f97ec07e94a98ae060c270bee7713b09b1e",
+      "sha256": "3e92751546f7552b5c8bd8002e1869b31e1ffc47e6b24c961b203f00b3bbbaed",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_08_end.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98464": {
+      "text": "伊比利亞人重新聚集於海岸，黃金時代的舊都——雷亞-伊比利亞的中心城區打撈在即。克萊門莎和卡門出席啟動儀式，而暗處，深海教徒也在行動。",
+      "blob": "a110c34df4657c53b1302da4ae9e1ff26ecf700b",
+      "sha256": "f88a4ab7ea54c02c863bac4a20a27be4cd7d1ca08288d374642bf6ba2d2b67c7",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_st01.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98465": {
+      "text": "貝納爾多死了，萊昂圖索離開了，貝洛內家族失去了它的家主。被拋下、被留在這座垂死舊城裡的人，又該怎麼辦？",
+      "blob": "b83299004158fe1c39319b346d8258f6d89d3f91",
+      "sha256": "5727385ed7675e48b8d9132bc6514ac30d63f524b3ee2536e2925d7c8575089f",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_demetr_1_1.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98466": {
+      "text": "德·托萊多找回船工；大審判官斐戴拉堅守船廠；德魯莎在互助會所在地遭遇海嗣襲擊；克萊門莎蒐集海中的一切資訊，定位到了遇襲的燈塔。",
+      "blob": "e720872afe5054146b39b09cce324e7cd3117174",
+      "sha256": "9b1fe02e713c1761615bb32073b4c851c498c95a2ea7cd2cb1180bcd88917524",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_st02.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98467": {
+      "text": "意欲輕生的薩盧佐家族打手無意中走進了一間禮堂，觀看了一場排練，遇見了一個熱心到無可救藥的女孩。",
+      "blob": "8dd3915629ce8cf2ce98bf61360e7563a391f5d5",
+      "sha256": "6ca4bbd9dc2d2e1322e384b1bd1caedc99ede5b922c0a40251af294d6ef980be",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_liesel_1_1.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98468": {
+      "text": "島民與伊比利亞人的矛盾暫時緩和。克萊門莎正式辭去阿戈爾的職務，留在伊比利亞，並招募與她合作的德魯莎，組建了陸巡隊。",
+      "blob": "c24d680fbf1ce941319c73b555971272be4a62aa",
+      "sha256": "2234afd64be3df30fce01336594f949d9944000bde663b2f5bd5c337e8d7f558",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_st03.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98469": {
+      "text": "趁著夜色，夜煙潛入了一幢房子，但她最先遇見的人卻並不是她所想的那一個。",
+      "blob": "236a1ffbd106397e0e2dfaa9399887605116c49f",
+      "sha256": "e5a887fb8f3623e84b134e140e5803130af716fcc47e1978e90fc8edeee0abd4",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_nights_2_1.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
     "prts-9847": {
       "text": "兩人的交談終於迎來了結果。\n黑與錫蘭互相理解，而後，黑終於重新站到了錫蘭這邊。\n\n",
       "blob": "5e7c610d66366f1361e55747ee7bb23025164ade",
       "sha256": "1692e48e9065c251109aa531677d2fc5cf039ea42ebaa4bf79ffea11490e3908",
       "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act3d0/level_act3d0_06_beg.txt",
+      "derivedFrom": "zh-CN",
+      "conversion": "opencc-cn-twp"
+    },
+    "prts-98470": {
+      "text": "在赫拉提婭宣佈已確認深海獵人死亡後，西昆妲依舊堅持執行搜救行動。而這一切，也許只和她小幫手上的一個模組有關……",
+      "blob": "cc00c3e2abc8b3d2c7991180f6f09c64154d56ee",
+      "sha256": "a69a45fa7dfdc3429588f7b78e8d6fecfcbd3e0cdd76f3502a90e787608baca8",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_udflow_1_1.txt",
       "derivedFrom": "zh-CN",
       "conversion": "opencc-cn-twp"
     },

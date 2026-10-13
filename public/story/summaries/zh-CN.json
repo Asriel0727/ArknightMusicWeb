@@ -11991,11 +11991,83 @@
       "sha256": "2c47c492b5b036b13b877dd51dce5650223248a31211c18bc21700937c290961",
       "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act3d0/level_act3d0_04_beg.txt"
     },
+    "prts-98448": {
+      "text": "克莱门莎为了让打捞提案通过，曾与赫拉提娅打赌，押上了她在阿戈尔的一切身份。如今，她与调查岛民的德鲁莎合作，以确保打捞计划顺利进行。",
+      "blob": "3a5f4d187df832032f23f3453f90112efe13c1ca",
+      "sha256": "6d9bb62ecc6c9e37265cbdbfe88c5b79b4305bf9fcd750114a34aa36466b593a",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_02_beg.txt"
+    },
+    "prts-98449": {
+      "text": "德鲁莎怀疑技术工阿奎拉参与了非法行动，纳乔与克莱门莎为其解围。教堂内，阿奎拉的互助会导师露出真身，他正是深海主教奥卢斯。",
+      "blob": "579a888e549f3b82d3d9cfc9ace124c0072bf12c",
+      "sha256": "efe73131f83e6280a8e5cec36eed6f94fd3927702c85c72f0061a076180af7cf",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_01_end.txt"
+    },
     "prts-9845": {
       "text": "赫拉格指出，黑的身份恐怕不只是市长保镖这么简单，而这番猜测被锡兰听到。\n锡兰不禁对自己的家人产生了动摇。\n\n",
       "blob": "c73791a875e650382e6d5f5a3a52922c871ec6b6",
       "sha256": "ea6fd47fdb9b265958b9f0654793070c57d915f3d949eff32339264ac6c4898a",
       "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act3d0/level_act3d0_04_end.txt"
+    },
+    "prts-98450": {
+      "text": "惩戒军德鲁莎对打捞中心的技术工产生了怀疑。另一边，新官上任的克莱门莎意识到岛民与伊比利亚人之间的矛盾不容小觑。",
+      "blob": "4b6ef6fa3c7d78e92dff469458f5cc4288f96624",
+      "sha256": "1f83c189954656e9be21d462db902c411231471317adca91aa6ebe343acfcecd",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_01_beg.txt"
+    },
+    "prts-98451": {
+      "text": "招摇撞骗的假贵族德·托莱多在同伴瓦列里奥的推荐下进入船厂工作。阿奎拉在人群中进行非法交易被德鲁莎逮捕。",
+      "blob": "3f03346ff23fea17580a23f8a446da62d1eab35d",
+      "sha256": "96724f996480db699860f31c8c19d49a9ad39cb3ea9ec51196d1fe85e78fc0ad",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_02_end.txt"
+    },
+    "prts-98452": {
+      "text": "纳乔得知阿奎拉死在狱中的消息，决定加入互助会。艾丽妮奉卡门的命令，护送地牢中的海嗣到达船厂。",
+      "blob": "26b09538bfed8233404afe20e5ba389022f77223",
+      "sha256": "f11b2557172777e5cdfe2111c43f8c894cf264578c55f86ff7d73a7ca6483f88",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_03_end.txt"
+    },
+    "prts-98453": {
+      "text": "阿奎拉的离世激起了互助会岛民的怒火，袭击计划准备就绪。克莱门莎发现纳乔状态不对，她与调查互助会的德鲁莎同步信息，商议对策。",
+      "blob": "804ba940a7d4fd1a2413e8a3fe82e416371f3513",
+      "sha256": "0b5fa41be340fa8bfb2b280448fded001214f7fdc4e4c69696468c3ef7748f1a",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_04_beg.txt"
+    },
+    "prts-98454": {
+      "text": "互助会的岛民劫持了通讯信号，袭击为打捞起重机供能的灯塔。船厂的一名船工失踪，德·托莱多决意找人。德鲁莎只身前往互助会所在地。",
+      "blob": "b38a849b785f2a071e96dfb9e47fc15d71951e91",
+      "sha256": "0b14dec844b891cea987484e1a540f433ad69bc9cfee4e1672befaccee0cb87d",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_04_end.txt"
+    },
+    "prts-98455": {
+      "text": "奥卢斯阴谋初露，纳乔救下的一位岛民变为海嗣。卡门与克莱门莎同步信息，告知她船厂才是对打捞计划真正重要的地方。纳乔向审判庭自首。",
+      "blob": "2e2c31b9990a94c65b46f596b97c25b64fc0ee57",
+      "sha256": "2c76480dd541169858e571e82b7b2e5b957e2be783893f146ba03c695a40bbcf",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_05_beg.txt"
+    },
+    "prts-98456": {
+      "text": "纳乔为阿奎拉被捕一事向互助会求助，与奥卢斯相遇。克莱门莎决定与卡门商议岛民问题的解决方法，而卡门也下定决心要改革审判庭。",
+      "blob": "81cc2087a5b344e52e8e75ba4b7e23cc107dc6a6",
+      "sha256": "e4543f06f749df0d612d422f4b6b179e535076a2d84feba10d76530edac0fbc1",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_03_beg.txt"
+    },
+    "prts-98457": {
+      "text": "纳乔向克莱门莎直言，想用奥卢斯的情报换所有岛民的命。港都中心城区打捞在即，斐戴拉重新安排船厂工作，德·托莱多想点亮海图。",
+      "blob": "0f7f9ed04b0ce5551783f4cdb460a9e02cb26753",
+      "sha256": "decd98213c66a30a00f85ccdb0dc932e344148c899330785d3d049ef3bfed7e8",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_05_end.txt"
+    },
+    "prts-98458": {
+      "text": "打捞港都中心城区当晚，瓦列里奥为德·托莱多求来了点亮海图的机会。另一边，审判庭开展针对奥卢斯的抓捕行动。",
+      "blob": "af759fb00bc922d02c174821cf82d9e3ca03916d",
+      "sha256": "b4855f2e06088c2765bc359b1c561176f4d9923d570055724cd16b8c821edee9",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_06_beg.txt"
+    },
+    "prts-98459": {
+      "text": "瓦列里奥在海图系统中抹去了港都的坐标。审判庭抓捕奥卢斯失败，而后奥卢斯出现在打捞中心，港都中心城区消失。",
+      "blob": "ca42f48c1aa6fb014e8b197efe60fcdabbc1e843",
+      "sha256": "caa75fb11ea41a245d215b46feaecfc00726413b87d66561cf8637c09a40d086",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_06_end.txt"
     },
     "prts-9846": {
       "text": "黑和锡兰的交谈还在继续。\n不过这一次，黑理解了锡兰的坚持，也发现了自己遭受蒙骗。\n\n",
@@ -12003,11 +12075,77 @@
       "sha256": "babbf757f1fb3365718a82a0925640782f0c6f45d0eb19a54ab1b0b07d35217c",
       "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act3d0/level_act3d0_05_end.txt"
     },
+    "prts-98460": {
+      "text": "卡门从德·托莱多的陈述中锁定了抹去港都坐标的真凶；克莱门莎在打捞中心与奥卢斯正面交锋。",
+      "blob": "29a21613e130b0e47b29615dbf72e1abaa676560",
+      "sha256": "a12d6ae2498d0f6e42f08fd6bd3db350aceef68f7f2000ce8b14b374fdf4eb5d",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_07_beg.txt"
+    },
+    "prts-98461": {
+      "text": "克莱门莎希望通过奥卢斯得知港都中心城区的去向。曾经的圣徒瓦列里奥指责卡门的背叛，破坏港都中心城区的主引擎，想让它永远离开伊比利亚。",
+      "blob": "b0b0deea7d4e1edfa068fb7de6cfcb1f4efa8ee0",
+      "sha256": "2b1b33ff2ceaa1bd64e99aa79de6ff6c4439e77841b886cdb6370f38da840a47",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_07_end.txt"
+    },
+    "prts-98462": {
+      "text": "卡门向瓦列里奥说明审判庭改革的深意。纳乔出现在打捞中心，想要变成海嗣找回港都中心城区。",
+      "blob": "0ae7c36d2c7c180a7903375c9208d8f92b7a7620",
+      "sha256": "7ae9bd9c516969786aa9449898637f6c1f69547955eb6d6fb32babf563a37edd",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_08_beg.txt"
+    },
+    "prts-98463": {
+      "text": "克莱门莎从纳乔义肢的零件上获得线索，雷亚-伊比利亚的坐标被重新点亮。岛民与伊比利亚人暂时团结，一同出海，打捞起港都中心城区。",
+      "blob": "32559f97ec07e94a98ae060c270bee7713b09b1e",
+      "sha256": "9c5ed775ec3ff29f7b7878576734dbcea946b5897404fb321e87f275a0c1b36d",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_08_end.txt"
+    },
+    "prts-98464": {
+      "text": "伊比利亚人重新聚集于海岸，黄金时代的旧都——雷亚-伊比利亚的中心城区打捞在即。克莱门莎和卡门出席启动仪式，而暗处，深海教徒也在行动。",
+      "blob": "a110c34df4657c53b1302da4ae9e1ff26ecf700b",
+      "sha256": "8de6808a90e54e626cec0252b3c4f938c3cf015ed00566deaab2f5b277ac2457",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_st01.txt"
+    },
+    "prts-98465": {
+      "text": "贝纳尔多死了，莱昂图索离开了，贝洛内家族失去了它的家主。被抛下、被留在这座垂死旧城里的人，又该怎么办？",
+      "blob": "b83299004158fe1c39319b346d8258f6d89d3f91",
+      "sha256": "97cd60fa999557c158a03c1c66195a484ee8ba471d137ed933c6e6082284479f",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_demetr_1_1.txt"
+    },
+    "prts-98466": {
+      "text": "德·托莱多找回船工；大审判官斐戴拉坚守船厂；德鲁莎在互助会所在地遭遇海嗣袭击；克莱门莎搜集海中的一切信息，定位到了遇袭的灯塔。",
+      "blob": "e720872afe5054146b39b09cce324e7cd3117174",
+      "sha256": "0f33fec3ee64f3803c643c44a9afdf26ef43d80007449895ccaef33b76b6a052",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_st02.txt"
+    },
+    "prts-98467": {
+      "text": "意欲轻生的萨卢佐家族打手无意中走进了一间礼堂，观看了一场排练，遇见了一个热心到无可救药的女孩。",
+      "blob": "8dd3915629ce8cf2ce98bf61360e7563a391f5d5",
+      "sha256": "3628a719ef51617496d56320df6e14e25846978cb1c64c27dc12657a0022b6f7",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_liesel_1_1.txt"
+    },
+    "prts-98468": {
+      "text": "岛民与伊比利亚人的矛盾暂时缓和。克莱门莎正式辞去阿戈尔的职务，留在伊比利亚，并招募与她合作的德鲁莎，组建了陆巡队。",
+      "blob": "c24d680fbf1ce941319c73b555971272be4a62aa",
+      "sha256": "dc2364c4f43ab29ba4cd1a3fc0fd0aacb98689a1fa46d08ac45c5f7e9014372b",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act52side/level_act52side_st03.txt"
+    },
+    "prts-98469": {
+      "text": "趁着夜色，夜烟潜入了一幢房子，但她最先遇见的人却并不是她所想的那一个。",
+      "blob": "236a1ffbd106397e0e2dfaa9399887605116c49f",
+      "sha256": "c6a585ab634be4784f90dfc67cd7565d5dfab91b4006ac12192aa20d0333de79",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_nights_2_1.txt"
+    },
     "prts-9847": {
       "text": "两人的交谈终于迎来了结果。\n黑与锡兰互相理解，而后，黑终于重新站到了锡兰这边。\n\n",
       "blob": "5e7c610d66366f1361e55747ee7bb23025164ade",
       "sha256": "2172f46221d2f3818f398af7b3eb4c99ff4fc6409e0ca71a9cbf63f3e06890ed",
       "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/activities/act3d0/level_act3d0_06_beg.txt"
+    },
+    "prts-98470": {
+      "text": "在赫拉提娅宣布已确认深海猎人死亡后，西昆妲依旧坚持执行搜救行动。而这一切，也许只和她小帮手上的一个模块有关……",
+      "blob": "cc00c3e2abc8b3d2c7991180f6f09c64154d56ee",
+      "sha256": "54115931657822eb8feecf02ac865e9f9aaf7d2ef2c578f918cf5fa55dacd4e6",
+      "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/17759cc8cdf37388414145d16262a3a06f3ab25e/zh_CN/gamedata/story/%5Buc%5Dinfo/obt/memory/story_udflow_1_1.txt"
     },
     "prts-9848": {
       "text": "博士和红豆的突击也获得了成果，正在准备逃亡的克洛宁变了脸色，并打算不顾一切逃跑。",
