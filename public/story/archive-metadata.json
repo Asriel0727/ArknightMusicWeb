@@ -465,7 +465,8 @@
         "覆潮之下",
         "愚人号",
         "生路",
-        "出苍白海"
+        "出苍白海",
+        "昨日海"
       ],
       "route": [
         {
@@ -500,6 +501,11 @@
         },
         {
           "group": "出苍白海",
+          "intersection": false,
+          "relation": "story"
+        },
+        {
+          "group": "昨日海",
           "intersection": false,
           "relation": "story"
         }
@@ -941,6 +947,11 @@
       "id": "Æ",
       "name": "自海渊的一瞥",
       "order": 4
+    },
+    "昨日海": {
+      "id": "Æ",
+      "name": "自海渊的一瞥",
+      "order": 5
     },
     "沃伦姆德的薄暮": {
       "id": "LE",
