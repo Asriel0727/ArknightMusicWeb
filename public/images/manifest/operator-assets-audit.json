@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-16T21:16:40.925Z",
+  "generatedAt": "2026-10-17T20:41:17.176Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -37,8 +37,8 @@
     },
     "portraits": {
       "total": 1356,
-      "existing": 1353,
-      "missing": 3
+      "existing": 1356,
+      "missing": 0
     },
     "items": {
       "total": 87,
@@ -60,11 +60,7 @@
     "avatars": [],
     "factions": [],
     "classes": [],
-    "portraits": [
-      "public/images/operators/portraits/char_1040_blaze2_nlc_1-a7cff49e.png",
-      "public/images/operators/portraits/char_1033_swire2_nlc_1-7107b606.png",
-      "public/images/operators/portraits/char_2025_shu_nlc_1-aeb38b50.png"
-    ],
+    "portraits": [],
     "items": [],
     "skills": [],
     "modules": [
@@ -18900,7 +18896,7 @@
         "label": "烛煌 - 烛煌 - 夜行烛火",
         "publicPath": "/images/operators/portraits/char_1040_blaze2_nlc_1-a7cff49e.png",
         "relativePath": "public/images/operators/portraits/char_1040_blaze2_nlc_1-a7cff49e.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1040_blaze2_nlc%231.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1040_blaze2_nlc%231.png",
@@ -19735,7 +19731,7 @@
         "label": "琳琅诗怀雅 - 琳琅诗怀雅 - 盛世之象",
         "publicPath": "/images/operators/portraits/char_1033_swire2_nlc_1-7107b606.png",
         "relativePath": "public/images/operators/portraits/char_1033_swire2_nlc_1-7107b606.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1033_swire2_nlc%231.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1033_swire2_nlc%231.png",
@@ -25370,7 +25366,7 @@
         "label": "黍 - 黍 - 源远流长",
         "publicPath": "/images/operators/portraits/char_2025_shu_nlc_1-aeb38b50.png",
         "relativePath": "public/images/operators/portraits/char_2025_shu_nlc_1-aeb38b50.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_2025_shu_nlc%231.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_2025_shu_nlc%231.png",
