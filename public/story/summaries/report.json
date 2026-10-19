@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "totalStories": 2293,
+  "totalStories": 2294,
   "sources": {
     "cn": "bee3f83c5d60590b5e1cd42b8d09d00ce32ab10d",
     "global": "57010cb5b2afea112cae57daa756b58676ba6850"
@@ -1739,6 +1739,13 @@
           "category": "roguelike",
           "scriptPath": "obt/roguelike/ro6/level_rogue6_entry",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98711",
+          "title": "RO6-END-4",
+          "category": "roguelike",
+          "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -1760,7 +1767,7 @@
           "imported": 394
         },
         "roguelike": {
-          "total": 35,
+          "total": 36,
           "imported": 11
         },
         "reclamation": {
@@ -5978,6 +5985,13 @@
           "category": "operator",
           "scriptPath": "obt/memory/story_udflow_1_1",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98711",
+          "title": "RO6-END-4",
+          "category": "roguelike",
+          "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -5999,7 +6013,7 @@
           "imported": 329
         },
         "roguelike": {
-          "total": 35,
+          "total": 36,
           "imported": 8
         },
         "reclamation": {
@@ -10217,6 +10231,13 @@
           "category": "operator",
           "scriptPath": "obt/memory/story_udflow_1_1",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98711",
+          "title": "RO6-END-4",
+          "category": "roguelike",
+          "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -10238,7 +10259,7 @@
           "imported": 329
         },
         "roguelike": {
-          "total": 35,
+          "total": 36,
           "imported": 8
         },
         "reclamation": {
@@ -14589,6 +14610,13 @@
           "category": "operator",
           "scriptPath": "obt/memory/story_udflow_1_1",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-98711",
+          "title": "RO6-END-4",
+          "category": "roguelike",
+          "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -14610,7 +14638,7 @@
           "imported": 329
         },
         "roguelike": {
-          "total": 35,
+          "total": 36,
           "imported": 8
         },
         "reclamation": {

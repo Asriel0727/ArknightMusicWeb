@@ -34403,6 +34403,22 @@
     "phase": "node"
   },
   {
+    "id": "prts-98711",
+    "title": "RO6-END-4",
+    "page": "RO6-END-4/NBT",
+    "group": "沉沦者的黑流树海",
+    "category": "剧情",
+    "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
+    "sourcePage": "https://prts.wiki/w/RO6-END-4/NBT",
+    "cover": "https://media.prts.wiki/0/0b/Avg_bg_75_mini03_highland.png",
+    "available": true,
+    "sourceGroup": "沉沦者的黑流树海",
+    "archiveCategory": "roguelike",
+    "section": "主题故事",
+    "chapterNumber": null,
+    "phase": "node"
+  },
+  {
     "id": "prts-50737",
     "title": "RA/ENTRY",
     "page": "RA/ENTRY",

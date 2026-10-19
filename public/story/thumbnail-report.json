@@ -1,6 +1,11 @@
 {
-  "sources": 746,
+  "sources": 747,
   "cached": 746,
   "bytes": 8459886,
-  "failures": []
+  "failures": [
+    {
+      "url": "https://media.prts.wiki/0/0b/Avg_bg_75_mini03_highland.png",
+      "reason": "Command failed: curl --fail --location --silent --show-error --max-time 45 https://media.prts.wiki/0/0b/Avg_bg_75_mini03_highland.png\ncurl: (28) Connection timed out after 45002 milliseconds\n"
+    }
+  ]
 }

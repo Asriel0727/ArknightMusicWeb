@@ -1,7 +1,7 @@
 {
-  "downloadedAt": "2026-10-18T21:03:17.591Z",
+  "downloadedAt": "2026-10-19T22:39:32.923Z",
   "mode": "incremental-local-files",
-  "stories": 2293,
+  "stories": 2294,
   "uniqueUrls": 2196,
   "downloaded": 0,
   "reused": 2105,
@@ -20,7 +20,7 @@
     "audio": 27,
     "videos": 0
   },
-  "localReferences": 37829,
+  "localReferences": 37834,
   "changedStories": 0,
   "failures": [
     {

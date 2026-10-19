@@ -1,13 +1,15 @@
 {
-  "syncedAt": "2026-10-18T21:01:53.657Z",
+  "syncedAt": "2026-10-19T22:37:39.496Z",
   "source": "https://prts.wiki/api.php",
   "mode": "incremental",
-  "discovered": 2293,
-  "fetchedScripts": 0,
+  "discovered": 2294,
+  "fetchedScripts": 1,
   "reusedScripts": 2293,
-  "changedFiles": 0,
+  "changedFiles": 4,
   "customContentConflicts": [],
-  "playable": 2293,
+  "playable": 2294,
   "failures": [],
-  "missingMedia": []
+  "missingMedia": [
+    "image:avg_npc_1796_1"
+  ]
 }

@@ -1,5 +1,5 @@
 {
-  "totalStories": 2293,
+  "totalStories": 2294,
   "locales": {
     "en": {
       "imported": 1749,
@@ -2556,6 +2556,11 @@
           "id": "prts-98470",
           "page": "深巡/干员密录/1",
           "scriptPath": "obt/memory/story_udflow_1_1"
+        },
+        {
+          "id": "prts-98711",
+          "page": "RO6-END-4/NBT",
+          "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4"
         }
       ],
       "failed": [],
@@ -5116,6 +5121,11 @@
           "id": "prts-98470",
           "page": "深巡/干员密录/1",
           "scriptPath": "obt/memory/story_udflow_1_1"
+        },
+        {
+          "id": "prts-98711",
+          "page": "RO6-END-4/NBT",
+          "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4"
         }
       ],
       "failed": [],
@@ -7771,6 +7781,11 @@
           "id": "prts-98470",
           "page": "深巡/干员密录/1",
           "scriptPath": "obt/memory/story_udflow_1_1"
+        },
+        {
+          "id": "prts-98711",
+          "page": "RO6-END-4/NBT",
+          "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4"
         }
       ],
       "failed": [],
