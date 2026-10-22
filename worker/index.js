@@ -1,3 +1,5 @@
+import { getVerifiedAudioSyncOffset } from '../shared/character-ep-audio-sync.mjs';
+
 const EXCEL_BASE =
   'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel';
 const EN_EXCEL_BASE =
@@ -3687,7 +3689,7 @@ async function syncMusicCache(env, options = {}) {
 async function getCharacterEpForSong(env, songId) {
   if (!hasSupabaseConfig(env) || !songId) return null;
   const params = new URLSearchParams({
-    select: 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url,video_offset_seconds',
+    select: 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url,video_offset_seconds,raw',
     song_id: `eq.${songId}`,
     is_visible: 'eq.true',
     // Character EP playback is intentionally pinned to the PRTS-curated
@@ -3705,12 +3707,14 @@ async function getCharacterEpForSong(env, songId) {
     // migration is applied. The frontend has the same 5-second fallback.
     if (!/video_offset_seconds|column .* does not exist/i.test(error.message || '')) throw error;
     console.warn('Character EP offset column is not available yet; using the default offset.');
-    params.set('select', 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url');
+    params.set('select', 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url,raw');
     rows = await supabaseRestRequest(env, 'music_character_ep_videos', { query: `?${params}` });
   }
   const row = rows?.[0];
   if (!row) return null;
   const numericOffset = Number(row.video_offset_seconds);
+  const audioSync = row.raw?.audioSync;
+  const verifiedAudioOffset = getVerifiedAudioSyncOffset(audioSync, { songId: row.song_id, videoId: row.bvid });
   return {
     bvid: row.bvid,
     songId: row.song_id,
@@ -3722,6 +3726,12 @@ async function getCharacterEpForSong(env, songId) {
     videoOffsetSeconds: Number.isFinite(numericOffset) && numericOffset >= 0
       ? numericOffset
       : DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS,
+    // Return only public calibration fields, never the rest of raw metadata.
+    audioSync: verifiedAudioOffset === null ? null : {
+      status: 'accepted', algorithmVersion: audioSync.algorithmVersion,
+      songId: row.song_id, videoId: row.bvid, offsetSeconds: verifiedAudioOffset,
+      confidence: audioSync.confidence, analyzedAt: audioSync.analyzedAt,
+    },
   };
 }
 

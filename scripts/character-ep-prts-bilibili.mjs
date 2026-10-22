@@ -2,7 +2,9 @@ import { chromium } from 'playwright';
 import { findSongMatch, normalizeMatchText } from './character-ep-matching.mjs';
 import { getPrtsMusicEntries } from './prts-character-ep-source.mjs';
 import { getSupabaseHeaders } from './supabase-headers.mjs';
-import { fetchBilibiliDurationSeconds } from './bilibili-video-duration.mjs';
+import { fetchBilibiliVideoMetadata } from './bilibili-video-duration.mjs';
+import { updateAudioSync } from './character-ep-audio-sync.mjs';
+import { getVerifiedAudioSyncOffset } from '../shared/character-ep-audio-sync.mjs';
 
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
@@ -181,7 +183,9 @@ try {
       const video = await getBilibiliVideoFromPrtsPage(detailPage, entry);
       if (video) {
         try {
-          video.durationSeconds = await fetchBilibiliDurationSeconds(context.request, video);
+          const metadata = await fetchBilibiliVideoMetadata(context.request, video);
+          video.durationSeconds = metadata.durationSeconds;
+          video.cid = metadata.cid;
         } catch (error) {
           // Metadata failure must not hide an otherwise valid MV mapping.
           video.durationError = error.message;
@@ -237,14 +241,38 @@ try {
       // MV duration minus the actual audio duration when both are available.
       video_offset_seconds: getVideoOffsetSeconds(existing),
       raw: {
+        ...existing?.raw,
+        bilibili: video.cid ? { cid: video.cid } : existing?.raw?.bilibili,
+        // Results belong to one song/video pair. Never carry a calibration
+        // across a changed mapping, even when its Bilibili ID is unchanged.
+        audioSync: getVerifiedAudioSyncOffset(existing?.raw?.audioSync, {
+          songId: shouldPreserveManualMatch ? existing.song_id : song.songId, videoId: video.videoId,
+        }) !== null ? existing.raw.audioSync : null,
         platform: 'bilibili',
-        matchSource: 'prts',
+        matchSource: isManualMatch(existing) ? 'manual' : 'prts',
         prts: { titleText: entry.titleText, titles: entry.titles, mvCharacters: entry.mvCharacters, songPageUrl: entry.songPageUrl },
         videoIdType: video.videoIdType,
       },
       updated_at: new Date().toISOString(),
       published_at: new Date().toISOString(),
     });
+  }
+
+  // Keep this work off the playback path and bounded during the initial backfill.
+  // Oldest attempts go first so an inaccessible MV cannot starve new songs.
+  const audioSyncStats = { accepted: 0, cached: 0, cooldown: 0, failed: 0, deferred: 0 };
+  const analysisDeadline = Date.now() + 8 * 60 * 1000;
+  let analysisAttempts = 0;
+  const analysisRows = [...rows].sort((left, right) =>
+    (Date.parse(left.raw.audioSyncAttempt?.at) || 0) - (Date.parse(right.raw.audioSyncAttempt?.at) || 0));
+  for (const row of analysisRows) {
+    if (process.env.CHARACTER_EP_AUDIO_SYNC === '0' || analysisAttempts >= 8 || Date.now() >= analysisDeadline) {
+      audioSyncStats.deferred += 1;
+      continue;
+    }
+    const status = await updateAudioSync(row, { musicApiOrigin, request: context.request });
+    audioSyncStats[status] += 1;
+    if (status === 'accepted' || status === 'failed') analysisAttempts += 1;
   }
 
   const matchedBvids = new Set(rows.map((row) => row.bvid));
@@ -265,6 +293,7 @@ try {
     musicSongsScanned: songs.length,
     musicSongsInSupabase: databaseSongs.length,
     matchedVideos: rows.length,
+    audioSync: audioSyncStats,
     videosWithDuration: rows.filter((row) => Number(row.duration_seconds) > 0).length,
     videoDurationFailures: prtsVideoResults.filter((result) => result.video?.durationError)
       .map(({ video }) => ({ videoId: video.videoId, error: video.durationError })),

@@ -1,8 +1,14 @@
+import { getVerifiedAudioSyncOffset } from '../../shared/character-ep-audio-sync.mjs';
+
 const BILIBILI_SOURCE_PATTERN = /(?:bilibili\.com|player\.bilibili\.com)/i;
 
 export const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
 
 export function getCharacterEpVideoOffsetSeconds(characterEp, audioDurationSeconds = 0) {
+  const verifiedOffset = getVerifiedAudioSyncOffset(characterEp?.audioSync, {
+    songId: characterEp?.songId, videoId: characterEp?.bvid,
+  });
+  if (verifiedOffset !== null) return verifiedOffset;
   const videoDuration = Number(characterEp?.durationSeconds);
   const audioDuration = Number(audioDurationSeconds);
   // Estimate a signed shift from the durations. Negative shifts require the

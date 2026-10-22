@@ -10,14 +10,25 @@ export function getBilibiliDurationSeconds(payload) {
 }
 
 export async function fetchBilibiliDurationSeconds(request, video) {
+  const metadata = await fetchBilibiliVideoMetadata(request, video);
+  return metadata.durationSeconds;
+}
+
+export async function fetchBilibiliVideoMetadata(request, video) {
   const params = new URLSearchParams({ [video.videoIdType]: video.videoId });
-  const response = await request.get(`https://api.bilibili.com/x/web-interface/view?${params}`, {
+  // pagelist supplies the first part's CID and duration without depending on
+  // the webpage or view endpoint, which can return HTTP 412 independently.
+  const response = await request.get(`https://api.bilibili.com/x/player/pagelist?${params}`, {
     headers: { referer: 'https://www.bilibili.com/' },
     timeout: 15_000,
   });
   if (!response.ok()) throw new Error(`Bilibili metadata HTTP ${response.status()}`);
   const payload = await response.json();
-  const duration = getBilibiliDurationSeconds(payload);
-  if (duration === null) throw new Error(`Bilibili duration unavailable (code ${payload?.code})`);
-  return duration;
+  const firstPart = payload?.code === 0 ? payload.data?.[0] : null;
+  const duration = Number(firstPart?.duration);
+  const cid = String(firstPart?.cid || '');
+  if (!Number.isFinite(duration) || duration <= 0 || !/^\d+$/.test(cid)) {
+    throw new Error(`Bilibili metadata unavailable (code ${payload?.code})`);
+  }
+  return { cid, durationSeconds: duration };
 }
