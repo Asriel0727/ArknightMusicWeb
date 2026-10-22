@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import { findSongMatch, normalizeMatchText } from './character-ep-matching.mjs';
 import { getPrtsMusicEntries } from './prts-character-ep-source.mjs';
 import { getSupabaseHeaders } from './supabase-headers.mjs';
+import { fetchBilibiliDurationSeconds } from './bilibili-video-duration.mjs';
 
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
@@ -171,13 +172,22 @@ try {
     getPrtsMusicEntries(page),
     getAuthoritativeMusicSongs(),
     getAllSupabaseRows('music_songs', 'id,name'),
-    getAllSupabaseRows('music_character_ep_videos', 'bvid,song_id,is_visible,match_score,author_mid,raw,video_offset_seconds'),
+    getAllSupabaseRows('music_character_ep_videos', 'bvid,song_id,is_visible,match_score,author_mid,raw,video_offset_seconds,duration_seconds'),
   ]);
   const databaseSongIds = new Set(databaseSongs.map((song) => String(song.id)));
   const prtsVideoResults = await mapWithConcurrency(prtsEntries, 2, async (entry) => {
     const detailPage = await context.newPage();
     try {
-      return { entry, video: await getBilibiliVideoFromPrtsPage(detailPage, entry) };
+      const video = await getBilibiliVideoFromPrtsPage(detailPage, entry);
+      if (video) {
+        try {
+          video.durationSeconds = await fetchBilibiliDurationSeconds(context.request, video);
+        } catch (error) {
+          // Metadata failure must not hide an otherwise valid MV mapping.
+          video.durationError = error.message;
+        }
+      }
+      return { entry, video };
     } catch (error) {
       return { entry, error: error.message };
     } finally {
@@ -220,10 +230,11 @@ try {
       cover_url: null,
       author_mid: sourceKey,
       source_url: video.sourceUrl,
+      duration_seconds: video.durationSeconds ?? existing?.duration_seconds ?? null,
       is_visible: shouldPreserveManualMatch ? existing.is_visible : true,
       match_score: shouldPreserveManualMatch ? existing.match_score || 100 : 100,
-      // Preserve manual calibration when the source sync runs again. New PRTS
-      // Bilibili rows start with the current 5-second intro estimate.
+      // Retain the legacy fallback for missing durations. The player prefers
+      // MV duration minus the actual audio duration when both are available.
       video_offset_seconds: getVideoOffsetSeconds(existing),
       raw: {
         platform: 'bilibili',
@@ -254,6 +265,9 @@ try {
     musicSongsScanned: songs.length,
     musicSongsInSupabase: databaseSongs.length,
     matchedVideos: rows.length,
+    videosWithDuration: rows.filter((row) => Number(row.duration_seconds) > 0).length,
+    videoDurationFailures: prtsVideoResults.filter((result) => result.video?.durationError)
+      .map(({ video }) => ({ videoId: video.videoId, error: video.durationError })),
     pagesWithoutBilibiliVideo,
     bilibiliVideosWithoutSongMatch: unmatchedSongPages,
     matchedSongsMissingFromSupabase,

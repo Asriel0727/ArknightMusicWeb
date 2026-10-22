@@ -606,7 +606,15 @@ const characterEpIframeSrc = computed(() => {
 
 const isYoutubeCharacterEp = computed(() => /(?:youtube\.com|youtu\.be)/i.test(characterEp.value?.sourceUrl || ''));
 const isBilibiliCharacterEp = computed(() => Boolean(characterEp.value) && !isYoutubeCharacterEp.value);
-const characterEpVideoOffsetSeconds = computed(() => getCharacterEpVideoOffsetSeconds(characterEp.value));
+const characterEpVideoOffsetSeconds = computed(() => getCharacterEpVideoOffsetSeconds(characterEp.value, playerState.duration));
+
+// Metadata may arrive after the MV starts. Apply the duration estimate once it
+// becomes available, including when the browser corrects the audio duration.
+watch(characterEpVideoOffsetSeconds, () => {
+  if (visualMode.value === 'ep' && characterEp.value && playerState.isPlaying) {
+    restartCharacterEp();
+  }
+});
 
 const loadYoutubePlayerApi = () => {
   if (window.YT?.Player) return Promise.resolve(window.YT);
