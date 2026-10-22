@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-21T21:51:44.669Z",
+  "generatedAt": "2026-10-22T08:55:00.374Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -273,13 +273,13 @@
       "syncedAt": "2026-07-17T03:49:59.669Z"
     },
     "wiki-languid-sentiment": {
-      "publicPath": "/images/activities/wiki-languid-sentiment.png",
-      "relativePath": "public/images/activities/wiki-languid-sentiment.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Languid_Sentiment_banner.png?b9e063",
-      "contentType": "image/png",
-      "size": 901599,
-      "hash": "fba83264ae97cc467b251f7323f5f2a5f20ee048b919f22948da5f281db6b174",
-      "syncedAt": "2026-10-20T11:53:00.491Z"
+      "publicPath": "/images/activities/wiki-languid-sentiment.jpg",
+      "relativePath": "public/images/activities/wiki-languid-sentiment.jpg",
+      "sourceUrl": "https://media.prts.wiki/9/94/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%85%B5%E6%87%92%E5%BF%83%E6%84%8F_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 301776,
+      "hash": "9b1bff71c6f1987551df0a0ee0f9fb5562cb66006efc2e4062dfb8417faf5070",
+      "syncedAt": "2026-10-22T08:55:00.374Z"
     },
     "prts-17xyioi": {
       "publicPath": "/images/activities/prts-17xyioi.jpg",
