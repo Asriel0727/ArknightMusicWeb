@@ -1,4 +1,6 @@
 const PRTS_MUSIC_URL = 'https://prts.wiki/w/%E8%A1%8D%E7%94%9F%E4%BD%9C%E5%93%81/%E9%9F%B3%E4%B9%90';
+const PRTS_MUSIC_PAGE_TITLE = '衍生作品/音乐';
+const PRTS_MUSIC_API_URL = `https://prts.wiki/api.php?action=parse&format=json&formatversion=2&prop=text&redirects=1&page=${encodeURIComponent(PRTS_MUSIC_PAGE_TITLE)}`;
 
 function cleanText(value) {
   return String(value || '').replace(/\s+/g, ' ').trim();
@@ -28,9 +30,47 @@ export async function getPrtsMusicEntries(page) {
       if (attempt < 3) await page.waitForTimeout(attempt * 2_000);
     }
   }
-  if (!loaded) throw new Error(`PRTS music page could not be loaded after 3 attempts: ${lastError?.message || 'unknown error'}`);
 
-  return page.locator('table').evaluateAll((tables) => {
+  if (!loaded) {
+    // GitHub-hosted runners can receive the PRTS document successfully while
+    // its table is withheld by the site edge or never rendered by the page
+    // scripts. MediaWiki's parse endpoint returns the same article HTML without
+    // depending on that browser-side rendering path.
+    let apiError;
+    try {
+      const response = await fetch(PRTS_MUSIC_API_URL, {
+        headers: {
+          accept: 'application/json',
+          'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+          'user-agent': 'ArknightMusicWeb character EP sync/1.0',
+        },
+      });
+      if (!response.ok) throw new Error(`MediaWiki API returned ${response.status}`);
+      const payload = await response.json();
+      const html = typeof payload?.parse?.text === 'string'
+        ? payload.parse.text
+        : payload?.parse?.text?.['*'];
+      if (!html || !/<table\b/i.test(html)) {
+        throw new Error('MediaWiki API response did not contain a music table');
+      }
+      await page.setContent(`<base href="${PRTS_MUSIC_URL}">${html}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30_000,
+      });
+      await page.locator('table').first().waitFor({ state: 'attached', timeout: 30_000 });
+      loaded = true;
+    } catch (error) {
+      apiError = error;
+    }
+    if (!loaded) {
+      throw new Error(
+        `PRTS music page and MediaWiki API could not be loaded: page=${lastError?.message || 'unknown error'}; api=${apiError?.message || 'unknown error'}`
+      );
+    }
+    console.warn('PRTS music page table was unavailable; used MediaWiki API fallback.');
+  }
+
+  return page.locator('table').evaluateAll((tables, baseUrl) => {
     const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
     const splitMixedTitle = (value) => clean(value)
       // PRTS sometimes concatenates a Japanese/Chinese title and its English
@@ -61,7 +101,15 @@ export async function getPrtsMusicEntries(page) {
         const titleCell = cells[titleIndex];
         const titleText = clean(titleCell.textContent);
         const songPageUrl = [...titleCell.querySelectorAll('a')]
-          .map((link) => link.href)
+          .map((link) => link.getAttribute('href'))
+          .map((href) => {
+            if (!href) return '';
+            try {
+              return new URL(href, baseUrl).href;
+            } catch {
+              return '';
+            }
+          })
           .find((href) => {
             try {
               return new URL(href).pathname.startsWith('/w/');
@@ -87,7 +135,7 @@ export async function getPrtsMusicEntries(page) {
     }
 
     return entries;
-  });
+  }, PRTS_MUSIC_URL);
 }
 
-export { PRTS_MUSIC_URL, cleanText };
+export { PRTS_MUSIC_API_URL, PRTS_MUSIC_URL, cleanText };
