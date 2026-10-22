@@ -1,13 +1,13 @@
 {
-  "syncedAt": "2026-10-06T22:48:02.386Z",
+  "syncedAt": "2026-10-21T21:58:45.380Z",
   "source": "https://prts.wiki/api.php",
   "mode": "incremental",
-  "discovered": 2270,
+  "discovered": 2294,
   "fetchedScripts": 0,
-  "reusedScripts": 2270,
+  "reusedScripts": 2294,
   "changedFiles": 0,
   "customContentConflicts": [],
-  "playable": 2270,
+  "playable": 2294,
   "failures": [],
   "missingMedia": []
 }

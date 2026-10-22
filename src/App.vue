@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{ 'album-page': currentPage === 'albums' }">
     <ParticleBackground />
     <Navbar :currentPage="currentPage" @change-page="handlePageChange" />
 
@@ -404,4 +404,17 @@ onMounted(() => {
 
 <style>
 /* Global styles are loaded from the existing CSS entry. */
+#app.album-page {
+  height: 100dvh;
+  min-height: 0;
+}
+#app.album-page > .main-navbar,
+#app.album-page > .topbar-section,
+#app.album-page > footer {
+  flex: none;
+}
+#app.album-page > footer {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+}
 </style>

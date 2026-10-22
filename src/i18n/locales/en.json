@@ -215,6 +215,8 @@
     "default": "Auto recovery"
   },
   "searchBar": {
+    "trackPlaceholder": "Search this album's tracks or artists…",
+    "noMatchingTracks": "No matching tracks.",
     "albumPlaceholder": "Search albums or tracks…"
   }
 }

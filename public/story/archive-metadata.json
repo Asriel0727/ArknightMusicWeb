@@ -465,7 +465,8 @@
         "覆潮之下",
         "愚人号",
         "生路",
-        "出苍白海"
+        "出苍白海",
+        "昨日海"
       ],
       "route": [
         {
@@ -500,6 +501,11 @@
         },
         {
           "group": "出苍白海",
+          "intersection": false,
+          "relation": "story"
+        },
+        {
+          "group": "昨日海",
           "intersection": false,
           "relation": "story"
         }
@@ -942,6 +948,11 @@
       "name": "自海渊的一瞥",
       "order": 4
     },
+    "昨日海": {
+      "id": "Æ",
+      "name": "自海渊的一瞥",
+      "order": 5
+    },
     "沃伦姆德的薄暮": {
       "id": "LE",
       "name": "高塔迷影",
@@ -1138,6 +1149,7 @@
     "人们，我们": 1775516400,
     "直到大地变成一颗酸橙": 1785538800,
     "月行水上": 1788476400,
+    "昨日海": 1791500400,
     "战地秘闻": 1571126400,
     "洪炉示岁": 1578513600,
     "午间逸话": 1582617600,
@@ -8596,6 +8608,101 @@
       "code": "SR-ST-2",
       "name": "满月一生"
     },
+    "YW-1 互助会/BEG": {
+      "order": 2,
+      "code": "YW-1",
+      "name": "互助会"
+    },
+    "YW-1 互助会/END": {
+      "order": 3,
+      "code": "YW-1",
+      "name": "互助会"
+    },
+    "YW-2 浮浮沉沉/BEG": {
+      "order": 4,
+      "code": "YW-2",
+      "name": "浮浮沉沉"
+    },
+    "YW-2 浮浮沉沉/END": {
+      "order": 5,
+      "code": "YW-2",
+      "name": "浮浮沉沉"
+    },
+    "YW-3 破手铐/BEG": {
+      "order": 6,
+      "code": "YW-3",
+      "name": "破手铐"
+    },
+    "YW-3 破手铐/END": {
+      "order": 7,
+      "code": "YW-3",
+      "name": "破手铐"
+    },
+    "YW-4 走上街道/BEG": {
+      "order": 8,
+      "code": "YW-4",
+      "name": "走上街道"
+    },
+    "YW-4 走上街道/END": {
+      "order": 9,
+      "code": "YW-4",
+      "name": "走上街道"
+    },
+    "YW-5 三岔路口/BEG": {
+      "order": 11,
+      "code": "YW-5",
+      "name": "三岔路口"
+    },
+    "YW-5 三岔路口/END": {
+      "order": 12,
+      "code": "YW-5",
+      "name": "三岔路口"
+    },
+    "YW-6 大人物/BEG": {
+      "order": 13,
+      "code": "YW-6",
+      "name": "大人物"
+    },
+    "YW-6 大人物/END": {
+      "order": 14,
+      "code": "YW-6",
+      "name": "大人物"
+    },
+    "YW-7 殉葬品/BEG": {
+      "order": 15,
+      "code": "YW-7",
+      "name": "殉葬品"
+    },
+    "YW-7 殉葬品/END": {
+      "order": 16,
+      "code": "YW-7",
+      "name": "殉葬品"
+    },
+    "YW-8 鳞的记忆/BEG": {
+      "order": 17,
+      "code": "YW-8",
+      "name": "鳞的记忆"
+    },
+    "YW-8 鳞的记忆/END": {
+      "order": 18,
+      "code": "YW-8",
+      "name": "鳞的记忆"
+    },
+    "YW-ST-1 羽兽盘旋/NBT": {
+      "order": 1,
+      "code": "YW-ST-1",
+      "name": "羽兽盘旋"
+    },
+    "YW-ST-2 海声嘈杂/NBT": {
+      "order": 10,
+      "code": "YW-ST-2",
+      "name": "海声嘈杂"
+    },
+    "YW-ST-3 留给明天/NBT": {
+      "order": 19,
+      "code": "YW-ST-3",
+      "name": "留给明天"
+    },
     "SW-ST1 无名氏的战争/NBT": {
       "order": 1,
       "code": "",
@@ -9465,6 +9572,11 @@
       "order": 0,
       "code": null,
       "name": "“猫猫”"
+    },
+    "夜烟/干员密录/2": {
+      "order": 0,
+      "code": null,
+      "name": "女巫夜话"
     },
     "德克萨斯/干员密录/1": {
       "order": 0,
@@ -11205,6 +11317,21 @@
       "order": 0,
       "code": null,
       "name": "砸碎一抹微笑"
+    },
+    "贝洛内/干员密录/1": {
+      "order": 0,
+      "code": null,
+      "name": "一个没有家主的家族"
+    },
+    "复奏/干员密录/1": {
+      "order": 0,
+      "code": null,
+      "name": "春日序曲"
+    },
+    "深巡/干员密录/1": {
+      "order": 0,
+      "code": null,
+      "name": "X103号模块"
     }
   }
 }

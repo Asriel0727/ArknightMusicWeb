@@ -1,14 +1,34 @@
 <template>
-  <main class="story-page" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
+  <main class="story-page" :class="{ 'archive-console': screen !== 'player' }" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
     <header class="story-heading">
       <div>
         <p class="eyebrow">{{ screen === 'player' ? `STORY / ${manifest?.storyId || selectedStory?.page || 'PRTS'}` : 'TERRA / FILM ARCHIVE' }}</p>
         <h1 ref="screenHeading" tabindex="-1">{{ screen === 'player' ? localize(manifest?.title || selectedStory?.title) : screen === 'episodes' ? localize(activeCollection?.label) : labels.archive }}</h1>
-        <p>{{ screen === 'player' ? labels.subtitle : screen === 'episodes' ? labels.chooseEpisode : labels.chooseCollection }}</p>
+        <p v-if="screen === 'player'">{{ labels.subtitle }}</p>
+        <div v-else class="console-status" :class="{ 'needs-attention': progressStorageFailed || ['expired', 'offline', 'unavailable', 'error'].includes(progressStatus) }" :aria-label="t('storyProgress.title')">
+          <span class="console-status-light" aria-hidden="true"></span>
+          <span v-if="progressOwner">{{ t('storyProgress.account', { name: authState.session?.user?.loginKey || progressOwner }) }} · </span>
+          <span role="status">{{ t('storyProgress.' + progressStatus) }}</span>
+          <span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span>
+        </div>
       </div>
-      <div class="heading-actions"><div v-if="screen !== 'player'" class="archive-audio"><button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button><label>{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label></div><button v-if="screen === 'player'" type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button><button v-else-if="screen === 'episodes'" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button><a :href="screen === 'player' ? manifest?.sourcePage || selectedStory?.sourcePage : 'https://prts.wiki/w/剧情一览'" target="_blank" rel="noopener noreferrer">PRTS ↗</a></div>
+      <div v-if="screen !== 'player'" class="heading-actions console-utilities">
+        <button v-if="screen === 'episodes'" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button>
+        <details class="console-audio" @keydown.esc="$event.currentTarget.removeAttribute('open')">
+          <summary><i class="fas" :class="audioEnabled ? 'fa-volume-up' : 'fa-volume-mute'" aria-hidden="true"></i>{{ consoleLabels.audio }}<span class="utility-indicator" :class="{ enabled: audioEnabled }" aria-hidden="true"></span></summary>
+          <div class="console-audio-panel">
+            <button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button>
+            <label>{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label>
+          </div>
+        </details>
+        <button v-if="!progressOwner || progressStatus === 'expired'" type="button" @click="emit('sign-in')"><i class="fas fa-user" aria-hidden="true"></i>{{ t('storyProgress.signIn') }}</button>
+        <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)"><i class="fas fa-sync-alt" aria-hidden="true"></i>{{ t('storyProgress.retry') }}</button>
+        <button v-if="progressImportCount" type="button" :disabled="progressSyncing" @click="importGuestProgress">{{ t('storyProgress.import', { count: progressImportCount }) }}</button>
+        <a href="https://prts.wiki/w/剧情一览" target="_blank" rel="noopener noreferrer">PRTS ↗</a>
+      </div>
+      <div v-else class="heading-actions"><button type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button><a :href="manifest?.sourcePage || selectedStory?.sourcePage" target="_blank" rel="noopener noreferrer">PRTS ↗</a></div>
     </header>
-    <section class="story-progress-sync" :aria-label="t('storyProgress.title')">
+    <section v-if="screen === 'player'" class="story-progress-sync" :aria-label="t('storyProgress.title')">
       <div><strong v-if="progressOwner">{{ t('storyProgress.account', { name: authState.session?.user?.loginKey || progressOwner }) }}</strong><span role="status">{{ t('storyProgress.' + progressStatus) }}</span><span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span></div>
       <button v-if="!progressOwner || progressStatus === 'expired'" type="button" @click="emit('sign-in')">{{ t('storyProgress.signIn') }}</button>
       <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)">{{ t('storyProgress.retry') }}</button>
@@ -18,19 +38,25 @@
     <Transition name="archive-screen" mode="out-in">
     <div :key="screen" class="archive-screen">
     <section v-if="catalog.length && screen !== 'player'" class="story-library" :class="`view-${viewMode}`" :aria-label="labels.selectStory">
+      <div class="projection-controls" @keydown.esc="advancedFilters = false">
+      <div class="archive-toolbar">
+        <div class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
+
+        <span v-if="screen === 'episodes'">{{ completedCount }} / {{ groupStories.length }} {{ labels.read }}</span>
+        <label v-if="viewMode !== 'sequence'" class="console-search"><i class="fas fa-search" aria-hidden="true"></i><input v-if="screen === 'collections'" v-model="search" type="search" :placeholder="labels.search" :aria-label="labels.search"><input v-else v-model="episodeSearch" type="search" :placeholder="labels.searchEpisodes" :aria-label="labels.searchEpisodes"></label>
+      </div>
       <div class="library-heading">
         <div><span class="eyebrow">{{ screen === 'collections' ? '01 / SELECT CHAPTER OR EVENT' : '02 / SELECT STORY' }}</span><p>{{ screen === 'collections' ? labels.collectionNames : localize(activeCollection?.label) }} <span>{{ screen === 'collections' ? filteredCollections.length : groupStories.length }}</span></p></div>
         <span class="archive-hint">{{ screen === 'collections' ? labels.chooseCollection : labels.chooseEpisode }}</span>
       </div>
-      <div v-if="screen === 'collections' && viewMode !== 'sequence'" class="library-filters">
-        <select v-model="selectedCategory" :aria-label="labels.category"><option value="">{{ labels.allCategories }}</option><option v-for="category in categories" :key="category.id" :value="category.id">{{ categoryLabel(category.id) }}</option></select>
-        <select v-model="selectedLine" :aria-label="labels.series"><option value="">{{ labels.allSeries }}</option><option v-for="line in availableLines" :key="line.id" :value="line.id">{{ localize(line.name) }} ({{ line.count }})</option></select>
-        <select v-model="selectedCollectionFilter" :aria-label="labels.collectionNames"><option value="">{{ labels.allCollections }}</option><option v-for="collection in groups" :key="collection.key" :value="collection.key">{{ localize(collection.label) }}</option></select>
-        <input v-model="search" type="search" :placeholder="labels.search" :aria-label="labels.search">
+      <div v-if="screen === 'collections' && viewMode !== 'sequence'" class="library-filters console-primary-filters">
+        <label class="console-filter"><span>{{ labels.category }}</span><select v-model="selectedCategory" :aria-label="labels.category"><option value="">{{ labels.allCategories }}</option><option v-for="category in categories" :key="category.id" :value="category.id">{{ categoryLabel(category.id) }}</option></select></label>
+        <label class="console-filter"><span>{{ labels.series }}</span><select v-model="selectedLine" :aria-label="labels.series"><option value="">{{ labels.allSeries }}</option><option v-for="line in availableLines" :key="line.id" :value="line.id">{{ localize(line.name) }} ({{ line.count }})</option></select></label>
+        <label class="console-filter"><span>{{ labels.collectionNames }}</span><select v-model="selectedCollectionFilter" :aria-label="labels.collectionNames"><option value="">{{ labels.allCollections }}</option><option v-for="collection in groups" :key="collection.key" :value="collection.key">{{ localize(collection.label) }}</option></select></label>
+        <button class="filter-toggle" type="button" :aria-expanded="advancedFilters" aria-controls="console-advanced-filters" @click="advancedFilters = !advancedFilters">{{ labels.refine }} <span aria-hidden="true">{{ advancedFilters ? '−' : '+' }}</span></button>
       </div>
       <div v-else-if="viewMode !== 'sequence'" class="library-filters">
-        <input v-model="episodeSearch" type="search" :placeholder="labels.searchEpisodes" :aria-label="labels.searchEpisodes">
-        <select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select>
+        <label class="console-filter"><span>{{ labels.phase }}</span><select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select></label>
       </div>
       <div v-else class="reading-plan-heading">
         <label v-if="screen === 'collections'">{{ labels.readingPath }}<select v-model="readingLineId" @change="guideTrail = []"><option v-for="line in archiveMetadata.lines || []" :key="line.id" :value="line.id">{{ localize(line.name) }}</option></select></label>
@@ -41,18 +67,14 @@
         <button v-if="screen === 'collections' && readingResumeIndex >= 0" type="button" @click="seekRack(readingResumeIndex)">{{ labels.resumeGuide }} → {{ localize(readingRoute[readingResumeIndex]?.label) }}</button>
         <details class="compact-note"><summary>{{ mediaLabels.details }}</summary><p>{{ labels.routeBasis }}</p></details>
       </div>
-      <div class="archive-toolbar">
-        <div class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
-        <button v-if="screen === 'collections' && viewMode !== 'sequence'" class="filter-toggle" type="button" :aria-expanded="advancedFilters" @click="advancedFilters = !advancedFilters">{{ labels.refine }} <span aria-hidden="true">{{ advancedFilters ? '−' : '+' }}</span></button>
-        <span v-if="screen === 'episodes'">{{ completedCount }} / {{ groupStories.length }} {{ labels.read }}</span>
-      </div>
-      <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" class="library-filters advanced-filters"><select v-if="sections.length > 1" v-model="selectedSection" :aria-label="labels.section"><option value="">{{ labels.allSections }}</option><option v-for="section in sections" :key="section" :value="section">{{ localize(section) }}</option></select><select v-model="collectionSort" :aria-label="labels.sort"><option value="line">{{ labels.lineOrder }}</option><option value="release">{{ labels.releaseOrder }}</option><option value="name">{{ labels.nameOrder }}</option></select></div></Transition>
+      <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" id="console-advanced-filters" class="library-filters advanced-filters"><select v-if="sections.length > 1" v-model="selectedSection" :aria-label="labels.section"><option value="">{{ labels.allSections }}</option><option v-for="section in sections" :key="section" :value="section">{{ localize(section) }}</option></select><select v-model="collectionSort" :aria-label="labels.sort"><option value="line">{{ labels.lineOrder }}</option><option value="release">{{ labels.releaseOrder }}</option><option value="name">{{ labels.nameOrder }}</option></select></div></Transition>
       <div v-if="screen === 'episodes' && viewMode === 'sequence'" class="reading-route">
         <p v-if="activeGuideNode"><button type="button" class="guide-context" @click="showGuide(readingLineId, activeCollection.group)">{{ labels.currentGuide }}：{{ localize(readingLineName) }} · {{ localize(activeCollection.label) }} ↗</button></p>
         <p>{{ labels.orderNote }} <span>{{ groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</span></p>
         <details v-if="activeRoute.length > 1"><summary>{{ labels.storyLines }} / {{ labels.order }}</summary><nav :aria-label="labels.lineOrder"><template v-for="(node, index) in activeRoute" :key="`${index}-${node.group}`"><span v-if="index" class="route-arrow" aria-hidden="true">{{ node.independent ? '·' : '→' }}</span><button type="button" :disabled="!findCollection(node.group)" :class="{ current: node.group === activeCollection.group, intersection: node.intersection }" @click="openCollection(findCollection(node.group))">{{ localize(node.group) }}<small v-if="node.intersection">{{ labels.intersection }}</small></button></template></nav></details>
       </div>
       <p v-if="viewMode !== 'sequence'" class="archive-breadcrumb">{{ screen === 'episodes' ? categoryLabel(activeCollection?.category) : selectedCategory ? categoryLabel(selectedCategory) : labels.allCategories }}<template v-if="screen === 'collections' && selectedSection"> / {{ localize(selectedSection) }}</template><template v-if="screen === 'episodes'"> / {{ localize(activeCollection?.label) }}</template><template v-if="screen === 'episodes' && selectedPhase"> / {{ labels.phases[selectedPhase] }}</template></p>
+      </div>
       <div v-if="rackEntries.length" class="story-rack-shell">
         <div ref="rackElement" class="story-rack" :class="{ dragging: rackDragging, moving: rackAnimating }" :style="{ '--film-position': `${-rackIndex * rackStep + rackDragOffset}px` }" tabindex="0" role="region" aria-roledescription="carousel" :aria-label="labels.selectStory"
           @keydown.left.prevent="moveRack(-1, true)" @keydown.right.prevent="moveRack(1, true)" @keydown.home.prevent="seekRack(0)" @keydown.end.prevent="seekRack(rackEntries.length - 1)" @keydown.enter.self.prevent="activateRackCard(rackIndex)" @keydown.space.self.prevent="activateRackCard(rackIndex)"
@@ -123,7 +145,7 @@
         <div class="portrait-row" aria-hidden="true">
           <template v-for="portrait in frame.state.portraits" :key="portrait.slot">
             <StoryPortrait v-if="portraitVisual(portrait.name)" class="portrait" :class="[`portrait-${portrait.slot}`, { subdued: portrait.dimmed }]" :visual="portraitVisual(portrait.name)"/>
-            <img v-else-if="assetPath(portrait.name)" class="portrait" :class="[`portrait-${portrait.slot}`, { subdued: portrait.dimmed }]" :src="assetPath(portrait.name)" :data-original-src="originalAssetPath(portrait.name)" alt="" draggable="false" decoding="async" @error="handleSceneImageError">
+            <StoryPortrait v-else-if="assetPath(portrait.name)" class="portrait" :class="[`portrait-${portrait.slot}`, { subdued: portrait.dimmed }]" :visual="{ baseUrl: assetPath(portrait.name), fallbackUrl: originalAssetPath(portrait.name) }"/>
           </template>
         </div>
         </div>
@@ -163,12 +185,13 @@
         <button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button>
         <label class="story-volume">{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label>
         <button type="button" :aria-expanded="logOpen" aria-controls="story-log" @click="openLog">{{ mediaLabels.log }}</button>
+        <button type="button" class="story-skip" :disabled="frame.type === 'end'" @click="openSkip()">{{ summaryLabels.skip }}</button>
         <button type="button" :disabled="frame.type !== 'dialogue'" @click="advance">{{ labels.next }} →</button>
       </footer>
       <p v-if="audioEnabled && audioProblem" class="story-note" role="status">
         {{ mediaLabels[audioProblem] }} <button type="button" @click="retryAudio">{{ audioProblem === 'blocked' ? mediaLabels.enable : mediaLabels.retry }}</button>
       </p>
-      <nav class="episode-navigation" :aria-label="labels.order"><button type="button" :disabled="!previousStory" @click="selectStoryId(previousStory.id)">← {{ labels.previousStory }}</button><span>{{ episodeNumber(selectedStory) }} / {{ groupStories.length }} · {{ localize(activeCollection?.label) }}</span><button type="button" :disabled="!nextStory" @click="selectStoryId(nextStory.id)">{{ labels.nextStory }} →</button></nav>
+      <nav class="episode-navigation" :aria-label="labels.order"><button type="button" :disabled="!previousStory" @click="selectStoryId(previousStory.id)">← {{ labels.previousStory }}</button><span>{{ episodeNumber(selectedStory) }} / {{ groupStories.length }} · {{ localize(activeCollection?.label) }}</span><button type="button" :disabled="!nextStory" @click="openSkip(nextStory.id)">{{ labels.nextStory }} →</button></nav>
       <details class="story-note compact-note"><summary>{{ mediaLabels.credits }}</summary><p>{{ labels.note }}</p></details>
     </section>
     </template>
@@ -178,10 +201,28 @@
     </Transition>
   </main>
   <Teleport to="body">
+    <dialog ref="skipDialog" class="story-log-dialog story-ending-dialog" aria-labelledby="story-skip-title" @cancel.prevent="closeSkip" @close="resetSkip" @click.capture="guardSkipClick" @keydown.capture="guardSkipKey">
+      <header><h2 id="story-skip-title" tabindex="-1">{{ summaryLabels.title }}</h2><button type="button" @click="closeSkip">{{ mediaLabels.close }}</button></header>
+      <p class="story-log-title">{{ localize(manifest?.title || selectedStory?.title) }}</p>
+      <div class="story-summary-text" aria-live="polite" :aria-busy="summaryStatus === 'loading'">
+        <p>{{ summaryStatus === 'ready' ? summaryText : summaryLabels[summaryStatus] }}</p>
+        <button v-if="summaryStatus === 'failed'" type="button" @click="loadCurrentSummary">{{ summaryLabels.retry }}</button>
+      </div>
+      <p>{{ summaryLabels.prompt }}</p>
+      <div class="ending-actions">
+        <button type="button" @click="closeSkip">{{ summaryLabels.resume }}</button>
+        <button class="ending-primary" type="button" @click="confirmSkip">{{ summaryLabels.confirm }}<strong>{{ skipTarget ? summaryLabels.next : summaryLabels.back }}</strong></button>
+      </div>
+    </dialog>
     <dialog ref="endingDialog" class="story-log-dialog story-ending-dialog" aria-labelledby="story-ending-title" @click.capture="guardEndingClick" @keydown.capture="guardEndingKey" @cancel.prevent="closeEnding" @close="resetEndingGuard">
       <header><h2 id="story-ending-title" tabindex="-1">{{ labels.finished }}</h2><button type="button" :disabled="!endingArmed" @click="closeEnding">{{ mediaLabels.close }}</button></header>
       <p class="story-log-title">{{ localize(manifest?.title || selectedStory?.title) }}</p>
       <p>{{ mediaLabels.continueChoice }}</p>
+      <section class="story-summary-text" aria-live="polite" :aria-busy="summaryStatus === 'loading'">
+        <h3>{{ summaryLabels.title }}</h3>
+        <p>{{ summaryStatus === 'ready' ? summaryText : summaryLabels[summaryStatus] }}</p>
+        <button v-if="summaryStatus === 'failed'" type="button" @click="loadCurrentSummary">{{ summaryLabels.retry }}</button>
+      </section>
       <div class="ending-actions">
         <button v-if="nextStory" class="ending-primary" type="button" :disabled="!endingArmed" @click="closeEnding(); selectStoryId(nextStory.id)">{{ labels.nextStory }} →<strong>{{ localize(nextStory.title) }}</strong></button>
         <button v-else-if="nextGuideNode" class="ending-primary" type="button" :disabled="!endingArmed" @click="closeEnding(); showGuide(readingLineId, nextGuideNode.group)">{{ labels.continueGuide }} →<strong>{{ localize(nextGuideNode.label) }}</strong></button>
@@ -210,6 +251,8 @@ import { authState } from '../services/auth.js';
 import { useStoryReadingProgress } from '../services/storyReadingProgress.js';
 import { normalizeChineseMusicText } from '../utils/s2tApiText.js';
 import { loadLocalizedStory } from '../services/storyLocalizations.js';
+import { loadStorySummary } from '../services/storySummaries.js';
+import { storySummaryMessages } from '../i18n/storySummaryMessages.js';
 import { storyMediaMessages } from '../i18n/storyMediaMessages.js';
 import { createMemorySound } from '../utils/storyMemorySound.js';
 import StoryPortrait from './StoryPortrait.vue';
@@ -222,7 +265,9 @@ import { collectionFamily, buildReadingRoute, readingGuideIntro, readingGuideSou
 
 const { locale, t } = useI18n();
 const mediaLabels = computed(() => storyMediaMessages[locale.value] || storyMediaMessages.en);
+const summaryLabels = computed(() => storySummaryMessages[locale.value] || storySummaryMessages.en);
 const emit = defineEmits(['sign-in']);
+const consoleLabels = computed(() => ({ 'zh-TW': { audio: '音效' }, 'zh-CN': { audio: '音效' } }[locale.value] || { audio: 'Audio' }));
 const copies = {
   'zh-TW': { title: '劇情', subtitle: '明日方舟 · 劇情演出', loading: '正在載入本地劇情…', narrator: '旁白', continue: '點擊或按空白鍵繼續', choose: '選擇回應', finished: '劇情結束', battle: '可以重新播放或選擇其他劇情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效開啟', audioOff: '🔇 開啟音效', videoHint: '影片播放完畢後繼續。', selectStory: '選擇劇情', note: '劇情及素材出處：明日方舟／PRTS。劇本與已匯入影音由本站載入，未匯入素材可能連線至 PRTS；部分表情與鏡頭指令仍未完整重現。' },
   'zh-CN': { title: '剧情', subtitle: '明日方舟 · 剧情演出', loading: '正在载入本地剧情…', narrator: '旁白', continue: '点击或按空格键继续', choose: '选择回应', finished: '剧情结束', battle: '可以重新播放或选择其他剧情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效开启', audioOff: '🔇 开启音效', videoHint: '视频播放完毕后继续。', selectStory: '选择剧情', note: '剧情及素材出处：明日方舟／PRTS。剧本与已导入影音由本站加载，未导入素材可能连接至 PRTS；部分表情与镜头指令仍未完整重现。' },
@@ -608,6 +653,67 @@ const endingOpen = ref(false);
 const endingArmed = ref(false);
 let endingGuardTimer;
 let endingReturnFocus;
+const skipDialog = ref(null);
+const skipOpen = ref(false);
+const skipTarget = ref('');
+const summaryText = ref('');
+const summaryStatus = ref('loading');
+let summaryRequest = 0;
+let skipReturnFocus;
+let skipOpenedAt = 0;
+let resumeSkipVideo = false;
+async function loadCurrentSummary() {
+  const request = ++summaryRequest;
+  const storyId = selectedStoryId.value;
+  const language = locale.value;
+  summaryText.value = '';
+  summaryStatus.value = 'loading';
+  const result = await loadStorySummary({ root, storyId, locale: language });
+  if (disposed || request !== summaryRequest || storyId !== selectedStoryId.value || language !== locale.value) return;
+  summaryText.value = result.text;
+  summaryStatus.value = result.status;
+}
+async function openSkip(target) {
+  if (!frame.value || skipOpen.value) return;
+  if (frame.value.type === 'end') { openEnding(); return; }
+  closeLog();
+  skipReturnFocus = document.activeElement;
+  skipTarget.value = target || nextStory.value?.id || '';
+  skipOpen.value = true;
+  skipOpenedAt = performance.now();
+  resumeSkipVideo = !!sceneVideo.value && !sceneVideo.value.paused;
+  sceneVideo.value?.pause();
+  if (isTyping.value && frame.value.type === 'dialogue') {
+    clearTyping();
+    visibleText.value = localize(frame.value.text);
+    isTyping.value = false;
+  }
+  loadCurrentSummary();
+  await nextTick();
+  if (!skipOpen.value) return;
+  skipDialog.value?.showModal();
+  skipDialog.value?.querySelector('#story-skip-title')?.focus({ preventScroll: true });
+}
+function resetSkip() { skipOpen.value = false; skipTarget.value = ''; resumeSkipVideo = false; }
+function closeSkip(resume = true) {
+  const shouldPlay = resume && resumeSkipVideo;
+  skipDialog.value?.close();
+  resetSkip();
+  if (shouldPlay) sceneVideo.value?.play().catch(() => {});
+  if (resume) skipReturnFocus?.focus?.({ preventScroll: true });
+}
+function guardSkipClick(event) {
+  if (performance.now() - skipOpenedAt < 700 || event.detail > 1) { event.preventDefault(); event.stopPropagation(); }
+}
+function guardSkipKey(event) {
+  if (['Enter', 'Space'].includes(event.code) && (performance.now() - skipOpenedAt < 700 || event.repeat)) { event.preventDefault(); event.stopPropagation(); }
+}
+function confirmSkip() {
+  const target = skipTarget.value;
+  closeSkip(false);
+  // Skipping does not mark the unread remainder as completed.
+  if (target) selectStoryId(target); else returnToEpisodes();
+}
 let cameraAnimation;
 let cameraRequest = 0;
 const portraitVisual = name => resolveStoryPortrait(name, characterIndex.value, prtsVariables);
@@ -638,6 +744,7 @@ async function openEnding() {
   closeLog();
   endingReturnFocus = document.activeElement;
   endingOpen.value = true;
+  loadCurrentSummary();
   await nextTick();
   if (endingOpen.value && frame.value?.type === 'end' && !endingDialog.value?.open) {
     endingDialog.value?.showModal();
@@ -957,7 +1064,7 @@ watch([frame, locale], ([nextFrame], [previousFrame]) => {
 }, { flush: 'sync' });
 
 function advance() {
-  if (!runner || frame.value?.type !== 'dialogue') return;
+  if (!runner || skipOpen.value || frame.value?.type !== 'dialogue') return;
   if (isTyping.value) {
     clearTyping();
     visibleText.value = localize(frame.value.text);
@@ -984,7 +1091,7 @@ function goBack() {
 }
 
 function advanceVideo() {
-  if (!runner || frame.value?.type !== 'video') return;
+  if (!runner || skipOpen.value || frame.value?.type !== 'video') return;
   frame.value = runner.next();
   canGoBack.value = runner.canPrevious();
 }
@@ -999,7 +1106,7 @@ function restart() {
 }
 
 function handleKeydown(event) {
-  if (screen.value !== 'player' || logOpen.value || endingOpen.value) return;
+  if (screen.value !== 'player' || logOpen.value || endingOpen.value || skipOpen.value) return;
   if (event.target instanceof HTMLElement && ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'VIDEO'].includes(event.target.tagName)) return;
   if (event.code === 'Space' || event.code === 'Enter') { event.preventDefault(); advance(); }
   if (event.code === 'ArrowLeft') goBack();
@@ -1007,6 +1114,10 @@ function handleKeydown(event) {
 
 async function loadStory() {
   const token = ++loadingToken;
+  closeSkip(false);
+  summaryRequest++;
+  summaryText.value = '';
+  summaryStatus.value = 'loading';
   closeEnding(); stopCameraMotion();
   closeLog();
   storyLog.value = [];
@@ -1069,6 +1180,10 @@ function openCollection(collection) {
 
 function clearPlayback() {
   loadingToken += 1;
+  closeSkip(false);
+  summaryRequest++;
+  summaryText.value = '';
+  summaryStatus.value = 'loading';
   clearImagePreloads();
   clearTyping();
   stopMusic();
@@ -1133,6 +1248,8 @@ onMounted(async () => {
   } catch (cause) { if (!disposed) catalogError.value = cause.message || String(cause); }
 });
 onUnmounted(() => {
+  closeSkip(false);
+  summaryRequest++;
   cancelRackDrag();
   rackObserver?.disconnect();
   clearTimeout(rackClickTimer);
@@ -1282,10 +1399,81 @@ onUnmounted(() => {
 .portrait-row .portrait-l{left:27%}.portrait-row .portrait-r{left:73%}.portrait-row .portrait-m{left:50%}
 .story-log-dialog{position:fixed;inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);margin:0;max-height:calc(100dvh - 40px);overflow:auto}
 .story-ending-dialog{width:min(580px,calc(100vw - 32px));padding:28px;border-top:3px solid #9cdde9}
+.story-summary-text{margin:18px 0;padding:16px 18px;border-left:2px solid #a5dce8;background:#132a35;line-height:1.8;overflow-wrap:anywhere}.story-summary-text h3{margin:0 0 8px;color:#a5dce8;font-size:.85rem}.story-summary-text p{margin:0;white-space:pre-wrap}.story-controls .story-skip{color:#efdab3;border-color:#a18b63;margin-left:8px}
 .story-ending-dialog h2{font-size:1.35rem}.ending-actions{display:grid;gap:12px;margin-top:20px}
 .ending-actions button{padding:13px 16px;text-align:left}.ending-actions .ending-primary{background:#234c5a;border-color:#a5dce8;color:#fff;font-size:.95rem}
 .ending-primary strong{display:block;margin-top:7px;font-size:1.1rem}.ending-actions button:focus-visible{outline:2px solid #c2edf5;outline-offset:3px}
 .story-ending-dialog button:disabled{opacity:.45;cursor:default}.story-ending-dialog h2:focus{outline:none}
 @media(max-width:700px){.portrait-row .portrait{width:53%}.story-ending-dialog{padding:20px}}
 
+/* The archive controls share the reel's brass frame and square film language. */
+.archive-console{--console-brass:#b9a06d;--console-edge:#71654d;--console-ink:#e9e3d6;--console-muted:#a9afa9}
+.archive-console .story-heading{align-items:center;margin-bottom:0;padding:12px 20px;border:1px solid var(--console-edge);border-bottom:0;border-radius:3px 3px 0 0;background:linear-gradient(120deg,#131f24,#0b151b);gap:16px;z-index:35}
+.archive-console .story-heading>div:first-child{min-width:0;flex:1}
+.archive-console .story-heading .eyebrow{color:var(--console-brass);font-size:.6rem;letter-spacing:.25em}
+.archive-console .story-heading h1{color:var(--console-ink);font-size:clamp(1.25rem,2.3vw,1.8rem);margin:4px 0;line-height:1.25}
+.console-status{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:.66rem;line-height:1.5;color:var(--console-muted)}
+.console-status-light,.utility-indicator{display:inline-block;flex:none;width:6px;height:6px;background:#8c928b;border-radius:1px}
+.console-status-light{background:var(--console-brass);margin-right:3px;box-shadow:0 0 6px #b9a06d33}
+.console-status.needs-attention .console-status-light{background:#e6a971}
+.utility-indicator.enabled{background:var(--console-brass);box-shadow:0 0 5px #b9a06d55}
+.archive-console .console-utilities{gap:8px;align-items:center}
+.archive-console .console-utilities>button,.archive-console .console-utilities>a,.console-audio>summary{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:34px;padding:7px 12px;border:1px solid var(--console-edge);border-radius:2px;background:linear-gradient(#16242b,#0c171d);color:var(--console-ink);font:inherit;font-size:.72rem;text-decoration:none;cursor:pointer;white-space:nowrap;transition:border-color .18s,background .18s}
+.archive-console .console-utilities>button:hover,.archive-console .console-utilities>a:hover,.console-audio>summary:hover{border-color:var(--console-brass);background:#26302e}
+.archive-console .console-utilities>button:disabled{opacity:.45;cursor:default}
+.console-audio{position:relative}
+.console-audio>summary{list-style:none}.console-audio>summary::-webkit-details-marker{display:none}
+.console-audio[open]>summary{border-color:var(--console-brass)}
+.console-audio-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:50;width:230px;padding:14px;border:1px solid var(--console-brass);background:#101d24;box-shadow:0 12px 30px #0009;display:grid;gap:12px}
+.console-audio-panel label{display:flex;align-items:center;gap:8px;color:var(--console-muted);font-size:.7rem}
+.console-audio-panel input{width:110px;accent-color:var(--console-brass)}
+.console-audio-panel output{width:4ch;font-variant-numeric:tabular-nums}
+.archive-console .story-library{padding-top:0;border-radius:0 0 3px 3px;border-color:var(--console-edge);background:#0c161c}
+.projection-controls{position:relative;z-index:25;padding-bottom:10px;background:linear-gradient(120deg,#131f24,#0b151b);border-bottom:1px solid var(--console-edge)}
+.projection-controls::after{content:'';position:absolute;left:10px;right:10px;bottom:0;height:5px;background:repeating-linear-gradient(90deg,#b9a06d88 0 1px,transparent 1px 10px);pointer-events:none}
+.archive-console .archive-toolbar{padding:10px 20px;margin:0;gap:14px;border-block:1px solid #4a4b41;flex-wrap:nowrap}
+.archive-console .view-switch{flex:none;gap:8px;padding:0;border:0;border-radius:0;background:transparent}
+.archive-console .view-switch button{position:relative;display:flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid #49565a;border-radius:2px;background:#111e25;color:#a8b1b3;font-size:.76rem}
+.archive-console .view-switch button::before{content:'';width:7px;height:7px;flex:none;background:#47504f;box-shadow:inset 0 0 0 1px #737e7433}
+.archive-console .view-switch button.active{border-color:var(--console-brass);background:linear-gradient(#28302d,#18221f);color:var(--console-ink)}
+.archive-console .view-switch button.active::before{background:#dfc086;box-shadow:0 0 6px #dfc08633}
+.archive-console .view-switch button:hover{color:var(--console-ink);border-color:#a99b79}
+.console-search{display:flex;align-items:center;gap:10px;flex:1;min-width:100px;max-width:420px;margin-left:auto;padding:0 12px;border:1px solid #4b5c60;border-radius:2px;background:#0b161d;color:#a2aba9}
+.console-search:focus-within{border-color:var(--console-brass)}
+.console-search input{box-sizing:border-box;width:100%;min-width:0;padding:9px 0;border:0;background:transparent;color:var(--console-ink);font:inherit;font-size:.75rem;outline:none}
+.console-search input::placeholder{color:#889390}.console-search i{font-size:.8rem}
+.archive-console .library-filters{margin:0;padding:10px 20px;gap:20px}
+.archive-console .console-primary-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end}
+.console-filter{min-width:0;display:grid;gap:5px;position:relative}
+.console-filter>span{font-size:.65rem;color:var(--console-muted);line-height:1.2}
+.archive-console .console-filter select{box-sizing:border-box;width:100%;max-width:none;min-width:0;flex:none;border:1px solid #4b5c60;border-radius:2px;background:#0d1920;color:var(--console-ink);padding:7px 10px;font-size:.73rem;cursor:pointer}
+.archive-console .console-filter select:focus-visible{outline-color:var(--console-brass)}
+.archive-console .filter-toggle{gap:18px;min-height:33px;white-space:nowrap;border:1px solid var(--console-edge);border-radius:2px;background:#111e25;color:#dfc898;font-size:.72rem;padding:7px 12px}
+.archive-console .filter-toggle:hover,.archive-console .filter-toggle[aria-expanded="true"]{border-color:var(--console-brass);background:#28302d;color:var(--console-ink)}
+.archive-console .advanced-filters{position:absolute;right:20px;top:calc(100% - 7px);z-index:40;box-sizing:border-box;max-width:calc(100% - 40px);padding:14px;border:1px solid var(--console-brass);background:#102029;box-shadow:0 12px 30px #0009;gap:10px}
+.archive-console .advanced-filters select{border-radius:2px;border-color:#67705f;padding:8px 10px;background:#0c1920;max-width:230px;flex:1}
+.archive-console .archive-breadcrumb{padding:0 20px;margin:0;font-size:.62rem;color:#999d8d;line-height:1.3}
+.archive-console .reading-plan-heading{margin:0;padding:10px 20px;gap:16px}
+.archive-console .reading-plan-heading select{border-radius:2px;border-color:var(--console-edge);padding:7px 10px;background:#0d1920;color:var(--console-ink)}
+.archive-console .guide-tools{padding:0 20px 8px;gap:8px}
+.archive-console .guide-tools button,.archive-console .guide-context{border-radius:2px;border-color:var(--console-edge);background:#172522;color:#dbc394}
+.archive-console .reading-route{padding-inline:20px}
+.archive-console .archive-toolbar button:focus-visible,.archive-console .console-utilities>button:focus-visible,.archive-console .console-utilities>a:focus-visible,.console-audio>summary:focus-visible{outline:2px solid #dfc086;outline-offset:3px}
+@media(max-width:700px){
+  .archive-console .story-heading{padding:10px 12px;align-items:flex-start;flex-wrap:wrap;gap:10px}
+  .archive-console .story-heading>div:first-child{flex-basis:100%}.archive-console .story-heading h1{font-size:1.3rem}
+  .archive-console .console-utilities{justify-content:flex-start;gap:6px;flex-wrap:wrap;width:100%}
+  .archive-console .console-utilities>button,.archive-console .console-utilities>a,.console-audio>summary{font-size:.65rem;padding:6px 9px;min-height:30px}
+  .console-audio-panel{right:auto;left:0;width:220px}
+  .archive-console .archive-toolbar{padding:8px 12px;flex-wrap:wrap;gap:8px}
+  .archive-console .view-switch button{padding:7px 10px;font-size:.7rem}
+  .console-search{flex-basis:100%;max-width:none;margin:0}.console-search input{padding-block:8px}
+  .archive-console .library-filters{padding:8px 12px;gap:10px}
+  .archive-console .console-primary-filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .archive-console .filter-toggle{justify-content:space-between;width:100%}
+  .archive-console .console-filter select{width:100%;max-width:none;font-size:.7rem}
+  .archive-console .archive-breadcrumb{padding-inline:12px}
+  .archive-console .advanced-filters{right:12px;max-width:calc(100% - 24px);flex-wrap:wrap}
+  .archive-console .reading-plan-heading,.archive-console .guide-tools,.archive-console .reading-route{padding-inline:12px}
+}
 </style>

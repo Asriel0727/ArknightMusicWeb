@@ -215,6 +215,8 @@
     "default": "자동 회복"
   },
   "searchBar": {
+    "trackPlaceholder": "이 앨범의 곡이나 아티스트 검색…",
+    "noMatchingTracks": "일치하는 곡이 없습니다.",
     "albumPlaceholder": "앨범 또는 곡 검색…"
   }
 }

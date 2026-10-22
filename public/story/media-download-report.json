@@ -1,10 +1,10 @@
 {
-  "downloadedAt": "2026-10-06T22:48:24.958Z",
+  "downloadedAt": "2026-10-21T22:00:35.369Z",
   "mode": "incremental-local-files",
-  "stories": 2270,
-  "uniqueUrls": 2177,
+  "stories": 2294,
+  "uniqueUrls": 2196,
   "downloaded": 0,
-  "reused": 2086,
+  "reused": 2105,
   "skippedKnownMissing": 91,
   "bytesDownloaded": 0,
   "compressed": 0,
@@ -12,15 +12,15 @@
   "preservedModifiedSources": [],
   "unsafeLocalFiles": [],
   "totals": {
-    "audio": 2074,
+    "audio": 2093,
     "videos": 12,
-    "bytes": 1096259992
+    "bytes": 1104795325
   },
   "missingTotals": {
     "audio": 27,
     "videos": 0
   },
-  "localReferences": 37355,
+  "localReferences": 37834,
   "changedStories": 0,
   "failures": [
     {

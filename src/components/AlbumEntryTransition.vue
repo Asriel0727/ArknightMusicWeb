@@ -26,42 +26,52 @@
       <img v-if="origin?.cover && coverUrl" ref="sleeve" class="source-sleeve"
         :style="sleeveStyle" :src="coverUrl" alt="" aria-hidden="true">
 
-      <section class="song-projection" :inert="!landed" :aria-busy="!ready">
-        <header class="song-projection-header">
-          <h1 id="projection-title">{{ album?.name || t('album.trackList') }}</h1>
-          <p>{{ album?.artistes?.join(' · ') || album?.belong || '唱片資料' }}</p>
-        </header>
-        <div class="album-visuals" :class="{ 'without-visual': !album?.coverDeUrl }">
+      <section ref="projectionPanelRef" class="song-projection" :inert="!landed" :aria-busy="!ready">
+        <div class="projection-album-info">
           <figure v-if="coverUrl" class="album-cover-visual">
             <img :src="coverUrl" :alt="album?.name || ''" decoding="async" @error="hideBrokenImage">
           </figure>
+          <div class="projection-album-copy">
+            <header class="song-projection-header">
+              <h1 id="projection-title">{{ album?.name || t('album.trackList') }}</h1>
+              <p>{{ album?.artistes?.join(' · ') || album?.belong || '唱片資料' }}</p>
+            </header>
+            <p v-if="album?.intro" class="album-intro">{{ normalizeEscapedNewlines(album.intro) }}</p>
+          </div>
+        </div>
+        <div class="projection-album-content">
           <figure v-if="album?.coverDeUrl" class="album-inner-visual">
             <img :src="proxyImageUrl(album.coverDeUrl)" :alt="album?.name || ''" decoding="async" @error="hideBrokenImage">
           </figure>
+          <section class="projection-tracks" :class="{ 'compact-tracks': hasManyTracks }" :aria-label="t('album.trackList')">
+            <div class="track-heading">
+              <h2>{{ t('album.trackList') }}</h2>
+              <span v-if="ready && !error">{{ t('album.trackCount', { count: visibleProjectionTracks.length }) }}</span>
+            </div>
+            <input v-if="hasManyTracks && ready && !error" v-model="trackSearchQuery" class="projection-track-search"
+              type="search" :placeholder="t('searchBar.trackPlaceholder')" :aria-label="t('searchBar.trackPlaceholder')">
+            <div class="projection-track-area" ref="trackAreaRef" tabindex="0" :aria-label="t('album.trackList')">
+              <div v-if="error" class="projection-message" role="alert">
+                <p>{{ t('album.loadError') }}</p>
+                <button type="button" @click="emit('retry')">{{ t('album.retry') }}</button>
+              </div>
+              <p v-else-if="!ready" class="projection-message" role="status">{{ t('common.loading') }}</p>
+              <p v-else-if="!songs.length" class="projection-message">{{ t('album.emptyTracks') }}</p>
+              <p v-else-if="!visibleProjectionTracks.length" class="projection-message" role="status">{{ t('searchBar.noMatchingTracks') }}</p>
+              <ol v-else class="song-projection-list">
+                <li v-for="{ song, index } in visibleProjectionTracks" :key="song.cid || index" class="song-projection-row"
+                  :class="{ 'is-launching': selectedTrackIndex === index && isLaunchingPlayer }">
+                  <span class="song-projection-number">{{ String(index + 1).padStart(2, '0') }}</span>
+                  <span class="song-projection-name" :title="song.name">{{ song.name }}</span>
+                  <span class="song-projection-artist">{{ song.artistes?.join(', ') || '—' }}</span>
+                  <button class="song-projection-play" type="button" :aria-label="t('album.play') + ' ' + song.name"
+                    @click="handleProjectionPlaySong(index)"><span aria-hidden="true">▷</span> {{ t('album.play') }}</button>
+                </li>
+              </ol>
+            </div>
+          </section>
         </div>
-        <p v-if="album?.intro" class="album-intro">{{ normalizeEscapedNewlines(album.intro) }}</p>
-        <div class="track-heading">
-          <h2>{{ t('album.trackList') }}</h2>
-          <span v-if="ready && !error">{{ t('album.trackCount', { count: songs.length }) }}</span>
-        </div>
-        <div v-if="error" class="projection-message" role="alert">
-          <p>{{ t('album.loadError') }}</p>
-          <button type="button" @click="emit('retry')">{{ t('album.retry') }}</button>
-        </div>
-        <p v-else-if="!ready" class="projection-message" role="status">{{ t('common.loading') }}</p>
-        <p v-else-if="!songs.length" class="projection-message">{{ t('album.emptyTracks') }}</p>
-        <ol v-else class="song-projection-list">
-          <li v-for="(song, index) in songs" :key="song.cid || index" class="song-projection-row"
-            :class="{ 'is-launching': selectedTrackIndex === index && isLaunchingPlayer }">
-            <span class="song-projection-number">{{ String(index + 1).padStart(2, '0') }}</span>
-            <span class="song-projection-name">{{ song.name }}</span>
-            <span class="song-projection-artist">{{ song.artistes?.join(', ') || '—' }}</span>
-            <button class="song-projection-play" type="button" :aria-label="t('album.play') + ' ' + song.name"
-              @click="handleProjectionPlaySong(index)"><span aria-hidden="true">▷</span> {{ t('album.play') }}</button>
-          </li>
-        </ol>
       </section>
-
       <Transition name="projection-player-stage">
         <section v-if="playerOpen" class="projection-player-stage" :aria-label="t('album.play')">
           <div class="projection-player-toolbar">
@@ -139,6 +149,55 @@ const { t } = useI18n();
 const dialog = ref(null);
 const closeButton = ref(null);
 const playerViewRef = ref(null);
+const projectionPanelRef = ref(null);
+const hasManyTracks = computed(() => props.songs.length > 6);
+let projectionPanelObserver = null;
+
+function fitProjectionPanel() {
+  const panel = projectionPanelRef.value;
+  if (!panel) return;
+  const cover = panel.querySelector('.album-cover-visual');
+  const copy = panel.querySelector('.projection-album-copy');
+  const banner = panel.querySelector('.album-inner-visual');
+  const styles = getComputedStyle(panel);
+  const padding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+  const gap = parseFloat(styles.columnGap);
+  const infoHeight = window.innerWidth <= 600
+    ? Math.max(cover?.offsetHeight || 0, copy?.scrollHeight || 0)
+    : (cover?.offsetHeight || 0) + (copy?.scrollHeight || 0) + 18;
+  const rowCount = Math.max(1, Math.min(props.songs.length, 8));
+  const rowHeight = hasManyTracks.value ? 54 : 68;
+  const rowGap = hasManyTracks.value ? 6 : 10;
+  const trackHeight = rowCount * rowHeight + (rowCount - 1) * rowGap + 24 + 12 + 8 + (hasManyTracks.value ? 54 : 0);
+  const contentHeight = (banner?.offsetHeight || 0) + (banner ? 20 : 0) + trackHeight;
+  const desiredHeight = window.innerWidth <= 600
+    ? infoHeight + contentHeight + gap + padding
+    : Math.max(infoHeight, contentHeight) + padding;
+  panel.style.setProperty('--projection-height', `${Math.ceil(desiredHeight)}px`);
+}
+
+watch(projectionPanelRef, (panel) => {
+  projectionPanelObserver?.disconnect();
+  if (!panel) return;
+  projectionPanelObserver = new ResizeObserver(fitProjectionPanel);
+  projectionPanelObserver.observe(panel);
+  for (const element of panel.querySelectorAll('.album-cover-visual, .projection-album-copy, .album-inner-visual')) {
+    projectionPanelObserver.observe(element);
+  }
+  fitProjectionPanel();
+}, { flush: 'post' });
+watch([() => props.album, () => props.songs.length, () => props.ready], () => nextTick(fitProjectionPanel));
+const trackAreaRef = ref(null);
+const trackSearchQuery = ref('');
+const visibleProjectionTracks = computed(() => {
+  const query = trackSearchQuery.value.trim().normalize('NFKC').toLocaleLowerCase();
+  return props.songs.map((song, index) => ({ song, index })).filter(({ song }) => {
+    const text = `${song.name || ''} ${(song.artistes || []).join(' ')}`;
+    return !query || text.normalize('NFKC').toLocaleLowerCase().includes(query);
+  });
+});
+watch(() => props.album?.cid, () => { trackSearchQuery.value = ''; });
+watch(trackSearchQuery, () => nextTick(() => { if (trackAreaRef.value) trackAreaRef.value.scrollTop = 0; }));
 const dock = ref(null);
 const travel = ref(null);
 const tilt = ref(null);
@@ -340,13 +399,17 @@ watch(() => props.playerOpen, isOpen => {
     queueOpen.value = false;
   }
 });
-onUnmounted(() => { generation++; releaseDialog(); });
+onUnmounted(() => {
+  projectionPanelObserver?.disconnect();
+  generation++;
+  releaseDialog();
+});
 </script>
 
 <style scoped>
 .album-entry-transition {
-  --dock-size: clamp(230px, 30vw, 430px);
-  --dock-bottom: clamp(78px, 11vh, 112px);
+  --dock-size: min(220px, 32vw);
+  --dock-bottom: 42px;
   position: fixed;
   z-index: 1300;
   inset: 0;
@@ -360,11 +423,11 @@ onUnmounted(() => { generation++; releaseDialog(); });
   z-index: -1;
   background: radial-gradient(
     ellipse at 50% 85%,
-    rgba(18, 57, 75, 0.56),
-    rgba(6, 20, 31, 0.72) 72%,
-    rgba(3, 12, 20, 0.78)
+    rgba(7, 20, 29, 0.88),
+    rgba(4, 13, 22, 0.94) 72%,
+    rgba(3, 9, 16, 0.96)
   );
-  backdrop-filter: blur(3px) saturate(0.84);
+  backdrop-filter: blur(10px) saturate(0.65);
   animation: scrim-in 600ms ease both;
 }
 .projection-exit {
@@ -387,24 +450,26 @@ onUnmounted(() => { generation++; releaseDialog(); });
 .song-projection {
   position: absolute;
   z-index: 3;
-  top: 78px;
-  bottom: calc(var(--dock-bottom) + 76px);
+  top: 50%;
+  height: min(var(--projection-height, 480px), calc(100dvh - 164px));
   left: 50%;
-  width: min(1160px, calc(100% - 64px));
-  padding: clamp(22px, 3vw, 38px);
-  overflow-x: hidden;
-  overflow-y: auto;
+  width: min(1080px, calc(100% - 64px));
+  display: grid;
+  grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: clamp(14px, 2vh, 24px) clamp(20px, 3vw, 42px);
+  padding: clamp(16px, 2.5vw, 30px);
+  overflow: hidden;
   overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  border: 1px solid #73b6d047;
-  border-top: 2px solid #8ac8df;
-  border-radius: 4px 4px 16px 16px;
-  background: linear-gradient(135deg, rgba(20, 65, 84, 0.12), rgba(9, 29, 42, 0.18) 64%, rgba(23, 76, 96, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(16, 38, 51, 0.98), rgba(7, 22, 33, 0.98));
   backdrop-filter: blur(3px) saturate(1.14);
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.22), inset 0 0 42px rgba(117, 211, 255, 0.035);
   opacity: 0;
-  transform: translate(-50%, 24px);
+  transform: translate(-50%, calc(-50% + 24px));
   transition: opacity 400ms ease, transform 500ms cubic-bezier(.2, .8, .2, 1);
 }
 .song-projection::-webkit-scrollbar {
@@ -430,18 +495,20 @@ onUnmounted(() => { generation++; releaseDialog(); });
 .track-heading,
 .song-projection-list,
 .projection-message { position: relative; z-index: 1; }
-.is-landed .song-projection { opacity: 1; transform: translate(-50%, 0); }
+.is-landed .song-projection { opacity: 1; transform: translate(-50%, -50%); }
 .is-player-mode .song-projection {
   opacity: 0.28;
-  transform: translate(-50%, -18px) scale(0.94);
+  transform: translate(-50%, calc(-50% - 18px)) scale(0.94);
   filter: blur(2px) saturate(0.72);
   pointer-events: none;
 }
-.is-player-mode .album-visuals {
+.is-player-mode .album-cover-visual,
+.is-player-mode .album-inner-visual {
   transform: translateY(-34px) scale(0.74);
   opacity: 0.22;
 }
-.album-visuals { transition: transform 520ms cubic-bezier(.2, .8, .2, 1), opacity 420ms ease; }
+.album-cover-visual,
+.album-inner-visual { transition: transform 520ms cubic-bezier(.2, .8, .2, 1), opacity 420ms ease; }
 .song-projection-header {
   position: static;
   display: block;
@@ -457,56 +524,114 @@ onUnmounted(() => { generation++; releaseDialog(); });
 .song-projection-header h1 {
   margin: 0 0 8px;
   color: #f1f7fb;
-  font-size: clamp(22px, 2.5vw, 36px);
+  font-size: clamp(22px, 2vw, 30px);
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
 .song-projection-header p { margin: 0; color: #aec5d2; font-size: 14px; }
-.album-visuals {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
-  gap: 20px;
-  margin: 26px 0;
-}
-.album-visuals figure {
+.album-cover-visual,
+.album-inner-visual {
   position: relative;
   margin: 0;
   min-width: 0;
-  height: clamp(140px, 24vh, 250px);
-  overflow: visible;
+  min-height: 0;
+  flex: none;
+  overflow: hidden;
   border: 0;
-  border-radius: 0;
+  border-radius: 10px;
   background: transparent;
 }
-.album-visuals img {
+.album-cover-visual {
+  width: min(100%, 240px, 26dvh);
+  aspect-ratio: 1;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+.album-inner-visual {
+  width: 100%;
+  height: min(150px, 17dvh);
+}
+.album-cover-visual img,
+.album-inner-visual img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.28));
 }
-.album-visuals.without-visual { grid-template-columns: minmax(0, 260px); }
 .album-intro {
-  margin: 0 0 28px; padding-left: 16px; border-left: 2px solid #82b6c760;
-  color: #b8ceda; font-size: 14px; line-height: 1.8; white-space: pre-line;
+  margin: 0; padding-left: 12px; border-left: 2px solid #82b6c760;
+  color: #b8ceda; font-size: 14px; line-height: 1.6; white-space: pre-line;
 }
-.track-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.projection-album-info {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 18px;
+}
+.projection-album-copy {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  gap: 18px;
+}
+.projection-album-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  gap: 20px;
+}
+.projection-tracks {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  gap: 12px;
+}
+.projection-track-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 2px 4px 4px 2px;
+}
+.projection-track-search {
+  flex: none;
+  width: 100%;
+  height: 42px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(3, 13, 22, 0.5);
+  color: #e7f2f8;
+  font: inherit;
+}
+.projection-track-search:focus-visible { outline: 2px solid #80b8d0; outline-offset: 2px; }
+.compact-tracks .song-projection-list { gap: 6px; }
+.compact-tracks .song-projection-row { height: 54px; padding: 4px 10px; border-radius: 8px; }
+.compact-tracks .song-projection-play { min-height: 36px; }
+.compact-tracks .song-projection-artist { font-size: 12px; }
+.track-heading { flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .track-heading h2 { margin: 0; font-size: 18px; color: #e9f3fa; }
 .track-heading > span { color: #9dbccf; font-size: 12px; }
 .song-projection-list {
   display: grid;
   gap: 10px;
-  margin: 14px 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 .song-projection-row {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 1fr) 84px;
-  gap: 16px;
+  grid-template-columns: 28px minmax(0, 1fr) 74px;
+  grid-template-rows: auto auto;
+  gap: 2px 12px;
   align-items: center;
-  min-height: 64px;
-  padding: 12px 14px;
+  height: 68px;
+  min-height: 0;
+  padding: 8px 12px;
   border: 1px solid rgba(151, 190, 205, 0.2);
   border-radius: 12px;
   background: rgba(10, 33, 45, 0.62);
@@ -538,6 +663,10 @@ onUnmounted(() => { generation++; releaseDialog(); });
 .song-projection-number { color: #7ba4b6; font: 12px monospace; }
 .song-projection-name { color: #e7f2f8; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
 .song-projection-artist { color: #a8c1cf; font-size: 13px; overflow-wrap: anywhere; }
+.song-projection-name { grid-column: 2; grid-row: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.song-projection-artist { grid-column: 2; grid-row: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.song-projection-number { grid-column: 1; grid-row: 1 / span 2; }
+.song-projection-play { grid-column: 3; grid-row: 1 / span 2; }
 .song-projection-play, .projection-message button {
   min-height: 44px; padding: 8px 14px; border: 1px solid #80b8d066;
   border-radius: 6px; background: #25475b; color: #edf7fc; font: inherit; cursor: pointer;
@@ -556,7 +685,6 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   padding: clamp(18px, 2.4vw, 34px);
   overflow: hidden;
   border: 1px solid rgba(129, 199, 221, 0.22);
-  border-top-color: rgba(156, 221, 242, 0.58);
   border-radius: 18px;
   background:
     radial-gradient(circle at 8% 12%, rgba(79, 176, 211, 0.12), transparent 26%),
@@ -646,15 +774,19 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-player-body {
   min-height: 0;
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  container-type: size;
   overflow: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(126, 198, 255, 0.35) transparent;
 }
 .projection-player-body :deep(.embedded-player-view) {
+  --record-size: min(300px, 32cqw, 52cqh);
   width: 100%;
   height: 100%;
   min-height: 0;
-  grid-template-columns: minmax(270px, 0.9fr) minmax(340px, 1.1fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: clamp(24px, 4vw, 68px);
   align-items: stretch;
 }
@@ -670,6 +802,8 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 .projection-player-body :deep(.embedded-player-view .player-container) {
   display: flex;
+  flex: none;
+  transform-origin: center;
   flex-direction: column;
   justify-content: center;
   width: min(100%, 410px);
@@ -686,19 +820,20 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   text-align: center;
 }
 .projection-player-body :deep(.embedded-player-view .player-cover) {
-  width: clamp(190px, 21vw, 300px);
-  height: auto;
+  width: var(--record-size);
+  height: var(--record-size);
+  flex: none;
   aspect-ratio: 1;
   box-sizing: border-box;
-  margin: 0 0 20px;
-  padding: clamp(18px, 2vw, 27px);
+  margin: 0 0 min(20px, 3cqh);
+  padding: min(27px, 3cqw, 5cqh);
 }
 .projection-player-body :deep(.embedded-player-view .vinyl-tonearm) {
   display: block;
-  top: clamp(18px, 2.2vw, 28px);
-  left: calc(50% + clamp(106px, 9vw, 128px));
+  top: calc(var(--record-size) * 0.08);
+  left: calc(50% + var(--record-size) * 0.36);
   z-index: 2;
-  height: clamp(112px, 10vw, 138px);
+  height: calc(var(--record-size) * 0.46);
   transform: rotate(22deg);
 }
 .projection-player-body :deep(.embedded-player-view .vinyl-tonearm.playing) {
@@ -709,21 +844,31 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   text-align: center;
 }
 .projection-player-body :deep(.embedded-player-view .player-info h4) {
-  margin-bottom: 8px;
+  margin: 0 0 min(8px, 1cqh);
   color: #f1f7fb;
-  font-size: clamp(1.35rem, 2.2vw, 2.1rem);
+  font-size: clamp(1rem, 4cqh, 2.1rem);
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 .projection-player-body :deep(.embedded-player-view .player-info p) { margin: 0; font-size: 0.96rem; }
 .projection-player-body :deep(.embedded-player-view .player-controls) {
-  margin-top: 22px;
+  margin-top: min(22px, 3cqh);
+  gap: min(15px, 2cqh);
 }
 .projection-player-body :deep(.embedded-player-view .controls-top) {
   justify-content: center;
-  gap: 12px;
+  gap: min(12px, 1cqw);
 }
-.projection-player-body :deep(.embedded-player-view .progress-container) { margin: 18px 0 10px; }
+.song-projection-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 8px;
+  font-size: 13px;
+}
+.projection-player-body :deep(.embedded-player-view .progress-container) { margin: min(18px, 2cqh) 0 min(10px, 1cqh); }
 .projection-player-body :deep(.embedded-player-view .controls-bottom) {
   width: 100%;
   justify-content: flex-start;
@@ -735,21 +880,31 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   max-height: calc(100vh - 100px);
 }
 .projection-player-body :deep(.embedded-player-view .player-view-right) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 0.42fr) minmax(0, 0.58fr);
   grid-column: 2;
   height: 100%;
+  box-sizing: border-box;
   align-self: stretch;
   max-width: none;
   min-height: 0;
   overflow: hidden;
   justify-content: flex-start;
-  gap: 12px;
-  padding: clamp(14px, 2vw, 22px);
-  border: 1px solid rgba(132, 198, 220, 0.14);
-  border-radius: 14px;
-  background: rgba(2, 15, 25, 0.24);
+  gap: min(12px, 2cqh);
+  padding: min(22px, 2cqw, 3cqh);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.projection-player-body :deep(.embedded-player-view .player-lyrics-panel) {
+  min-height: 0;
+  gap: min(12px, 2cqh);
 }
 .projection-player-body :deep(.embedded-player-view .player-visual-panel) {
   display: flex;
+  height: 100%;
+  min-height: 0;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -757,35 +912,44 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   margin: 0;
   gap: 8px;
 }
-.projection-player-body :deep(.embedded-player-view .player-visual-switch) { align-self: center; }
+.projection-player-body :deep(.embedded-player-view .player-visual-switch) { align-self: center; flex: none; margin: 0; }
 .projection-player-body :deep(.embedded-player-view .album-grid-visual-small) {
   width: min(100%, 580px);
   max-width: 580px;
-  height: clamp(210px, 32vh, 300px);
-  max-height: 300px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
   object-fit: contain;
-  background: #06090d;
+  background: transparent;
   margin: 0;
 }
 .projection-player-body :deep(.embedded-player-view .character-ep-visual) {
   width: min(100%, 580px);
   max-width: 580px;
-  height: clamp(210px, 32vh, 300px);
-  max-height: 300px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
   aspect-ratio: 16 / 9;
   margin: 0;
 }
 .projection-player-body :deep(.embedded-player-view .lyrics-container) {
-  flex: 1;
+  flex: 1 1 0;
+  box-sizing: border-box;
   height: auto;
   min-height: 0;
   max-height: none;
-  padding: 14px;
+  padding: min(14px, 2cqh);
   border: 1px solid rgba(127, 181, 205, 0.16);
   background: rgba(5, 18, 29, 0.42);
 }
+.projection-player-body :deep(.embedded-player-view .lyrics-toolbar),
+.projection-player-body :deep(.embedded-player-view .lyrics-translation-error) {
+  flex: none;
+}
 .projection-player-body :deep(.embedded-player-view .no-lyrics) {
-  min-height: 180px;
+  min-height: 0;
   padding: 20px;
   border: 1px solid rgba(127, 181, 205, 0.16);
   border-radius: 8px;
@@ -1049,22 +1213,14 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 .album-entry-transition-leave-active { transition: opacity 180ms; }
 .album-entry-transition-leave-to { opacity: 0; }
-@media (min-width: 1800px) {
-  .song-projection { width: min(1440px, calc(100% - 120px)); }
-  .song-projection-row { min-height: 72px; }
-}
-@media (max-width: 900px) {
-  .projection-player-body {
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
+@media (max-width: 600px) {
   .projection-player-stage {
     inset: 56px 4px 6px;
     gap: 8px;
     padding: 8px;
   }
   .projection-player-body :deep(.embedded-player-view) {
+    --record-size: min(150px, 26cqw, 22cqh);
     display: flex;
     flex-direction: column;
     height: auto;
@@ -1073,41 +1229,24 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     align-items: stretch;
   }
   .projection-player-body :deep(.embedded-player-view .player-view-left) {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    height: auto;
-    min-height: max-content;
-    align-self: start;
+    grid-column: 1;
+    grid-row: 1;
   }
   .projection-player-body :deep(.embedded-player-view .player-container) {
-    display: flex;
     width: 100%;
-    padding: 0;
+    max-width: none;
   }
   .projection-player-body :deep(.embedded-player-view .player-header) {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
+    flex-direction: row;
+    justify-content: center;
+    gap: min(16px, 3cqw);
   }
-  .projection-player-body :deep(.embedded-player-view .player-cover) {
-    width: min(62vw, 250px);
-    height: auto;
-    margin: 0 auto 12px;
-    padding: 22px;
-  }
+  .projection-player-body :deep(.embedded-player-view .player-cover) { margin: 0; }
   .projection-player-body :deep(.embedded-player-view .player-info) {
-    width: 100%;
-    text-align: center;
+    flex: 0 1 auto;
+    text-align: left;
   }
-  .projection-player-body :deep(.embedded-player-view .player-info h4) { font-size: 1.25rem; }
-  .projection-player-body :deep(.embedded-player-view .player-controls) {
-    width: 100%;
-    margin-top: 0;
-  }
-  .projection-player-body :deep(.embedded-player-view .controls-top) { justify-content: center; }
-  .projection-player-body :deep(.embedded-player-view .controls-bottom) { justify-content: space-between; }
+  .projection-player-body :deep(.embedded-player-view .player-info h4) { font-size: clamp(0.95rem, 3cqh, 1.25rem); }
   .projection-player-body :deep(.embedded-player-view .player-view-right) {
     width: 100%;
     height: auto;
@@ -1121,11 +1260,7 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     box-sizing: border-box;
   }
   .projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
-  .projection-player-body :deep(.embedded-player-view .lyrics-container) {
-    flex: none;
-    height: clamp(180px, 32vh, 240px);
-    min-height: 0;
-  }
+  .projection-player-body :deep(.embedded-player-view.single-panel) { grid-template-rows: minmax(0, 1fr); }
   .projection-player-queue {
     right: 12px;
     bottom: 12px;
@@ -1141,9 +1276,18 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .projection-player-queue-item { flex: none; }
 }
 @media (max-width: 600px) {
-  .album-entry-transition { --dock-size: min(260px, 66vw); --dock-bottom: 62px; }
+  .album-entry-transition { --dock-size: min(160px, 40vw); --dock-bottom: 28px; }
   .projection-exit { left: 16px; }
-  .song-projection { top: 72px; bottom: 120px; width: calc(100% - 28px); padding: 18px 14px; }
+  .song-projection {
+    top: 72px;
+    bottom: 120px;
+    width: calc(100% - 28px);
+    height: min(var(--projection-height, 480px), calc(100dvh - 148px));
+    padding: 18px 14px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 16px;
+  }
   .projection-player-stage {
     inset: 56px 0 0;
     padding: 8px;
@@ -1158,15 +1302,12 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .projection-player-eyebrow { font-size: 12px; }
   .projection-player-queue-toggle { min-height: 32px; padding: 6px 9px; }
   .projection-player-queue-toggle > span:not(.projection-player-queue-count) { display: none; }
-  .projection-player-body :deep(.embedded-player-view .player-cover) { width: min(58vw, 210px); padding: 18px; }
-  .projection-player-body :deep(.embedded-player-view .album-grid-visual-small),
-  .projection-player-body :deep(.embedded-player-view .character-ep-visual) {
-    height: clamp(86px, 24vw, 116px);
-    max-height: none;
-  }
-  .album-visuals { gap: 10px; margin: 18px 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr); }
-  .album-visuals figure { height: clamp(100px, 28vw, 150px); }
-  .album-intro { font-size: 13px; margin-bottom: 22px; }
+  .projection-album-info { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; }
+  .album-cover-visual { width: min(100px, 22vw); }
+  .projection-album-copy { gap: 10px; }
+  .projection-album-content { gap: 14px; }
+  .album-inner-visual { height: min(90px, 12dvh); }
+  .album-intro { font-size: 12px; line-height: 1.5; }
   .song-projection-row { grid-template-columns: 24px minmax(0, 1fr) 72px; gap: 4px 10px; }
   .song-projection-name { font-size: 14px; }
   .song-projection-artist { grid-column: 2; grid-row: 2; font-size: 12px; }
@@ -1190,10 +1331,58 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .projection-player-body :deep(.embedded-player-view .character-ep-visual) { height: 88px; }
   .projection-player-body :deep(.embedded-player-view .lyrics-container) { height: min(34vh, 190px); }
 }
+@media (max-height: 600px) {
+  .projection-player-toolbar { min-height: 30px; padding-bottom: 6px; }
+  .projection-player-body :deep(.embedded-player-view) { gap: 12px; }
+  .projection-player-body :deep(.embedded-player-view .player-info p) { font-size: 0.8rem; }
+  .projection-player-body :deep(.embedded-player-view .control-btn) {
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    max-height: 32px;
+    font-size: 1rem;
+  }
+  .projection-player-body :deep(.embedded-player-view .control-btn.play-pause) {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+  }
+}
+@media (max-width: 600px) and (max-height: 600px) and (orientation: landscape) {
+  .projection-player-body :deep(.embedded-player-view) {
+    display: grid;
+    height: 100%;
+    min-height: 0;
+    --record-size: min(180px, 28cqw, 42cqh);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .projection-player-body :deep(.embedded-player-view .player-view-left) {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    height: 100%;
+  }
+  .projection-player-body :deep(.embedded-player-view .player-header) { flex-direction: column; gap: 6px; }
+  .projection-player-body :deep(.embedded-player-view .player-info) { text-align: center; }
+  .projection-player-body :deep(.embedded-player-view .player-view-right) {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    height: 100%;
+  }
+  .projection-player-body :deep(.embedded-player-view .mobile-details-toggle) { display: none; }
+  .projection-player-body :deep(.embedded-player-view.single-panel) { grid-template-columns: minmax(0, 1fr); }
+}
 @media (max-height: 520px) {
-  .album-entry-transition { --dock-size: 180px; --dock-bottom: 38px; }
-  .song-projection { top: 66px; bottom: 78px; }
-  .album-visuals figure { height: 120px; }
+  .album-entry-transition { --dock-size: 140px; --dock-bottom: 24px; }
+  .song-projection-header h1 { font-size: 20px; margin-bottom: 4px; }
+  .album-intro { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

@@ -38,6 +38,7 @@ defineExpose({ clearSearch });
   max-width: 1880px;
   margin: 0 auto 18px auto;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -51,9 +52,10 @@ defineExpose({ clearSearch });
 
 .topbar-right {
   flex-shrink: 0;
+  width: clamp(180px, 28vw, 300px);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
   .topbar-section {
     padding: 0 15px;
     gap: 8px;
