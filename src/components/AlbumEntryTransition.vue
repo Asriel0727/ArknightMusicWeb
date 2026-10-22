@@ -126,15 +126,16 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, nextTick, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getProxyImageUrl } from '../services/api.js';
 import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
 import { playerState } from '../stores/player.js';
 import AlbumCard from './AlbumCard.vue';
 import VinylDisc from './VinylDisc.vue';
-
-const PlayerView = defineAsyncComponent(() => import('./PlayerView.vue'));
+// Load the player styles with the page, rather than requesting a stale hashed
+// CSS chunk only when a song is opened after a deployment.
+import PlayerView from './PlayerView.vue';
 
 const props = defineProps({
   active: Boolean, ready: Boolean, settled: Boolean, error: Boolean,
@@ -156,6 +157,10 @@ let projectionPanelObserver = null;
 function fitProjectionPanel() {
   const panel = projectionPanelRef.value;
   if (!panel) return;
+  if (window.innerWidth <= 900) {
+    panel.style.removeProperty('--projection-height');
+    return;
+  }
   const cover = panel.querySelector('.album-cover-visual');
   const copy = panel.querySelector('.projection-album-copy');
   const banner = panel.querySelector('.album-inner-visual');
@@ -1213,24 +1218,39 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 .album-entry-transition-leave-active { transition: opacity 180ms; }
 .album-entry-transition-leave-to { opacity: 0; }
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .projection-player-stage {
-    inset: 56px 4px 6px;
-    gap: 8px;
-    padding: 8px;
+    inset: max(68px, calc(env(safe-area-inset-top) + 56px)) 8px auto;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 84px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    gap: 12px;
+    padding: 12px;
+    border-radius: 14px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .projection-player-toolbar { flex: none; }
+  .projection-player-body {
+    flex: none;
+    display: block;
+    container-type: inline-size;
+    overflow: visible;
   }
   .projection-player-body :deep(.embedded-player-view) {
-    --record-size: min(150px, 26cqw, 22cqh);
+    --record-size: clamp(88px, 24vw, 120px);
     display: flex;
     flex-direction: column;
     height: auto;
-    min-height: 100%;
-    gap: 10px;
+    min-height: 0;
+    gap: 16px;
     align-items: stretch;
   }
   .projection-player-body :deep(.embedded-player-view .player-view-left) {
-    grid-column: 1;
-    grid-row: 1;
+    flex: none;
+    height: auto;
+    align-items: stretch;
+    justify-content: flex-start;
   }
   .projection-player-body :deep(.embedded-player-view .player-container) {
     width: 100%;
@@ -1238,35 +1258,74 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   }
   .projection-player-body :deep(.embedded-player-view .player-header) {
     flex-direction: row;
-    justify-content: center;
-    gap: min(16px, 3cqw);
+    justify-content: flex-start;
+    gap: 16px;
   }
-  .projection-player-body :deep(.embedded-player-view .player-cover) { margin: 0; }
+  .projection-player-body :deep(.embedded-player-view .player-cover) {
+    margin: 0;
+    padding: 14px;
+    border-width: 5px;
+  }
   .projection-player-body :deep(.embedded-player-view .player-info) {
-    flex: 0 1 auto;
+    flex: 1;
     text-align: left;
   }
-  .projection-player-body :deep(.embedded-player-view .player-info h4) { font-size: clamp(0.95rem, 3cqh, 1.25rem); }
+  .projection-player-body :deep(.embedded-player-view .player-info h4) { margin-bottom: 6px; font-size: 1.15rem; }
+  .projection-player-body :deep(.embedded-player-view .player-info p) { font-size: 0.875rem; }
+  .projection-player-body :deep(.embedded-player-view .player-controls) { margin-top: 20px; gap: 12px; }
+  .projection-player-body :deep(.embedded-player-view .controls-top) {
+    gap: clamp(0px, calc(20cqw - 55.2px), 8px);
+  }
+  .projection-player-body :deep(.embedded-player-view .progress-container) { margin: 12px 0 0; }
+  .projection-player-body :deep(.embedded-player-view .progress-time) { margin-top: 0; }
+  .projection-player-body :deep(.embedded-player-view .controls-bottom:empty) { display: none; }
   .projection-player-body :deep(.embedded-player-view .player-view-right) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: none;
     width: 100%;
     height: auto;
     min-height: max-content;
     align-self: start;
     overflow: visible;
-    padding: 8px 0;
+    padding: 0;
     border: 0;
     border-radius: 0;
     background: none;
     box-sizing: border-box;
   }
+  .projection-player-body :deep(.embedded-player-view .player-visual-panel),
+  .projection-player-body :deep(.embedded-player-view .player-lyrics-panel) {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    height: auto;
+    gap: 12px;
+  }
+  .projection-player-body :deep(.embedded-player-view .album-grid-visual-small),
+  .projection-player-body :deep(.embedded-player-view .character-ep-visual:not(.expanded)) {
+    flex: none;
+    width: 100%;
+    height: auto;
+    max-height: 240px;
+    aspect-ratio: 16 / 9;
+  }
+  .projection-player-body :deep(.embedded-player-view .lyrics-container) {
+    flex: none;
+    height: auto;
+    min-height: 120px;
+    max-height: min(42dvh, 360px);
+    padding: 12px;
+  }
   .projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
   .projection-player-body :deep(.embedded-player-view.single-panel) { grid-template-rows: minmax(0, 1fr); }
   .projection-player-queue {
-    right: 12px;
-    bottom: 12px;
-    left: 12px;
-    max-height: min(36vh, 260px);
-    padding-right: 3px;
+    position: static;
+    flex: none;
+    max-height: min(36dvh, 260px);
+    padding: 10px;
+    box-shadow: none;
   }
   .projection-player-queue-list {
     display: grid;
@@ -1275,28 +1334,31 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   }
   .projection-player-queue-item { flex: none; }
 }
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .album-entry-transition { --dock-size: min(160px, 40vw); --dock-bottom: 28px; }
-  .projection-exit { left: 16px; }
+  .projection-exit { left: max(12px, env(safe-area-inset-left)); }
+  .is-landed .record-dock, .projection-beam { display: none; }
   .song-projection {
-    top: 72px;
-    bottom: 120px;
+    top: max(72px, calc(env(safe-area-inset-top) + 60px));
+    bottom: auto;
     width: calc(100% - 28px);
-    height: min(var(--projection-height, 480px), calc(100dvh - 148px));
+    height: auto;
+    max-height: calc(100dvh - 88px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     padding: 18px 14px;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 16px;
+    overflow-y: auto;
+    transform: translate(-50%, 12px);
   }
-  .projection-player-stage {
-    inset: 56px 0 0;
-    padding: 8px;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-    border-right: 0;
-    border-bottom: 0;
-    border-left: 0;
-    border-radius: 10px 10px 0 0;
+  .is-landed .song-projection { transform: translateX(-50%); }
+  .is-player-mode .song-projection {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -12px);
   }
+  .projection-album-info, .projection-album-content, .projection-tracks { flex: none; }
+  .projection-track-area { flex: none; overflow: visible; }
   .projection-player-status { display: none; }
   .projection-player-toolbar { min-height: 36px; gap: 8px; padding-bottom: 6px; }
   .projection-player-eyebrow { font-size: 12px; }
@@ -1314,24 +1376,7 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .song-projection-number, .song-projection-play { grid-row: 1 / span 2; }
   .song-projection-play { grid-column: 3; padding: 8px; font-size: 12px; }
 }
-@media (max-width: 900px) and (max-height: 720px) {
-  .projection-player-stage {
-    top: 54px;
-  }
-  .projection-player-body :deep(.embedded-player-view) { gap: 8px; }
-  .projection-player-body :deep(.embedded-player-view .player-header) { margin-bottom: 10px; }
-  .projection-player-body :deep(.embedded-player-view .player-cover) {
-    width: min(42vw, 160px);
-    margin-bottom: 8px;
-    padding: 14px;
-  }
-  .projection-player-body :deep(.embedded-player-view .player-controls) { gap: 8px; }
-  .projection-player-body :deep(.embedded-player-view .progress-container) { margin: 8px 0 4px; }
-  .projection-player-body :deep(.embedded-player-view .album-grid-visual-small),
-  .projection-player-body :deep(.embedded-player-view .character-ep-visual) { height: 88px; }
-  .projection-player-body :deep(.embedded-player-view .lyrics-container) { height: min(34vh, 190px); }
-}
-@media (max-height: 600px) {
+@media (min-width: 901px) and (max-height: 600px) {
   .projection-player-toolbar { min-height: 30px; padding-bottom: 6px; }
   .projection-player-body :deep(.embedded-player-view) { gap: 12px; }
   .projection-player-body :deep(.embedded-player-view .player-info p) { font-size: 0.8rem; }
@@ -1352,32 +1397,6 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     min-height: 40px;
     max-height: 40px;
   }
-}
-@media (max-width: 600px) and (max-height: 600px) and (orientation: landscape) {
-  .projection-player-body :deep(.embedded-player-view) {
-    display: grid;
-    height: 100%;
-    min-height: 0;
-    --record-size: min(180px, 28cqw, 42cqh);
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    grid-template-rows: minmax(0, 1fr);
-  }
-  .projection-player-body :deep(.embedded-player-view .player-view-left) {
-    grid-column: 1;
-    grid-row: 1;
-    width: 100%;
-    height: 100%;
-  }
-  .projection-player-body :deep(.embedded-player-view .player-header) { flex-direction: column; gap: 6px; }
-  .projection-player-body :deep(.embedded-player-view .player-info) { text-align: center; }
-  .projection-player-body :deep(.embedded-player-view .player-view-right) {
-    grid-column: 2;
-    grid-row: 1;
-    width: 100%;
-    height: 100%;
-  }
-  .projection-player-body :deep(.embedded-player-view .mobile-details-toggle) { display: none; }
-  .projection-player-body :deep(.embedded-player-view.single-panel) { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-height: 520px) {
   .album-entry-transition { --dock-size: 140px; --dock-bottom: 24px; }

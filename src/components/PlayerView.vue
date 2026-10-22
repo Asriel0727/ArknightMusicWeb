@@ -7,7 +7,7 @@
     </div>
     <div class="player-view-left" ref="playerLeftRef">
       <div class="player-container" ref="playerContentRef"
-        :style="playerProps.embedded ? { transform: `scale(${embeddedContentScale})` } : undefined">
+        :style="playerProps.embedded && !isMobileLayout ? { transform: `scale(${embeddedContentScale})` } : undefined">
         <div class="player-header">
           <div class="player-cover" :class="{ playing: playerState.isPlaying }">
             <img v-if="playerState.currentSong && playerState.currentSong.coverUrl"
@@ -108,7 +108,8 @@
       <div v-if="playerState.currentSong" class="player-visual-panel">
         <div class="player-visual-switch" role="group" :aria-label="t('player.visualMode')">
           <button type="button" :class="{ active: visualMode === 'cover' }" @click="showCoverVisual">
-            <i class="fas fa-image"></i> {{ t('player.coverVisual') }}
+            <i :class="isMobileLayout ? 'fas fa-align-left' : 'fas fa-image'"></i>
+            {{ isMobileLayout ? t('player.lyrics') : t('player.coverVisual') }}
           </button>
           <button type="button" :class="{ active: visualMode === 'ep' }" :disabled="isCharacterEpLoading || !characterEp"
             :title="isCharacterEpLoading ? t('common.loading') : (characterEp ? t('player.characterEp') : t('player.noCharacterEp'))"
@@ -116,7 +117,7 @@
             <i class="fas fa-film"></i> {{ t('player.characterEp') }}
           </button>
         </div>
-        <img v-if="(visualMode === 'cover' || !characterEp) && playerState.currentSong?.coverDeUrl"
+        <img v-if="!isMobileLayout && (visualMode === 'cover' || !characterEp) && playerState.currentSong?.coverDeUrl"
           :src="proxyImageUrl(playerState.currentSong?.coverDeUrl)" :alt="playerState.currentSong?.name"
           class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
           @error="handleImageError">
@@ -146,7 +147,7 @@
         <div v-if="isCharacterEpExpanded" class="character-ep-preview-backdrop" aria-hidden="true"
           @click.self="closeCharacterEpPreview"></div>
       </div>
-      <section class="player-lyrics-panel" :aria-label="t('player.lyrics')">
+      <section v-show="!isMobileLayout || visualMode !== 'ep' || !characterEp" class="player-lyrics-panel" :aria-label="t('player.lyrics')">
         <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-toolbar">
           <span class="lyrics-toolbar-title"><i class="fas fa-align-left"></i> {{ t('player.lyrics') }}</span>
           <div class="lyrics-translation-controls">
@@ -275,6 +276,10 @@ const embeddedContentScale = ref(1);
 let embeddedLayoutObserver = null;
 
 function fitEmbeddedPlayerContent() {
+  if (window.innerWidth <= 900) {
+    embeddedContentScale.value = 1;
+    return;
+  }
   const panel = playerLeftRef.value;
   const content = playerContentRef.value;
   if (!panel || !content || !content.offsetHeight || !content.offsetWidth) return;

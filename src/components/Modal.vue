@@ -85,9 +85,9 @@
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { modalState, albumState, playerState, characterState } from '../stores/player.js';
+import PlayerView from './PlayerView.vue';
 
 const AlbumDetails = defineAsyncComponent(() => import('./AlbumDetails.vue'));
-const PlayerView = defineAsyncComponent(() => import('./PlayerView.vue'));
 const CharacterDetails = defineAsyncComponent(() => import('./CharacterDetails.vue'));
 const CharacterShareDetails = defineAsyncComponent(() => import('./CharacterShareDetails.vue'));
 
