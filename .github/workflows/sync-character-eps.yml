@@ -40,6 +40,7 @@ jobs:
             scripts/character-ep-prts-bilibili.mjs
             scripts/character-ep-matching.mjs
             scripts/prts-character-ep-source.mjs
+            scripts/supabase-headers.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -49,7 +50,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Reconcile PRTS Character EP and embedded Bilibili video mapping
         run: |
-          if [ "${{ inputs.mode || 'dry-run' }}" = "apply" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.mode || 'dry-run' }}" = "apply" ]; then
             npm run character-eps:apply
           else
             npm run character-eps:dry-run

@@ -98,7 +98,12 @@
         </div>
       </div>
     </div>
-    <div class="player-view-right">
+    <button v-if="hasRightPanel" class="mobile-details-toggle" type="button"
+      :aria-expanded="isMobileDetailsOpen" @click="toggleMobileDetails">
+      <span>{{ t('player.lyrics') }} / {{ t('player.characterEp') }}</span>
+      <i :class="isMobileDetailsOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" aria-hidden="true"></i>
+    </button>
+    <div v-show="!isMobileLayout || isMobileDetailsOpen" class="player-view-right">
       <div v-if="playerState.currentSong" class="player-visual-panel">
         <div class="player-visual-switch" role="group" :aria-label="t('player.visualMode')">
           <button type="button" :class="{ active: visualMode === 'cover' }" @click="showCoverVisual">
@@ -155,6 +160,13 @@
       </div>
       <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationError" class="lyrics-translation-error" role="alert">
         {{ playerState.lyricTranslationError }}
+      </p>
+      <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationSaveStatus" class="lyrics-save-status" role="status">
+        {{ t(playerState.lyricTranslationSaveStatus === 'saved' ? 'player.translationSaved' : 'player.translationSaveFailed') }}
+        <button v-if="playerState.lyricTranslationSaveStatus === 'failed'" type="button"
+          :disabled="playerState.isTranslatingLyrics" @click="refreshLyricTranslations()">
+          {{ t('player.retryTranslationSave') }}
+        </button>
       </p>
       <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-container" ref="lyricsContainerRef"
         @scroll="handleLyricsScroll">
@@ -256,6 +268,9 @@ const emit = defineEmits(['view-album', 'character-ep-expanded-change']);
 const lyricsContainerRef = ref(null);
 const activeLyricIndex = ref(-1);
 const isCompactVolumeOpen = ref(false);
+const mobileLayoutQuery = window.matchMedia('(max-width: 900px)');
+const isMobileLayout = ref(mobileLayoutQuery.matches);
+const isMobileDetailsOpen = ref(false);
 const hasCopiedShareLink = ref(false);
 const isFavoriteSong = ref(false);
 const favoriteActionPending = ref(false);
@@ -272,7 +287,7 @@ const characterEp = ref(null);
 const isCharacterEpLoading = ref(false);
 const isBilibiliSyncPending = ref(false);
 const isCharacterEpExpanded = ref(false);
-const visualMode = ref(playerState.characterEpVisualMode);
+const visualMode = ref(isMobileLayout.value ? 'cover' : playerState.characterEpVisualMode);
 const epIframeKey = ref(0);
 const epStartTime = ref(0);
 const youtubePlayerContainer = ref(null);
@@ -647,7 +662,7 @@ const volumeIcon = computed(() => {
 });
 
 const hasRightPanel = computed(() => {
-  return Boolean(playerState.currentSong?.coverDeUrl || playerState.lyrics?.length);
+  return Boolean(playerState.currentSong?.coverDeUrl || playerState.lyrics?.length || characterEp.value);
 });
 
 const shareIcon = computed(() => {
@@ -779,6 +794,23 @@ const closeCharacterEpPreview = () => {
   if (!isCharacterEpExpanded.value) return;
   isCharacterEpExpanded.value = false;
   emit('character-ep-expanded-change', false);
+};
+
+const toggleMobileDetails = () => {
+  isMobileDetailsOpen.value = !isMobileDetailsOpen.value;
+  if (isMobileDetailsOpen.value) {
+    activeLyricIndex.value = -1;
+  } else {
+    showCoverVisual();
+  }
+};
+
+const handleMobileLayoutChange = (event) => {
+  isMobileLayout.value = event.matches;
+  if (event.matches) {
+    isMobileDetailsOpen.value = false;
+    showCoverVisual();
+  }
 };
 
 const toggleCharacterEpPreview = () => {
@@ -1072,7 +1104,8 @@ watch(() => playerState.currentSong, async (newSong) => {
   }
   isBilibiliSyncPending.value = false;
   bilibiliPendingIframeKey = -1;
-  visualMode.value = playerState.characterEpVisualMode;
+  visualMode.value = isMobileLayout.value && !isMobileDetailsOpen.value
+    ? 'cover' : playerState.characterEpVisualMode;
   epStartTime.value = getAudioCurrentTime();
   const requestedSongId = newSong?.cid;
   if (!requestedSongId) {
@@ -1105,6 +1138,7 @@ watch(locale, () => {
 
 // 組件?��??��?如�?�?��?�放?��??��?�?
 onMounted(() => {
+  mobileLayoutQuery.addEventListener('change', handleMobileLayoutChange);
   window.addEventListener('keydown', handleCharacterEpPreviewKeydown);
   window.addEventListener('focus', resyncCharacterEpAfterPageReturn);
   document.addEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
@@ -1117,6 +1151,7 @@ onMounted(() => {
 
 // 組件?��??��??��??�循?��?超�?
 onUnmounted(() => {
+  mobileLayoutQuery.removeEventListener('change', handleMobileLayoutChange);
   window.removeEventListener('keydown', handleCharacterEpPreviewKeydown);
   window.removeEventListener('focus', resyncCharacterEpAfterPageReturn);
   document.removeEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
@@ -1772,7 +1807,50 @@ defineExpose({ closeCharacterEpPreview });
   }
 }
 
+.mobile-details-toggle {
+  display: none;
+}
+
+.lyrics-save-status {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.lyrics-save-status button {
+  min-height: 44px;
+  margin-left: 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary-color);
+  font: inherit;
+  cursor: pointer;
+}
+
 @media (max-width: 900px) {
+  .mobile-details-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid rgba(132, 198, 220, 0.2);
+    border-radius: 8px;
+    background: rgba(2, 15, 25, 0.24);
+    color: var(--text-color);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .mobile-details-toggle:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
   .player-view-grid {
     grid-template-columns: 1fr;
   }

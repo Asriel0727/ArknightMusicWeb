@@ -193,6 +193,7 @@ export const playerState = reactive({
   showLyricTranslation: false,
   isTranslatingLyrics: false,
   lyricTranslationError: '',
+  lyricTranslationSaveStatus: '',
   isLoadingSong: false,
   playMode: 'repeat-all',
 });
@@ -292,6 +293,7 @@ export async function playSong(song, coverUrl, coverDeUrl) {
   const currentAudioLoadToken = ++audioLoadToken;
   playerState.isLoadingSong = true;
   playerState.lyricTranslationError = '';
+  playerState.lyricTranslationSaveStatus = '';
   try {
     resetPlaybackProgress();
     playerState.characterEpVisualMode = 'cover';
@@ -409,11 +411,12 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
   }
 
   const translationToken = ++lyricTranslationToken;
+  const isSaveRetry = playerState.lyricTranslationSaveStatus === 'failed';
+  playerState.lyricTranslationSaveStatus = '';
   playerState.lyricTranslationError = '';
-  playerState.lyrics = playerState.lyrics.map((line) => ({
-    ...line,
-    translation: '',
-  }));
+  if (!isSaveRetry) {
+    playerState.lyrics = playerState.lyrics.map((line) => ({ ...line, translation: '' }));
+  }
   playerState.isTranslatingLyrics = true;
 
   try {
@@ -431,7 +434,8 @@ export async function refreshLyricTranslations(expectedLyricLoadToken = lyricLoa
       return;
     }
 
-    playerState.lyrics = translatedLyrics;
+    playerState.lyrics = translatedLyrics.lyrics;
+    playerState.lyricTranslationSaveStatus = translatedLyrics.saveStatus;
   } catch (error) {
     if (translationToken === lyricTranslationToken) {
       playerState.lyricTranslationError = i18n.global.t('player.translationUnavailable');

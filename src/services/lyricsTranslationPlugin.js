@@ -1,6 +1,7 @@
 import {
   translateLyricsOnServer,
   translateTextOnServer,
+  saveLyricTranslationsOnServer,
 } from './api.js';
 import { normalizeChineseMusicText } from '../utils/s2tApiText.js';
 
@@ -51,6 +52,9 @@ function requestLyricTranslations(lines, targetLocale, songId) {
           throw new Error(data.error || 'Translation service unavailable');
         }
         const translations = Array.isArray(data.translations) ? data.translations : [];
+        if (translations.length !== lines.length) {
+          throw new Error('Translation service returned misaligned lyrics');
+        }
         if (data?.translatableCount > 0 && data?.translatedCount === 0) {
           throw new Error(data.error || 'Translation service returned no translated lines');
         }
@@ -59,7 +63,7 @@ function requestLyricTranslations(lines, targetLocale, songId) {
         } else {
           lyricTranslationFailureCache.delete(cacheKey);
         }
-        return translations;
+        return { translations, persistence: data.persistence || { database: data.source === 'supabase' ? 'saved' : 'unknown' } };
       })
       .catch((error) => {
         lyricTranslationPromiseCache.delete(cacheKey);
@@ -82,7 +86,7 @@ export async function prefetchLyricLines(lines, locale, songId = '') {
 
 export async function translateLyricLines(lines, locale, songId = '') {
   if (!Array.isArray(lines) || lines.length === 0) {
-    return [];
+    return { lyrics: [], saveStatus: '' };
   }
 
   const targetLocale = normalizeTargetLocale(locale);
@@ -94,40 +98,57 @@ export async function translateLyricLines(lines, locale, songId = '') {
   }));
 
   try {
-    let translations = await requestLyricTranslations(lines, targetLocale, songId);
-    if (!translations.some((translation) => String(translation || '').trim())) {
-      translations = await requestLyricTranslations(lines, targetLocale, songId);
+    let data = await requestLyricTranslations(lines, targetLocale, songId);
+    if (!data.translations.some((translation) => String(translation || '').trim())) {
+      data = await requestLyricTranslations(lines, targetLocale, songId);
     }
-
-    return result.map((line, index) => ({
-      ...line,
-      translation: translations[index] || '',
-    }));
+    await persistTranslations(data, lines, targetLocale, songId);
+    return buildTranslationResult(result, data);
   } catch (error) {
     try {
       const translations = await translateLyricLinesInBrowser(lines, targetLocale);
-      const hasTranslation = translations.some((translation) => String(translation || '').trim());
-      const hasTranslatableLine = lines.some((line) => {
+      const isComplete = lines.every((line, index) => {
         const text = getSourceText(line);
-        return !shouldSkipBrowserTranslation(text, detectSourceLocale(text), targetLocale);
+        return shouldSkipBrowserTranslation(text, detectSourceLocale(text), targetLocale)
+          || Boolean(String(translations[index] || '').trim());
       });
-      if (!hasTranslation && hasTranslatableLine) {
-        throw new Error('Browser translation fallback returned no translated lines');
+      if (!isComplete) {
+        throw new Error('Browser translation fallback returned incomplete lyrics');
       }
 
       const cacheKey = getLyricTranslationCacheKey(lines, targetLocale, songId);
+      const data = { translations, persistence: { database: 'not-saved' } };
       lyricTranslationFailureCache.delete(cacheKey);
-      lyricTranslationPromiseCache.set(cacheKey, Promise.resolve(translations));
-      return result.map((line, index) => ({
-        ...line,
-        translation: translations[index] || '',
-      }));
+      lyricTranslationPromiseCache.set(cacheKey, Promise.resolve(data));
+      await persistTranslations(data, lines, targetLocale, songId);
+      return buildTranslationResult(result, data);
     } catch (fallbackError) {
       console.warn('Lyric translation failed:', error.message);
       console.warn('Browser lyric translation fallback failed:', fallbackError.message);
       throw error;
     }
   }
+}
+
+async function persistTranslations(data, lines, targetLocale, songId) {
+  if (!songId || data.persistence?.database === 'saved') return;
+  try {
+    const saved = await saveLyricTranslationsOnServer(lines, data.translations, targetLocale, songId);
+    if (!saved.ok) throw new Error(saved.error || 'Translation save rejected');
+    data.persistence = saved.persistence;
+    // The server may already have a complete translation; use that canonical result.
+    if (Array.isArray(saved.translations)) data.translations = saved.translations;
+  } catch (error) {
+    data.persistence = { database: 'failed' };
+    console.warn('Translated lyrics could not be saved:', error.message);
+  }
+}
+
+function buildTranslationResult(lines, data) {
+  return {
+    lyrics: lines.map((line, index) => ({ ...line, translation: data.translations[index] || '' })),
+    saveStatus: data.persistence?.database === 'saved' ? 'saved' : 'failed',
+  };
 }
 
 function detectSourceLocale(text) {
@@ -185,7 +206,7 @@ async function requestBrowserTranslationBatch(batch, targetLocale) {
   for (const endpoint of GOOGLE_TRANSLATE_ENDPOINTS) {
     const params = new URLSearchParams({ client: 'gtx', sl: sourceLocale, tl: targetLocale, dt: 't', q: text });
     try {
-      const response = await fetch(`${endpoint}?${params.toString()}`);
+      const response = await fetch(`${endpoint}?${params.toString()}`, { signal: AbortSignal.timeout(10000) });
       if (!response.ok) {
         errors.push(`HTTP ${response.status}`);
         continue;

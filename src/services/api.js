@@ -314,6 +314,16 @@ export async function translateTextOnServer(text, locale) {
   return data.translation || '';
 }
 
+export async function saveLyricTranslationsOnServer(lines, translations, locale, songId) {
+  const response = await fetch(`${API_BASE}/lyrics/translations`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ songId, locale, lines: lines.map((line) => ({ text: line.sourceText || line.text || '' })), translations }),
+  });
+  if (!response.ok) throw new Error(`Translation save failed: ${response.status}`);
+  return response.json();
+}
+
 export function createSongShareUrl(songId, appUrl = window.location.href) {
   if (!songId) return '';
 

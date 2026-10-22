@@ -1060,16 +1060,16 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     overscroll-behavior: contain;
   }
   .projection-player-stage {
-    inset: 64px 12px 18px;
-    gap: 10px;
-    padding: 12px;
+    inset: 56px 4px 6px;
+    gap: 8px;
+    padding: 8px;
   }
   .projection-player-body :deep(.embedded-player-view) {
     display: flex;
     flex-direction: column;
     height: auto;
     min-height: 100%;
-    gap: 18px;
+    gap: 10px;
     align-items: stretch;
   }
   .projection-player-body :deep(.embedded-player-view .player-view-left) {
@@ -1114,7 +1114,10 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     min-height: max-content;
     align-self: start;
     overflow: visible;
-    padding: 14px;
+    padding: 8px 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
     box-sizing: border-box;
   }
   .projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
@@ -1141,9 +1144,17 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .album-entry-transition { --dock-size: min(260px, 66vw); --dock-bottom: 62px; }
   .projection-exit { left: 16px; }
   .song-projection { top: 72px; bottom: 120px; width: calc(100% - 28px); padding: 18px 14px; }
-  .projection-player-stage { inset: 66px 8px 14px; padding: 10px; border-radius: 10px 10px 18px 18px; }
+  .projection-player-stage {
+    inset: 56px 0 0;
+    padding: 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 10px 10px 0 0;
+  }
   .projection-player-status { display: none; }
-  .projection-player-toolbar { gap: 8px; padding-bottom: 10px; }
+  .projection-player-toolbar { min-height: 36px; gap: 8px; padding-bottom: 6px; }
   .projection-player-eyebrow { font-size: 12px; }
   .projection-player-queue-toggle { min-height: 32px; padding: 6px 9px; }
   .projection-player-queue-toggle > span:not(.projection-player-queue-count) { display: none; }
@@ -1164,10 +1175,9 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 @media (max-width: 900px) and (max-height: 720px) {
   .projection-player-stage {
-    inset: 54px 10px 12px;
-    padding: 10px;
+    top: 54px;
   }
-  .projection-player-body :deep(.embedded-player-view) { gap: 12px; }
+  .projection-player-body :deep(.embedded-player-view) { gap: 8px; }
   .projection-player-body :deep(.embedded-player-view .player-header) { margin-bottom: 10px; }
   .projection-player-body :deep(.embedded-player-view .player-cover) {
     width: min(42vw, 160px);

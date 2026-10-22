@@ -7,7 +7,30 @@
 3. It reads the whole-song record from Workers KV.
 4. On a KV miss, it reads `music_lyric_translations` from Supabase.
 5. On a persistent-cache miss, it translates in language-homogeneous batches.
-6. The complete aligned translation array is written once to KV and once to Supabase.
+6. The complete aligned translation array is written to Supabase, then cached in KV.
+   The response reports `persistence.database` (`saved`, `failed`, or `unavailable`)
+   independently of translation success. Supabase HTTP failures must not be treated
+   as successful saves. Both interactive translation and scheduled prewarming use
+   the same completeness guard before writing.
+
+## Browser fallback and save retries
+
+If server translation fails, the browser can translate through its fallback provider
+and submit the aligned result to `POST /api/lyrics/translations` with `songId`,
+`locale`, `lines`, and `translations`. The Worker verifies the source hash against
+the song's official LRC, validates all required lines, and reuses an existing complete
+translation when available. Browser results retain their provider provenance;
+source validation checks alignment and completeness, not linguistic correctness.
+
+The player reports whether the translation was saved. A failed save retains the
+translation in memory and exposes a save retry that does not call the translation
+provider again. This memory copy does not survive a page reload; successfully
+written KV records remain available for a later database save retry.
+
+KV failures do not prevent reading an existing Supabase translation. KV records
+include `databaseSaved`, so a translation cached during a database outage can be
+saved on the next request or prewarm run. The cache key excludes the provider,
+so provider changes do not invalidate saved translations.
 
 Each Supabase row represents one complete song and target locale. `source_lyrics` and
 `translated_lyrics` store the full text, while `translations` keeps the aligned array
