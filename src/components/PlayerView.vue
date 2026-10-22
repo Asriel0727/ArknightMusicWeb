@@ -122,16 +122,16 @@
           @error="handleImageError">
         <div v-else-if="visualMode === 'ep' && characterEp" class="character-ep-visual"
           :class="{ expanded: isCharacterEpExpanded }">
-          <div v-if="isYoutubeCharacterEp && playerState.isPlaying" class="character-ep-frame character-ep-youtube-frame">
+          <div v-if="isYoutubeCharacterEp && playerState.isPlaying && !isCharacterEpWaiting" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
           </div>
-          <iframe v-else-if="playerState.isPlaying || isBilibiliSyncPending" :key="epIframeKey" class="character-ep-frame"
+          <iframe v-else-if="!isCharacterEpWaiting && (playerState.isPlaying || isBilibiliSyncPending)" :key="epIframeKey" class="character-ep-frame"
             :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
             allow="autoplay" referrerpolicy="strict-origin-when-cross-origin" @load="handleBilibiliFrameLoad"></iframe>
           <div v-else class="character-ep-paused">
             <img v-if="characterEp.coverUrl" :src="characterEp.coverUrl" :alt="characterEp.title || t('player.characterEp')">
             <i v-else class="fas fa-film" aria-hidden="true"></i>
-            <span>{{ t('player.epPaused') }}</span>
+            <span>{{ t(isCharacterEpWaiting && playerState.isPlaying ? 'player.epWaiting' : 'player.epPaused') }}</span>
           </div>
           <button class="character-ep-expand-button" type="button"
             :aria-expanded="isCharacterEpExpanded" :aria-label="isCharacterEpExpanded ? t('player.closeVideo') : t('player.expandVideo')"
@@ -260,7 +260,7 @@ import { fetchCharacterEp, getProxyImageUrl } from '../services/api.js';
 import { authState } from '../services/auth.js';
 import { addFavoriteSong, addSongToPlaylist, createPlaylist, fetchFavoriteSongs, fetchPlaylists, removeFavoriteSong, removeSongFromPlaylist } from '../services/userLibrary.js';
 import { formatTime } from '../utils/time.js';
-import { getCharacterEpVideoOffsetSeconds, getCharacterEpVideoTime } from '../utils/characterEpPlayback.js';
+import { getCharacterEpVideoOffsetSeconds, getCharacterEpVideoTime, getCharacterEpVideoDelaySeconds } from '../utils/characterEpPlayback.js';
 
 const { t, locale } = useI18n();
 const playerProps = defineProps({
@@ -607,6 +607,27 @@ const characterEpIframeSrc = computed(() => {
 const isYoutubeCharacterEp = computed(() => /(?:youtube\.com|youtu\.be)/i.test(characterEp.value?.sourceUrl || ''));
 const isBilibiliCharacterEp = computed(() => Boolean(characterEp.value) && !isYoutubeCharacterEp.value);
 const characterEpVideoOffsetSeconds = computed(() => getCharacterEpVideoOffsetSeconds(characterEp.value, playerState.duration));
+// Follow the audio clock so pausing, seeking and backgrounding cannot exhaust
+// a wall-clock delay while the song itself is stopped.
+const isCharacterEpWaiting = computed(() => getCharacterEpVideoDelaySeconds(
+  playerState.currentTime, characterEpVideoOffsetSeconds.value,
+) > 0);
+
+watch(isCharacterEpWaiting, (waiting) => {
+  if (waiting) {
+    clearYoutubePlayer();
+    if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
+    bilibiliSyncTimeout = null;
+    isBilibiliSyncPending.value = false;
+    bilibiliPendingIframeKey = -1;
+  } else if (visualMode.value === 'ep' && characterEp.value && playerState.isPlaying) {
+    nextTick(() => {
+      if (visualMode.value !== 'ep' || !characterEp.value || !playerState.isPlaying || isCharacterEpWaiting.value) return;
+      if (isYoutubeCharacterEp.value) createYoutubePlayer();
+      else restartCharacterEp();
+    });
+  }
+});
 
 // Metadata may arrive after the MV starts. Apply the duration estimate once it
 // becomes available, including when the browser corrects the audio duration.
@@ -640,7 +661,7 @@ const clearYoutubePlayer = () => {
 };
 
 const syncYoutubeToAudio = (force = false, audioTimeOverride = null) => {
-  if (!youtubePlayer || !playerState.audioPlayer || !playerState.isPlaying) return;
+  if (!youtubePlayer || !playerState.audioPlayer || !playerState.isPlaying || isCharacterEpWaiting.value) return;
   const audioTime = Number.isFinite(audioTimeOverride)
     ? Math.max(0, audioTimeOverride)
     : (playerState.audioPlayer.currentTime || 0);
@@ -650,7 +671,7 @@ const syncYoutubeToAudio = (force = false, audioTimeOverride = null) => {
 };
 
 const createYoutubePlayer = async () => {
-  if (!isYoutubeCharacterEp.value || !playerState.isPlaying || !youtubePlayerContainer.value) return;
+  if (!isYoutubeCharacterEp.value || !playerState.isPlaying || isCharacterEpWaiting.value || !youtubePlayerContainer.value) return;
   const videoId = characterEp.value?.bvid;
   if (!videoId) return;
   clearYoutubePlayer();
@@ -661,13 +682,22 @@ const createYoutubePlayer = async () => {
       generation !== youtubePlayerGeneration ||
       !youtubePlayerContainer.value ||
       !playerState.isPlaying ||
+      isCharacterEpWaiting.value ||
       characterEp.value?.bvid !== videoId
     ) return;
     youtubePlayer = new YT.Player(youtubePlayerContainer.value, {
       videoId,
       playerVars: { autoplay: 1, mute: 1, playsinline: 1, rel: 0, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3, origin: window.location.origin, start: Math.floor(getCharacterEpVideoTime(playerState.audioPlayer?.currentTime || 0, characterEpVideoOffsetSeconds.value)) },
       events: {
-        onReady: (event) => { event.target.mute(); syncYoutubeToAudio(true); event.target.playVideo(); },
+        onReady: (event) => {
+          event.target.mute();
+          if (!playerState.isPlaying || isCharacterEpWaiting.value) {
+            event.target.pauseVideo();
+            return;
+          }
+          syncYoutubeToAudio(true);
+          event.target.playVideo();
+        },
         onStateChange: (event) => { if (event.data === YT.PlayerState.PLAYING) syncYoutubeToAudio(); },
       },
     });
@@ -769,6 +799,12 @@ const startBilibiliSync = (audioTimeOverride = null) => {
   epStartTime.value = Number.isFinite(audioTimeOverride)
     ? Math.max(0, audioTimeOverride)
     : getAudioCurrentTime();
+  if (!playerState.isPlaying || getCharacterEpVideoDelaySeconds(epStartTime.value, characterEpVideoOffsetSeconds.value) > 0) {
+    bilibiliSyncTimeout = null;
+    isBilibiliSyncPending.value = false;
+    bilibiliPendingIframeKey = -1;
+    return;
+  }
   isBilibiliSyncPending.value = true;
   epIframeKey.value += 1;
   bilibiliPendingIframeKey = epIframeKey.value;
@@ -1070,6 +1106,10 @@ watch(() => playerState.isPlaying, (isPlaying) => {
     startLyricsSync();
   } else {
     stopLyricsSync();
+    if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
+    bilibiliSyncTimeout = null;
+    isBilibiliSyncPending.value = false;
+    bilibiliPendingIframeKey = -1;
   }
   if (visualMode.value === 'ep' && characterEp.value) {
     if (isBilibiliCharacterEp.value) {
