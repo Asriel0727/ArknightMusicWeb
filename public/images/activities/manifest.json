@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-23T05:04:53.633Z",
+  "generatedAt": "2026-10-23T11:51:49.716Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -795,13 +795,13 @@
       "syncedAt": "2026-08-07T06:26:18.331Z"
     },
     "wiki-a-gift-of-time": {
-      "publicPath": "/images/activities/wiki-a-gift-of-time.jpg",
-      "relativePath": "public/images/activities/wiki-a-gift-of-time.jpg",
-      "sourceUrl": "https://media.prts.wiki/b/bf/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%97%B6%E5%85%89%E7%9A%84%E8%B5%A0%E7%A4%BC_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 411025,
-      "hash": "5f978676e2a417299098daefa1f67d6ff184eb423995ed03fe48e7aae052e47a",
-      "syncedAt": "2026-07-17T03:50:16.141Z"
+      "publicPath": "/images/activities/wiki-a-gift-of-time.png",
+      "relativePath": "public/images/activities/wiki-a-gift-of-time.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_A_Gift_of_Time_banner.png?d98977",
+      "contentType": "image/png",
+      "size": 1194956,
+      "hash": "a69c0e8f15ba72e13453b82a59734220327aa61b533ab247e04a2800542fb0b1",
+      "syncedAt": "2026-10-23T11:51:49.716Z"
     },
     "prts-v8thu5": {
       "publicPath": "/images/activities/prts-v8thu5.jpg",
@@ -3720,6 +3720,15 @@
       "size": 473310,
       "hash": "25110dfea3037255a670e85e01cf4f05be88842405c6c1828c5ec6bcf82ae281",
       "syncedAt": "2026-10-17T10:58:51.076Z"
+    },
+    "wiki-poly-vision-museum-evolution": {
+      "publicPath": "/images/activities/wiki-poly-vision-museum-evolution.webp",
+      "relativePath": "public/images/activities/wiki-poly-vision-museum-evolution.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Poly_Vision_Museum_Evolution_banner.png?e4c193",
+      "contentType": "image/webp",
+      "size": 748706,
+      "hash": "7636227c3f659386881c58d916a66717d9304374fa8a67e4255bf86d15fdd724",
+      "syncedAt": "2026-10-23T11:51:49.555Z"
     }
   }
 }
