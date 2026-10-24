@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-24T16:06:15.575Z",
+  "generatedAt": "2026-10-24T20:59:52.494Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -273,13 +273,13 @@
       "syncedAt": "2026-07-17T03:49:59.669Z"
     },
     "wiki-languid-sentiment": {
-      "publicPath": "/images/activities/wiki-languid-sentiment.jpg",
-      "relativePath": "public/images/activities/wiki-languid-sentiment.jpg",
-      "sourceUrl": "https://media.prts.wiki/9/94/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%85%B5%E6%87%92%E5%BF%83%E6%84%8F_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 301776,
-      "hash": "9b1bff71c6f1987551df0a0ee0f9fb5562cb66006efc2e4062dfb8417faf5070",
-      "syncedAt": "2026-10-24T16:06:15.575Z"
+      "publicPath": "/images/activities/wiki-languid-sentiment.png",
+      "relativePath": "public/images/activities/wiki-languid-sentiment.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Languid_Sentiment_banner.png?b9e063",
+      "contentType": "image/png",
+      "size": 901599,
+      "hash": "fba83264ae97cc467b251f7323f5f2a5f20ee048b919f22948da5f281db6b174",
+      "syncedAt": "2026-10-24T20:59:52.493Z"
     },
     "prts-17xyioi": {
       "publicPath": "/images/activities/prts-17xyioi.jpg",
@@ -3734,13 +3734,58 @@
       "syncedAt": "2026-10-17T10:58:51.076Z"
     },
     "wiki-poly-vision-museum-evolution": {
-      "publicPath": "/images/activities/wiki-poly-vision-museum-evolution.webp",
-      "relativePath": "public/images/activities/wiki-poly-vision-museum-evolution.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Poly_Vision_Museum_Evolution_banner.png?e4c193",
-      "contentType": "image/webp",
-      "size": 748706,
-      "hash": "7636227c3f659386881c58d916a66717d9304374fa8a67e4255bf86d15fdd724",
-      "syncedAt": "2026-10-23T11:51:49.555Z"
+      "publicPath": "/images/activities/wiki-poly-vision-museum-evolution.jpg",
+      "relativePath": "public/images/activities/wiki-poly-vision-museum-evolution.jpg",
+      "sourceUrl": "https://media.prts.wiki/0/03/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82026_11.jpg",
+      "contentType": "image/jpeg",
+      "size": 424203,
+      "hash": "f2a277cecd0134f11a4c193e4b8d31b9ead355f6b8aa57bc3cef72b9414bbc3b",
+      "syncedAt": "2026-10-24T20:59:52.336Z"
+    },
+    "prts-1vwk3x0": {
+      "publicPath": "/images/activities/prts-1vwk3x0.jpg",
+      "relativePath": "public/images/activities/prts-1vwk3x0.jpg",
+      "sourceUrl": "https://media.prts.wiki/4/49/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82026_39.JPG",
+      "contentType": "image/jpeg",
+      "size": 442130,
+      "hash": "b2006ab118079079b3a63424185b4c3f0510269ae068a5d4c5d8a505992eed49",
+      "syncedAt": "2026-10-24T20:59:50.003Z"
+    },
+    "prts-o2qjoo": {
+      "publicPath": "/images/activities/prts-o2qjoo.jpg",
+      "relativePath": "public/images/activities/prts-o2qjoo.jpg",
+      "sourceUrl": "https://media.prts.wiki/9/9d/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82026_33.JPG",
+      "contentType": "image/jpeg",
+      "size": 322358,
+      "hash": "6a5f5d14346eb18237d6974b6ff1eb6ff7a19f3a5f85b186d75d35542c5d4ea2",
+      "syncedAt": "2026-10-24T20:59:50.662Z"
+    },
+    "wiki-vremya-v-put": {
+      "publicPath": "/images/activities/wiki-vremya-v-put.jpg",
+      "relativePath": "public/images/activities/wiki-vremya-v-put.jpg",
+      "sourceUrl": "https://media.prts.wiki/4/49/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82026_02.JPG",
+      "contentType": "image/jpeg",
+      "size": 447932,
+      "hash": "fede06a11a5923b74c74360b151b3dc9224b30a4370202192e2db5cf6d4586d8",
+      "syncedAt": "2026-10-24T20:59:51.275Z"
+    },
+    "prts-1f0xrt0": {
+      "publicPath": "/images/activities/prts-1f0xrt0.jpg",
+      "relativePath": "public/images/activities/prts-1f0xrt0.jpg",
+      "sourceUrl": "https://media.prts.wiki/b/b7/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82026_12.JPG",
+      "contentType": "image/jpeg",
+      "size": 439279,
+      "hash": "5ddec46c02155afd73a97e330b9dc050448de08007d4bb9b6f697c3adb50e8b6",
+      "syncedAt": "2026-10-24T20:59:51.749Z"
+    },
+    "prts-18c0i02": {
+      "publicPath": "/images/activities/prts-18c0i02.jpg",
+      "relativePath": "public/images/activities/prts-18c0i02.jpg",
+      "sourceUrl": "https://media.prts.wiki/c/cf/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%84%9F%E8%B0%A2%E5%BA%86%E5%85%B82026_10.jpg",
+      "contentType": "image/jpeg",
+      "size": 306900,
+      "hash": "8c892dc979b6c64fef1241190983022dde0a82a885022f2ed954139c87eb4014",
+      "syncedAt": "2026-10-24T20:59:52.034Z"
     }
   }
 }
