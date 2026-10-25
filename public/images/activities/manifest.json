@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-24T20:59:52.494Z",
+  "generatedAt": "2026-10-25T04:57:42.450Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -210,13 +210,13 @@
       "syncedAt": "2026-07-17T03:49:57.942Z"
     },
     "wiki-crossing": {
-      "publicPath": "/images/activities/wiki-crossing.png",
-      "relativePath": "public/images/activities/wiki-crossing.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Crossing_banner.png?51dbf8",
-      "contentType": "image/png",
-      "size": 1260096,
-      "hash": "a5987cbff31bc74ff5ac24f8cce7522f7b824087d89d3d4ba83cdf5b61dfce4d",
-      "syncedAt": "2026-10-20T11:53:00.220Z"
+      "publicPath": "/images/activities/wiki-crossing.jpg",
+      "relativePath": "public/images/activities/wiki-crossing.jpg",
+      "sourceUrl": "https://media.prts.wiki/7/79/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%81%E5%AD%97%E8%B7%AF%E5%8F%A3_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 471348,
+      "hash": "8be10006032610874d92f735b46283b4e5e95509c3e8973ec4f53c89ab78437e",
+      "syncedAt": "2026-10-25T04:57:39.316Z"
     },
     "prts-1m42naa": {
       "publicPath": "/images/activities/prts-1m42naa.jpg",
@@ -237,13 +237,13 @@
       "syncedAt": "2026-07-17T03:49:58.701Z"
     },
     "wiki-first-of-a-thousand-autumns": {
-      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.webp",
-      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_First_of_A_Thousand_Autumns_banner.png?72d32f",
-      "contentType": "image/webp",
-      "size": 1285088,
-      "hash": "a345cc93d50c3b7da92bfb9f20c64428e3e70169d2f735fa4e64ac16ff5c11dc",
-      "syncedAt": "2026-10-20T11:53:00.257Z"
+      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.jpg",
+      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.jpg",
+      "sourceUrl": "https://media.prts.wiki/d/d4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BE%9E%E5%B2%81%E8%A1%8C_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 432667,
+      "hash": "121524b8cb3c3aab55cfd041ce5ecc002389f0f67307440eee0206e5b66480c7",
+      "syncedAt": "2026-10-25T04:57:40.055Z"
     },
     "prts-1cqt5uv": {
       "publicPath": "/images/activities/prts-1cqt5uv.jpg",
@@ -273,13 +273,13 @@
       "syncedAt": "2026-07-17T03:49:59.669Z"
     },
     "wiki-languid-sentiment": {
-      "publicPath": "/images/activities/wiki-languid-sentiment.png",
-      "relativePath": "public/images/activities/wiki-languid-sentiment.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Languid_Sentiment_banner.png?b9e063",
-      "contentType": "image/png",
-      "size": 901599,
-      "hash": "fba83264ae97cc467b251f7323f5f2a5f20ee048b919f22948da5f281db6b174",
-      "syncedAt": "2026-10-24T20:59:52.493Z"
+      "publicPath": "/images/activities/wiki-languid-sentiment.jpg",
+      "relativePath": "public/images/activities/wiki-languid-sentiment.jpg",
+      "sourceUrl": "https://media.prts.wiki/9/94/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%85%B5%E6%87%92%E5%BF%83%E6%84%8F_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 301776,
+      "hash": "9b1bff71c6f1987551df0a0ee0f9fb5562cb66006efc2e4062dfb8417faf5070",
+      "syncedAt": "2026-10-25T04:57:40.545Z"
     },
     "prts-17xyioi": {
       "publicPath": "/images/activities/prts-17xyioi.jpg",
@@ -1083,13 +1083,13 @@
       "syncedAt": "2026-07-17T03:50:25.804Z"
     },
     "wiki-babel-event": {
-      "publicPath": "/images/activities/wiki-babel-event.png",
-      "relativePath": "public/images/activities/wiki-babel-event.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_banner.png?633a64",
-      "contentType": "image/png",
-      "size": 1368155,
-      "hash": "0afdbf3c48a19739726d3d610510c344b3515832b0c4730926761204a0b78a2a",
-      "syncedAt": "2026-10-23T05:04:53.624Z"
+      "publicPath": "/images/activities/wiki-babel-event.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-10-25T04:57:42.450Z"
     },
     "prts-6rbm0p": {
       "publicPath": "/images/activities/prts-6rbm0p.jpg",
@@ -3225,22 +3225,22 @@
       "syncedAt": "2026-07-17T09:56:38.783Z"
     },
     "wiki-contingency-contract-arclight": {
-      "publicPath": "/images/activities/wiki-contingency-contract-arclight.jpg",
-      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.jpg",
-      "sourceUrl": "https://media.prts.wiki/0/0e/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%B1%E6%9C%BA%E5%90%88%E7%BA%A6%E6%B6%A4%E5%A2%A8%E4%BD%9C%E6%88%98_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 499320,
-      "hash": "049f6021c182183cb441414851082d8628de9588a2649385d6e9439bc0301165",
-      "syncedAt": "2026-10-23T05:04:52.940Z"
+      "publicPath": "/images/activities/wiki-contingency-contract-arclight.png",
+      "relativePath": "public/images/activities/wiki-contingency-contract-arclight.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Contingency_Contract_Arclight_banner.png?58ee45",
+      "contentType": "image/png",
+      "size": 339979,
+      "hash": "8f1e28a3cc7eec1ad1f4eda824e5b70ebc847c13551b191011574550867d9b37",
+      "syncedAt": "2026-10-25T04:57:40.886Z"
     },
     "wiki-babel-event-rerun": {
-      "publicPath": "/images/activities/wiki-babel-event-rerun.webp",
-      "relativePath": "public/images/activities/wiki-babel-event-rerun.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_Rerun_banner.png?b0dc17",
-      "contentType": "image/webp",
-      "size": 793802,
-      "hash": "78c21c9cbd263d4b46c34b6e40b0c3a570491b19e5b5b7ade70c3cb6f537e06a",
-      "syncedAt": "2026-10-23T05:04:53.210Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-10-25T04:57:41.326Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
@@ -3252,22 +3252,22 @@
       "syncedAt": "2026-10-14T12:10:18.646Z"
     },
     "wiki-stronghold-protocol-event": {
-      "publicPath": "/images/activities/wiki-stronghold-protocol-event.png",
-      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Stronghold_Protocol_banner.png?a4b4e2",
-      "contentType": "image/png",
-      "size": 844107,
-      "hash": "c139cc4c1ad6c9cd96f31de612221913b5cd946467b87fb6afed8c30badcf8ce",
-      "syncedAt": "2026-10-23T05:04:53.256Z"
+      "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
+      "relativePath": "public/images/activities/wiki-stronghold-protocol-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/f/f4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%AB%E6%88%8D%E5%8D%8F%E8%AE%AE%EF%BC%9A%E7%9B%9F%E7%BA%A6_%E4%B8%8B%E5%8D%8A_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 244822,
+      "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
+      "syncedAt": "2026-10-25T04:57:41.684Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.webp",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ending_a_Grand_Overture_banner.png?e80c0c",
-      "contentType": "image/webp",
-      "size": 847718,
-      "hash": "4527335cd9b23ecc2df1c83a0b12bd3fb37fbb4d745804e14b6c46f17110a11f",
-      "syncedAt": "2026-10-23T05:04:53.313Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
+      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 280529,
+      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
+      "syncedAt": "2026-10-25T04:57:42.137Z"
     },
     "wiki-vector-breakthrough-event": {
       "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
