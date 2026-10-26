@@ -91,6 +91,8 @@
     "loading": "載入中…"
   },
   "album": {
+    "nowPlaying": "正在播放",
+    "returnToPlayer": "回到播放",
     "selectAlbum": "選取專輯",
     "loadError": "專輯暫時無法載入，請稍後再試。",
     "retry": "重試",

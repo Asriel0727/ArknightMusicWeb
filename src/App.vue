@@ -172,8 +172,7 @@ const handleOpenCurrentAlbum = async () => {
   // search also invalidates any in-flight search response in AlbumList.
   topBarRef.value?.clearSearch();
   const origin = await albumListRef.value?.focusAlbumForOpening?.(albumId);
-  if (!origin) return;
-  await handleViewAlbum(albumId, origin, { openPlayerForSongId: songId });
+  await handleViewAlbum(albumId, origin || null, { openPlayerForSongId: songId });
 };
 
 const completeAlbumTransition = () => {
@@ -216,6 +215,8 @@ const handleTransitionPlaySong = async (songIndex) => {
   };
   modalState.currentView = 'album';
   modalState.isOpen = false;
+  const selectedSong = albumTransition.value.songs[songIndex];
+  if (selectedSong?.cid != null && String(selectedSong.cid) === String(playerState.currentSong?.cid)) return;
   await playSongFromAlbum(songIndex, albumId);
 };
 
@@ -228,6 +229,8 @@ const handleEmbeddedQueueSong = async (songIndex) => {
     playerOpen: true,
     playerSongIndex: songIndex,
   };
+  const selectedSong = albumTransition.value.songs[songIndex];
+  if (selectedSong?.cid != null && String(selectedSong.cid) === String(playerState.currentSong?.cid)) return;
   await playSongFromAlbum(songIndex, albumId);
 };
 

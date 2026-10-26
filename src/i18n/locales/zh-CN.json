@@ -91,6 +91,8 @@
     "loading": "载入中…"
   },
   "album": {
+    "nowPlaying": "正在播放",
+    "returnToPlayer": "回到播放",
     "selectAlbum": "选取专辑",
     "loadError": "专辑暂时无法加载，请稍后再试。",
     "retry": "重试",

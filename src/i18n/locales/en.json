@@ -91,6 +91,8 @@
     "loading": "Loading…"
   },
   "album": {
+    "nowPlaying": "Now playing",
+    "returnToPlayer": "Now playing",
     "selectAlbum": "Select album",
     "loadError": "Unable to load this album. Please try again.",
     "retry": "Retry",

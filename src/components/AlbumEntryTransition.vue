@@ -9,13 +9,6 @@
         <span aria-hidden="true">←</span> {{ t('album.back') }}
       </button>
 
-      <div ref="dock" class="record-dock" aria-hidden="true">
-        <div class="projection-beam"></div>
-        <div class="record-floor"></div>
-        <div ref="travel" class="record-travel">
-          <div ref="tilt" class="record-tilt"><VinylDisc :cover="coverUrl" /></div>
-        </div>
-      </div>
       <div v-if="origin?.card && album" ref="sourceCard" class="source-card album-slot is-active"
         :style="sourceCardStyle" aria-hidden="true" inert>
         <div class="source-card-record" aria-hidden="true">
@@ -26,107 +19,133 @@
       <img v-if="origin?.cover && coverUrl" ref="sleeve" class="source-sleeve"
         :style="sleeveStyle" :src="coverUrl" alt="" aria-hidden="true">
 
-      <section ref="projectionPanelRef" class="song-projection" :inert="!landed" :aria-busy="!ready">
-        <div class="projection-album-info">
-          <figure v-if="coverUrl" class="album-cover-visual">
-            <img :src="coverUrl" :alt="album?.name || ''" decoding="async" @error="hideBrokenImage">
-          </figure>
-          <div class="projection-album-copy">
-            <header class="song-projection-header">
-              <h1 id="projection-title">{{ album?.name || t('album.trackList') }}</h1>
-              <p>{{ album?.artistes?.join(' · ') || album?.belong || '唱片資料' }}</p>
-            </header>
-            <p v-if="album?.intro" class="album-intro">{{ normalizeEscapedNewlines(album.intro) }}</p>
-          </div>
-        </div>
-        <div class="projection-album-content">
-          <figure v-if="album?.coverDeUrl" class="album-inner-visual">
-            <img :src="proxyImageUrl(album.coverDeUrl)" :alt="album?.name || ''" decoding="async" @error="hideBrokenImage">
-          </figure>
-          <section class="projection-tracks" :class="{ 'compact-tracks': hasManyTracks }" :aria-label="t('album.trackList')">
-            <div class="track-heading">
-              <h2>{{ t('album.trackList') }}</h2>
-              <span v-if="ready && !error">{{ t('album.trackCount', { count: visibleProjectionTracks.length }) }}</span>
-            </div>
-            <input v-if="hasManyTracks && ready && !error" v-model="trackSearchQuery" class="projection-track-search"
-              type="search" :placeholder="t('searchBar.trackPlaceholder')" :aria-label="t('searchBar.trackPlaceholder')">
-            <div class="projection-track-area" ref="trackAreaRef" tabindex="0" :aria-label="t('album.trackList')">
-              <div v-if="error" class="projection-message" role="alert">
-                <p>{{ t('album.loadError') }}</p>
-                <button type="button" @click="emit('retry')">{{ t('album.retry') }}</button>
-              </div>
-              <p v-else-if="!ready" class="projection-message" role="status">{{ t('common.loading') }}</p>
-              <p v-else-if="!songs.length" class="projection-message">{{ t('album.emptyTracks') }}</p>
-              <p v-else-if="!visibleProjectionTracks.length" class="projection-message" role="status">{{ t('searchBar.noMatchingTracks') }}</p>
-              <ol v-else class="song-projection-list">
-                <li v-for="{ song, index } in visibleProjectionTracks" :key="song.cid || index" class="song-projection-row"
-                  :class="{ 'is-launching': selectedTrackIndex === index && isLaunchingPlayer }">
-                  <span class="song-projection-number">{{ String(index + 1).padStart(2, '0') }}</span>
-                  <span class="song-projection-name" :title="song.name">{{ song.name }}</span>
-                  <span class="song-projection-artist">{{ song.artistes?.join(', ') || '—' }}</span>
-                  <button class="song-projection-play" type="button" :aria-label="t('album.play') + ' ' + song.name"
-                    @click="handleProjectionPlaySong(index)"><span aria-hidden="true">▷</span> {{ t('album.play') }}</button>
-                </li>
-              </ol>
-            </div>
-          </section>
-        </div>
-      </section>
-      <Transition name="projection-player-stage">
-        <section v-if="playerOpen" class="projection-player-stage" :aria-label="t('album.play')">
+      <div class="album-display-stage">
+        <section class="song-projection" :inert="!landed" :aria-busy="!ready">
+          <img v-if="album?.coverDeUrl" :key="album.coverDeUrl" class="projection-artwork" :src="proxyImageUrl(album.coverDeUrl)"
+            alt="" aria-hidden="true" decoding="async" @error="hideBrokenImage">
           <div class="projection-player-toolbar">
             <div class="projection-player-toolbar-left">
               <div class="projection-player-context">
-                <span class="projection-player-eyebrow">{{ album?.name || t('album.trackList') }}</span>
-                <span class="projection-player-status">
+                <span id="projection-title" class="projection-player-eyebrow">{{ album?.name || t('album.trackList') }}</span>
+                <span v-if="playerOpen" class="projection-player-status">
                   <span class="projection-player-status-dot" aria-hidden="true"></span>
                   {{ t('album.play') }}
                 </span>
               </div>
             </div>
-            <button v-if="songs.length" class="projection-player-queue-toggle" type="button"
-              :aria-expanded="queueOpen" aria-controls="projection-player-queue" @click="queueOpen = !queueOpen">
-              <i class="fas fa-list" aria-hidden="true"></i>
-              <span>{{ t('album.trackList') }}</span>
-              <span class="projection-player-queue-count">{{ songs.length }}</span>
-              <i :class="queueOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" aria-hidden="true"></i>
-            </button>
-          </div>
-
-          <div class="projection-player-body">
-            <PlayerView ref="playerViewRef" :embedded="true"
-              @character-ep-expanded-change="isCharacterEpExpanded = $event" />
-          </div>
-
-          <Transition name="projection-queue-drawer">
-            <section v-if="songs.length && queueOpen" id="projection-player-queue" class="projection-player-queue"
-              :aria-label="t('album.trackList')">
-              <div class="projection-player-queue-heading">
+            <div class="projection-toolbar-actions">
+              <button v-if="!playerOpen && currentAlbumSongIndex >= 0" type="button" class="projection-player-queue-toggle"
+                @click="handleProjectionPlaySong(currentAlbumSongIndex)">
+                {{ t('album.returnToPlayer') }}
+              </button>
+              <button v-if="playerOpen" type="button" class="projection-player-queue-toggle" @click="emit('close-player')">
+                <span aria-hidden="true">←</span> {{ t('album.trackList') }}
+              </button>
+              <button v-if="playerOpen && songs.length" class="projection-player-queue-toggle" type="button"
+                :aria-expanded="queueOpen" aria-controls="projection-player-queue" @click="queueOpen = !queueOpen">
+                <i class="fas fa-list" aria-hidden="true"></i>
                 <span>{{ t('album.trackList') }}</span>
-                <span>{{ t('album.trackCount', { count: songs.length }) }}</span>
+                <span class="projection-player-queue-count">{{ songs.length }}</span>
+                <i :class="queueOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div v-show="!playerOpen" class="projection-layout" :inert="playerOpen">
+            <div class="projection-album-info">
+              <figure v-if="coverUrl" class="album-cover-visual">
+                <img :src="coverUrl" :alt="album?.name || ''" decoding="async" @error="hideBrokenImage">
+              </figure>
+              <div class="projection-album-copy">
+                <header class="song-projection-header">
+                  <h1>{{ album?.name || t('album.trackList') }}</h1>
+                  <p>{{ album?.artistes?.join(' · ') || album?.belong || '唱片資料' }}</p>
+                </header>
+                <blockquote v-if="albumIntroLines.length" class="album-tagline">{{ albumIntroLines[0] }}</blockquote>
+                <p v-if="albumIntroLines.length > 1" class="album-intro">{{ albumIntroLines.slice(1).join('\n') }}</p>
               </div>
-              <ol class="projection-player-queue-list">
-                <li v-for="(song, index) in songs" :key="song.cid || `queue-${index}`"
-                  class="projection-player-queue-item" :class="{ active: activeQueueIndex === index }">
-                  <button type="button" @click="handleQueueSong(index)">
-                    <span class="projection-player-queue-number">{{ String(index + 1).padStart(2, '0') }}</span>
-                    <span class="projection-player-queue-name">{{ song.name }}</span>
-                    <span class="projection-player-queue-state" aria-hidden="true">
-                      {{ activeQueueIndex === index ? '▶' : '＋' }}
-                    </span>
-                  </button>
-                </li>
-              </ol>
-            </section>
-          </Transition>
+            </div>
+            <div class="projection-album-content">
+              <section class="projection-tracks" :class="{ 'compact-tracks': hasManyTracks }" :aria-label="t('album.trackList')">
+                <div class="track-heading">
+                  <h2>{{ t('album.trackList') }}</h2>
+                  <span v-if="ready && !error">{{ t('album.trackCount', { count: visibleProjectionTracks.length }) }}</span>
+                </div>
+                <input v-if="hasManyTracks && ready && !error" v-model="trackSearchQuery" class="projection-track-search"
+                  type="search" :placeholder="t('searchBar.trackPlaceholder')" :aria-label="t('searchBar.trackPlaceholder')">
+                <div class="projection-track-area" ref="trackAreaRef" tabindex="0" :aria-label="t('album.trackList')">
+                  <div v-if="error" class="projection-message" role="alert">
+                    <p>{{ t('album.loadError') }}</p>
+                    <button type="button" @click="emit('retry')">{{ t('album.retry') }}</button>
+                  </div>
+                  <p v-else-if="!ready" class="projection-message" role="status">{{ t('common.loading') }}</p>
+                  <p v-else-if="!songs.length" class="projection-message">{{ t('album.emptyTracks') }}</p>
+                  <p v-else-if="!visibleProjectionTracks.length" class="projection-message" role="status">{{ t('searchBar.noMatchingTracks') }}</p>
+                  <ol v-else class="song-projection-list">
+                    <li v-for="{ song, index } in visibleProjectionTracks" :key="song.cid || index" class="song-projection-row"
+                      :class="{ 'is-current': index === currentAlbumSongIndex, 'is-launching': selectedTrackIndex === index && isLaunchingPlayer }"
+                      :aria-current="index === currentAlbumSongIndex ? 'true' : undefined">
+                      <span class="song-projection-number">{{ String(index + 1).padStart(2, '0') }}</span>
+                      <span class="song-projection-name" :title="song.name">{{ song.name }}</span>
+                      <span class="song-projection-artist">{{ song.artistes?.join(', ') || '—' }}</span>
+                      <span class="song-projection-waveform" aria-hidden="true">
+                        <i v-for="(height, bar) in waveformHeights" :key="bar"
+                          :style="{ '--bar-height': `${index === currentAlbumSongIndex ? spectrumHeights[bar] : height}px` }"></i>
+                      </span>
+                      <button class="song-projection-play" type="button"
+                        :aria-label="t(index === currentAlbumSongIndex ? 'album.returnToPlayer' : 'album.play') + ' ' + song.name"
+                        @click="handleProjectionPlaySong(index)"><span v-if="index !== currentAlbumSongIndex" aria-hidden="true">▷</span>
+                        {{ t(index === currentAlbumSongIndex ? (playerState.isPlaying ? 'album.nowPlaying' : 'album.returnToPlayer') : 'album.play') }}</button>
+                    </li>
+                  </ol>
+                </div>
+              </section>
+            </div>
+          </div>
+          <section v-if="playerOpen" class="projection-player-stage" :aria-label="t('album.play')">
+            <div class="projection-player-body">
+              <PlayerView ref="playerViewRef" :embedded="true"
+                @character-ep-expanded-change="isCharacterEpExpanded = $event" />
+            </div>
+
+            <Transition name="projection-queue-drawer">
+              <section v-if="songs.length && queueOpen" id="projection-player-queue" class="projection-player-queue"
+                :aria-label="t('album.trackList')">
+                <div class="projection-player-queue-heading">
+                  <span>{{ t('album.trackList') }}</span>
+                  <span>{{ t('album.trackCount', { count: songs.length }) }}</span>
+                </div>
+                <ol class="projection-player-queue-list">
+                  <li v-for="(song, index) in songs" :key="song.cid || `queue-${index}`"
+                    class="projection-player-queue-item" :class="{ active: activeQueueIndex === index }">
+                    <button type="button" @click="handleQueueSong(index)">
+                      <span class="projection-player-queue-number">{{ String(index + 1).padStart(2, '0') }}</span>
+                      <span class="projection-player-queue-name">{{ song.name }}</span>
+                      <span class="projection-player-queue-state" aria-hidden="true">
+                        {{ activeQueueIndex === index ? '▶' : '＋' }}
+                      </span>
+                    </button>
+                  </li>
+                </ol>
+              </section>
+            </Transition>
+          </section>
         </section>
-      </Transition>
+        <div ref="dock" class="record-dock" aria-hidden="true">
+          <div class="projection-beam"></div>
+          <div class="record-floor"></div>
+          <div ref="travel" class="record-travel">
+            <div ref="tilt" class="record-tilt"><VinylDisc :cover="coverUrl" /></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </Transition>
 </template>
 
 <script setup>
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { readAudioSpectrum } from '../utils/audioSpectrum.js';
 import { useI18n } from 'vue-i18n';
 import { getProxyImageUrl } from '../services/api.js';
 import { normalizeEscapedNewlines } from '../utils/formatApiText.js';
@@ -150,48 +169,36 @@ const { t } = useI18n();
 const dialog = ref(null);
 const closeButton = ref(null);
 const playerViewRef = ref(null);
-const projectionPanelRef = ref(null);
 const hasManyTracks = computed(() => props.songs.length > 6);
-let projectionPanelObserver = null;
-
-function fitProjectionPanel() {
-  const panel = projectionPanelRef.value;
-  if (!panel) return;
-  if (window.innerWidth <= 900) {
-    panel.style.removeProperty('--projection-height');
-    return;
-  }
-  const cover = panel.querySelector('.album-cover-visual');
-  const copy = panel.querySelector('.projection-album-copy');
-  const banner = panel.querySelector('.album-inner-visual');
-  const styles = getComputedStyle(panel);
-  const padding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
-  const gap = parseFloat(styles.columnGap);
-  const infoHeight = window.innerWidth <= 600
-    ? Math.max(cover?.offsetHeight || 0, copy?.scrollHeight || 0)
-    : (cover?.offsetHeight || 0) + (copy?.scrollHeight || 0) + 18;
-  const rowCount = Math.max(1, Math.min(props.songs.length, 8));
-  const rowHeight = hasManyTracks.value ? 54 : 68;
-  const rowGap = hasManyTracks.value ? 6 : 10;
-  const trackHeight = rowCount * rowHeight + (rowCount - 1) * rowGap + 24 + 12 + 8 + (hasManyTracks.value ? 54 : 0);
-  const contentHeight = (banner?.offsetHeight || 0) + (banner ? 20 : 0) + trackHeight;
-  const desiredHeight = window.innerWidth <= 600
-    ? infoHeight + contentHeight + gap + padding
-    : Math.max(infoHeight, contentHeight) + padding;
-  panel.style.setProperty('--projection-height', `${Math.ceil(desiredHeight)}px`);
+const currentAlbumSongIndex = computed(() => {
+  const cid = playerState.currentSong?.cid;
+  return cid == null ? -1 : props.songs.findIndex(song => String(song.cid) === String(cid));
+});
+const albumIntroLines = computed(() => normalizeEscapedNewlines(props.album?.intro || '')
+  .split(/\n+/u).map((line) => line.trim()).filter(Boolean));
+const waveformHeights = [4, 7, 12, 17, 20, 15, 11, 8, 13, 9, 6, 10, 5, 7, 3];
+const spectrumHeights = ref(waveformHeights);
+let spectrumFrame = null;
+let lastSpectrumTime = 0;
+const reducedSpectrumMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+function stopSpectrum() {
+  if (spectrumFrame !== null) cancelAnimationFrame(spectrumFrame);
+  spectrumFrame = null;
+  spectrumHeights.value = waveformHeights;
 }
-
-watch(projectionPanelRef, (panel) => {
-  projectionPanelObserver?.disconnect();
-  if (!panel) return;
-  projectionPanelObserver = new ResizeObserver(fitProjectionPanel);
-  projectionPanelObserver.observe(panel);
-  for (const element of panel.querySelectorAll('.album-cover-visual, .projection-album-copy, .album-inner-visual')) {
-    projectionPanelObserver.observe(element);
-  }
-  fitProjectionPanel();
-}, { flush: 'post' });
-watch([() => props.album, () => props.songs.length, () => props.ready], () => nextTick(fitProjectionPanel));
+function updateSpectrumLoop() {
+  stopSpectrum();
+  if (!props.active || !landed.value || props.playerOpen || !playerState.isPlaying
+    || currentAlbumSongIndex.value < 0 || document.hidden || reducedSpectrumMotion.matches) return;
+  const tick = time => {
+    if (time - lastSpectrumTime >= 33) {
+      spectrumHeights.value = readAudioSpectrum(waveformHeights.length) || waveformHeights;
+      lastSpectrumTime = time;
+    }
+    spectrumFrame = requestAnimationFrame(tick);
+  };
+  spectrumFrame = requestAnimationFrame(tick);
+}
 const trackAreaRef = ref(null);
 const trackSearchQuery = ref('');
 const visibleProjectionTracks = computed(() => {
@@ -209,10 +216,17 @@ const tilt = ref(null);
 const sourceCard = ref(null);
 const sleeve = ref(null);
 const landed = ref(false);
+watch(() => [props.active, props.playerOpen, landed.value, playerState.isPlaying, currentAlbumSongIndex.value], updateSpectrumLoop);
+onMounted(() => {
+  document.addEventListener('visibilitychange', updateSpectrumLoop);
+  reducedSpectrumMotion.addEventListener('change', updateSpectrumLoop);
+});
 const selectedTrackIndex = ref(null);
 const queueOpen = ref(false);
 const isCharacterEpExpanded = ref(false);
 let playerLaunchTimer = null;
+let albumScrollTop = 0;
+let albumTrackFocus = null;
 const proxyImageUrl = url => url ? getProxyImageUrl(url) : '';
 const coverUrl = computed(() => proxyImageUrl(props.album?.coverUrl));
 const sleeveStyle = computed(() => {
@@ -254,6 +268,8 @@ let locked = false;
 
 function handleProjectionPlaySong(index) {
   if (props.playerOpen || !Number.isInteger(index)) return;
+  albumScrollTop = dialog.value?.scrollTop || 0;
+  albumTrackFocus = document.activeElement;
   selectedTrackIndex.value = index;
   if (playerLaunchTimer) window.clearTimeout(playerLaunchTimer);
   playerLaunchTimer = window.setTimeout(() => {
@@ -346,6 +362,7 @@ async function openScene() {
   closeButton.value?.focus({ preventScroll: true });
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = window.matchMedia('(max-width: 900px)').matches;
   if (!reduced) {
     const target = dock.value.getBoundingClientRect();
     const source = props.origin?.disc;
@@ -367,7 +384,7 @@ async function openScene() {
     animations.push(tilt.value.animate([
       { transform: 'scaleY(1)', offset: 0 },
       { transform: 'scaleY(1)', offset: .42, easing: 'cubic-bezier(.3,0,.2,1)' },
-      { transform: 'scaleY(.26)', offset: 1 },
+      { transform: mobile ? 'scaleY(1)' : 'scaleY(.26)', offset: 1 },
     ], { duration: DISC_ANIMATION_DURATION, delay: CARD_LIFT_DURATION, fill: 'both' }));
     if (sleeve.value) animations.push(sleeve.value.animate([
       // The sleeve stays above the record while it clears the card, so the extraction reads as one object.
@@ -398,14 +415,26 @@ watch(() => props.active, active => {
   if (active) void openScene();
   else { generation++; releaseDialog(); }
 }, { immediate: true });
-watch(() => props.playerOpen, isOpen => {
+watch(() => props.playerOpen, async isOpen => {
   if (!isOpen) {
     selectedTrackIndex.value = null;
     queueOpen.value = false;
   }
+  await nextTick();
+  if (!dialog.value) return;
+  if (isOpen) {
+    const stage = dialog.value.querySelector('.projection-player-stage');
+    dialog.value.scrollTop = Math.max(0, (stage?.getBoundingClientRect().top || 0) + dialog.value.scrollTop - 88);
+    stage?.querySelector('button')?.focus({ preventScroll: true });
+  } else {
+    dialog.value.scrollTop = albumScrollTop;
+    if (albumTrackFocus?.isConnected) albumTrackFocus.focus({ preventScroll: true });
+  }
 });
 onUnmounted(() => {
-  projectionPanelObserver?.disconnect();
+  stopSpectrum();
+  document.removeEventListener('visibilitychange', updateSpectrumLoop);
+  reducedSpectrumMotion.removeEventListener('change', updateSpectrumLoop);
   generation++;
   releaseDialog();
 });
@@ -413,30 +442,34 @@ onUnmounted(() => {
 
 <style scoped>
 .album-entry-transition {
-  --dock-size: min(220px, 32vw);
-  --dock-bottom: 42px;
+  --dock-size: min(210px, 26vw);
+  --dock-bottom: 52px;
   position: fixed;
   z-index: 1300;
   inset: 0;
   isolation: isolate;
   color: #e7f2f8;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .transition-scrim {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(
-    ellipse at 50% 85%,
-    rgba(7, 20, 29, 0.88),
-    rgba(4, 13, 22, 0.94) 72%,
-    rgba(3, 9, 16, 0.96)
-  );
+  background:
+    radial-gradient(ellipse at 50% 88%, rgba(15, 75, 103, 0.24), transparent 48%),
+    radial-gradient(ellipse at 50% 45%, rgba(3, 18, 29, 0.93), rgba(1, 9, 16, 0.97) 78%);
   backdrop-filter: blur(10px) saturate(0.65);
   animation: scrim-in 600ms ease both;
 }
 .projection-exit {
-  position: absolute;
+  position: fixed;
   z-index: 8;
   top: max(16px, env(safe-area-inset-top));
   left: max(24px, env(safe-area-inset-left));
@@ -452,66 +485,73 @@ onUnmounted(() => {
   cursor: pointer;
   font: inherit;
 }
+.album-display-stage {
+  position: relative;
+  flex: none;
+  width: min(1240px, calc(100% - 96px));
+  margin: auto;
+  padding: 88px 0 150px;
+}
 .song-projection {
-  position: absolute;
+  position: relative;
   z-index: 3;
-  top: 50%;
-  height: min(var(--projection-height, 480px), calc(100dvh - 164px));
-  left: 50%;
-  width: min(1080px, calc(100% - 64px));
-  display: grid;
-  grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
-  grid-template-rows: minmax(0, 1fr);
-  gap: clamp(14px, 2vh, 24px) clamp(20px, 3vw, 42px);
-  padding: clamp(16px, 2.5vw, 30px);
-  overflow: hidden;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(16, 38, 51, 0.98), rgba(7, 22, 33, 0.98));
-  backdrop-filter: blur(3px) saturate(1.14);
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.22), inset 0 0 42px rgba(117, 211, 255, 0.035);
+  width: 100%;
+  box-sizing: border-box;
+  /* Preserve the short-album proportions as a minimum, never a height cap. */
+  min-height: clamp(480px, calc(56.25vw - 54px), 697.5px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Clip the rounded artwork without creating a nested scroll container.
+     A hidden overflow + contained overscroll traps mobile swipes here. */
+  overflow: clip;
+  border: 1px solid rgba(99, 164, 191, 0.4);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(10, 39, 57, 0.96), rgba(3, 19, 30, 0.97) 58%, rgba(8, 32, 46, 0.96));
+  box-shadow: 0 24px 90px #0007, 0 0 42px #157ca018, inset 0 0 40px #5fc8ff0b;
   opacity: 0;
-  transform: translate(-50%, calc(-50% + 24px));
+  transform: translateY(24px);
   transition: opacity 400ms ease, transform 500ms cubic-bezier(.2, .8, .2, 1);
 }
-.song-projection::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  display: none;
+.projection-layout {
+  flex: 1 0 auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(28px, 4vw, 56px);
+  padding: clamp(28px, 3.5vw, 48px);
+  align-items: start;
 }
 .song-projection::before {
   content: '';
   position: absolute;
-  z-index: 0;
+  z-index: 1;
   inset: 0;
   pointer-events: none;
 }
 .song-projection::before {
   background:
-    radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.16) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.08));
-  opacity: 0.85;
+    radial-gradient(ellipse at 0 0, #3aafea22, transparent 46%),
+    linear-gradient(90deg, #04152214, #04152240 42%, #04152280 100%);
 }
-.song-projection > * { position: relative; z-index: 1; }
+.song-projection > * { position: relative; z-index: 2; }
+.song-projection > .projection-artwork {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  opacity: 0.4;
+  filter: saturate(0.65) brightness(1.1);
+  pointer-events: none;
+}
 .song-projection-header,
 .track-heading,
 .song-projection-list,
 .projection-message { position: relative; z-index: 1; }
-.is-landed .song-projection { opacity: 1; transform: translate(-50%, -50%); }
-.is-player-mode .song-projection {
-  opacity: 0.28;
-  transform: translate(-50%, calc(-50% - 18px)) scale(0.94);
-  filter: blur(2px) saturate(0.72);
-  pointer-events: none;
-}
-.is-player-mode .album-cover-visual,
-.is-player-mode .album-inner-visual {
-  transform: translateY(-34px) scale(0.74);
-  opacity: 0.22;
-}
+.is-landed .song-projection { opacity: 1; transform: none; }
 .album-cover-visual,
 .album-inner-visual { transition: transform 520ms cubic-bezier(.2, .8, .2, 1), opacity 420ms ease; }
 .song-projection-header {
@@ -523,6 +563,8 @@ onUnmounted(() => {
   border: 0;
   border-radius: 0;
   background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   box-shadow: none;
   text-align: left;
 }
@@ -530,10 +572,11 @@ onUnmounted(() => {
   margin: 0 0 8px;
   color: #f1f7fb;
   font-size: clamp(22px, 2vw, 30px);
+  letter-spacing: 0.045em;
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
-.song-projection-header p { margin: 0; color: #aec5d2; font-size: 14px; }
+.song-projection-header p { margin: 0; color: #b4cfe0; font-size: 16px; line-height: 1.6; }
 .album-cover-visual,
 .album-inner-visual {
   position: relative;
@@ -547,9 +590,11 @@ onUnmounted(() => {
   background: transparent;
 }
 .album-cover-visual {
-  width: min(100%, 240px, 26dvh);
+  width: min(100%, 240px);
   aspect-ratio: 1;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  border: 1px solid #8bb6c44d;
+  border-radius: 14px;
+  box-shadow: 0 14px 32px #0006, 0 0 22px #1b9bcd12;
 }
 .album-inner-visual {
   width: 100%;
@@ -562,21 +607,34 @@ onUnmounted(() => {
   height: 100%;
   object-fit: contain;
 }
+.album-tagline {
+  margin: 0;
+  padding: 4px 0 4px 12px;
+  border-left: 2px solid #719aae80;
+  color: #bed5e3;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
 .album-intro {
-  margin: 0; padding-left: 12px; border-left: 2px solid #82b6c760;
-  color: #b8ceda; font-size: 14px; line-height: 1.6; white-space: pre-line;
+  margin: 0;
+  color: #8eaabf; font-size: 14px; line-height: 1.8; white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 .projection-album-info {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  gap: 18px;
+  min-width: 0;
+  gap: 22px;
+  justify-content: flex-start;
 }
 .projection-album-copy {
   display: flex;
   flex-direction: column;
   flex: none;
-  gap: 18px;
+  gap: 16px;
 }
 .projection-album-content {
   display: flex;
@@ -584,21 +642,24 @@ onUnmounted(() => {
   min-width: 0;
   min-height: 0;
   gap: 20px;
+  justify-content: flex-start;
 }
 .projection-tracks {
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  gap: 12px;
+  gap: 14px;
 }
 .projection-track-area {
-  flex: 1;
+  flex: none;
   min-height: 0;
-  overflow-y: auto;
+  max-height: clamp(240px, calc(100dvh - 380px), 460px);
   overflow-x: hidden;
-  overscroll-behavior: contain;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #719aae80 transparent;
   scrollbar-gutter: stable;
   padding: 2px 4px 4px 2px;
 }
@@ -614,32 +675,33 @@ onUnmounted(() => {
   font: inherit;
 }
 .projection-track-search:focus-visible { outline: 2px solid #80b8d0; outline-offset: 2px; }
-.compact-tracks .song-projection-list { gap: 6px; }
-.compact-tracks .song-projection-row { height: 54px; padding: 4px 10px; border-radius: 8px; }
+.compact-tracks .song-projection-list { gap: 12px; }
+.compact-tracks .song-projection-row { height: 64px; padding: 6px 16px; border-radius: 12px; }
 .compact-tracks .song-projection-play { min-height: 36px; }
 .compact-tracks .song-projection-artist { font-size: 12px; }
-.track-heading { flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.track-heading h2 { margin: 0; font-size: 18px; color: #e9f3fa; }
-.track-heading > span { color: #9dbccf; font-size: 12px; }
+.track-heading { flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 4px 12px; border-bottom: 1px solid #4c8aa333; }
+.track-heading::after { content: ''; position: absolute; bottom: -1px; left: 4px; width: 32px; height: 2px; background: #78a9bf99; }
+.track-heading h2 { margin: 0; font-size: 23px; color: #f1f7fc; letter-spacing: 0.06em; }
+.track-heading > span { color: #9dbccf; font-size: 13px; letter-spacing: 0.08em; }
 .song-projection-list {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .song-projection-row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 74px;
+  grid-template-columns: 34px minmax(0, 1fr) 96px 110px;
   grid-template-rows: auto auto;
   gap: 2px 12px;
   align-items: center;
-  height: 68px;
+  height: 84px;
   min-height: 0;
-  padding: 8px 12px;
-  border: 1px solid rgba(151, 190, 205, 0.2);
-  border-radius: 12px;
-  background: rgba(10, 33, 45, 0.62);
+  padding: 12px 16px;
+  border: 1px solid rgba(88, 156, 185, 0.36);
+  border-radius: 15px;
+  background: linear-gradient(110deg, rgba(9, 34, 49, 0.84), rgba(5, 24, 36, 0.64));
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
   transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
@@ -648,6 +710,20 @@ onUnmounted(() => {
   background: rgba(22, 61, 78, 0.78);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
   transform: translateY(-1px);
+}
+.song-projection-row.is-current {
+  border-color: #7dcdebb3;
+  background: linear-gradient(110deg, #164b63ed, #0b2b40eb);
+  box-shadow: inset 3px 0 0 #83d5ef, 0 4px 18px #05131b40;
+}
+.song-projection-row.is-current .song-projection-name { color: #effbff; }
+.song-projection-row.is-current .song-projection-number { color: #a5e7ff; }
+.song-projection-row.is-current .song-projection-waveform { opacity: 0.85; }
+.song-projection-row.is-current .song-projection-waveform i { background: #94dcf2; }
+.song-projection-row.is-current .song-projection-play {
+  border-color: #9cdef2aa;
+  background: #24617b;
+  color: #f0fbff;
 }
 .song-projection-row.is-launching {
   position: relative;
@@ -665,14 +741,46 @@ onUnmounted(() => {
   background: linear-gradient(105deg, transparent 18%, rgba(207, 244, 255, 0.65) 48%, transparent 76%);
   animation: track-row-sweep 180ms ease-out both;
 }
-.song-projection-number { color: #7ba4b6; font: 12px monospace; }
-.song-projection-name { color: #e7f2f8; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.song-projection-number { color: #8db6cf; font: 14px monospace; }
+.song-projection-name { color: #e7f2f8; font-size: 17px; font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; }
 .song-projection-artist { color: #a8c1cf; font-size: 13px; overflow-wrap: anywhere; }
 .song-projection-name { grid-column: 2; grid-row: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .song-projection-artist { grid-column: 2; grid-row: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .song-projection-number { grid-column: 1; grid-row: 1 / span 2; }
-.song-projection-play { grid-column: 3; grid-row: 1 / span 2; }
-.song-projection-play, .projection-message button {
+.song-projection-waveform {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 4px;
+  height: 16px;
+  opacity: 0.3;
+}
+.song-projection-waveform i {
+  width: 2px;
+  height: calc(var(--bar-height) * 0.7);
+  background: #6295ab;
+  border-radius: 2px;
+}
+.song-projection-play { grid-column: 4; grid-row: 1 / span 2; }
+.song-projection-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  border: 1px solid #6fabc580;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #18425a, #123044);
+  box-shadow: inset 0 1px 0 #b5e3f412;
+  color: #f0faff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.song-projection-play > span { color: #bcefff; font-size: 25px; line-height: 1; }
+.projection-message button {
   min-height: 44px; padding: 8px 14px; border: 1px solid #80b8d066;
   border-radius: 6px; background: #25475b; color: #edf7fc; font: inherit; cursor: pointer;
 }
@@ -680,43 +788,44 @@ button:hover { background: #356580; }
 button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-message { padding: 28px 0; color: #b8ceda; }
 .projection-player-stage {
-  position: absolute;
+  position: relative;
+  flex-shrink: 0;
   z-index: 5;
-  inset: clamp(72px, 9vh, 96px) clamp(18px, 6vw, 110px) clamp(34px, 5vh, 70px);
+  width: 100%;
+  height: clamp(480px, 65dvh, 640px);
+  margin: 0;
+  box-sizing: border-box;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: clamp(14px, 2vh, 24px);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 24px;
   min-height: 0;
-  padding: clamp(18px, 2.4vw, 34px);
+  padding: 28px clamp(28px, 3.5vw, 48px);
   overflow: hidden;
-  border: 1px solid rgba(129, 199, 221, 0.22);
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 8% 12%, rgba(79, 176, 211, 0.12), transparent 26%),
-    linear-gradient(135deg, rgba(7, 29, 42, 0.88), rgba(4, 17, 28, 0.93) 64%, rgba(12, 46, 59, 0.82));
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(214, 244, 255, 0.07);
-  backdrop-filter: blur(16px) saturate(1.05);
+  border: 0;
+  border-radius: 0;
+  background: #04152270;
+  /* Unmount immediately on return so the list and player never add heights. */
+  animation: player-content-in 180ms ease;
 }
-.projection-player-stage-enter-active,
-.projection-player-stage-leave-active {
-  transition: opacity 420ms ease, transform 520ms cubic-bezier(.2, .8, .2, 1);
-}
-.projection-player-stage-enter-from,
-.projection-player-stage-leave-to {
-  opacity: 0;
-  transform: translateY(34px) scale(0.94);
+@keyframes player-content-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .projection-player-toolbar {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   min-height: 46px;
-  padding-bottom: 14px;
+  padding: 18px clamp(28px, 3.5vw, 48px);
   border-bottom: 1px solid rgba(137, 198, 218, 0.14);
+  background: #04152299;
 }
+.projection-toolbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 .projection-player-toolbar-left {
   display: flex;
+  flex: 1;
   align-items: center;
   min-width: 0;
   gap: 18px;
@@ -786,13 +895,13 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   scrollbar-color: rgba(126, 198, 255, 0.35) transparent;
 }
 .projection-player-body :deep(.embedded-player-view) {
-  --record-size: min(300px, 32cqw, 52cqh);
+  --record-size: min(280px, 30cqw, 44cqh);
   width: 100%;
   height: 100%;
   min-height: 0;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   grid-template-rows: minmax(0, 1fr);
-  gap: clamp(24px, 4vw, 68px);
+  gap: clamp(28px, 4vw, 52px);
   align-items: stretch;
 }
 .projection-player-body :deep(.embedded-player-view .player-view-left) {
@@ -851,8 +960,8 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-player-body :deep(.embedded-player-view .player-info h4) {
   margin: 0 0 min(8px, 1cqh);
   color: #f1f7fb;
-  font-size: clamp(1rem, 4cqh, 2.1rem);
-  line-height: 1.25;
+  font-size: clamp(1.2rem, 3.6cqh, 1.8rem);
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 .projection-player-body :deep(.embedded-player-view .player-info p) { margin: 0; font-size: 0.96rem; }
@@ -873,7 +982,8 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   padding: 8px;
   font-size: 13px;
 }
-.projection-player-body :deep(.embedded-player-view .progress-container) { margin: min(18px, 2cqh) 0 min(10px, 1cqh); }
+.projection-player-body :deep(.embedded-player-view .progress-container) { margin: 0; }
+.projection-player-body :deep(.embedded-player-view .progress-time) { margin: -6px 0 4px; font-variant-numeric: tabular-nums; }
 .projection-player-body :deep(.embedded-player-view .controls-bottom) {
   width: 100%;
   justify-content: flex-start;
@@ -887,7 +997,7 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .projection-player-body :deep(.embedded-player-view .player-view-right) {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 0.42fr) minmax(0, 0.58fr);
+  grid-template-rows: minmax(0, 1fr);
   grid-column: 2;
   height: 100%;
   box-sizing: border-box;
@@ -896,9 +1006,10 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   min-height: 0;
   overflow: hidden;
   justify-content: flex-start;
-  gap: min(12px, 2cqh);
-  padding: min(22px, 2cqw, 3cqh);
+  gap: 20px;
+  padding: 0 0 0 24px;
   border: none;
+  border-left: 1px solid #89c6da24;
   border-radius: 0;
   background: transparent;
 }
@@ -906,36 +1017,34 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   min-height: 0;
   gap: min(12px, 2cqh);
 }
+.projection-player-body :deep(.embedded-player-view .player-view-right.has-video.has-lyrics) {
+  grid-template-rows: auto auto;
+  overflow: visible;
+}
+.projection-player-body :deep(.embedded-player-view .player-view-right:not(.has-lyrics) .player-visual-panel) {
+  height: 100%;
+  max-height: none;
+  justify-content: center;
+}
 .projection-player-body :deep(.embedded-player-view .player-visual-panel) {
   display: flex;
-  height: 100%;
+  height: auto;
+  max-height: none;
   min-height: 0;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
   margin: 0;
   gap: 8px;
 }
-.projection-player-body :deep(.embedded-player-view .player-visual-switch) { align-self: center; flex: none; margin: 0; }
-.projection-player-body :deep(.embedded-player-view .album-grid-visual-small) {
-  width: min(100%, 580px);
-  max-width: 580px;
-  flex: 1;
+.projection-player-body :deep(.embedded-player-view .character-ep-visual:not(.expanded)) {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  flex: none;
   min-height: 0;
-  height: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  background: transparent;
-  margin: 0;
-}
-.projection-player-body :deep(.embedded-player-view .character-ep-visual) {
-  width: min(100%, 580px);
-  max-width: 580px;
-  flex: 1;
-  min-height: 0;
-  height: 100%;
-  max-height: 100%;
+  height: auto;
   aspect-ratio: 16 / 9;
   margin: 0;
 }
@@ -1193,10 +1302,10 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   opacity: 0; transition: opacity 500ms;
 }
 .projection-beam {
-  position: absolute; width: min(1000px, 88vw); height: 65vh;
+  position: absolute; width: min(760px, 74vw); height: 260px;
   bottom: 50%; left: 50%; transform: translateX(-50%) scaleY(0);
   transform-origin: bottom center;
-  background: linear-gradient(to top, #74c9e638, #74c9e610 50%, transparent);
+  background: linear-gradient(to top, #55caf350, #46b9ed1c 40%, #74c9e608 78%, transparent);
   clip-path: polygon(0 0, 100% 0, 56% 100%, 44% 100%);
   opacity: 0; transition: transform 600ms ease, opacity 500ms;
 }
@@ -1220,15 +1329,16 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 .album-entry-transition-leave-to { opacity: 0; }
 @media (max-width: 900px) {
   .projection-player-stage {
-    inset: max(68px, calc(env(safe-area-inset-top) + 56px)) 8px auto;
+    width: 100%;
+    height: auto;
+    flex: none;
     display: flex;
     flex-direction: column;
-    max-height: calc(100dvh - 84px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    gap: 12px;
-    padding: 12px;
-    border-radius: 14px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    max-height: none;
+    gap: 24px;
+    padding: 20px;
+    border-radius: 0;
+    overflow: visible;
   }
   .projection-player-toolbar { flex: none; }
   .projection-player-body {
@@ -1238,12 +1348,12 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     overflow: visible;
   }
   .projection-player-body :deep(.embedded-player-view) {
-    --record-size: clamp(88px, 24vw, 120px);
+    --record-size: clamp(160px, 44vw, 230px);
     display: flex;
     flex-direction: column;
     height: auto;
     min-height: 0;
-    gap: 16px;
+    gap: 24px;
     align-items: stretch;
   }
   .projection-player-body :deep(.embedded-player-view .player-view-left) {
@@ -1254,23 +1364,24 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   }
   .projection-player-body :deep(.embedded-player-view .player-container) {
     width: 100%;
-    max-width: none;
+    max-width: 440px;
+    margin: 0 auto;
   }
   .projection-player-body :deep(.embedded-player-view .player-header) {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 16px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
   }
   .projection-player-body :deep(.embedded-player-view .player-cover) {
     margin: 0;
-    padding: 14px;
+    padding: 20px;
     border-width: 5px;
   }
   .projection-player-body :deep(.embedded-player-view .player-info) {
     flex: 1;
-    text-align: left;
+    text-align: center;
   }
-  .projection-player-body :deep(.embedded-player-view .player-info h4) { margin-bottom: 6px; font-size: 1.15rem; }
+  .projection-player-body :deep(.embedded-player-view .player-info h4) { margin-bottom: 6px; font-size: 1.4rem; }
   .projection-player-body :deep(.embedded-player-view .player-info p) { font-size: 0.875rem; }
   .projection-player-body :deep(.embedded-player-view .player-controls) { margin-top: 20px; gap: 12px; }
   .projection-player-body :deep(.embedded-player-view .controls-top) {
@@ -1279,7 +1390,8 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   .projection-player-body :deep(.embedded-player-view .progress-container) { margin: 12px 0 0; }
   .projection-player-body :deep(.embedded-player-view .progress-time) { margin-top: 0; }
   .projection-player-body :deep(.embedded-player-view .controls-bottom:empty) { display: none; }
-  .projection-player-body :deep(.embedded-player-view .player-view-right) {
+  .projection-player-body :deep(.embedded-player-view .player-view-right),
+  .projection-player-body :deep(.embedded-player-view .player-view-right.has-video.has-lyrics) {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -1301,21 +1413,25 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     flex: none;
     flex-direction: column;
     height: auto;
+    max-height: none;
     gap: 12px;
   }
-  .projection-player-body :deep(.embedded-player-view .album-grid-visual-small),
+  .projection-player-body :deep(.embedded-player-view .has-lyrics .character-ep-visual:not(.expanded)),
   .projection-player-body :deep(.embedded-player-view .character-ep-visual:not(.expanded)) {
     flex: none;
     width: 100%;
     height: auto;
-    max-height: 240px;
+    max-height: none;
     aspect-ratio: 16 / 9;
+  }
+  .projection-player-body :deep(.embedded-player-view .player-view-right:not(.has-lyrics) .player-visual-panel) {
+    height: auto;
   }
   .projection-player-body :deep(.embedded-player-view .lyrics-container) {
     flex: none;
-    height: auto;
-    min-height: 120px;
-    max-height: min(42dvh, 360px);
+    height: clamp(280px, 40dvh, 380px);
+    min-height: 280px;
+    max-height: none;
     padding: 12px;
   }
   .projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
@@ -1336,45 +1452,116 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
 }
 @media (max-width: 900px) {
   .album-entry-transition { --dock-size: min(160px, 40vw); --dock-bottom: 28px; }
+  /* The entrance is viewport-based; the album below can be arbitrarily tall. */
+  .record-dock {
+    position: fixed;
+    top: calc(50dvh - var(--dock-size) / 2);
+    left: calc(50% - var(--dock-size) / 2);
+  }
+  .record-tilt { transform: scaleY(1); }
+  .album-display-stage {
+    width: min(720px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: max(76px, calc(env(safe-area-inset-top) + 60px)) 0 max(24px, env(safe-area-inset-bottom));
+  }
   .projection-exit { left: max(12px, env(safe-area-inset-left)); }
   .is-landed .record-dock, .projection-beam { display: none; }
   .song-projection {
-    top: max(72px, calc(env(safe-area-inset-top) + 60px));
-    bottom: auto;
-    width: calc(100% - 28px);
-    height: auto;
-    max-height: calc(100dvh - 88px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    padding: 18px 14px;
+    min-height: 0;
+    aspect-ratio: auto;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    overflow-y: auto;
-    transform: translate(-50%, 12px);
+    gap: 0;
+    transform: translateY(12px);
   }
-  .is-landed .song-projection { transform: translateX(-50%); }
-  .is-player-mode .song-projection {
-    opacity: 0;
-    visibility: hidden;
-    transform: translate(-50%, -12px);
+  .song-projection::before { display: none; }
+  .song-projection > .projection-artwork {
+    position: relative;
+    inset: auto;
+    display: block;
+    height: auto;
+    flex: none;
+    opacity: 1;
+    filter: none;
+    border-bottom: 1px solid #78a9bf26;
   }
-  .projection-album-info, .projection-album-content, .projection-tracks { flex: none; }
-  .projection-track-area { flex: none; overflow: visible; }
+  .projection-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 28px;
+    align-items: stretch;
+  }
+  .is-landed .song-projection { transform: none; }
+  .projection-album-info { flex: none; }
   .projection-player-status { display: none; }
-  .projection-player-toolbar { min-height: 36px; gap: 8px; padding-bottom: 6px; }
+  .projection-player-toolbar { min-height: 44px; gap: 12px; padding: 16px 20px; flex-wrap: wrap; }
   .projection-player-eyebrow { font-size: 12px; }
   .projection-player-queue-toggle { min-height: 32px; padding: 6px 9px; }
   .projection-player-queue-toggle > span:not(.projection-player-queue-count) { display: none; }
-  .projection-album-info { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; }
-  .album-cover-visual { width: min(100px, 22vw); }
+  .projection-album-info { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: start; }
+  .album-cover-visual { width: clamp(80px, 18vw, 128px); border-radius: 10px; }
   .projection-album-copy { gap: 10px; }
   .projection-album-content { gap: 14px; }
   .album-inner-visual { height: min(90px, 12dvh); }
-  .album-intro { font-size: 12px; line-height: 1.5; }
+  .album-intro, .album-tagline { font-size: 13px; line-height: 1.8; }
+  .song-projection-header p { font-size: 13px; }
+  .track-heading h2 { font-size: 19px; }
   .song-projection-row { grid-template-columns: 24px minmax(0, 1fr) 72px; gap: 4px 10px; }
   .song-projection-name { font-size: 14px; }
   .song-projection-artist { grid-column: 2; grid-row: 2; font-size: 12px; }
   .song-projection-number, .song-projection-play { grid-row: 1 / span 2; }
   .song-projection-play { grid-column: 3; padding: 8px; font-size: 12px; }
+  .song-projection-waveform { display: none; }
+  .song-projection-row, .compact-tracks .song-projection-row { min-height: 76px; height: auto; padding: 10px; }
+}
+@media (max-width: 480px) {
+  .projection-player-stage { padding: 16px; }
+  .projection-player-body :deep(.embedded-player-view .control-btn) {
+    width: 40px; min-width: 40px; max-width: 40px;
+    height: 44px; min-height: 44px; max-height: 44px;
+  }
+  .projection-player-body :deep(.embedded-player-view .control-btn.play-pause) {
+    width: 52px; min-width: 52px; max-width: 52px;
+    height: 52px; min-height: 52px; max-height: 52px;
+  }
+  .album-display-stage { width: calc(100% - 24px); }
+  .song-projection { border-radius: 16px; }
+  .projection-layout { padding: 20px 16px; gap: 24px; }
+  .projection-album-info { gap: 14px; }
+  .song-projection-header h1 { font-size: 21px; }
+  .song-projection-header p { font-size: 12px; }
+  .song-projection-play { gap: 6px; }
+}
+/* Let the video and readable lyrics determine the panel height together.
+   Size containment here would otherwise force them to share a fixed height. */
+@media (min-width: 901px) {
+  .projection-player-stage:has(.has-video.has-lyrics) {
+    height: auto;
+  }
+  .projection-player-body:has(.has-video.has-lyrics) {
+    container-type: inline-size;
+    overflow: visible;
+  }
+  .projection-player-body :deep(.embedded-player-view:has(.has-video.has-lyrics)) {
+    --record-size: clamp(220px, 26cqw, 280px);
+    height: auto;
+  }
+  .projection-player-body :deep(.embedded-player-view .player-view-right.has-video.has-lyrics) {
+    height: auto;
+    gap: 24px;
+  }
+  .projection-player-body :deep(.embedded-player-view .has-video.has-lyrics .lyrics-container) {
+    flex: none;
+    height: clamp(300px, 40dvh, 400px);
+  }
+}
+@media (min-width: 901px) and (max-width: 1150px) {
+  .song-projection-row { grid-template-columns: 26px minmax(0, 1fr) 92px; gap: 2px 10px; }
+  .song-projection-waveform { display: none; }
+  .song-projection-play { grid-column: 3; }
+  .song-projection-name { font-size: 15px; }
 }
 @media (min-width: 901px) and (max-height: 600px) {
   .projection-player-toolbar { min-height: 30px; padding-bottom: 6px; }
@@ -1397,6 +1584,10 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     min-height: 40px;
     max-height: 40px;
   }
+}
+@media (min-width: 901px) and (max-height: 650px) {
+  .album-display-stage { padding: 76px 0 28px; }
+  .is-landed .record-dock, .projection-beam { display: none; }
 }
 @media (max-height: 520px) {
   .album-entry-transition { --dock-size: 140px; --dock-bottom: 24px; }

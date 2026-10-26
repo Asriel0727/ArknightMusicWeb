@@ -23,6 +23,13 @@
           </div>
         </div>
         <div class="player-controls">
+          <div class="progress-container" @click="handleSeek">
+            <div class="progress-bar" :style="{ width: progressPercent + '%' }"></div>
+          </div>
+          <div class="progress-time">
+            <span>{{ formatTime(playerState.currentTime) }}</span>
+            <span>{{ formatTime(playerState.duration) }}</span>
+          </div>
           <div class="controls-top">
             <button class="control-btn" :title="playModeTitle" @click="togglePlayMode">
               <i :class="playModeIcon"></i>
@@ -52,13 +59,6 @@
                 </div>
               </Transition>
             </div>
-          </div>
-          <div class="progress-container" @click="handleSeek">
-            <div class="progress-bar" :style="{ width: progressPercent + '%' }"></div>
-          </div>
-          <div class="progress-time">
-            <span>{{ formatTime(playerState.currentTime) }}</span>
-            <span>{{ formatTime(playerState.duration) }}</span>
           </div>
           <div class="controls-bottom">
             <div v-if="!playerProps.embedded" class="volume-control">
@@ -99,29 +99,9 @@
         </div>
       </div>
     </div>
-    <button v-if="hasRightPanel" class="mobile-details-toggle" type="button"
-      :aria-expanded="isMobileDetailsOpen" @click="toggleMobileDetails">
-      <span>{{ t('player.lyrics') }} / {{ t('player.characterEp') }}</span>
-      <i :class="isMobileDetailsOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" aria-hidden="true"></i>
-    </button>
-    <div v-show="!isMobileLayout || isMobileDetailsOpen" class="player-view-right">
-      <div v-if="playerState.currentSong" class="player-visual-panel">
-        <div class="player-visual-switch" role="group" :aria-label="t('player.visualMode')">
-          <button type="button" :class="{ active: visualMode === 'cover' }" @click="showCoverVisual">
-            <i :class="isMobileLayout ? 'fas fa-align-left' : 'fas fa-image'"></i>
-            {{ isMobileLayout ? t('player.lyrics') : t('player.coverVisual') }}
-          </button>
-          <button type="button" :class="{ active: visualMode === 'ep' }" :disabled="isCharacterEpLoading || !characterEp"
-            :title="isCharacterEpLoading ? t('common.loading') : (characterEp ? t('player.characterEp') : t('player.noCharacterEp'))"
-            @click="showCharacterEp">
-            <i class="fas fa-film"></i> {{ t('player.characterEp') }}
-          </button>
-        </div>
-        <img v-if="!isMobileLayout && (visualMode === 'cover' || !characterEp) && playerState.currentSong?.coverDeUrl"
-          :src="proxyImageUrl(playerState.currentSong?.coverDeUrl)" :alt="playerState.currentSong?.name"
-          class="album-grid-visual-small" decoding="async" fetchpriority="high" @load="handleImageLoad"
-          @error="handleImageError">
-        <div v-else-if="visualMode === 'ep' && characterEp" class="character-ep-visual"
+    <div v-if="hasRightPanel" class="player-view-right" :class="{ 'has-video': !!characterEp, 'has-lyrics': hasLyrics }">
+      <div v-if="characterEp" class="player-visual-panel">
+        <div class="character-ep-visual"
           :class="{ expanded: isCharacterEpExpanded }">
           <div v-if="isYoutubeCharacterEp && playerState.isPlaying && !isCharacterEpWaiting" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
@@ -147,7 +127,7 @@
         <div v-if="isCharacterEpExpanded" class="character-ep-preview-backdrop" aria-hidden="true"
           @click.self="closeCharacterEpPreview"></div>
       </div>
-      <section v-show="!isMobileLayout || visualMode !== 'ep' || !characterEp" class="player-lyrics-panel" :aria-label="t('player.lyrics')">
+      <section v-if="hasLyrics" class="player-lyrics-panel" :aria-label="t('player.lyrics')">
         <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-toolbar">
           <span class="lyrics-toolbar-title"><i class="fas fa-align-left"></i> {{ t('player.lyrics') }}</span>
           <div class="lyrics-translation-controls">
@@ -164,8 +144,8 @@
         <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationError" class="lyrics-translation-error" role="alert">
           {{ playerState.lyricTranslationError }}
         </p>
-        <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationSaveStatus" class="lyrics-save-status" role="status">
-          {{ t(playerState.lyricTranslationSaveStatus === 'saved' ? 'player.translationSaved' : 'player.translationSaveFailed') }}
+        <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationSaveStatus === 'failed'" class="lyrics-save-status" role="status">
+          {{ t('player.translationSaveFailed') }}
           <button v-if="playerState.lyricTranslationSaveStatus === 'failed'" type="button"
             :disabled="playerState.isTranslatingLyrics" @click="refreshLyricTranslations()">
             {{ t('player.retryTranslationSave') }}
@@ -293,7 +273,6 @@ const activeLyricIndex = ref(-1);
 const isCompactVolumeOpen = ref(false);
 const mobileLayoutQuery = window.matchMedia('(max-width: 900px)');
 const isMobileLayout = ref(mobileLayoutQuery.matches);
-const isMobileDetailsOpen = ref(false);
 const hasCopiedShareLink = ref(false);
 const isFavoriteSong = ref(false);
 const favoriteActionPending = ref(false);
@@ -310,7 +289,8 @@ const characterEp = ref(null);
 const isCharacterEpLoading = ref(false);
 const isBilibiliSyncPending = ref(false);
 const isCharacterEpExpanded = ref(false);
-const visualMode = ref(isMobileLayout.value ? 'cover' : playerState.characterEpVisualMode);
+// Video playback follows MV availability; lyrics remain visible alongside it.
+const visualMode = computed(() => characterEp.value ? 'ep' : 'cover');
 const epIframeKey = ref(0);
 const epStartTime = ref(0);
 const youtubePlayerContainer = ref(null);
@@ -722,9 +702,8 @@ const volumeIcon = computed(() => {
   }
 });
 
-const hasRightPanel = computed(() => {
-  return Boolean(playerState.currentSong?.coverDeUrl || playerState.lyrics?.length || characterEp.value);
-});
+const hasLyrics = computed(() => Boolean(playerState.lyrics?.length));
+const hasRightPanel = computed(() => hasLyrics.value || Boolean(characterEp.value));
 
 const shareIcon = computed(() => {
   return hasCopiedShareLink.value ? 'fas fa-check' : 'fas fa-share-alt';
@@ -845,39 +824,14 @@ const handleBilibiliFrameLoad = () => {
   bilibiliPendingIframeKey = -1;
 };
 
-const showCoverVisual = () => {
-  closeCharacterEpPreview();
-  cancelPendingSeekSync();
-  if (bilibiliSyncTimeout) {
-    clearTimeout(bilibiliSyncTimeout);
-    bilibiliSyncTimeout = null;
-  }
-  isBilibiliSyncPending.value = false;
-  bilibiliPendingIframeKey = -1;
-  visualMode.value = 'cover';
-};
-
 const closeCharacterEpPreview = () => {
   if (!isCharacterEpExpanded.value) return;
   isCharacterEpExpanded.value = false;
   emit('character-ep-expanded-change', false);
 };
 
-const toggleMobileDetails = () => {
-  isMobileDetailsOpen.value = !isMobileDetailsOpen.value;
-  if (isMobileDetailsOpen.value) {
-    activeLyricIndex.value = -1;
-  } else {
-    showCoverVisual();
-  }
-};
-
 const handleMobileLayoutChange = (event) => {
   isMobileLayout.value = event.matches;
-  if (event.matches) {
-    isMobileDetailsOpen.value = false;
-    showCoverVisual();
-  }
 };
 
 const toggleCharacterEpPreview = () => {
@@ -903,16 +857,6 @@ const restartCharacterEp = () => {
   }
   epStartTime.value = playerState.audioPlayer?.currentTime ?? playerState.currentTime;
   epIframeKey.value += 1;
-};
-
-const showCharacterEp = () => {
-  if (!characterEp.value) return;
-  visualMode.value = 'ep';
-  if (isBilibiliCharacterEp.value && playerState.isPlaying) {
-    startBilibiliSync();
-  } else {
-    restartCharacterEp();
-  }
 };
 
 const restartCharacterEpAt = (audioTime) => {
@@ -1134,10 +1078,6 @@ watch(() => playerState.isPlaying, (isPlaying) => {
   }
 });
 
-watch(visualMode, (mode) => {
-  playerState.characterEpVisualMode = mode;
-});
-
 watch([visualMode, characterEp], () => {
   if (visualMode.value !== 'ep' || !characterEp.value) {
     closeCharacterEpPreview();
@@ -1175,8 +1115,6 @@ watch(() => playerState.currentSong, async (newSong) => {
   }
   isBilibiliSyncPending.value = false;
   bilibiliPendingIframeKey = -1;
-  visualMode.value = isMobileLayout.value && !isMobileDetailsOpen.value
-    ? 'cover' : playerState.characterEpVisualMode;
   epStartTime.value = getAudioCurrentTime();
   const requestedSongId = newSong?.cid;
   if (!requestedSongId) {
@@ -1635,47 +1573,15 @@ defineExpose({ closeCharacterEpPreview });
   line-height: 1;
 }
 
-.album-grid-visual-small {
-  width: min(100%, 360px);
-  max-width: 400px;
-  height: auto;
-  border-radius: 8px;
-  display: block;
-  margin: 0 auto 15px auto;
-}
 
 .player-visual-panel {
   width: min(100%, 360px);
   margin: 0 auto;
 }
 
-.player-visual-switch {
-  display: inline-flex;
-  margin-bottom: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(92, 178, 255, 0.28);
-  border-radius: 999px;
-  background: rgba(5, 9, 14, 0.72);
-}
 
-.player-visual-switch button {
-  border: 0;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 7px 11px;
-  font-size: 0.78rem;
-}
 
-.player-visual-switch button.active {
-  background: rgba(88, 166, 255, 0.2);
-  color: var(--primary-color);
-}
 
-.player-visual-switch button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
 
 .character-ep-visual {
   position: relative;
@@ -1892,9 +1798,6 @@ defineExpose({ closeCharacterEpPreview });
   }
 }
 
-.mobile-details-toggle {
-  display: none;
-}
 
 .lyrics-save-status {
   margin: 0;
@@ -1915,26 +1818,7 @@ defineExpose({ closeCharacterEpPreview });
 }
 
 @media (max-width: 900px) {
-  .mobile-details-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    width: 100%;
-    min-height: 44px;
-    padding: 8px 12px;
-    border: 1px solid rgba(132, 198, 220, 0.2);
-    border-radius: 8px;
-    background: rgba(2, 15, 25, 0.24);
-    color: var(--text-color);
-    font: inherit;
-    cursor: pointer;
-  }
 
-  .mobile-details-toggle:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-  }
 
   .player-view-grid {
     grid-template-columns: 1fr;

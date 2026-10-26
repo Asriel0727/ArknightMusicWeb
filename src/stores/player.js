@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { attachAudioSpectrum } from '../utils/audioSpectrum.js';
 import { i18n } from '../i18n/index.js';
 import {
   fetchAlbumDetails,
@@ -238,6 +239,7 @@ export const dropdownState = reactive({
 // 初始化音頻播放器
 export function initAudioPlayer(audioElement) {
   playerState.audioPlayer = audioElement;
+  attachAudioSpectrum(audioElement);
   
   if (audioElement) {
     audioElement.volume = playerState.volume;
