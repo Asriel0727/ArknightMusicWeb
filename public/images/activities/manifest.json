@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-25T16:36:24.802Z",
+  "generatedAt": "2026-10-26T00:24:44.543Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -84,13 +84,13 @@
       "syncedAt": "2026-10-25T16:36:24.802Z"
     },
     "wiki-thunder-in-the-azure-dream": {
-      "publicPath": "/images/activities/wiki-thunder-in-the-azure-dream.webp",
-      "relativePath": "public/images/activities/wiki-thunder-in-the-azure-dream.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Thunder_in_the_Azure_Dream_banner.png?37c120",
-      "contentType": "image/webp",
-      "size": 975730,
-      "hash": "e415137fd24431f445443ba9a95846b949c942059b3ce82773089a80a79f8f57",
-      "syncedAt": "2026-10-17T04:42:41.584Z"
+      "publicPath": "/images/activities/wiki-thunder-in-the-azure-dream.jpg",
+      "relativePath": "public/images/activities/wiki-thunder-in-the-azure-dream.jpg",
+      "sourceUrl": "https://media.prts.wiki/4/4b/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%B3%A1%E5%BD%B1%E8%8B%8D%E9%9C%86_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 347529,
+      "hash": "1d0294f2bb7ccee9503da09c092bc4cfccd47e8e999a1109034de39de684bc9a",
+      "syncedAt": "2026-10-26T00:24:42.585Z"
     },
     "prts-syri4j": {
       "publicPath": "/images/activities/prts-syri4j.jpg",
@@ -210,13 +210,13 @@
       "syncedAt": "2026-07-17T03:49:57.942Z"
     },
     "wiki-crossing": {
-      "publicPath": "/images/activities/wiki-crossing.webp",
-      "relativePath": "public/images/activities/wiki-crossing.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Crossing_banner.png?51dbf8",
-      "contentType": "image/webp",
-      "size": 937546,
-      "hash": "e02ea03bd5b74af9cf529ee70acbb002e97fdcaf59e4a02780c090b5a6b8a16e",
-      "syncedAt": "2026-10-25T11:49:02.608Z"
+      "publicPath": "/images/activities/wiki-crossing.jpg",
+      "relativePath": "public/images/activities/wiki-crossing.jpg",
+      "sourceUrl": "https://media.prts.wiki/7/79/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%81%E5%AD%97%E8%B7%AF%E5%8F%A3_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 471348,
+      "hash": "8be10006032610874d92f735b46283b4e5e95509c3e8973ec4f53c89ab78437e",
+      "syncedAt": "2026-10-26T00:24:43.215Z"
     },
     "prts-1m42naa": {
       "publicPath": "/images/activities/prts-1m42naa.jpg",
@@ -237,13 +237,13 @@
       "syncedAt": "2026-07-17T03:49:58.701Z"
     },
     "wiki-first-of-a-thousand-autumns": {
-      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.webp",
-      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_First_of_A_Thousand_Autumns_banner.png?72d32f",
-      "contentType": "image/webp",
-      "size": 1285088,
-      "hash": "a345cc93d50c3b7da92bfb9f20c64428e3e70169d2f735fa4e64ac16ff5c11dc",
-      "syncedAt": "2026-10-25T11:49:02.715Z"
+      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.jpg",
+      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.jpg",
+      "sourceUrl": "https://media.prts.wiki/d/d4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BE%9E%E5%B2%81%E8%A1%8C_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 432667,
+      "hash": "121524b8cb3c3aab55cfd041ce5ecc002389f0f67307440eee0206e5b66480c7",
+      "syncedAt": "2026-10-26T00:24:43.834Z"
     },
     "prts-1cqt5uv": {
       "publicPath": "/images/activities/prts-1cqt5uv.jpg",
@@ -273,13 +273,13 @@
       "syncedAt": "2026-07-17T03:49:59.669Z"
     },
     "wiki-languid-sentiment": {
-      "publicPath": "/images/activities/wiki-languid-sentiment.png",
-      "relativePath": "public/images/activities/wiki-languid-sentiment.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Languid_Sentiment_banner.png?b9e063",
-      "contentType": "image/png",
-      "size": 901599,
-      "hash": "fba83264ae97cc467b251f7323f5f2a5f20ee048b919f22948da5f281db6b174",
-      "syncedAt": "2026-10-25T11:49:03.014Z"
+      "publicPath": "/images/activities/wiki-languid-sentiment.jpg",
+      "relativePath": "public/images/activities/wiki-languid-sentiment.jpg",
+      "sourceUrl": "https://media.prts.wiki/9/94/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%85%B5%E6%87%92%E5%BF%83%E6%84%8F_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 301776,
+      "hash": "9b1bff71c6f1987551df0a0ee0f9fb5562cb66006efc2e4062dfb8417faf5070",
+      "syncedAt": "2026-10-26T00:24:44.133Z"
     },
     "prts-17xyioi": {
       "publicPath": "/images/activities/prts-17xyioi.jpg",
@@ -3270,13 +3270,13 @@
       "syncedAt": "2026-10-25T11:49:05.361Z"
     },
     "wiki-vector-breakthrough-event": {
-      "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
-      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.jpg",
-      "sourceUrl": "https://media.prts.wiki/f/f1/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%9F%A2%E9%87%8F%E7%AA%81%E7%A0%B402_01.jpg",
-      "contentType": "image/jpeg",
-      "size": 268285,
-      "hash": "ff713d7f63678c88f76b577bf7bf1637a61907b3c8c32c4a8c11b4c7621de3f6",
-      "syncedAt": "2026-10-14T12:10:19.480Z"
+      "publicPath": "/images/activities/wiki-vector-breakthrough-event.png",
+      "relativePath": "public/images/activities/wiki-vector-breakthrough-event.png",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Vector_Breakthrough_banner.png?2aec9d",
+      "contentType": "image/png",
+      "size": 975196,
+      "hash": "668f9851d9abb0da55688a7ae4a929704ea5aa06cc53fb5d93a9bed3f8c31c7c",
+      "syncedAt": "2026-10-26T00:24:44.543Z"
     },
     "wiki-reclamation-algorithm-mission-event": {
       "publicPath": "/images/activities/wiki-reclamation-algorithm-mission-event.png",
