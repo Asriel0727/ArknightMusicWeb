@@ -1,0 +1,1106 @@
+{
+  "generated_at": "2026-10-26T00:19:17.197Z",
+  "servers": {
+    "cn": {
+      "matched": 103,
+      "no_pool_expected": [
+        "wiki-ato-rerun",
+        "prts-1en990k",
+        "prts-123fgas",
+        "prts-gsi0ix",
+        "wiki-the-masses-travels-rerun",
+        "wiki-such-is-the-joy-of-our-reunion-rerun",
+        "prts-hj2yk2",
+        "prts-1mtlb0d",
+        "wiki-i-portatori-dei-velluti-rerun",
+        "wiki-adventure-that-cannot-wait-for-the-sun-rerun",
+        "prts-q1d0op",
+        "prts-1yi0v88",
+        "wiki-here-a-people-sows-rerun",
+        "prts-v8thu5",
+        "prts-3wyus0",
+        "wiki-zwillingsturme-im-herbst-rerun",
+        "prts-fp6wsa",
+        "wiki-so-long-adele-rerun",
+        "prts-2u3jvs",
+        "prts-5rwjcj",
+        "wiki-where-vernal-winds-will-never-blow-rerun",
+        "prts-1afaaxs",
+        "wiki-il-siracusano-rerun",
+        "prts-fktx8u",
+        "wiki-ideal-city-rerun",
+        "prts-111ilib",
+        "wiki-stultifera-navis-rerun",
+        "prts-1eibk3p",
+        "wiki-invitation-to-wine-rerun",
+        "prts-18ii387",
+        "wiki-near-light-rerun",
+        "wiki-it-s-been-a-while",
+        "prts-dmz301",
+        "wiki-dossoles-holiday-rerun",
+        "prts-11o91xl",
+        "wiki-under-tides-rerun",
+        "prts-18otgzb",
+        "wiki-who-is-real-rerun",
+        "prts-1kcd030"
+      ],
+      "unresolved": [
+        {
+          "code": "wiki-till-the-lands-become-an-orange",
+          "names": {
+            "en": "Till the Lands Become an Orange",
+            "zh-CN": "直到大地变成一颗酸橙"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        },
+        {
+          "code": "wiki-bolivar-diagnosed",
+          "names": {
+            "en": "Bolívar Diagnosed",
+            "zh-CN": "丛林症结"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        },
+        {
+          "code": "wiki-a-flurry-to-the-flame-rerun",
+          "names": {
+            "en": "A Flurry to the Flame/Rerun",
+            "zh-CN": "落叶逐火 复刻"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        },
+        {
+          "code": "wiki-thunder-in-the-azure-dream",
+          "names": {
+            "en": "Thunder in the Azure Dream",
+            "zh-CN": "泡影苍霆",
+            "zh-TW": "泡影蒼霆"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        },
+        {
+          "code": "prts-17xyioi",
+          "names": {
+            "zh-CN": "雅赛努斯复仇记"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        },
+        {
+          "code": "prts-fyig8v",
+          "names": {
+            "zh-CN": "密林悍将归来2021"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        },
+        {
+          "code": "prts-mh98fv",
+          "names": {
+            "zh-CN": "火蓝之心2020"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        }
+      ],
+      "operator_time_conflicts": [],
+      "activity_time_discrepancies": [],
+      "debut_time_discrepancies": [],
+      "time_precision": {
+        "second": 71,
+        "day": 30,
+        "unknown": 2
+      },
+      "display_coverage": {
+        "records": 149,
+        "missing_pools": [],
+        "pools_without_exact_time": [
+          {
+            "activity_code": "wiki-till-the-lands-become-an-orange",
+            "pool": {
+              "zh-CN": "车辙与风的归所",
+              "zh-TW": "車轍與風的歸所"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-bolivar-diagnosed",
+            "pool": {
+              "zh-TW": "確定性混沌",
+              "zh-CN": "确定性混沌",
+              "en": "Deterministic Chaos"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-a-flurry-to-the-flame-rerun",
+            "pool": {
+              "zh-TW": "烈火磨礪・復刻",
+              "zh-CN": "砺火成锋・复刻",
+              "en": "Sharpened by Flames Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-thunder-in-the-azure-dream",
+            "pool": {
+              "zh-TW": "幽境獵人",
+              "zh-CN": "幽境狩人",
+              "en": "Hunters of the Umbral Wilds"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "prts-17xyioi",
+            "pool": {
+              "en": "Quester in Frozen Moments"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-the-rides-to-lake-silberneherze",
+            "pool": {
+              "en": "The Sojourner"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "prts-1mclugj",
+            "pool": {
+              "en": "Flame of Immaculacy Rerun"
+            },
+            "start_date": "2023-02-21",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-guide-ahead-rerun",
+            "pool": {
+              "en": "Flame of Immaculacy Rerun"
+            },
+            "start_date": "2023-02-21",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-what-the-firelight-casts",
+            "pool": {
+              "en": "To Bloom From a Dim Flame"
+            },
+            "start_date": "2022-12-15",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-56o1vt",
+            "pool": {
+              "en": "Edelweiss' Vow Rerun"
+            },
+            "start_date": "2022-12-01",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-break-the-ice-rerun",
+            "pool": {
+              "en": "Edelweiss' Vow Rerun"
+            },
+            "start_date": "2022-12-01",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-return-to-mist",
+            "pool": {
+              "en": "Bearings and Sparks"
+            },
+            "start_date": "2022-10-11",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-dorothy-s-vision",
+            "pool": {
+              "en": "Pathfinder of Sands"
+            },
+            "start_date": "2022-07-05",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-lingering-echoes",
+            "pool": {
+              "en": "Dissonanzen"
+            },
+            "start_date": "2022-06-09",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-shatterpoint",
+            "pool": {
+              "en": "Roaring Cliffrunner"
+            },
+            "start_date": "2022-04-14",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-c20oss",
+            "pool": {
+              "en": "Erg Passenger Rerun"
+            },
+            "start_date": "2022-03-29",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-a-walk-in-the-dust-rerun",
+            "pool": {
+              "en": "Erg Passenger Rerun"
+            },
+            "start_date": "2022-03-29",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-guide-ahead",
+            "pool": {
+              "en": "Flame of Immaculacy"
+            },
+            "start_date": "2022-03-15",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-break-the-ice",
+            "pool": {
+              "en": "Edelweiss' Vow"
+            },
+            "start_date": "2021-12-21",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-zg3ek6",
+            "pool": {
+              "en": "Jail Tiger Unchained Rerun"
+            },
+            "start_date": "2021-12-07",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-mansfield-break-rerun",
+            "pool": {
+              "en": "Jail Tiger Unchained Rerun"
+            },
+            "start_date": "2021-12-07",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-1hm2ync",
+            "pool": {
+              "en": "Fractured Light Rerun"
+            },
+            "start_date": "2021-10-01",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-stormwatch",
+            "pool": {
+              "en": "Saileach on the Hill"
+            },
+            "start_date": "2021-09-17",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-fyig8v",
+            "pool": {
+              "en": "Heart of Steel, the Raging Ironhide Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-the-great-chief-returns-rerun",
+            "pool": {
+              "en": "Heart of Steel, the Raging Ironhide Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-a-walk-in-the-dust",
+            "pool": {
+              "en": "Erg Passenger"
+            },
+            "start_date": "2021-04-15",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-ov1flm",
+            "pool": {
+              "en": "Illusions of the Past Rerun"
+            },
+            "start_date": "2021-03-30",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-mansfield-break",
+            "pool": {
+              "en": "Jail Tiger Unchained"
+            },
+            "start_date": "2020-12-17",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-1x6vmwz",
+            "pool": {
+              "en": "Keeper of the Lock & Keys Rerun"
+            },
+            "start_date": "2020-12-01",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-code-of-brawl-rerun",
+            "pool": {
+              "en": "Keeper of the Lock & Keys Rerun"
+            },
+            "start_date": "2020-12-01",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-18u529n",
+            "pool": {
+              "en": "Fractured Light"
+            },
+            "start_date": "2020-10-15",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-1w26bbv",
+            "pool": {
+              "en": "Behold the Sword of Tide Rerun"
+            },
+            "start_date": "2020-10-01",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-grani-and-the-knights-treasure-rerun",
+            "pool": {
+              "en": "Behold the Sword of Tide Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-grani-and-the-knights-treasure-rerun",
+            "pool": {
+              "en": "Quicksand Vortex Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-the-great-chief-returns",
+            "pool": {
+              "en": "Heart of Steel, The Rage Ironhide"
+            },
+            "start_date": "2020-08-25",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "prts-mh98fv",
+            "pool": {
+              "en": "Unbound Reflux"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "prts-mh98fv",
+            "pool": {
+              "en": "Unbound Reflux Rerun"
+            },
+            "start_date": "2020-08-11",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-heart-of-surging-flame-rerun",
+            "pool": {
+              "en": "Unbound Reflux"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-heart-of-surging-flame-rerun",
+            "pool": {
+              "en": "Unbound Reflux Rerun"
+            },
+            "start_date": "2020-08-11",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-twilight-of-wolumonde",
+            "pool": {
+              "en": "Lisa of the Valley"
+            },
+            "start_date": "2020-07-09",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-darknights-memoir",
+            "pool": {
+              "en": "Illusions of the Past"
+            },
+            "start_date": "2020-04-21",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-code-of-brawl",
+            "pool": {
+              "en": "Keeper of the Lock & Keys"
+            },
+            "start_date": "2019-11-19",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-code-of-brawl",
+            "pool": {
+              "zh-TW": "鎖與匙的守衛者",
+              "zh-CN": "锁与匙的守卫者",
+              "en": "Lock & Load"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-heart-of-surging-flame-part-2",
+            "pool": {
+              "en": "Summer Guardians"
+            },
+            "start_date": "2019-08-27",
+            "time_precision": "day"
+          }
+        ]
+      }
+    },
+    "global": {
+      "matched": 75,
+      "no_pool_expected": [
+        "wiki-the-masses-travels-rerun",
+        "wiki-such-is-the-joy-of-our-reunion-rerun",
+        "wiki-i-portatori-dei-velluti-rerun",
+        "wiki-adventure-that-cannot-wait-for-the-sun-rerun",
+        "wiki-here-a-people-sows-rerun",
+        "wiki-zwillingsturme-im-herbst-rerun",
+        "wiki-so-long-adele-rerun",
+        "wiki-where-vernal-winds-will-never-blow-rerun",
+        "wiki-il-siracusano-rerun",
+        "wiki-ideal-city-rerun",
+        "wiki-stultifera-navis-rerun",
+        "wiki-invitation-to-wine-rerun",
+        "wiki-near-light-rerun",
+        "wiki-it-s-been-a-while",
+        "wiki-dossoles-holiday-rerun",
+        "wiki-under-tides-rerun",
+        "wiki-who-is-real-rerun"
+      ],
+      "unresolved": [
+        {
+          "code": "wiki-a-flurry-to-the-flame-rerun",
+          "names": {
+            "en": "A Flurry to the Flame/Rerun",
+            "zh-CN": "落叶逐火 复刻"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        },
+        {
+          "code": "wiki-thunder-in-the-azure-dream",
+          "names": {
+            "en": "Thunder in the Azure Dream",
+            "zh-CN": "泡影苍霆",
+            "zh-TW": "泡影蒼霆"
+          },
+          "reason": "No unique banner with event/operator and regional time evidence"
+        }
+      ],
+      "operator_time_conflicts": [],
+      "activity_time_discrepancies": [],
+      "debut_time_discrepancies": [],
+      "time_precision": {
+        "day": 13,
+        "second": 62
+      },
+      "display_coverage": {
+        "records": 94,
+        "missing_pools": [],
+        "pools_without_exact_time": [
+          {
+            "activity_code": "wiki-a-flurry-to-the-flame-rerun",
+            "pool": {
+              "zh-TW": "烈火磨礪・復刻",
+              "zh-CN": "砺火成锋・复刻",
+              "en": "Sharpened by Flames Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-thunder-in-the-azure-dream",
+            "pool": {
+              "zh-TW": "幽境獵人",
+              "zh-CN": "幽境狩人",
+              "en": "Hunters of the Umbral Wilds"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-critical-phase-transition",
+            "pool": {
+              "en": "Promise",
+              "zh-CN": "承诺",
+              "zh-TW": "承諾"
+            },
+            "start_date": "2026-10-14",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-people-a-people",
+            "pool": {
+              "en": "Rage of the Many",
+              "zh-CN": "辟路之人",
+              "zh-TW": "闢路之人"
+            },
+            "start_date": "2026-09-16",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-when-elegies-are-ashes-rerun",
+            "pool": {
+              "en": "Returned From A Pyre Rerun",
+              "zh-CN": "自余烬归来・复刻",
+              "zh-TW": "自餘燼歸來・復刻"
+            },
+            "start_date": "2026-08-27",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-crossing",
+            "pool": {
+              "en": "By My Rules",
+              "zh-CN": "以我的方式"
+            },
+            "start_date": "2026-08-13",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-first-of-a-thousand-autumns",
+            "pool": {
+              "en": "Ashes to Ashes, Ages on Ages",
+              "zh-CN": "劫尽古今",
+              "zh-TW": "劫盡古今"
+            },
+            "start_date": "2026-07-16",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-medjehtiqedti-bound",
+            "pool": {
+              "en": "Quester in Frozen Moments",
+              "zh-CN": "在凝固的时光中探寻",
+              "zh-TW": "在凝固的時光中探尋"
+            },
+            "start_date": "2026-06-22",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-exodus-from-the-pale-sea-rerun",
+            "pool": {
+              "en": "Confirmation, Completion, Conduction Rerun",
+              "zh-CN": "证实，完成，指引"
+            },
+            "start_date": "2026-06-05",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-unrealized-realities",
+            "pool": {
+              "en": "600 Meters Over The Facts",
+              "zh-CN": "现实之上六百米",
+              "zh-TW": "現實之上六百米"
+            },
+            "start_date": "2026-05-21",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-retracing-our-steps",
+            "pool": {
+              "en": "A Shared Oath of Guardianship",
+              "zh-CN": "以风雪为誓",
+              "zh-TW": "以風雪為誓"
+            },
+            "start_date": "2026-04-14",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-somniloquium-serenum",
+            "pool": {
+              "en": "Cantilena Puppae",
+              "zh-CN": "人偶的歌谣",
+              "zh-TW": "人偶的歌謠"
+            },
+            "start_date": "2026-02-10",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-ato",
+            "pool": {
+              "en": "Hanabi Exiled",
+              "zh-CN": "不归花火"
+            },
+            "start_date": "2026-01-16",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-fantasy-in-the-mirage",
+            "pool": {
+              "en": "The Rolling Thunder",
+              "zh-CN": "青霆重明"
+            },
+            "start_date": "2025-12-11",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-the-rides-to-lake-silberneherze",
+            "pool": {
+              "en": "The Sojourner"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-the-great-chief-returns",
+            "pool": {
+              "en": "Heart of Steel, The Rage Ironhide"
+            },
+            "start_date": "2021-02-25",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-heart-of-surging-flame-rerun",
+            "pool": {
+              "en": "Unbound Reflux"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-grani-and-the-knights-treasure-rerun",
+            "pool": {
+              "en": "Behold the Sword of Tide Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-code-of-brawl",
+            "pool": {
+              "zh-TW": "鎖與匙的守衛者",
+              "zh-CN": "锁与匙的守卫者",
+              "en": "Lock & Load"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          }
+        ]
+      }
+    },
+    "tw": {
+      "matched": 74,
+      "no_pool_expected": [
+        "wiki-such-is-the-joy-of-our-reunion-rerun",
+        "wiki-i-portatori-dei-velluti-rerun",
+        "wiki-adventure-that-cannot-wait-for-the-sun-rerun",
+        "wiki-here-a-people-sows-rerun",
+        "wiki-so-long-adele-rerun",
+        "wiki-where-vernal-winds-will-never-blow-rerun",
+        "wiki-il-siracusano-rerun",
+        "wiki-ideal-city-rerun",
+        "wiki-stultifera-navis-rerun",
+        "wiki-invitation-to-wine-rerun",
+        "wiki-it-s-been-a-while",
+        "wiki-near-light-rerun",
+        "wiki-dossoles-holiday-rerun",
+        "wiki-under-tides-rerun",
+        "wiki-who-is-real-rerun"
+      ],
+      "unresolved": [],
+      "operator_time_conflicts": [],
+      "activity_time_discrepancies": [],
+      "debut_time_discrepancies": [],
+      "time_precision": {
+        "unknown": 10,
+        "second": 39,
+        "day": 25
+      },
+      "display_coverage": {
+        "records": 89,
+        "missing_pools": [],
+        "pools_without_exact_time": [
+          {
+            "activity_code": "wiki-when-elegies-are-ashes-rerun",
+            "pool": {
+              "en": "Returned From A Pyre Rerun",
+              "zh-CN": "自余烬归来・复刻",
+              "zh-TW": "自餘燼歸來・復刻"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-unrealized-realities",
+            "pool": {
+              "en": "600 Meters Over The Facts",
+              "zh-CN": "现实之上六百米",
+              "zh-TW": "現實之上六百米"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-exodus-from-the-pale-sea-rerun",
+            "pool": {
+              "en": "Confirmation, Completion, Conduction Rerun",
+              "zh-CN": "证实，完成，指引"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-path-of-life-rerun",
+            "pool": {
+              "en": "Anchor In The Deep Rerun",
+              "zh-CN": "沉向深渊的锚"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-the-masses-travels",
+            "pool": {
+              "en": "Anchor In The Deep Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-such-is-the-joy-of-our-reunion",
+            "pool": {
+              "en": "Command: Reconstruction"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-the-rides-to-lake-silberneherze-rerun",
+            "pool": {
+              "en": "The Sojourner Rerun",
+              "zh-CN": "游邦者"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-come-catastrophes-or-wakes-of-vultures-rerun",
+            "pool": {
+              "en": "Clank Liberty Rerun",
+              "zh-CN": "鸣铳"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-adventure-that-cannot-wait-for-the-sun",
+            "pool": {
+              "en": "We Mischievous Few"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-hortus-de-escapismo-rerun",
+            "pool": {
+              "en": "Arbiter Aequissimus Rerun",
+              "zh-CN": "执裁者"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-operation-originium-dust-rerun",
+            "pool": {
+              "en": "Attack, Defence, Tactical Collide Rerun",
+              "zh-CN": "进攻·防守·战术交汇"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-to-the-grinning-valley",
+            "pool": {
+              "en": "Anchor in the Deep"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-what-the-firelight-casts-rerun",
+            "pool": {
+              "en": "To Bloom From a Dim Flame Rerun",
+              "zh-CN": "枯焰生花"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-the-rides-to-lake-silberneherze",
+            "pool": {
+              "en": "Our Kind"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-dorothy-s-vision-rerun",
+            "pool": {
+              "en": "Pathfinder of Sands Rerun",
+              "zh-CN": "沙洲引路人"
+            },
+            "start_date": null,
+            "time_precision": "unknown"
+          },
+          {
+            "activity_code": "wiki-lingering-echoes-rerun",
+            "pool": {
+              "en": "Dissonanzen Rerun",
+              "zh-CN": "不协和音程"
+            },
+            "start_date": "2024-05-14",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-guide-ahead-rerun",
+            "pool": {
+              "en": "Flame of Immaculacy Rerun"
+            },
+            "start_date": "2024-01-23",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-what-the-firelight-casts",
+            "pool": {
+              "en": "To Bloom From a Dim Flame"
+            },
+            "start_date": "2023-10-19",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-break-the-ice-rerun",
+            "pool": {
+              "en": "Edelweiss' Vow Rerun"
+            },
+            "start_date": "2023-08-29",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-return-to-mist",
+            "pool": {
+              "en": "Bearings and Sparks"
+            },
+            "start_date": "2023-08-10",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-dorothy-s-vision",
+            "pool": {
+              "en": "Pathfinder of Sands"
+            },
+            "start_date": "2023-04-13",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-lingering-echoes",
+            "pool": {
+              "en": "Dissonanzen"
+            },
+            "start_date": "2023-03-28",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-shatterpoint",
+            "pool": {
+              "en": "Roaring Cliffrunner"
+            },
+            "start_date": "2023-01-17",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-guide-ahead",
+            "pool": {
+              "en": "Flame of Immaculacy"
+            },
+            "start_date": "2022-12-29",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-a-walk-in-the-dust-rerun",
+            "pool": {
+              "en": "Erg Passenger Rerun"
+            },
+            "start_date": "2022-12-15",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-break-the-ice",
+            "pool": {
+              "en": "Edelweiss' Vow"
+            },
+            "start_date": "2022-09-29",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-mansfield-break-rerun",
+            "pool": {
+              "en": "Jail Tiger Unchained Rerun"
+            },
+            "start_date": "2022-09-14",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-stormwatch",
+            "pool": {
+              "en": "Saileach on the Hill"
+            },
+            "start_date": "2022-06-21",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-the-great-chief-returns-rerun",
+            "pool": {
+              "en": "Heart of Steel, the Raging Ironhide Rerun"
+            },
+            "start_date": "2022-04-26",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-a-walk-in-the-dust",
+            "pool": {
+              "en": "Erg Passenger"
+            },
+            "start_date": "2022-01-11",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-mansfield-break",
+            "pool": {
+              "en": "Jail Tiger Unchained"
+            },
+            "start_date": "2021-10-28",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-code-of-brawl-rerun",
+            "pool": {
+              "en": "Keeper of the Lock & Keys Rerun"
+            },
+            "start_date": "2021-10-14",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-the-great-chief-returns",
+            "pool": {
+              "en": "Heart of Steel, The Rage Ironhide"
+            },
+            "start_date": "2021-06-24",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-heart-of-surging-flame-rerun",
+            "pool": {
+              "en": "Unbound Reflux"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-heart-of-surging-flame-rerun",
+            "pool": {
+              "en": "Unbound Reflux Rerun"
+            },
+            "start_date": "2021-06-10",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-darknights-memoir",
+            "pool": {
+              "en": "Illusions of the Past"
+            },
+            "start_date": "2021-05-13",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-grani-and-the-knights-treasure-rerun",
+            "pool": {
+              "en": "Behold the Sword of Tide Rerun"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-grani-and-the-knights-treasure-rerun",
+            "pool": {
+              "en": "Quicksand Vortex Rerun"
+            },
+            "start_date": "2021-04-29",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-twilight-of-wolumonde",
+            "pool": {
+              "en": "Lisa of the Valley"
+            },
+            "start_date": "2021-04-01",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-code-of-brawl",
+            "pool": {
+              "en": "Keeper of the Lock & Keys"
+            },
+            "start_date": "2020-11-19",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-code-of-brawl",
+            "pool": {
+              "zh-TW": "鎖與匙的守衛者",
+              "zh-CN": "锁与匙的守卫者",
+              "en": "Lock & Load"
+            },
+            "start_date": null,
+            "time_precision": "unverified"
+          },
+          {
+            "activity_code": "wiki-heart-of-surging-flame-part-2",
+            "pool": {
+              "en": "Summer Guardians"
+            },
+            "start_date": "2020-10-14",
+            "time_precision": "day"
+          },
+          {
+            "activity_code": "wiki-grani-and-the-knights-treasure",
+            "pool": {
+              "en": "Behold the Sword of Tide"
+            },
+            "start_date": "2020-07-23",
+            "time_precision": "day"
+          }
+        ]
+      }
+    }
+  }
+}

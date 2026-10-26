@@ -103,6 +103,7 @@
                 <div class="pool-dialog-content">
                   <p class="pool-kind">{{ poolTypeLabel(pool.kind) }}</p>
                   <h2>{{ localizedPoolName(pool) }}</h2>
+                  <p class="date-range">{{ poolTimingCopy.period }}：{{ poolTimeRange(pool) }}</p>
                   <h3>{{ poolDetailCopy.rateUpOperators }}</h3>
                   <template v-if="pool.operators?.length">
                     <section v-for="group in poolOperatorGroups(pool)" :key="group.key" class="pool-operator-group">
@@ -110,9 +111,10 @@
                       <div class="pool-operators">
                     <button
                       v-for="operator in group.operators"
-                      :key="operator.id"
+                      :key="operator.id || operator.name_i18n?.['zh-CN']"
                       class="pool-operator"
                       type="button"
+                      :disabled="!operator.id"
                       @click="viewOperator(operator)"
                     >
                       <img v-if="operatorAvatarUrl(operator)" :src="operatorAvatarUrl(operator)" :alt="localizedOperatorName(operator)" loading="lazy">
@@ -123,6 +125,7 @@
                           · {{ operator.featured === 'secondary' ? poolDetailCopy.secondaryRateUp : poolDetailCopy.primaryRateUp }}
                           <template v-if="operator.limited"> · {{ poolDetailCopy.limited }}</template>
                         </small>
+                        <small v-if="operator.release_at">{{ operator.release_status === 'announced' ? poolTimingCopy.plannedDebut : poolTimingCopy.debut }}：{{ operatorReleaseDate(operator.release_at) }}</small>
                       </span>
                       <i class="fas fa-chevron-right"></i>
                     </button>
@@ -208,6 +211,12 @@ const POOL_DETAIL_TEXT = {
   en: { openPool: 'View banner', close: 'Close banner details', rateUpOperators: 'Rate-up Operators', primaryRateUp: 'Primary rate-up', secondaryRateUp: 'Secondary rate-up', limited: 'Limited', noOperatorData: 'No Operator data is available for this banner.' },
 };
 const poolDetailCopy = computed(() => POOL_DETAIL_TEXT[locale.value] || POOL_DETAIL_TEXT.en);
+const POOL_TIMING_TEXT = {
+  'zh-TW': { period: '卡池期間', debut: '此伺服器實裝日期', plannedDebut: '預定實裝日期', unknown: '尚無確切卡池時間', dateOnly: '僅提供日期', zone: '伺服器時間' },
+  'zh-CN': { period: '卡池期间', debut: '此服务器实装日期', plannedDebut: '预定实装日期', unknown: '暂无确切卡池时间', dateOnly: '仅提供日期', zone: '服务器时间' },
+  en: { period: 'Banner period', debut: 'Server debut date', plannedDebut: 'Announced debut date', unknown: 'Exact banner times unavailable', dateOnly: 'Dates only', zone: 'Server time' },
+};
+const poolTimingCopy = computed(() => POOL_TIMING_TEXT[locale.value] || POOL_TIMING_TEXT.en);
 const POOL_GROUP_TEXT = {
   'zh-TW': { current: '當期限定', legacy: '過往限定復刻', other: '其他 UP 幹員' },
   'zh-CN': { current: '当期限定', legacy: '过往限定复刻', other: '其他 UP 干员' },
@@ -350,6 +359,23 @@ function localized(value) {
   return ['zh-TW', 'zh-CN'].includes(locale.value)
     ? localizedText.replace(/\s*\([^()]*[A-Za-z][^()]*\)\s*/gu, ' ').trim()
     : localizedText;
+}
+function operatorReleaseDate(value) {
+  return new Intl.DateTimeFormat(locale.value, {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    timeZone: server.value === 'global' ? 'Etc/GMT+7' : 'Asia/Taipei',
+  }).format(new Date(value));
+}
+function poolTimeRange(pool) {
+  if (pool.time_precision === 'second' && pool.start_at) {
+    const formatter = new Intl.DateTimeFormat(locale.value, {
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+      timeZone: server.value === 'global' ? 'Etc/GMT+7' : 'Asia/Taipei', hourCycle: 'h23',
+    });
+    return `${formatter.format(new Date(pool.start_at))} — ${pool.end_at ? formatter.format(new Date(pool.end_at)) : '—'} (${poolTimingCopy.value.zone}, UTC${server.value === 'global' ? '−7' : '+8'})`;
+  }
+  if (pool.start_date) return `${pool.start_date} — ${pool.end_date || '—'} (${poolTimingCopy.value.dateOnly})`;
+  return poolTimingCopy.value.unknown;
 }
 function poolTypeLabel(type) { return copy.value.pools[type] || type; }
 function poolOperatorGroups(pool) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import generatedActivityPools from '../src/data/generatedActivityPools.js';
+import generatedActivityPools from '../src/data/verifiedActivityPools.js';
 import { getSupabaseHeaders } from './supabase-headers.mjs';
 
 const DEFAULT_SUPABASE_URL = 'https://rdneemerltoxlfosazcz.supabase.co';
@@ -57,6 +57,8 @@ function operatorRow(poolId, operator) {
       featured: operator.featured === 'secondary' ? 'secondary' : 'primary',
       limited: Boolean(operator.limited),
       name_i18n: operator.name_i18n || {},
+      release_at: operator.release_at || null,
+      release_source_url: operator.release_source_url || null,
     },
   };
 }
@@ -115,7 +117,12 @@ async function writeBatches(config, table, rows, query, prefer) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const entries = selectedEntries(options);
+  const selected = selectedEntries(options);
+  const entries = selected.filter(({ pool }) => pool.verification?.status === 'verified'
+    && pool.time_precision === 'second' && pool.start_at && pool.operators?.every((operator) => operator.id));
+  const dateOnlyPools = selected.filter(({ pool }) => pool.time_precision !== 'second').map(({ activityCode, server }) => `${activityCode}:${server}`);
+  const pendingOperatorPools = selected.filter(({ pool }) => pool.operators?.some((operator) => !operator.id))
+    .map(({ activityCode, server }) => `${activityCode}:${server}`);
   if (!entries.length) throw new Error('No generated activity pools matched the requested filters.');
 
   const servers = [...new Set(entries.map((entry) => entry.server))];
@@ -123,7 +130,8 @@ async function main() {
     const withoutOperatorIds = entries.flatMap(({ activityCode, server, pool }) => (pool.operators || [])
       .filter((operator) => !operator.id)
       .map((operator) => `${activityCode}:${server}:${pool.slug} → ${operator.name_i18n?.en || 'unknown'}`));
-    console.log(JSON.stringify({ dryRun: true, pools: entries.length, servers, withoutOperatorIds }, null, 2));
+    console.log(JSON.stringify({ dryRun: true, pools: entries.length, servers, withoutOperatorIds,
+      skippedWithoutExactTime: dateOnlyPools, skippedPendingOperatorIds: pendingOperatorPools }, null, 2));
     return;
   }
 
@@ -151,8 +159,8 @@ async function main() {
       name_i18n: entry.pool.name_i18n || {},
       image_url: getPoolImage(entry.pool) || window.activities?.image_url || null,
       server: entry.server,
-      start_at: window.start_at,
-      end_at: window.end_at || null,
+      start_at: entry.pool.start_at,
+      end_at: entry.pool.end_at || null,
       source_url: entry.pool.source_url || null,
       updated_at: now,
     });
@@ -198,6 +206,8 @@ async function main() {
     syncedPools: poolRows.length,
     syncedOperators: operatorRows.length,
     skippedMissingActivities: missingActivities.length,
+    skippedWithoutExactTime: dateOnlyPools,
+    skippedPendingOperatorIds: pendingOperatorPools,
     servers,
   }, null, 2));
 }

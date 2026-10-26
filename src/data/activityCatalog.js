@@ -1,3 +1,5 @@
+import verifiedActivityPools, { operatorReleaseDates } from './verifiedActivityPools.js';
+
 function story(recruitmentPools = [], options = {}) {
   return { classification: 'story', recruitmentPools, expectsRecruitmentPool: options.expectsRecruitmentPool !== false };
 }
@@ -287,6 +289,8 @@ const ACTIVITY_CATALOG = {
   ]),
 
   // Story-stage collaborations share this classification across every server.
+  'wiki-sur-le-lac-lune-vivante': story(),
+  'prts-1bfjzz3': story(),
   'wiki-a-flurry-to-the-flame': story(),
   'wiki-a-flurry-to-the-flame-rerun': story([
     {
@@ -350,6 +354,9 @@ const NO_RECRUITMENT_POOL_CODES = new Set([
   'wiki-il-siracusano-rerun',
   'wiki-stultifera-navis-rerun',
   'wiki-near-light-rerun',
+  'wiki-ideal-city-rerun',
+  'wiki-ato-rerun',
+  'prts-1en990k',
   'wiki-dossoles-holiday-rerun',
   'wiki-under-tides-rerun',
   'wiki-who-is-real-rerun',
@@ -385,8 +392,18 @@ export function activityExpectsRecruitmentPool(activity) {
     && !NO_RECRUITMENT_POOL_CODES.has(activity?.code);
 }
 
-function curatedPoolsFor(activity) {
-  return catalogEntry(activity)?.recruitmentPools || [];
+function curatedPoolsFor(activity, server, verifiedCatalog) {
+  const aliases = { 'prts-fyig8v': 'wiki-the-great-chief-returns-rerun', 'prts-mh98fv': 'wiki-heart-of-surging-flame-rerun' };
+  const verified = verifiedCatalog[activity?.code]?.[server]
+    || verifiedCatalog[aliases[activity?.code]]?.[server] || [];
+  const manual = catalogEntry(activity)?.recruitmentPools || [];
+  const result = [...verified];
+  for (const pool of manual) {
+    const index = result.findIndex((candidate) => poolsMatch(candidate, pool));
+    if (index < 0) result.push(pool);
+    else result[index] = mergePool(pool, result[index]);
+  }
+  return result;
 }
 
 function catalogEntry(activity) {
@@ -412,6 +429,8 @@ function poolsMatch(left, right) {
 }
 
 function mergePool(apiPool, curatedPool) {
+  const verified = curatedPool.verification?.status === 'verified';
+  const operators = verified ? curatedPool.operators : apiPool.operators?.length ? apiPool.operators : curatedPool.operators;
   return {
     ...curatedPool,
     ...apiPool,
@@ -420,7 +439,15 @@ function mergePool(apiPool, curatedPool) {
       ...apiPool.name_i18n,
     },
     image_url: apiPool.image_url || curatedPool.image_url,
-    operators: apiPool.operators?.length ? apiPool.operators : curatedPool.operators,
+    ...(verified ? {
+      start_at: curatedPool.start_at,
+      end_at: curatedPool.end_at,
+      start_date: curatedPool.start_date,
+      end_date: curatedPool.end_date,
+      time_precision: curatedPool.time_precision,
+      verification: curatedPool.verification,
+    } : {}),
+    operators,
   };
 }
 
@@ -436,7 +463,7 @@ function attachLimitedOperatorRoles(activity, pools) {
   }));
 }
 
-export function attachCuratedActivityRecruitmentPools(activities, server) {
+export function attachCuratedActivityRecruitmentPools(activities, server, verifiedCatalog = verifiedActivityPools) {
   return (activities || []).map((activity) => {
     if (!activityExpectsRecruitmentPool(activity)) {
       return {
@@ -451,7 +478,7 @@ export function attachCuratedActivityRecruitmentPools(activities, server) {
     // A date- and operator-based guess can associate an unrelated concurrent
     // banner with an activity. Only API data and catalog entries reviewed by
     // hand may be displayed as activity recruitment pools.
-    const unmatchedCuratedPools = [...curatedPoolsFor(activity)];
+    const unmatchedCuratedPools = [...curatedPoolsFor(activity, server, verifiedCatalog)];
     const mergedApiPools = apiPools.map((apiPool) => {
       const curatedIndex = unmatchedCuratedPools.findIndex((pool) => poolsMatch(apiPool, pool));
       if (curatedIndex < 0) return apiPool;
@@ -463,13 +490,19 @@ export function attachCuratedActivityRecruitmentPools(activities, server) {
         id: `curated:${activity.code}:${server}:${pool.slug}`,
         activity_id: activity.id,
         server,
-        start_at: activity.window?.start_at || null,
-        end_at: activity.window?.end_at || null,
+        start_at: pool.start_at || null,
+        end_at: pool.end_at || null,
       }));
 
     return {
       ...activity,
-      recruitment_pools: attachLimitedOperatorRoles(activity, [...mergedApiPools, ...curatedPools]),
+      recruitment_pools: attachLimitedOperatorRoles(activity, [...mergedApiPools, ...curatedPools]).map((pool) => ({
+        ...pool,
+        operators: (pool.operators || []).map((operator) => ({
+          ...operator,
+          ...(operatorReleaseDates[server]?.[operator.id] || {}),
+        })),
+      })),
       expects_recruitment_pool: activityExpectsRecruitmentPool(activity),
     };
   });

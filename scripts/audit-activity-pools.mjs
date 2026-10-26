@@ -14,7 +14,7 @@ function localized(value) {
 
 function isStory(activity) {
   const classification = getActivityClassification(activity);
-  return classification ? classification === 'story' : STORY_TYPES.has(activity.type);
+  return classification ? ['story', 'main_story'].includes(classification) : STORY_TYPES.has(activity.type);
 }
 
 for (const server of SERVERS) {

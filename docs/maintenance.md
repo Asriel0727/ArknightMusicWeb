@@ -27,16 +27,33 @@ npm run activities:sync
 npm run activities:audit-pools
 ```
 
-`activities:sync` 先從 Wiki／遊戲資料產生經過日期與角色交集比對的活動卡池，接著以
+`activities:sync` 先從 Wiki、官方公告、三服卡池遊戲資料與幹員實裝紀錄產生交叉比對的活動卡池，接著以
 `activity code + server + pool slug` 寫入 Supabase。它不會刪除既有資料；可先使用
 `npm run activities:push-pools -- --dry-run` 檢視預計寫入的筆數。
+
+僅更新本地資料、不寫入資料庫時，使用 `npm run activities:sync-pools`。
+結果儲存在 `src/data/verifiedActivityPools.js`，前端會直接載入；完整比對報告在
+`docs/data/activity-pool-audit.json`。報告包含尚無唯一來源配對的紀錄、實裝日期衝突、
+活動與卡池日期差異，以及實際畫面仍缺卡池或缺確切時間的清單。
+
+卡池比對必須有活動所屬事件與 UP 幹員的證據，不能只靠同期日期；繁中服不借用國際服日期。
+幹員首次實裝日期與本期尋訪時間分開保存，復刻不會改寫首次實裝日期。
+官方公告優先於遊戲資料中的預載開放時間。未實裝幹員可以先顯示公告名單與預定實裝日期，
+ID 尚未公布時不提供幹員詳情入口。只有日期的卡池保留日期精度；無時間來源則明確標示，
+不再將活動起訖時間填入卡池。資料庫的 `start_at` 不可為空，因此寫入腳本只推送有確切時間的卡池，
+日期精度與來源仍由本地資料補充顯示。
+
+產生器會將唯讀來源暫存於忽略版控的 `tmp/activity-pools/`。
+`node scripts/sync-verified-activity-pools.mjs` 可重用快照；`--refresh` 重新抓取來源。
 
 ## 自動卡池同步
 
 卡池同步由 Cloudflare Worker 的既有六小時 cron 執行：每個伺服器完成活動資料同步後，會立即
-比對 Wiki 招募 banner 並寫入 Supabase。它使用 Worker 已有的 `SUPABASE_SERVICE_ROLE_KEY` secret，
+優先寫入已交叉核對且有確切時間的卡池，再以事件、幹員實裝紀錄與遊戲卡池時間比對新的 Wiki 招募 banner。
+無法唯一確認的項目不猜測寫入，會回報於同步結果的 `unresolved`；來源暫時失敗時仍保留既有核對資料。
+它使用 Worker 已有的 `SUPABASE_SERVICE_ROLE_KEY` secret，
 不需要 GitHub Actions 或額外 GitHub Secret。本機的 `npm run activities:sync` 僅保留給需要立即
-回補資料時使用。
+回補資料與更新完整來源快照時使用。需要部署更新後的 Worker，排程才會使用新的比對規則。
 
 ## 主要資料夾
 

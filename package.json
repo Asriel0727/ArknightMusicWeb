@@ -13,7 +13,7 @@
     "assets:audit": "node scripts/assets/audit-operator-assets.mjs",
     "assets:sync": "node scripts/assets/sync-operator-assets.mjs",
     "activities:sync-assets": "node scripts/assets/sync-activity-assets.mjs",
-    "activities:sync-pools": "node scripts/generate-activity-pool-catalog.mjs",
+    "activities:sync-pools": "node scripts/sync-verified-activity-pools.mjs --refresh",
     "activities:push-pools": "node scripts/push-activity-pools-to-supabase.mjs",
     "activities:sync": "npm run activities:sync-pools && npm run activities:push-pools",
     "activities:audit-pools": "node scripts/audit-activity-pools.mjs",
