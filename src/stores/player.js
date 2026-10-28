@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 import { attachAudioSpectrum } from '../utils/audioSpectrum.js';
+import { attachMediaSession } from '../utils/mediaSession.js';
 import { i18n } from '../i18n/index.js';
 import {
   fetchAlbumDetails,
@@ -21,6 +22,7 @@ let lyricLoadToken = 0;
 let lyricTranslationToken = 0;
 let audioLoadToken = 0;
 let lyricsTranslationPluginPromise = null;
+let detachMediaSession = () => {};
 const PLAY_MODES = ['repeat-all', 'repeat-one', 'shuffle'];
 const PLAYER_VOLUME_STORAGE_KEY = 'arknight-music-player-volume';
 
@@ -238,8 +240,30 @@ export const dropdownState = reactive({
 
 // 初始化音頻播放器
 export function initAudioPlayer(audioElement) {
+  detachMediaSession();
   playerState.audioPlayer = audioElement;
   attachAudioSpectrum(audioElement);
+  detachMediaSession = attachMediaSession(audioElement, {
+    getMetadata: () => {
+      const song = playerState.currentSong;
+      if (!song) return null;
+      const album = song.album || (albumState.currentAlbumDetails?.cid === song.albumCid
+        ? albumState.currentAlbumDetails : null);
+      const cover = song.coverUrl || album?.coverUrl;
+      return {
+        title: song.name || '',
+        artist: Array.isArray(song.artistes) ? song.artistes.join(' / ') : song.artistes || '',
+        album: album?.name || '',
+        artwork: cover ? [{ src: cover }] : [],
+      };
+    },
+    previous: playPreviousSong,
+    next: playNextSong,
+    onSeek: (time) => {
+      playerState.currentTime = time;
+      syncLyrics(time);
+    },
+  });
   
   if (audioElement) {
     audioElement.volume = playerState.volume;
@@ -322,6 +346,7 @@ export async function playSong(song, coverUrl, coverDeUrl) {
 
     const fullSong = {
       ...songDetails,
+      album: song.album || songDetails.album || null,
       artistes: song.artistes || songDetails.artistes || [unknownArtistLabel()],
       coverUrl: coverUrl || song.coverUrl || songDetails.coverUrl,
       coverDeUrl: coverDeUrl || song.coverDeUrl || songDetails.coverDeUrl,
@@ -569,7 +594,7 @@ export function playPreviousSong() {
   }
   playerState.currentSongIndex = newIndex;
   const song = playerState.currentPlaylist[newIndex];
-  playSong(song, song.coverUrl, song.coverDeUrl);
+  return playSong(song, song.coverUrl, song.coverDeUrl);
 }
 
 export function playNextSong() {
@@ -577,7 +602,7 @@ export function playNextSong() {
   const newIndex = getNextSongIndex();
   playerState.currentSongIndex = newIndex;
   const song = playerState.currentPlaylist[newIndex];
-  playSong(song, song.coverUrl, song.coverDeUrl);
+  return playSong(song, song.coverUrl, song.coverDeUrl);
 }
 
 export function togglePlayMode() {

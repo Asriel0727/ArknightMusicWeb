@@ -7,6 +7,14 @@ export function attachAudioSpectrum(audio) {
   detach();
   activeGraph = null;
   if (!audio) return;
+  const navigator = window.navigator;
+  const isMobile = window.matchMedia?.('(hover: none) and (pointer: coarse)').matches
+    || /Android|iPhone|iPad|iPod/i.test(navigator?.userAgent || '')
+    || (navigator?.platform === 'MacIntel' && navigator?.maxTouchPoints > 1);
+  // Creating a MediaElementAudioSourceNode permanently routes this element
+  // through Web Audio. Skip it entirely on mobile so native background audio
+  // does not depend on an AudioContext staying active. Static bars are used.
+  if (isMobile) return;
   const activate = async () => {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
