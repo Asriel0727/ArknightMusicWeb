@@ -1,5 +1,5 @@
 name = "arknights-recruit-api"
-main = "worker/index.js"
+main = "worker/runtime.js"
 compatibility_date = "2026-06-10"
 
 [vars]
@@ -9,6 +9,14 @@ LYRICS_PREWARM_LOCALES = "zh-TW,zh-CN,en,ja,ko"
 [[kv_namespaces]]
 binding = "ARKNIGHTS_DATA"
 id = "1f16c51e50154624856b1feb4f67ea2e"
+
+[[durable_objects.bindings]]
+name = "AUTH_STATE"
+class_name = "AuthState"
+
+[[migrations]]
+tag = "auth-state-v1"
+new_sqlite_classes = ["AuthState"]
 
 [triggers]
 # Keep heavyweight sync jobs in separate Worker invocations. Subrequests from

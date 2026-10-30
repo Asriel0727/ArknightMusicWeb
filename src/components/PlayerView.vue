@@ -37,7 +37,7 @@
             <button class="control-btn" @click="playPreviousSong">
               <i class="fas fa-step-backward"></i>
             </button>
-            <button class="control-btn play-pause" @click="togglePlay">
+            <button class="control-btn play-pause" @click="handleTogglePlay">
               <i :class="playerState.isPlaying ? 'fas fa-pause' : 'fas fa-play'"></i>
             </button>
             <button class="control-btn" @click="playNextSong">
@@ -102,11 +102,12 @@
     <div v-if="hasRightPanel" class="player-view-right" :class="{ 'has-video': !!characterEp, 'has-lyrics': hasLyrics }">
       <div v-if="characterEp" class="player-visual-panel">
         <div class="character-ep-visual"
-          :class="{ expanded: isCharacterEpExpanded }">
+          :class="{ expanded: isCharacterEpExpanded, 'manual-start': isManualEpStart }">
           <div v-if="isYoutubeCharacterEp && playerState.isPlaying && !isCharacterEpWaiting" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
           </div>
           <iframe v-else-if="!isCharacterEpWaiting && (playerState.isPlaying || isBilibiliSyncPending)" :key="epIframeKey" class="character-ep-frame"
+            :tabindex="isManualEpStart ? 0 : -1"
             :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
             allow="autoplay" referrerpolicy="strict-origin-when-cross-origin" @load="handleBilibiliFrameLoad"></iframe>
           <div v-else class="character-ep-paused">
@@ -123,6 +124,14 @@
           <a class="character-ep-link" :href="characterEp.sourceUrl" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-up-right-from-square"></i> {{ t('player.openVideo') }}
           </a>
+        </div>
+        <div v-if="isMobileLayout && playerState.isPlaying && !isCharacterEpWaiting" class="character-ep-start-help"
+          :class="{ expanded: isCharacterEpExpanded }">
+          <p v-if="isManualEpStart" role="status">{{ t('player.epManualStartHint') }}</p>
+          <button type="button" :aria-pressed="isManualEpStart" @click="isManualEpStart = !isManualEpStart">
+            {{ t(isManualEpStart ? 'player.epManualStartDone' : 'player.epManualStart') }}
+          </button>
+          <button v-if="isManualEpStart" type="button" @click="restartCharacterEp()">{{ t('player.epRetry') }}</button>
         </div>
         <div v-if="isCharacterEpExpanded" class="character-ep-preview-backdrop" aria-hidden="true"
           @click.self="closeCharacterEpPreview"></div>
@@ -289,6 +298,7 @@ const characterEp = ref(null);
 const isCharacterEpLoading = ref(false);
 const isBilibiliSyncPending = ref(false);
 const isCharacterEpExpanded = ref(false);
+const isManualEpStart = ref(false);
 // Video playback follows MV availability; lyrics remain visible alongside it.
 const visualMode = computed(() => characterEp.value ? 'ep' : 'cover');
 const epIframeKey = ref(0);
@@ -311,6 +321,15 @@ const libraryActionStatusQueue = [];
 const LYRICS_TIME_OFFSET = 0.5;
 const BILIBILI_SYNC_TIMEOUT_MS = 15000;
 const AUDIO_SEEK_SYNC_FALLBACK_MS = 750;
+const PAGE_RETURN_RESYNC_DEDUPE_MS = 500;
+const CHARACTER_EP_WAIT_WATCHDOG_INTERVAL_MS = 1000;
+const CHARACTER_EP_WAIT_STALL_TIMEOUT_MS = 15000;
+
+const isCharacterEpWaitBypassed = ref(false);
+let characterEpWaitWatchdog = null;
+let characterEpWaitLastAudioTime = 0;
+let characterEpWaitStalledAt = 0;
+let lastPageReturnResyncAt = -Infinity;
 
 const cancelPendingSeekSync = () => {
   pendingSeekSyncCleanup?.();
@@ -320,13 +339,19 @@ const cancelPendingSeekSync = () => {
 const resyncCharacterEpAfterPageReturn = () => {
   if (
     document.visibilityState !== 'visible'
+    // Returning focus from a real iframe tap must not destroy the newly
+    // unlocked player before the user can finish manual activation.
+    || isManualEpStart.value
     || visualMode.value !== 'ep'
     || !characterEp.value
     || !playerState.isPlaying
-    || isBilibiliSyncPending.value
   ) {
     return;
   }
+
+  const now = performance.now();
+  if (now - lastPageReturnResyncAt < PAGE_RETURN_RESYNC_DEDUPE_MS) return;
+  lastPageReturnResyncAt = now;
 
   const audioTime = getAudioCurrentTime();
   if (isYoutubeCharacterEp.value) {
@@ -583,7 +608,7 @@ const characterEpIframeSrc = computed(() => {
     autoplay: '1',
     muted: '1',
     danmaku: '0',
-    controls: '0',
+    controls: isMobileLayout.value ? '1' : '0',
     t: startTime,
   });
   return `https://player.bilibili.com/player.html?${params.toString()}`;
@@ -591,21 +616,70 @@ const characterEpIframeSrc = computed(() => {
 
 const isYoutubeCharacterEp = computed(() => /(?:youtube\.com|youtu\.be)/i.test(characterEp.value?.sourceUrl || ''));
 const isBilibiliCharacterEp = computed(() => Boolean(characterEp.value) && !isYoutubeCharacterEp.value);
-const characterEpVideoOffsetSeconds = computed(() => getCharacterEpVideoOffsetSeconds(characterEp.value, playerState.duration));
+const characterEpVideoOffsetSeconds = computed(() => getCharacterEpVideoOffsetSeconds(characterEp.value));
 // Follow the audio clock so pausing, seeking and backgrounding cannot exhaust
 // a wall-clock delay while the song itself is stopped.
 const isCharacterEpWaiting = computed(() => getCharacterEpVideoDelaySeconds(
   playerState.currentTime, characterEpVideoOffsetSeconds.value,
-) > 0);
+) > 0 && !isCharacterEpWaitBypassed.value);
+
+const clearCharacterEpWaitWatchdog = () => {
+  if (characterEpWaitWatchdog) {
+    clearInterval(characterEpWaitWatchdog);
+    characterEpWaitWatchdog = null;
+  }
+  characterEpWaitLastAudioTime = 0;
+  characterEpWaitStalledAt = 0;
+};
+
+const resetCharacterEpWaitState = () => {
+  isCharacterEpWaitBypassed.value = false;
+  clearCharacterEpWaitWatchdog();
+};
+
+const startCharacterEpWaitWatchdog = () => {
+  clearCharacterEpWaitWatchdog();
+  if (!playerState.isPlaying || !isCharacterEpWaiting.value) return;
+
+  characterEpWaitLastAudioTime = getAudioCurrentTime();
+  characterEpWaitStalledAt = performance.now();
+  characterEpWaitWatchdog = window.setInterval(() => {
+    if (!playerState.isPlaying || !isCharacterEpWaiting.value) {
+      clearCharacterEpWaitWatchdog();
+      return;
+    }
+
+    const audioTime = getAudioCurrentTime();
+    // Keep the reactive clock fresh even if the browser throttles timeupdate.
+    if (Number.isFinite(audioTime) && audioTime !== playerState.currentTime) {
+      playerState.currentTime = audioTime;
+    }
+
+    if (Math.abs(audioTime - characterEpWaitLastAudioTime) > 0.05) {
+      characterEpWaitLastAudioTime = audioTime;
+      characterEpWaitStalledAt = performance.now();
+      return;
+    }
+
+    if (performance.now() - characterEpWaitStalledAt < CHARACTER_EP_WAIT_STALL_TIMEOUT_MS) return;
+
+    console.warn('Character EP sync wait timed out; starting MV at the current audio position.');
+    isCharacterEpWaitBypassed.value = true;
+    clearCharacterEpWaitWatchdog();
+  }, CHARACTER_EP_WAIT_WATCHDOG_INTERVAL_MS);
+};
 
 watch(isCharacterEpWaiting, (waiting) => {
   if (waiting) {
+    isCharacterEpWaitBypassed.value = false;
+    startCharacterEpWaitWatchdog();
     clearYoutubePlayer();
     if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
     bilibiliSyncTimeout = null;
     isBilibiliSyncPending.value = false;
     bilibiliPendingIframeKey = -1;
   } else if (visualMode.value === 'ep' && characterEp.value && playerState.isPlaying) {
+    clearCharacterEpWaitWatchdog();
     nextTick(() => {
       if (visualMode.value !== 'ep' || !characterEp.value || !playerState.isPlaying || isCharacterEpWaiting.value) return;
       if (isYoutubeCharacterEp.value) createYoutubePlayer();
@@ -614,11 +688,13 @@ watch(isCharacterEpWaiting, (waiting) => {
   }
 });
 
-// Metadata may arrive after the MV starts. Apply the duration estimate once it
-// becomes available, including when the browser corrects the audio duration.
+// Sync metadata may arrive after the MV starts. Re-apply the verified or
+// explicitly configured offset when it becomes available.
 watch(characterEpVideoOffsetSeconds, () => {
+  resetCharacterEpWaitState();
   if (visualMode.value === 'ep' && characterEp.value && playerState.isPlaying) {
-    restartCharacterEp();
+    if (isCharacterEpWaiting.value) startCharacterEpWaitWatchdog();
+    else restartCharacterEp();
   }
 });
 
@@ -643,6 +719,16 @@ const clearYoutubePlayer = () => {
   youtubeDriftTimer = null;
   youtubePlayer?.destroy?.();
   youtubePlayer = null;
+};
+
+const handleTogglePlay = () => {
+  // Keep this request in the real click handler; a synthetic click cannot
+  // grant user activation. Bilibili exposes no equivalent documented API.
+  if (playerState.audioPlayer?.paused && !isCharacterEpWaiting.value && youtubePlayer) {
+    youtubePlayer.mute?.();
+    youtubePlayer.playVideo?.();
+  }
+  togglePlay();
 };
 
 const syncYoutubeToAudio = (force = false, audioTimeOverride = null) => {
@@ -832,6 +918,7 @@ const closeCharacterEpPreview = () => {
 
 const handleMobileLayoutChange = (event) => {
   isMobileLayout.value = event.matches;
+  if (!event.matches) isManualEpStart.value = false;
 };
 
 const toggleCharacterEpPreview = () => {
@@ -876,6 +963,7 @@ const restartCharacterEpAt = (audioTime) => {
 
 const restartCharacterEpAfterSeek = (targetAudioTime = null) => {
   if (visualMode.value !== 'ep' || !characterEp.value) return;
+  resetCharacterEpWaitState();
   cancelPendingSeekSync();
 
   const audio = playerState.audioPlayer;
@@ -1052,8 +1140,12 @@ const handleLyricsScroll = () => {
 // ??��?�放?�?��??�制歌�??�步循環
 watch(() => playerState.isPlaying, (isPlaying) => {
   if (isPlaying) {
+    resetCharacterEpWaitState();
     startLyricsSync();
+    if (isCharacterEpWaiting.value) startCharacterEpWaitWatchdog();
   } else {
+    isManualEpStart.value = false;
+    resetCharacterEpWaitState();
     stopLyricsSync();
     if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
     bilibiliSyncTimeout = null;
@@ -1079,6 +1171,7 @@ watch(() => playerState.isPlaying, (isPlaying) => {
 });
 
 watch([visualMode, characterEp], () => {
+  resetCharacterEpWaitState();
   if (visualMode.value !== 'ep' || !characterEp.value) {
     closeCharacterEpPreview();
   }
@@ -1097,6 +1190,8 @@ watch([visualMode, characterEp], () => {
 });
 
 watch(() => playerState.currentSong, async (newSong) => {
+  isManualEpStart.value = false;
+  resetCharacterEpWaitState();
   cancelPendingSeekSync();
   activeLyricIndex.value = -1;
   clearLibraryActionStatus();
@@ -1173,6 +1268,7 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
   cancelPendingSeekSync();
   clearYoutubePlayer();
+  clearCharacterEpWaitWatchdog();
   stopLyricsSync();
   if (bilibiliSyncTimeout) {
     clearTimeout(bilibiliSyncTimeout);
@@ -1651,6 +1747,46 @@ defineExpose({ closeCharacterEpPreview });
 .character-ep-frame {
   pointer-events: none;
   user-select: none;
+}
+
+.character-ep-visual.manual-start .character-ep-frame {
+  pointer-events: auto;
+}
+
+.character-ep-start-help {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.character-ep-start-help p {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.character-ep-start-help button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid rgba(126, 198, 255, 0.28);
+  border-radius: 6px;
+  color: var(--text-primary);
+  background: rgba(24, 66, 84, 0.45);
+  cursor: pointer;
+}
+
+.character-ep-start-help.expanded {
+  position: fixed;
+  right: 16px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: 16px;
+  z-index: 1101;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(5, 9, 14, 0.96);
 }
 
 .character-ep-youtube-frame {

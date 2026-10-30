@@ -12,19 +12,24 @@
           <span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span>
         </div>
       </div>
-      <div v-if="screen !== 'player'" class="heading-actions console-utilities">
-        <button v-if="screen === 'episodes'" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button>
-        <details class="console-audio" @keydown.esc="$event.currentTarget.removeAttribute('open')">
-          <summary><i class="fas" :class="audioEnabled ? 'fa-volume-up' : 'fa-volume-mute'" aria-hidden="true"></i>{{ consoleLabels.audio }}<span class="utility-indicator" :class="{ enabled: audioEnabled }" aria-hidden="true"></span></summary>
+      <div v-if="screen !== 'player'" ref="archiveTools" class="heading-actions console-utilities" @keydown.esc.stop.prevent="closeArchiveTools(true)">
+        <button v-if="screen === 'episodes'" class="archive-back" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button>
+        <details class="console-audio" name="archive-tools">
+          <summary :aria-label="consoleLabels.audio" :title="consoleLabels.audio"><i class="fas" :class="audioEnabled ? 'fa-volume-up' : 'fa-volume-mute'" aria-hidden="true"></i><span class="utility-indicator" :class="{ enabled: audioEnabled }" aria-hidden="true"></span></summary>
           <div class="console-audio-panel">
             <button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button>
             <label>{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label>
           </div>
         </details>
         <button v-if="!progressOwner || progressStatus === 'expired'" type="button" @click="emit('sign-in')"><i class="fas fa-user" aria-hidden="true"></i>{{ t('storyProgress.signIn') }}</button>
-        <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)"><i class="fas fa-sync-alt" aria-hidden="true"></i>{{ t('storyProgress.retry') }}</button>
         <button v-if="progressImportCount" type="button" :disabled="progressSyncing" @click="importGuestProgress">{{ t('storyProgress.import', { count: progressImportCount }) }}</button>
-        <a href="https://prts.wiki/w/剧情一览" target="_blank" rel="noopener noreferrer">PRTS ↗</a>
+        <details class="console-more" name="archive-tools">
+          <summary :aria-label="consoleLabels.more" :title="consoleLabels.more"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></summary>
+          <div class="console-more-panel">
+            <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)"><i class="fas fa-sync-alt" aria-hidden="true"></i>{{ t('storyProgress.retry') }}</button>
+            <a href="https://prts.wiki/w/剧情一览" target="_blank" rel="noopener noreferrer">{{ consoleLabels.source }} <span aria-hidden="true">↗</span></a>
+          </div>
+        </details>
       </div>
       <div v-else class="heading-actions"><button type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button><a :href="manifest?.sourcePage || selectedStory?.sourcePage" target="_blank" rel="noopener noreferrer">PRTS ↗</a></div>
     </header>
@@ -44,16 +49,16 @@
 
         <span v-if="screen === 'episodes'">{{ completedCount }} / {{ groupStories.length }} {{ labels.read }}</span>
         <label v-if="viewMode !== 'sequence'" class="console-search"><i class="fas fa-search" aria-hidden="true"></i><input v-if="screen === 'collections'" v-model="search" type="search" :placeholder="labels.search" :aria-label="labels.search"><input v-else v-model="episodeSearch" type="search" :placeholder="labels.searchEpisodes" :aria-label="labels.searchEpisodes"></label>
+        <button v-if="screen === 'collections' && viewMode !== 'sequence'" class="filter-toggle" type="button" :class="{ 'has-filters': refinementCount > 0 }" :aria-expanded="advancedFilters" aria-controls="console-advanced-filters" @click="advancedFilters = !advancedFilters"><i class="fas fa-sliders-h" aria-hidden="true"></i>{{ consoleLabels.filters }}<span v-if="refinementCount" class="filter-count">{{ refinementCount }}</span><i class="fas fa-chevron-down" :class="{ expanded: advancedFilters }" aria-hidden="true"></i></button>
       </div>
       <div class="library-heading">
         <div><span class="eyebrow">{{ screen === 'collections' ? '01 / SELECT CHAPTER OR EVENT' : '02 / SELECT STORY' }}</span><p>{{ screen === 'collections' ? labels.collectionNames : localize(activeCollection?.label) }} <span>{{ screen === 'collections' ? filteredCollections.length : groupStories.length }}</span></p></div>
         <span class="archive-hint">{{ screen === 'collections' ? labels.chooseCollection : labels.chooseEpisode }}</span>
       </div>
-      <div v-if="screen === 'collections' && viewMode !== 'sequence'" class="library-filters console-primary-filters">
-        <label class="console-filter"><span>{{ labels.category }}</span><select v-model="selectedCategory" :aria-label="labels.category"><option value="">{{ labels.allCategories }}</option><option v-for="category in categories" :key="category.id" :value="category.id">{{ categoryLabel(category.id) }}</option></select></label>
-        <label class="console-filter"><span>{{ labels.series }}</span><select v-model="selectedLine" :aria-label="labels.series"><option value="">{{ labels.allSeries }}</option><option v-for="line in availableLines" :key="line.id" :value="line.id">{{ localize(line.name) }} ({{ line.count }})</option></select></label>
-        <label class="console-filter"><span>{{ labels.collectionNames }}</span><select v-model="selectedCollectionFilter" :aria-label="labels.collectionNames"><option value="">{{ labels.allCollections }}</option><option v-for="collection in groups" :key="collection.key" :value="collection.key">{{ localize(collection.label) }}</option></select></label>
-        <button class="filter-toggle" type="button" :aria-expanded="advancedFilters" aria-controls="console-advanced-filters" @click="advancedFilters = !advancedFilters">{{ labels.refine }} <span aria-hidden="true">{{ advancedFilters ? '−' : '+' }}</span></button>
+      <div v-if="screen === 'collections' && viewMode !== 'sequence'" class="archive-categories" role="group" :aria-label="labels.category">
+        <button type="button" :class="{ active: !selectedCategory }" :aria-pressed="!selectedCategory" @click="selectedCategory = ''">{{ consoleLabels.all }}</button>
+        <button v-for="category in primaryCategories" :key="category.id" type="button" :class="{ active: selectedCategory === category.id }" :aria-pressed="selectedCategory === category.id" @click="selectedCategory = category.id">{{ categoryLabel(category.id) }}</button>
+        <label v-if="secondaryCategories.length" class="archive-other-category" :class="{ active: secondaryCategories.some(category => category.id === selectedCategory) }"><select :value="secondaryCategories.some(category => category.id === selectedCategory) ? selectedCategory : ''" :aria-label="consoleLabels.otherCategories" @change="selectedCategory = $event.target.value"><option value="" disabled>{{ consoleLabels.otherCategories }}</option><option v-for="category in secondaryCategories" :key="category.id" :value="category.id">{{ categoryLabel(category.id) }}</option></select></label>
       </div>
       <div v-else-if="viewMode !== 'sequence'" class="library-filters">
         <label class="console-filter"><span>{{ labels.phase }}</span><select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select></label>
@@ -67,7 +72,13 @@
         <button v-if="screen === 'collections' && readingResumeIndex >= 0" type="button" @click="seekRack(readingResumeIndex)">{{ labels.resumeGuide }} → {{ localize(readingRoute[readingResumeIndex]?.label) }}</button>
         <details class="compact-note"><summary>{{ mediaLabels.details }}</summary><p>{{ labels.routeBasis }}</p></details>
       </div>
-      <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" id="console-advanced-filters" class="library-filters advanced-filters"><select v-if="sections.length > 1" v-model="selectedSection" :aria-label="labels.section"><option value="">{{ labels.allSections }}</option><option v-for="section in sections" :key="section" :value="section">{{ localize(section) }}</option></select><select v-model="collectionSort" :aria-label="labels.sort"><option value="line">{{ labels.lineOrder }}</option><option value="release">{{ labels.releaseOrder }}</option><option value="name">{{ labels.nameOrder }}</option></select></div></Transition>
+      <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" id="console-advanced-filters" class="library-filters advanced-filters">
+        <label class="console-filter"><span>{{ labels.series }}</span><select v-model="selectedLine"><option value="">{{ labels.allSeries }}</option><option v-for="line in availableLines" :key="line.id" :value="line.id">{{ localize(line.name) }} ({{ line.count }})</option></select></label>
+        <label class="console-filter"><span>{{ labels.collectionNames }}</span><select v-model="selectedCollectionFilter"><option value="">{{ labels.allCollections }}</option><option v-for="collection in groups" :key="collection.key" :value="collection.key">{{ localize(collection.label) }}</option></select></label>
+        <label v-if="sections.length > 1" class="console-filter"><span>{{ labels.section }}</span><select v-model="selectedSection"><option value="">{{ labels.allSections }}</option><option v-for="section in sections" :key="section" :value="section">{{ localize(section) }}</option></select></label>
+        <label class="console-filter"><span>{{ labels.sort }}</span><select v-model="collectionSort"><option value="line">{{ labels.lineOrder }}</option><option value="release">{{ labels.releaseOrder }}</option><option value="name">{{ labels.nameOrder }}</option></select></label>
+        <button v-if="refinementCount" type="button" class="filter-reset" @click="resetRefinements">{{ consoleLabels.reset }}</button>
+      </div></Transition>
       <div v-if="screen === 'episodes' && viewMode === 'sequence'" class="reading-route">
         <p v-if="activeGuideNode"><button type="button" class="guide-context" @click="showGuide(readingLineId, activeCollection.group)">{{ labels.currentGuide }}：{{ localize(readingLineName) }} · {{ localize(activeCollection.label) }} ↗</button></p>
         <p>{{ labels.orderNote }} <span>{{ groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</span></p>
@@ -267,7 +278,20 @@ const { locale, t } = useI18n();
 const mediaLabels = computed(() => storyMediaMessages[locale.value] || storyMediaMessages.en);
 const summaryLabels = computed(() => storySummaryMessages[locale.value] || storySummaryMessages.en);
 const emit = defineEmits(['sign-in']);
-const consoleLabels = computed(() => ({ 'zh-TW': { audio: '音效' }, 'zh-CN': { audio: '音效' } }[locale.value] || { audio: 'Audio' }));
+const consoleLabels = computed(() => ({
+  'zh-TW': { audio: '音效設定', more: '更多選項', source: '前往 PRTS', filters: '篩選', all: '全部', otherCategories: '其他類型', reset: '重設篩選' },
+  'zh-CN': { audio: '音效设置', more: '更多选项', source: '前往 PRTS', filters: '筛选', all: '全部', otherCategories: '其他类型', reset: '重置筛选' },
+}[locale.value] || { audio: 'Audio settings', more: 'More options', source: 'Open PRTS', filters: 'Filters', all: 'All', otherCategories: 'More types', reset: 'Reset filters' }));
+const archiveTools = ref(null);
+function closeArchiveTools(restoreFocus = false) {
+  archiveTools.value?.querySelectorAll('details[open]').forEach(details => {
+    details.open = false;
+    if (restoreFocus) details.querySelector('summary')?.focus();
+  });
+}
+function dismissArchiveTools(event) {
+  if (!archiveTools.value?.contains(event.target)) closeArchiveTools();
+}
 const copies = {
   'zh-TW': { title: '劇情', subtitle: '明日方舟 · 劇情演出', loading: '正在載入本地劇情…', narrator: '旁白', continue: '點擊或按空白鍵繼續', choose: '選擇回應', finished: '劇情結束', battle: '可以重新播放或選擇其他劇情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效開啟', audioOff: '🔇 開啟音效', videoHint: '影片播放完畢後繼續。', selectStory: '選擇劇情', note: '劇情及素材出處：明日方舟／PRTS。劇本與已匯入影音由本站載入，未匯入素材可能連線至 PRTS；部分表情與鏡頭指令仍未完整重現。' },
   'zh-CN': { title: '剧情', subtitle: '明日方舟 · 剧情演出', loading: '正在载入本地剧情…', narrator: '旁白', continue: '点击或按空格键继续', choose: '选择回应', finished: '剧情结束', battle: '可以重新播放或选择其他剧情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效开启', audioOff: '🔇 开启音效', videoHint: '视频播放完毕后继续。', selectStory: '选择剧情', note: '剧情及素材出处：明日方舟／PRTS。剧本与已导入影音由本站加载，未导入素材可能连接至 PRTS；部分表情与镜头指令仍未完整重现。' },
@@ -340,6 +364,15 @@ const selectedSection = ref('');
 const selectedGroup = ref('');
 const selectedPhase = ref('');
 const categories = computed(() => storyCategories.map(category => ({ ...category, count: catalog.value.filter(story => story.archiveCategory === category.id).length })).filter(category => category.count));
+const primaryCategories = computed(() => categories.value.filter(category => ['main', 'event', 'vignette', 'operator'].includes(category.id)));
+const secondaryCategories = computed(() => categories.value.filter(category => !['main', 'event', 'vignette', 'operator'].includes(category.id)));
+const refinementCount = computed(() => [selectedLine.value, selectedCollectionFilter.value, selectedSection.value, collectionSort.value !== 'line'].filter(Boolean).length);
+function resetRefinements() {
+  selectedLine.value = '';
+  selectedCollectionFilter.value = '';
+  selectedSection.value = '';
+  collectionSort.value = 'line';
+}
 function categoryLabel(id) { const category = storyCategories.find(category => category.id === id); return category?.labels[locale.value] || category?.labels.en || ''; }
 const categoryStories = computed(() => catalog.value.filter(story => !selectedCategory.value || story.archiveCategory === selectedCategory.value));
 const sections = computed(() => [...new Set(categoryStories.value.filter(story => !selectedLine.value || collectionFamily({ ...story, category: story.archiveCategory }).id === selectedLine.value).map(story => story.section))]);
@@ -1218,6 +1251,7 @@ async function focusScreenHeading() {
 }
 
 onMounted(async () => {
+  document.addEventListener('pointerdown', dismissArchiveTools);
   window.addEventListener('keydown', handleKeydown);
   window.addEventListener('blur', cancelRackDrag);
   if (!document.head.querySelector('link[rel="preconnect"][href="https://media.prts.wiki"]')) {
@@ -1248,6 +1282,7 @@ onMounted(async () => {
   } catch (cause) { if (!disposed) catalogError.value = cause.message || String(cause); }
 });
 onUnmounted(() => {
+  document.removeEventListener('pointerdown', dismissArchiveTools);
   closeSkip(false);
   summaryRequest++;
   cancelRackDrag();
@@ -1406,74 +1441,204 @@ onUnmounted(() => {
 .story-ending-dialog button:disabled{opacity:.45;cursor:default}.story-ending-dialog h2:focus{outline:none}
 @media(max-width:700px){.portrait-row .portrait{width:53%}.story-ending-dialog{padding:20px}}
 
-/* The archive controls share the reel's brass frame and square film language. */
-.archive-console{--console-brass:#b9a06d;--console-edge:#71654d;--console-ink:#e9e3d6;--console-muted:#a9afa9}
-.archive-console .story-heading{align-items:center;margin-bottom:0;padding:12px 20px;border:1px solid var(--console-edge);border-bottom:0;border-radius:3px 3px 0 0;background:linear-gradient(120deg,#131f24,#0b151b);gap:16px;z-index:35}
-.archive-console .story-heading>div:first-child{min-width:0;flex:1}
-.archive-console .story-heading .eyebrow{color:var(--console-brass);font-size:.6rem;letter-spacing:.25em}
-.archive-console .story-heading h1{color:var(--console-ink);font-size:clamp(1.25rem,2.3vw,1.8rem);margin:4px 0;line-height:1.25}
-.console-status{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:.66rem;line-height:1.5;color:var(--console-muted)}
-.console-status-light,.utility-indicator{display:inline-block;flex:none;width:6px;height:6px;background:#8c928b;border-radius:1px}
-.console-status-light{background:var(--console-brass);margin-right:3px;box-shadow:0 0 6px #b9a06d33}
-.console-status.needs-attention .console-status-light{background:#e6a971}
-.utility-indicator.enabled{background:var(--console-brass);box-shadow:0 0 5px #b9a06d55}
-.archive-console .console-utilities{gap:8px;align-items:center}
-.archive-console .console-utilities>button,.archive-console .console-utilities>a,.console-audio>summary{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:34px;padding:7px 12px;border:1px solid var(--console-edge);border-radius:2px;background:linear-gradient(#16242b,#0c171d);color:var(--console-ink);font:inherit;font-size:.72rem;text-decoration:none;cursor:pointer;white-space:nowrap;transition:border-color .18s,background .18s}
-.archive-console .console-utilities>button:hover,.archive-console .console-utilities>a:hover,.console-audio>summary:hover{border-color:var(--console-brass);background:#26302e}
-.archive-console .console-utilities>button:disabled{opacity:.45;cursor:default}
-.console-audio{position:relative}
-.console-audio>summary{list-style:none}.console-audio>summary::-webkit-details-marker{display:none}
-.console-audio[open]>summary{border-color:var(--console-brass)}
-.console-audio-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:50;width:230px;padding:14px;border:1px solid var(--console-brass);background:#101d24;box-shadow:0 12px 30px #0009;display:grid;gap:12px}
-.console-audio-panel label{display:flex;align-items:center;gap:8px;color:var(--console-muted);font-size:.7rem}
-.console-audio-panel input{width:110px;accent-color:var(--console-brass)}
-.console-audio-panel output{width:4ch;font-variant-numeric:tabular-nums}
-.archive-console .story-library{padding-top:0;border-radius:0 0 3px 3px;border-color:var(--console-edge);background:#0c161c}
-.projection-controls{position:relative;z-index:25;padding-bottom:10px;background:linear-gradient(120deg,#131f24,#0b151b);border-bottom:1px solid var(--console-edge)}
-.projection-controls::after{content:'';position:absolute;left:10px;right:10px;bottom:0;height:5px;background:repeating-linear-gradient(90deg,#b9a06d88 0 1px,transparent 1px 10px);pointer-events:none}
-.archive-console .archive-toolbar{padding:10px 20px;margin:0;gap:14px;border-block:1px solid #4a4b41;flex-wrap:nowrap}
-.archive-console .view-switch{flex:none;gap:8px;padding:0;border:0;border-radius:0;background:transparent}
-.archive-console .view-switch button{position:relative;display:flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid #49565a;border-radius:2px;background:#111e25;color:#a8b1b3;font-size:.76rem}
-.archive-console .view-switch button::before{content:'';width:7px;height:7px;flex:none;background:#47504f;box-shadow:inset 0 0 0 1px #737e7433}
-.archive-console .view-switch button.active{border-color:var(--console-brass);background:linear-gradient(#28302d,#18221f);color:var(--console-ink)}
-.archive-console .view-switch button.active::before{background:#dfc086;box-shadow:0 0 6px #dfc08633}
-.archive-console .view-switch button:hover{color:var(--console-ink);border-color:#a99b79}
-.console-search{display:flex;align-items:center;gap:10px;flex:1;min-width:100px;max-width:420px;margin-left:auto;padding:0 12px;border:1px solid #4b5c60;border-radius:2px;background:#0b161d;color:#a2aba9}
-.console-search:focus-within{border-color:var(--console-brass)}
-.console-search input{box-sizing:border-box;width:100%;min-width:0;padding:9px 0;border:0;background:transparent;color:var(--console-ink);font:inherit;font-size:.75rem;outline:none}
-.console-search input::placeholder{color:#889390}.console-search i{font-size:.8rem}
-.archive-console .library-filters{margin:0;padding:10px 20px;gap:20px}
-.archive-console .console-primary-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end}
-.console-filter{min-width:0;display:grid;gap:5px;position:relative}
-.console-filter>span{font-size:.65rem;color:var(--console-muted);line-height:1.2}
-.archive-console .console-filter select{box-sizing:border-box;width:100%;max-width:none;min-width:0;flex:none;border:1px solid #4b5c60;border-radius:2px;background:#0d1920;color:var(--console-ink);padding:7px 10px;font-size:.73rem;cursor:pointer}
-.archive-console .console-filter select:focus-visible{outline-color:var(--console-brass)}
-.archive-console .filter-toggle{gap:18px;min-height:33px;white-space:nowrap;border:1px solid var(--console-edge);border-radius:2px;background:#111e25;color:#dfc898;font-size:.72rem;padding:7px 12px}
-.archive-console .filter-toggle:hover,.archive-console .filter-toggle[aria-expanded="true"]{border-color:var(--console-brass);background:#28302d;color:var(--console-ink)}
-.archive-console .advanced-filters{position:absolute;right:20px;top:calc(100% - 7px);z-index:40;box-sizing:border-box;max-width:calc(100% - 40px);padding:14px;border:1px solid var(--console-brass);background:#102029;box-shadow:0 12px 30px #0009;gap:10px}
-.archive-console .advanced-filters select{border-radius:2px;border-color:#67705f;padding:8px 10px;background:#0c1920;max-width:230px;flex:1}
-.archive-console .archive-breadcrumb{padding:0 20px;margin:0;font-size:.62rem;color:#999d8d;line-height:1.3}
-.archive-console .reading-plan-heading{margin:0;padding:10px 20px;gap:16px}
-.archive-console .reading-plan-heading select{border-radius:2px;border-color:var(--console-edge);padding:7px 10px;background:#0d1920;color:var(--console-ink)}
-.archive-console .guide-tools{padding:0 20px 8px;gap:8px}
-.archive-console .guide-tools button,.archive-console .guide-context{border-radius:2px;border-color:var(--console-edge);background:#172522;color:#dbc394}
-.archive-console .reading-route{padding-inline:20px}
-.archive-console .archive-toolbar button:focus-visible,.archive-console .console-utilities>button:focus-visible,.archive-console .console-utilities>a:focus-visible,.console-audio>summary:focus-visible{outline:2px solid #dfc086;outline-offset:3px}
-@media(max-width:700px){
-  .archive-console .story-heading{padding:10px 12px;align-items:flex-start;flex-wrap:wrap;gap:10px}
-  .archive-console .story-heading>div:first-child{flex-basis:100%}.archive-console .story-heading h1{font-size:1.3rem}
-  .archive-console .console-utilities{justify-content:flex-start;gap:6px;flex-wrap:wrap;width:100%}
-  .archive-console .console-utilities>button,.archive-console .console-utilities>a,.console-audio>summary{font-size:.65rem;padding:6px 9px;min-height:30px}
-  .console-audio-panel{right:auto;left:0;width:220px}
-  .archive-console .archive-toolbar{padding:8px 12px;flex-wrap:wrap;gap:8px}
-  .archive-console .view-switch button{padding:7px 10px;font-size:.7rem}
-  .console-search{flex-basis:100%;max-width:none;margin:0}.console-search input{padding-block:8px}
-  .archive-console .library-filters{padding:8px 12px;gap:10px}
-  .archive-console .console-primary-filters{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .archive-console .filter-toggle{justify-content:space-between;width:100%}
-  .archive-console .console-filter select{width:100%;max-width:none;font-size:.7rem}
-  .archive-console .archive-breadcrumb{padding-inline:12px}
-  .archive-console .advanced-filters{right:12px;max-width:calc(100% - 24px);flex-wrap:wrap}
-  .archive-console .reading-plan-heading,.archive-console .guide-tools,.archive-console .reading-route{padding-inline:12px}
+/* Archive chrome follows the album shelf; film details stay inside the reel. */
+.archive-console {
+  --console-accent: var(--primary-color, #58a6ff);
+  --console-edge: rgba(166, 193, 213, .16);
+  --console-ink: var(--text-color, #e6edf3);
+  --console-muted: var(--text-secondary, #8b949e);
+  width: min(1600px, calc(100% - 48px));
+  margin: 24px auto 40px;
+  color: var(--console-ink);
+}
+.archive-console .story-heading {
+  align-items: center;
+  gap: 20px;
+  padding: 0 0 24px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  z-index: 35;
+}
+.archive-console .story-heading > div:first-child { min-width: 0; flex: 1; }
+.archive-console .story-heading .eyebrow { color: var(--console-muted); font: 10px monospace; letter-spacing: .22em; }
+.archive-console .story-heading h1 { margin: 6px 0 8px; font-size: 1.35rem; font-weight: 600; line-height: 1.4; }
+.console-status { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; color: var(--console-muted); font-size: .68rem; line-height: 1.6; }
+.console-status-light, .utility-indicator { display: inline-block; flex: none; width: 5px; height: 5px; border-radius: 50%; background: #687585; }
+.console-status-light { margin-right: 3px; }
+.console-status.needs-attention .console-status-light { background: #e6a971; }
+.utility-indicator.enabled { background: var(--console-accent); }
+.archive-console .console-utilities { flex-wrap: wrap; align-items: center; gap: 6px; }
+.archive-console .console-utilities > button,
+.archive-console .console-utilities summary {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--console-muted);
+  font: inherit;
+  font-size: .76rem;
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+.archive-console .console-utilities > button:hover,
+.archive-console .console-utilities summary:hover,
+.archive-console .console-utilities details[open] > summary { color: var(--console-ink); background: rgba(166, 193, 213, .08); }
+.archive-console .console-utilities > button:disabled { opacity: .45; cursor: default; }
+.console-audio, .console-more { position: relative; }
+.archive-console .console-utilities summary { list-style: none; }
+.archive-console .console-utilities summary::-webkit-details-marker { display: none; }
+.console-audio-panel, .console-more-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 50;
+  box-sizing: border-box;
+  width: 260px;
+  padding: 16px;
+  border: 1px solid var(--console-edge);
+  border-radius: 12px;
+  background: #161e28;
+  box-shadow: 0 16px 40px #0007;
+  display: grid;
+  gap: 12px;
+}
+.console-audio-panel label { display: flex; align-items: center; gap: 10px; color: var(--console-muted); font-size: .75rem; }
+.console-audio-panel input { min-width: 0; flex: 1; accent-color: var(--console-accent); }
+.console-audio-panel output { width: 4ch; font-variant-numeric: tabular-nums; }
+.console-audio-panel button, .console-more-panel button, .console-more-panel a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(166, 193, 213, .05);
+  color: var(--console-ink);
+  font: inherit;
+  font-size: .78rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.console-audio-panel button:hover, .console-more-panel button:hover, .console-more-panel a:hover { background: rgba(166, 193, 213, .12); }
+.console-more-panel button:disabled { opacity: .45; cursor: default; }
+.archive-console .story-library { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
+.archive-console .projection-controls { position: relative; z-index: 25; padding: 0 0 16px; border: 0; background: transparent; }
+.archive-console .projection-controls::after { display: none; }
+.archive-console .archive-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin: 0; padding: 0; border: 0; }
+.archive-console .view-switch { display: flex; flex: none; gap: 24px; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.archive-console .view-switch button {
+  position: relative;
+  min-height: 46px;
+  padding: 10px 0 13px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--console-muted);
+  font: inherit;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.archive-console .view-switch button::before { display: none; }
+.archive-console .view-switch button::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: transparent; }
+.archive-console .view-switch button.active { color: var(--console-ink); background: transparent; }
+.archive-console .view-switch button.active::after { background: var(--console-accent); }
+.archive-console .view-switch button:hover { color: var(--console-ink); }
+.archive-toolbar > span { color: var(--console-muted); font-size: .72rem; }
+.console-search { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 180px; max-width: 400px; min-height: 44px; box-sizing: border-box; margin-left: auto; padding: 0 14px; border: 1px solid var(--console-edge); border-radius: 8px; background: rgba(13, 17, 23, .32); color: var(--console-muted); }
+.console-search:focus-within { border-color: var(--console-accent); }
+.console-search input { box-sizing: border-box; width: 100%; min-width: 0; padding: 11px 0; border: 0; background: transparent; color: var(--console-ink); font: inherit; font-size: .78rem; outline: none; }
+.console-search input::placeholder { color: var(--console-muted); opacity: .85; }
+.archive-console .filter-toggle { display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 10px 14px; border: 1px solid var(--console-edge); border-radius: 8px; background: transparent; color: var(--console-muted); font: inherit; font-size: .78rem; cursor: pointer; }
+.archive-console .filter-toggle:hover, .archive-console .filter-toggle[aria-expanded="true"], .archive-console .filter-toggle.has-filters { color: var(--console-accent); border-color: var(--console-accent); background: rgba(88, 166, 255, .06); }
+.filter-toggle .fa-chevron-down { font-size: .6rem; transition: transform .2s; }
+.filter-toggle .expanded { transform: rotate(180deg); }
+.filter-count { display: grid; place-items: center; min-width: 18px; height: 18px; padding-inline: 2px; box-sizing: border-box; border-radius: 50%; background: var(--console-accent); color: #0d1117; font-size: .65rem; }
+.archive-categories { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 24px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--console-edge); }
+.archive-categories > button { min-height: 44px; padding: 8px 0; border: 0; border-radius: 0; background: transparent; color: var(--console-muted); font: inherit; font-size: .78rem; cursor: pointer; }
+.archive-categories > button:hover, .archive-categories > button.active { color: var(--console-accent); }
+.archive-other-category { display: flex; min-width: 0; max-width: 100%; }
+.archive-other-category select { min-height: 44px; max-width: 100%; padding: 8px 4px; border: 0; border-radius: 0; background: transparent; color: var(--console-muted); font: inherit; font-size: .78rem; cursor: pointer; }
+.archive-other-category.active select { color: var(--console-accent); }
+.archive-other-category option { background: #161e28; color: var(--console-ink); }
+.archive-console .library-filters { gap: 12px; padding: 12px 0 0; margin: 0; }
+.archive-console .advanced-filters { position: static; display: flex; align-items: end; flex-wrap: wrap; max-width: none; margin: 12px 0 4px; padding: 20px; border: 1px solid var(--console-edge); border-radius: 10px; background: rgba(13, 17, 23, .4); box-shadow: none; }
+.console-filter { display: grid; gap: 8px; min-width: 0; flex: 1 1 180px; }
+.console-filter > span { color: var(--console-muted); font-size: .7rem; }
+.archive-console .console-filter select { box-sizing: border-box; width: 100%; max-width: none; min-height: 44px; padding: 10px 12px; border: 1px solid var(--console-edge); border-radius: 6px; background: #131c26; color: var(--console-ink); font: inherit; font-size: .76rem; cursor: pointer; }
+.filter-reset { min-height: 44px; padding: 10px 4px; border: 0; background: transparent; color: var(--console-accent); font: inherit; font-size: .75rem; cursor: pointer; }
+.archive-console .archive-breadcrumb { padding: 10px 0 0; margin: 0; color: var(--console-muted); font-size: .65rem; line-height: 1.5; }
+.archive-console .reading-plan-heading { margin: 0; padding: 18px 0 8px; gap: 16px; }
+.archive-console .reading-plan-heading select { min-height: 44px; padding: 8px 12px; border: 1px solid var(--console-edge); border-radius: 6px; background: #131c26; color: var(--console-ink); }
+.archive-console .guide-tools { padding: 8px 0; gap: 12px; }
+.archive-console .guide-tools button, .archive-console .guide-context { min-height: 44px; border: 0; border-radius: 6px; background: rgba(166, 193, 213, .06); color: var(--console-ink); }
+.archive-console .reading-route { padding-inline: 0; }
+.archive-console .story-rack-shell { border: 0; background: transparent; overflow: hidden; }
+.archive-console .story-rack { height: clamp(420px, calc(100svh - 340px), 620px); min-height: 420px; max-height: none; border-block: 1px solid var(--console-edge); background: rgba(9, 14, 20, .3); }
+.archive-console .rack-ambient { opacity: .18; filter: blur(42px) saturate(.85); }
+.archive-console .story-rack::after { background: linear-gradient(90deg, #0d151c99, transparent 18% 82%, #0d151c99), linear-gradient(0deg, #0d151c66, transparent 30%); }
+.archive-console .film-perforations { height: 11px; opacity: .45; background-image: repeating-linear-gradient(90deg, transparent 0 12px, #c7c1ac 12px 26px, transparent 26px 40px); }
+.archive-console .film-perforations-top { top: 9px; }
+.archive-console .film-perforations-bottom { bottom: 9px; }
+.archive-console .rack-line-label { top: 32px; left: 24px; color: var(--console-muted); font-size: .65rem; }
+.archive-console .rack-card { top: 52%; border: 1px solid #60748666; border-radius: 4px; background: #141d26; box-shadow: 0 16px 32px #0005; }
+.archive-console .rack-card.active { border-color: #8bb9df99; box-shadow: 0 20px 48px #0007, 0 0 28px #58a6ff0c; }
+.archive-console .rack-art { height: clamp(155px, 23vh, 230px); }
+.archive-console .rack-art::after { background: linear-gradient(transparent 65%, #141d26); }
+.archive-console .rack-number { color: #ddcba1; }
+.archive-console .rack-caption { padding: 16px 22px 20px; }
+.archive-console .rack-caption > small { color: #91a6b6; }
+.archive-console .rack-caption > strong { color: var(--console-ink); font-size: 1.25rem; }
+.archive-console .rack-open { color: #a1cef4; border-color: var(--console-edge); }
+.archive-console .rack-navigation { padding: 18px 0 8px; gap: 20px; background: transparent; }
+.archive-console .rack-navigation button { width: 44px; height: 44px; border: 1px solid var(--console-edge); background: transparent; color: var(--console-ink); }
+.archive-console .rack-navigation button:hover:not(:disabled) { background: rgba(88, 166, 255, .1); border-color: var(--console-accent); }
+.archive-console .rack-scrubber { padding: 4px 0 16px; color: var(--console-muted); }
+.archive-console .rack-scrubber input { width: min(240px, 65%); accent-color: var(--console-accent); }
+.archive-console .progress-note { margin-inline: 0; padding-inline: 0; color: var(--console-muted); }
+.archive-console button:focus-visible, .archive-console a:focus-visible, .archive-console summary:focus-visible, .archive-console select:focus-visible { outline: 2px solid var(--console-accent); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .archive-console { width: calc(100% - 32px); margin-top: 20px; }
+  .archive-console .story-heading { align-items: flex-start; flex-wrap: wrap; gap: 8px; padding-bottom: 18px; }
+  .archive-console .story-heading > div:first-child { flex-basis: 180px; }
+  .archive-console .console-utilities { gap: 0; justify-content: flex-end; }
+  .archive-console .console-utilities > button { font-size: .7rem; padding-inline: 8px; }
+  .archive-console .console-utilities .archive-back { flex-basis: 100%; }
+  .archive-console .archive-toolbar { gap: 12px; }
+  .archive-console .view-switch { flex-basis: 100%; gap: 24px; }
+  .console-search { flex: 1; min-width: 0; max-width: none; margin: 0; }
+  .console-search input { font-size: .72rem; }
+  .archive-console .filter-toggle { padding-inline: 12px; }
+  .archive-categories { gap: 0 18px; margin-top: 12px; padding-top: 8px; }
+  .archive-categories > button, .archive-other-category select { font-size: .72rem; }
+  .archive-console .advanced-filters { padding: 14px; gap: 14px; }
+  .console-filter { flex-basis: 100%; }
+  .archive-console .story-rack { height: 420px; min-height: 420px; }
+  .archive-console .rack-art { height: 175px; }
+  .archive-console .rack-caption { padding: 14px 16px 18px; }
+  .archive-console .rack-caption > strong { font-size: 1.1rem; }
+  .archive-console .rack-line-label { left: 16px; }
+  .archive-console .reading-plan-heading { flex-wrap: wrap; }
+  .archive-console .reading-plan-heading label { flex-wrap: wrap; }
+}
+@media (max-width: 420px) {
+  .archive-console .story-heading > div:first-child { flex-basis: 100%; }
+  .archive-console .console-utilities { width: 100%; justify-content: flex-start; }
+  .console-audio-panel { left: 0; right: auto; }
+  .console-more-panel { right: auto; left: 0; width: min(260px, calc(100vw - 32px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .archive-console .film-perforations, .archive-console .filter-toggle .fa-chevron-down { transition: none; }
 }
 </style>

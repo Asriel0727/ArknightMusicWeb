@@ -21,16 +21,18 @@ test('accepted audio alignment takes priority over duration estimates, including
     return measured;
   } }), 'accepted');
   const ep = { songId: 'song1', bvid: 'video1', durationSeconds: 200, audioSync: row.raw.audioSync };
-  assert.equal(getCharacterEpVideoOffsetSeconds(ep, 190), -2.34);
-  assert.equal(getCharacterEpVideoOffsetSeconds({ ...ep, audioSync: { ...ep.audioSync, offsetSeconds: 0 } }, 190), 0);
+  assert.equal(getCharacterEpVideoOffsetSeconds(ep), -2.34);
+  assert.equal(getCharacterEpVideoOffsetSeconds({ ...ep, audioSync: { ...ep.audioSync, offsetSeconds: 0 } }), 0);
   assert.equal(await updateAudioSync(row, { ...options, analyze: () => assert.fail('must reuse cached result') }), 'cached');
 });
 
-test('low confidence or an unrelated mapping cannot override duration matching', () => {
+test('low confidence or an unrelated mapping falls back to the configured offset', () => {
   for (const invalid of [{ confidence: 0.2 }, { videoId: 'other' }, { songId: 'other' },
     { offsetSeconds: null }, { offsetSeconds: Infinity }, { offsetSeconds: 80 }, { algorithmVersion: 99 }]) {
     const audioSync = { ...measured, songId: 'song1', videoId: 'video1', ...invalid };
-    assert.equal(getCharacterEpVideoOffsetSeconds({ songId: 'song1', bvid: 'video1', durationSeconds: 200, audioSync }, 190), 10);
+    assert.equal(getCharacterEpVideoOffsetSeconds({
+      songId: 'song1', bvid: 'video1', durationSeconds: 200, videoOffsetSeconds: 10, audioSync,
+    }), 10);
   }
 });
 

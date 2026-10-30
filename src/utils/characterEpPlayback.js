@@ -4,19 +4,11 @@ const BILIBILI_SOURCE_PATTERN = /(?:bilibili\.com|player\.bilibili\.com)/i;
 
 export const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
 
-export function getCharacterEpVideoOffsetSeconds(characterEp, audioDurationSeconds = 0) {
+export function getCharacterEpVideoOffsetSeconds(characterEp) {
   const verifiedOffset = getVerifiedAudioSyncOffset(characterEp?.audioSync, {
     songId: characterEp?.songId, videoId: characterEp?.bvid,
   });
   if (verifiedOffset !== null) return verifiedOffset;
-  const videoDuration = Number(characterEp?.durationSeconds);
-  const audioDuration = Number(audioDurationSeconds);
-  // Estimate a signed shift from the durations. Negative shifts require the
-  // player to wait until the audio reaches -offset before starting the MV.
-  if (Number.isFinite(videoDuration) && videoDuration > 0
-    && Number.isFinite(audioDuration) && audioDuration > 0) {
-    return Math.round((videoDuration - audioDuration) * 1000) / 1000;
-  }
 
   const configuredOffset = characterEp?.videoOffsetSeconds;
   const hasConfiguredOffset = configuredOffset !== null

@@ -237,8 +237,8 @@ try {
       duration_seconds: video.durationSeconds ?? existing?.duration_seconds ?? null,
       is_visible: shouldPreserveManualMatch ? existing.is_visible : true,
       match_score: shouldPreserveManualMatch ? existing.match_score || 100 : 100,
-      // Retain the legacy fallback for missing durations. The player prefers
-      // MV duration minus the actual audio duration when both are available.
+      // Retain the explicit legacy offset until an audio calibration is
+      // available; duration differences are not reliable start offsets.
       video_offset_seconds: getVideoOffsetSeconds(existing),
       raw: {
         ...existing?.raw,
