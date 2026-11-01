@@ -209,7 +209,7 @@
         "path": "localizations/en/prts-10722.txt"
       },
       "prts-11261": {
-        "sourceHash": "51323eee95ea7b53dd0bdacaecca68f431451e078b0dde8082f686a104f07c3c",
+        "sourceHash": "c2433cd9ee0e2c7d370c22bce8ffb2c2970cf729d3bee1bae3ce345bfa80da73",
         "translationHash": "628f1505710bdebbc854ea0719480374e22f372022ac4f7d46a47addb6c19d25",
         "blob": "9f0a4ae9762665a21262d72ecd2ff09b34544187",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/obt/main/level_st_06-03.txt",
@@ -223,7 +223,7 @@
         "path": "localizations/en/prts-11330.txt"
       },
       "prts-11331": {
-        "sourceHash": "a0ff328883d71ce75038495fde450df30441010ed853270b914279894112e88d",
+        "sourceHash": "f602142244e08b9567f370432536408626878fc4253089c546e78239d69a7ad0",
         "translationHash": "abb457600828866da49f32dcb8b4d8caf0e6f6ba80e8d4d55e8d02b2d85b6695",
         "blob": "db3d5de405ada39426d8a936ea0308dd9e140576",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/obt/main/level_main_06-01_end.txt",
@@ -580,7 +580,7 @@
         "path": "localizations/en/prts-15653.txt"
       },
       "prts-15654": {
-        "sourceHash": "d819473629227ee750c55f6e1e3c1ba1afc97f7b51f076411c69fd8c83d43d2a",
+        "sourceHash": "0439dcbf1bb125103dc69326675535699f75ea479bc1619c3c285c2b86edbe80",
         "translationHash": "34fa2a54a6e77706c09c9f0ca3f5e87fce92f4f094bfe2e5e669e5c41630f549",
         "blob": "86ed32da92d14ae351e9fc37d1a3a9bd9f95847f",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/obt/main/level_main_07-01_end.txt",
@@ -664,7 +664,7 @@
         "path": "localizations/en/prts-15665.txt"
       },
       "prts-15666": {
-        "sourceHash": "eb5da423a8a450204a3653d7be713928138a6d629466b2153972359b0d55cdf6",
+        "sourceHash": "5d797459a317b0cbb7d98cdec513f8e21e72927a147b97a4201157e97febcb48",
         "translationHash": "e16cf27f6e5d95735b055e77e0432f5d5d84d7eac2134431e6fb6ebab258e7d2",
         "blob": "088e3812ae88de267373764eae5da459c52ec9fe",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/obt/main/level_main_07-08_end.txt",
@@ -902,7 +902,7 @@
         "path": "localizations/en/prts-18640.txt"
       },
       "prts-19517": {
-        "sourceHash": "ce93f40f779e3844c097c9d4eb0375d1f473c91d64a9597a0942cbcce858249e",
+        "sourceHash": "ae9028b41b3bdad89874bfd6f36697b40aa39c306e28613b1eb30dd8e3545c94",
         "translationHash": "f3368481f5315ba02c7d15add680647ec87f74dfd311a5cc99d8654fb5d4e30c",
         "blob": "b327099211d17257b0e74dcd247a0ca8fe1ba840",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act11d7/level_act11d7_st01.txt",
@@ -1231,7 +1231,7 @@
         "path": "localizations/en/prts-21992.txt"
       },
       "prts-21993": {
-        "sourceHash": "22e1ded750a3ee7306472115611407a063f2677f66e6405afa73714595e30bb7",
+        "sourceHash": "562682c7ee0acc0f9aad48cab8ff7b07e1d0ceaaca0a923c062584b0b2732dd7",
         "translationHash": "26f03abf53904431121b4442de24f547cd85f1fba6c34ca4c929398613922008",
         "blob": "f930c354ec40c80b2aad877cca29d15586ac8f33",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act13d5/level_act13d5_08_end.txt",
@@ -1259,7 +1259,7 @@
         "path": "localizations/en/prts-21998.txt"
       },
       "prts-22000": {
-        "sourceHash": "62b9cb4518159e8d5861f4169ced1a19ab9ec5fdc0627d0cef708c719738999b",
+        "sourceHash": "650f637461d569db0a1bb62844189cca082673f2d57d86f306348a71c9f6c63c",
         "translationHash": "aebbd4c3705f2c7c79eb9b4168abb5b203cce1adce8dadece5f643964fa955ba",
         "blob": "3051e8ab388edb8bb59993bd2f29206c00867606",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act13d5/level_act13d5_st03.txt",
@@ -1665,7 +1665,7 @@
         "path": "localizations/en/prts-24966.txt"
       },
       "prts-25106": {
-        "sourceHash": "662a9ffe3d189de3b39fb1bd0d1d3fe076ca5fc157c30d760b995de5063d267b",
+        "sourceHash": "3ba98215011e8b716d9076cb669934c05603844c7705b2eabd030609aedfbcdd",
         "translationHash": "5da7a2975b52b3e7a075d25f04a15f2df89dfec75ac92eccd7379c77b8af72e1",
         "blob": "1e6dacd052cff045d11f23a92ff9c8cc0d484c4b",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/obt/memory/story_kroos_1_1.txt",
@@ -1756,7 +1756,7 @@
         "path": "localizations/en/prts-25452.txt"
       },
       "prts-25453": {
-        "sourceHash": "a74d1e30f10da205a5482b1291d691c65bfd422fcc039ba739990403a07370f8",
+        "sourceHash": "a8677d1d61447abef6d457dd68f010907b9f5c727fc3e8c31847544cfc8fe5aa",
         "translationHash": "d88183a4462b13dbb1572ce9d94d4f5f5fbc2dca78a6ac2e4bb3925b024ba35b",
         "blob": "3e5e704a014ccd08bce72850b18f0f48eeed0fe5",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act15d5/level_act15d5_st01.txt",
@@ -2414,7 +2414,7 @@
         "path": "localizations/en/prts-28890.txt"
       },
       "prts-28891": {
-        "sourceHash": "7354a177c9a11b4dbfd083885a3ba506213515d9b8e581bd4d7142a6b73feecb",
+        "sourceHash": "cf19d0d5a42e0867f169e73d1c5f5f609fb3229798bc81578819fc5c3b463071",
         "translationHash": "1b00f670b83063d1ec8d3ff762c577f0f42cbd9447c6993f40b78f336de90df3",
         "blob": "287c8000d68952cc603cd93ba234db89e0105f56",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act18d3/level_act18d3_st01.txt",
@@ -3100,7 +3100,7 @@
         "path": "localizations/en/prts-33620.txt"
       },
       "prts-33621": {
-        "sourceHash": "35fd6da1a7d5ac78b87dfad173c035b1870fd827fadba61253add6bf65dbff1d",
+        "sourceHash": "dbc85439e2a2cc0c275cf08d95eac210c6c0c5366f80b5ea14645649c8255fbd",
         "translationHash": "a90452b7172ff063c905c41ca67d31a5746de5b3f0770853d378f81eb37e3cdb",
         "blob": "7728924a124e8b4031e6b3b10b8fb4ffda50475a",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act9mini/level_act9mini_st07.txt",
@@ -3163,7 +3163,7 @@
         "path": "localizations/en/prts-35282.txt"
       },
       "prts-35283": {
-        "sourceHash": "48ec5c9be32b9697cae8583fe4bbe53f1a5f5b96c511480c75337af6c3e9cbdb",
+        "sourceHash": "275a87bec6d10a823ecef3221ce52104d77c2072f0f9ba9c944611596488948e",
         "translationHash": "a0bbfc33222db85d96aa2778e47cafaacf19e54513da132e258f48196c4b7591",
         "blob": "a5e6a717f3c2461259c46d7c5e1122bf25c47fc7",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act13side/level_act13side_05_end.txt",
@@ -3198,7 +3198,7 @@
         "path": "localizations/en/prts-35287.txt"
       },
       "prts-35288": {
-        "sourceHash": "35335a197e3085004ff4227208037e9c62c803667f1311a311debd96b6f9c527",
+        "sourceHash": "bc08e7e2eb00fe66e6bdaac6c81818ff3a50389ae8d68a80a158f6f617931968",
         "translationHash": "a04630408a7343a9468caaf4715cd3c851e83a6a99277a6a3df3687b2797f38d",
         "blob": "ce3dbcb3b01c42bdbfa0d3a283a6dfde9221893d",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/activities/act13side/level_act13side_07_beg.txt",
@@ -3996,7 +3996,7 @@
         "path": "localizations/en/prts-39505.txt"
       },
       "prts-39506": {
-        "sourceHash": "f63416cb41ee476da1141ac18f58b27f228936537e8acf22853c653e4eba5a02",
+        "sourceHash": "a4fbde336d2e819071af76c95e901f8cac796aae10daf456ccc43b8bdad01a73",
         "translationHash": "265fda68f7e7d15ae8bb179f4e01dfe228dc6d8ffa7c12515e242d6c0732eff7",
         "blob": "75d867d84aa337595b8bbcbd0bdc9ca5cfd95c6f",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/obt/memory/story_folivo_1_1.txt",
@@ -11549,7 +11549,7 @@
         "path": "localizations/en/prts-9570.txt"
       },
       "prts-9571": {
-        "sourceHash": "c2958ee4c4bde5a5fce0e03447458440611c6395ab5f126f771783435f4c0f96",
+        "sourceHash": "e3a9c82b1518355f76cfa82161ede23a4c7c6943aa758d4188df568d46555916",
         "translationHash": "675dd4a76707496805e977127af0d6cf20e033e964448506e46950769d4bfb9e",
         "blob": "4b91c18980615f42d086bc6f138fb4976bde6750",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/story/obt/main/level_main_03-01_end.txt",
@@ -12454,7 +12454,7 @@
         "path": "localizations/ja/prts-10722.txt"
       },
       "prts-11261": {
-        "sourceHash": "51323eee95ea7b53dd0bdacaecca68f431451e078b0dde8082f686a104f07c3c",
+        "sourceHash": "c2433cd9ee0e2c7d370c22bce8ffb2c2970cf729d3bee1bae3ce345bfa80da73",
         "translationHash": "52ecfcc1c738dca39f3649b10201e19cbbd863c3975cfeda0b5bf1c9d08dc739",
         "blob": "ae6e0fd252c547db591cc00cfba691539bbbbdf2",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/obt/main/level_st_06-03.txt",
@@ -12468,7 +12468,7 @@
         "path": "localizations/ja/prts-11330.txt"
       },
       "prts-11331": {
-        "sourceHash": "a0ff328883d71ce75038495fde450df30441010ed853270b914279894112e88d",
+        "sourceHash": "f602142244e08b9567f370432536408626878fc4253089c546e78239d69a7ad0",
         "translationHash": "cf50017b09bcce8d6b56ebfafda30779830e68a158a42cde0b0d81bc60aaf18d",
         "blob": "ba3e09ae1da6b57dd7d0ab2f393c8a5385f95acb",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/obt/main/level_main_06-01_end.txt",
@@ -12825,7 +12825,7 @@
         "path": "localizations/ja/prts-15653.txt"
       },
       "prts-15654": {
-        "sourceHash": "d819473629227ee750c55f6e1e3c1ba1afc97f7b51f076411c69fd8c83d43d2a",
+        "sourceHash": "0439dcbf1bb125103dc69326675535699f75ea479bc1619c3c285c2b86edbe80",
         "translationHash": "b415be30c8f63fd9f310a94e82ffef71a8d2474a4fb9636d3dda59ab53bd20bb",
         "blob": "9681d857aa97e6434cf8c8668d88fc6b7f2e0bb2",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/obt/main/level_main_07-01_end.txt",
@@ -12909,7 +12909,7 @@
         "path": "localizations/ja/prts-15665.txt"
       },
       "prts-15666": {
-        "sourceHash": "eb5da423a8a450204a3653d7be713928138a6d629466b2153972359b0d55cdf6",
+        "sourceHash": "5d797459a317b0cbb7d98cdec513f8e21e72927a147b97a4201157e97febcb48",
         "translationHash": "a1536a6b5ffa4fb8e626ba0e5be3555cb30f85784ce4e76f134a6aa9269db855",
         "blob": "8f0f1215221b27ed20efc9d2b14e09c4bf288d08",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/obt/main/level_main_07-08_end.txt",
@@ -13147,7 +13147,7 @@
         "path": "localizations/ja/prts-18640.txt"
       },
       "prts-19517": {
-        "sourceHash": "ce93f40f779e3844c097c9d4eb0375d1f473c91d64a9597a0942cbcce858249e",
+        "sourceHash": "ae9028b41b3bdad89874bfd6f36697b40aa39c306e28613b1eb30dd8e3545c94",
         "translationHash": "964eb47860b61faad067569b415e07bd333b359d277dfacadfbedcfb4c66303f",
         "blob": "90e3c8d5072660485389e4d1712095f6847765fa",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act11d7/level_act11d7_st01.txt",
@@ -13476,7 +13476,7 @@
         "path": "localizations/ja/prts-21992.txt"
       },
       "prts-21993": {
-        "sourceHash": "22e1ded750a3ee7306472115611407a063f2677f66e6405afa73714595e30bb7",
+        "sourceHash": "562682c7ee0acc0f9aad48cab8ff7b07e1d0ceaaca0a923c062584b0b2732dd7",
         "translationHash": "bcf53375a2fb84ef56c683ec007888e2b7c8bf95fcc403f139403b9664e58654",
         "blob": "418af1f2c678920c25f7193df2c21b7514ca4b4f",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act13d5/level_act13d5_08_end.txt",
@@ -13504,7 +13504,7 @@
         "path": "localizations/ja/prts-21998.txt"
       },
       "prts-22000": {
-        "sourceHash": "62b9cb4518159e8d5861f4169ced1a19ab9ec5fdc0627d0cef708c719738999b",
+        "sourceHash": "650f637461d569db0a1bb62844189cca082673f2d57d86f306348a71c9f6c63c",
         "translationHash": "4a0f9dcec027749d7784589dc3c684d8b2ca09e31418d9cf8e3a8a135184b54d",
         "blob": "9b8050d0d8ea8c0adff9176dd6de3f3304100ea3",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act13d5/level_act13d5_st03.txt",
@@ -13910,7 +13910,7 @@
         "path": "localizations/ja/prts-24966.txt"
       },
       "prts-25106": {
-        "sourceHash": "662a9ffe3d189de3b39fb1bd0d1d3fe076ca5fc157c30d760b995de5063d267b",
+        "sourceHash": "3ba98215011e8b716d9076cb669934c05603844c7705b2eabd030609aedfbcdd",
         "translationHash": "42240c4e78b428aef657e1f4ec1cec0218bbf7d1b0713457ba7f564c37a86ae8",
         "blob": "f9ac2c33c5860118bb313003ca6b683b15232fba",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/obt/memory/story_kroos_1_1.txt",
@@ -14001,7 +14001,7 @@
         "path": "localizations/ja/prts-25452.txt"
       },
       "prts-25453": {
-        "sourceHash": "a74d1e30f10da205a5482b1291d691c65bfd422fcc039ba739990403a07370f8",
+        "sourceHash": "a8677d1d61447abef6d457dd68f010907b9f5c727fc3e8c31847544cfc8fe5aa",
         "translationHash": "ae4fc5c23df4d03ab5b1ce51ddbba64c2c746cef20a8ea5bc5f09836c46dc06b",
         "blob": "913771551095f7cfcb274320c1ce4abbbca2290c",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act15d5/level_act15d5_st01.txt",
@@ -14659,7 +14659,7 @@
         "path": "localizations/ja/prts-28890.txt"
       },
       "prts-28891": {
-        "sourceHash": "7354a177c9a11b4dbfd083885a3ba506213515d9b8e581bd4d7142a6b73feecb",
+        "sourceHash": "cf19d0d5a42e0867f169e73d1c5f5f609fb3229798bc81578819fc5c3b463071",
         "translationHash": "336ed9a0e07d3dc41b55b0d335f1e1de06757fd299f494060d2df3382dd0cad1",
         "blob": "288ff81676f130a2639fe1240d158aef04e4335a",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act18d3/level_act18d3_st01.txt",
@@ -15345,7 +15345,7 @@
         "path": "localizations/ja/prts-33620.txt"
       },
       "prts-33621": {
-        "sourceHash": "35fd6da1a7d5ac78b87dfad173c035b1870fd827fadba61253add6bf65dbff1d",
+        "sourceHash": "dbc85439e2a2cc0c275cf08d95eac210c6c0c5366f80b5ea14645649c8255fbd",
         "translationHash": "36bb0ad4031e4d33ed630dea655d85374a9c20df59cae94b7a9e15b7e46d4e5d",
         "blob": "a9ade0d6e3a6be3747d87424c8b043ac9739f728",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act9mini/level_act9mini_st07.txt",
@@ -15408,7 +15408,7 @@
         "path": "localizations/ja/prts-35282.txt"
       },
       "prts-35283": {
-        "sourceHash": "48ec5c9be32b9697cae8583fe4bbe53f1a5f5b96c511480c75337af6c3e9cbdb",
+        "sourceHash": "275a87bec6d10a823ecef3221ce52104d77c2072f0f9ba9c944611596488948e",
         "translationHash": "162c439d0536c44f8bedf850f5e05eac0367f0ce2fbcd6a890efb9f331584da7",
         "blob": "5c0e08dd2f2dee3f4a971e7886c9b9171b648d58",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act13side/level_act13side_05_end.txt",
@@ -15443,7 +15443,7 @@
         "path": "localizations/ja/prts-35287.txt"
       },
       "prts-35288": {
-        "sourceHash": "35335a197e3085004ff4227208037e9c62c803667f1311a311debd96b6f9c527",
+        "sourceHash": "bc08e7e2eb00fe66e6bdaac6c81818ff3a50389ae8d68a80a158f6f617931968",
         "translationHash": "2e42b11b86fa913bf8a75186484e9858a8c9b497f1b5ccf825c9cc0dbaebdee3",
         "blob": "1e343712b8009db7cc095fd81a76c328ccaab748",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/activities/act13side/level_act13side_07_beg.txt",
@@ -16241,7 +16241,7 @@
         "path": "localizations/ja/prts-39505.txt"
       },
       "prts-39506": {
-        "sourceHash": "f63416cb41ee476da1141ac18f58b27f228936537e8acf22853c653e4eba5a02",
+        "sourceHash": "a4fbde336d2e819071af76c95e901f8cac796aae10daf456ccc43b8bdad01a73",
         "translationHash": "071d9cb21d7a72bd8d5216235b9037ec8dca04bef9ba0ea9d1f779baf1409332",
         "blob": "84ee6f7e54c2490d5b3c3579030fc6521f6a3633",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/obt/memory/story_folivo_1_1.txt",
@@ -23794,7 +23794,7 @@
         "path": "localizations/ja/prts-9570.txt"
       },
       "prts-9571": {
-        "sourceHash": "c2958ee4c4bde5a5fce0e03447458440611c6395ab5f126f771783435f4c0f96",
+        "sourceHash": "e3a9c82b1518355f76cfa82161ede23a4c7c6943aa758d4188df568d46555916",
         "translationHash": "74660e59cbc2fb3b8e2afab9211073a373970bc6a5511274214806d5b8334523",
         "blob": "16ad18e0730fb89454adc588bd508f019b46a4d8",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ja_JP/gamedata/story/obt/main/level_main_03-01_end.txt",
@@ -24699,7 +24699,7 @@
         "path": "localizations/ko/prts-10722.txt"
       },
       "prts-11261": {
-        "sourceHash": "51323eee95ea7b53dd0bdacaecca68f431451e078b0dde8082f686a104f07c3c",
+        "sourceHash": "c2433cd9ee0e2c7d370c22bce8ffb2c2970cf729d3bee1bae3ce345bfa80da73",
         "translationHash": "c106bd3d38eaa8d7bd89d57a4bf38df5bf6fc61a39c4ceca766cdaad7c43ca77",
         "blob": "7ee0a237660ea8bc6ca309bd7b717858cf6bffe6",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/obt/main/level_st_06-03.txt",
@@ -24713,7 +24713,7 @@
         "path": "localizations/ko/prts-11330.txt"
       },
       "prts-11331": {
-        "sourceHash": "a0ff328883d71ce75038495fde450df30441010ed853270b914279894112e88d",
+        "sourceHash": "f602142244e08b9567f370432536408626878fc4253089c546e78239d69a7ad0",
         "translationHash": "9d9f90ad3e1e6338a96cea31defff006e78b1597d584d28af45ed30f2ab2c22b",
         "blob": "af9e7b7ba346564a9dca911b9a34068f4541f8c2",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/obt/main/level_main_06-01_end.txt",
@@ -25070,7 +25070,7 @@
         "path": "localizations/ko/prts-15653.txt"
       },
       "prts-15654": {
-        "sourceHash": "d819473629227ee750c55f6e1e3c1ba1afc97f7b51f076411c69fd8c83d43d2a",
+        "sourceHash": "0439dcbf1bb125103dc69326675535699f75ea479bc1619c3c285c2b86edbe80",
         "translationHash": "553ffdb62f0a277a69a7fd9549f50244b47f9985564d119b73fb9ca215c00078",
         "blob": "2b136e89a5fa4d0c6fd62336adafa5375fcc4b50",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/obt/main/level_main_07-01_end.txt",
@@ -25154,7 +25154,7 @@
         "path": "localizations/ko/prts-15665.txt"
       },
       "prts-15666": {
-        "sourceHash": "eb5da423a8a450204a3653d7be713928138a6d629466b2153972359b0d55cdf6",
+        "sourceHash": "5d797459a317b0cbb7d98cdec513f8e21e72927a147b97a4201157e97febcb48",
         "translationHash": "3678f3840ea4d0d2690c3e4ea8a04f79ff0ccdcc469012fcb7b919fcff606829",
         "blob": "d73e74c3a843be5ff25f8aa5819fb274054d4ee5",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/obt/main/level_main_07-08_end.txt",
@@ -25392,7 +25392,7 @@
         "path": "localizations/ko/prts-18640.txt"
       },
       "prts-19517": {
-        "sourceHash": "ce93f40f779e3844c097c9d4eb0375d1f473c91d64a9597a0942cbcce858249e",
+        "sourceHash": "ae9028b41b3bdad89874bfd6f36697b40aa39c306e28613b1eb30dd8e3545c94",
         "translationHash": "9eaaab17be9392a26fef779d919473bd82020c4e7e78dd7fa7e7a93cb670ad62",
         "blob": "5ab34ce091b08538d22cc68f84b99fb78e9c29e2",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act11d7/level_act11d7_st01.txt",
@@ -25721,7 +25721,7 @@
         "path": "localizations/ko/prts-21992.txt"
       },
       "prts-21993": {
-        "sourceHash": "22e1ded750a3ee7306472115611407a063f2677f66e6405afa73714595e30bb7",
+        "sourceHash": "562682c7ee0acc0f9aad48cab8ff7b07e1d0ceaaca0a923c062584b0b2732dd7",
         "translationHash": "e9570f322cb437512fdfefb0fa1bf09d7ba56fcac27b566b037ec6d056d0cce3",
         "blob": "57b32c77f73891d7b84be2a2f673e9962308dda5",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act13d5/level_act13d5_08_end.txt",
@@ -25749,7 +25749,7 @@
         "path": "localizations/ko/prts-21998.txt"
       },
       "prts-22000": {
-        "sourceHash": "62b9cb4518159e8d5861f4169ced1a19ab9ec5fdc0627d0cef708c719738999b",
+        "sourceHash": "650f637461d569db0a1bb62844189cca082673f2d57d86f306348a71c9f6c63c",
         "translationHash": "28b51827c72f4a2efeeb20774966e3d260382f8e393e42772e080f569e887786",
         "blob": "9adcd5f1f5948651e7fcb13030f8df202588257e",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act13d5/level_act13d5_st03.txt",
@@ -26155,7 +26155,7 @@
         "path": "localizations/ko/prts-24966.txt"
       },
       "prts-25106": {
-        "sourceHash": "662a9ffe3d189de3b39fb1bd0d1d3fe076ca5fc157c30d760b995de5063d267b",
+        "sourceHash": "3ba98215011e8b716d9076cb669934c05603844c7705b2eabd030609aedfbcdd",
         "translationHash": "cad8a723652d1b4ec906a02e7d0d7c156dcd31e3ce1163f66b116822a955287c",
         "blob": "1a5dab803087e41034712658ec934ab0286cec03",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/obt/memory/story_kroos_1_1.txt",
@@ -26246,7 +26246,7 @@
         "path": "localizations/ko/prts-25452.txt"
       },
       "prts-25453": {
-        "sourceHash": "a74d1e30f10da205a5482b1291d691c65bfd422fcc039ba739990403a07370f8",
+        "sourceHash": "a8677d1d61447abef6d457dd68f010907b9f5c727fc3e8c31847544cfc8fe5aa",
         "translationHash": "180dded5c45ffe05cc189140cb76a4a0ff67f54216c26c67e1f5e4a8749374f3",
         "blob": "af0c7d730673b98258c438d110a197f0e34687d3",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act15d5/level_act15d5_st01.txt",
@@ -26904,7 +26904,7 @@
         "path": "localizations/ko/prts-28890.txt"
       },
       "prts-28891": {
-        "sourceHash": "7354a177c9a11b4dbfd083885a3ba506213515d9b8e581bd4d7142a6b73feecb",
+        "sourceHash": "cf19d0d5a42e0867f169e73d1c5f5f609fb3229798bc81578819fc5c3b463071",
         "translationHash": "36bebe2077fc50fd7915f40bf33a59fe7c1e0a6298adf3d57518731713866f1f",
         "blob": "b5e296cee88c944acaf444cc3a881ddf8920a667",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act18d3/level_act18d3_st01.txt",
@@ -27590,7 +27590,7 @@
         "path": "localizations/ko/prts-33620.txt"
       },
       "prts-33621": {
-        "sourceHash": "35fd6da1a7d5ac78b87dfad173c035b1870fd827fadba61253add6bf65dbff1d",
+        "sourceHash": "dbc85439e2a2cc0c275cf08d95eac210c6c0c5366f80b5ea14645649c8255fbd",
         "translationHash": "01255e000ef8e019a9693d1b820494602f918bc7a57bee5a21a8a02dc5d9d66c",
         "blob": "71ffc574c09f396ea75329a601e7841ff980807c",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act9mini/level_act9mini_st07.txt",
@@ -27653,7 +27653,7 @@
         "path": "localizations/ko/prts-35282.txt"
       },
       "prts-35283": {
-        "sourceHash": "48ec5c9be32b9697cae8583fe4bbe53f1a5f5b96c511480c75337af6c3e9cbdb",
+        "sourceHash": "275a87bec6d10a823ecef3221ce52104d77c2072f0f9ba9c944611596488948e",
         "translationHash": "dacc904923b20d1f3822ea077eddf2a6fdddce43ac5254b3647f06f616bccf1e",
         "blob": "ea6c46894e2e6e03ef34cc826e080401985ba083",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act13side/level_act13side_05_end.txt",
@@ -27688,7 +27688,7 @@
         "path": "localizations/ko/prts-35287.txt"
       },
       "prts-35288": {
-        "sourceHash": "35335a197e3085004ff4227208037e9c62c803667f1311a311debd96b6f9c527",
+        "sourceHash": "bc08e7e2eb00fe66e6bdaac6c81818ff3a50389ae8d68a80a158f6f617931968",
         "translationHash": "ec7fc1d042115bd9827645b430891d50eaac6484a6afc37f045ac1f7e3e8f40f",
         "blob": "f69996ee1f7533bdd3177e418874a9253b79ccfb",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/activities/act13side/level_act13side_07_beg.txt",
@@ -28486,7 +28486,7 @@
         "path": "localizations/ko/prts-39505.txt"
       },
       "prts-39506": {
-        "sourceHash": "f63416cb41ee476da1141ac18f58b27f228936537e8acf22853c653e4eba5a02",
+        "sourceHash": "a4fbde336d2e819071af76c95e901f8cac796aae10daf456ccc43b8bdad01a73",
         "translationHash": "0c6affdee9e2a2a4d9d955b9ca8e0e003918b76f4d344bd3d35e9342c7f5c7d4",
         "blob": "d8a9b9e8fd09aec962568dd0a62b70d783255d02",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/obt/memory/story_folivo_1_1.txt",
@@ -35906,7 +35906,7 @@
         "path": "localizations/ko/prts-9570.txt"
       },
       "prts-9571": {
-        "sourceHash": "c2958ee4c4bde5a5fce0e03447458440611c6395ab5f126f771783435f4c0f96",
+        "sourceHash": "e3a9c82b1518355f76cfa82161ede23a4c7c6943aa758d4188df568d46555916",
         "translationHash": "0707f048cb7f359fcb5923bfb416c10d98f7a9f77599f7e8827e48054cbcff16",
         "blob": "4833bf7617b406e68172af4dad7c8d27541182fe",
         "source": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/ko_KR/gamedata/story/obt/main/level_main_03-01_end.txt",

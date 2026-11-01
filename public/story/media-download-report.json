@@ -1,27 +1,27 @@
 {
-  "downloadedAt": "2026-10-31T21:52:12.181Z",
+  "downloadedAt": "2026-11-01T22:20:25.742Z",
   "mode": "incremental-local-files",
-  "stories": 2294,
-  "uniqueUrls": 2196,
-  "downloaded": 0,
+  "stories": 2323,
+  "uniqueUrls": 2246,
+  "downloaded": 49,
   "reused": 2105,
   "skippedKnownMissing": 91,
-  "bytesDownloaded": 0,
+  "bytesDownloaded": 31508845,
   "compressed": 0,
   "compressedSources": [],
   "preservedModifiedSources": [],
   "unsafeLocalFiles": [],
   "totals": {
-    "audio": 2093,
+    "audio": 2142,
     "videos": 12,
-    "bytes": 1104795325
+    "bytes": 1136304170
   },
   "missingTotals": {
     "audio": 27,
-    "videos": 0
+    "videos": 1
   },
-  "localReferences": 37834,
-  "changedStories": 0,
+  "localReferences": 38981,
+  "changedStories": 20,
   "failures": [
     {
       "url": "https://static.prts.wiki/video/03.mp4",
@@ -450,6 +450,13 @@
       "reason": "http-error"
     },
     {
+      "url": "https://static.prts.wiki/video/act55side/tl02.mp4",
+      "type": "videos",
+      "status": 404,
+      "reason": "http-error",
+      "retainedExisting": false
+    },
+    {
       "url": "https://torappu.prts.wiki/assets/audio/test/slideshow1.mp3",
       "type": "audio",
       "status": 404,
@@ -582,6 +589,14 @@
       "type": "audio",
       "key": "p_atk_smg_n",
       "candidates": []
+    },
+    {
+      "storyId": "prts-99311",
+      "type": "videos",
+      "key": "video/act55side/TL02.mp4",
+      "candidates": [
+        "https://static.prts.wiki/video/act55side/tl02.mp4"
+      ]
     },
     {
       "storyId": "prts-13868",

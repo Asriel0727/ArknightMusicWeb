@@ -1,9 +1,9 @@
 {
-  "totalStories": 2294,
+  "totalStories": 2323,
   "locales": {
     "en": {
       "imported": 1749,
-      "reused": 1749,
+      "reused": 1734,
       "missing": [
         {
           "id": "prts-13671",
@@ -2561,6 +2561,151 @@
           "id": "prts-98711",
           "page": "RO6-END-4/NBT",
           "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4"
+        },
+        {
+          "id": "prts-99276",
+          "page": "TL-1 庸俗的实践/BEG",
+          "scriptPath": "activities/act55side/level_act55side_01_beg"
+        },
+        {
+          "id": "prts-99278",
+          "page": "TL-2 孑遗的道路/BEG",
+          "scriptPath": "activities/act55side/level_act55side_02_beg"
+        },
+        {
+          "id": "prts-99279",
+          "page": "TL-1 庸俗的实践/END",
+          "scriptPath": "activities/act55side/level_act55side_01_end"
+        },
+        {
+          "id": "prts-99281",
+          "page": "TL-2 孑遗的道路/END",
+          "scriptPath": "activities/act55side/level_act55side_02_end"
+        },
+        {
+          "id": "prts-99282",
+          "page": "TL-3 苦难的历程/BEG",
+          "scriptPath": "activities/act55side/level_act55side_03_beg"
+        },
+        {
+          "id": "prts-99283",
+          "page": "TL-3 苦难的历程/END",
+          "scriptPath": "activities/act55side/level_act55side_03_end"
+        },
+        {
+          "id": "prts-99285",
+          "page": "TL-4 刻板的争论/BEG",
+          "scriptPath": "activities/act55side/level_act55side_04_beg"
+        },
+        {
+          "id": "prts-99287",
+          "page": "TL-5 轰鸣的沉默/END",
+          "scriptPath": "activities/act55side/level_act55side_05_end"
+        },
+        {
+          "id": "prts-99288",
+          "page": "TL-5 轰鸣的沉默/BEG",
+          "scriptPath": "activities/act55side/level_act55side_05_beg"
+        },
+        {
+          "id": "prts-99289",
+          "page": "TL-4 刻板的争论/END",
+          "scriptPath": "activities/act55side/level_act55side_04_end"
+        },
+        {
+          "id": "prts-99291",
+          "page": "TL-6 元音的长度/BEG",
+          "scriptPath": "activities/act55side/level_act55side_06_beg"
+        },
+        {
+          "id": "prts-99292",
+          "page": "TL-6 元音的长度/END",
+          "scriptPath": "activities/act55side/level_act55side_06_end"
+        },
+        {
+          "id": "prts-99293",
+          "page": "TL-7 滚烫的双眸/BEG",
+          "scriptPath": "activities/act55side/level_act55side_07_beg"
+        },
+        {
+          "id": "prts-99295",
+          "page": "TL-7 滚烫的双眸/END",
+          "scriptPath": "activities/act55side/level_act55side_07_end"
+        },
+        {
+          "id": "prts-99296",
+          "page": "TL-8 潮湿的火焰/BEG",
+          "scriptPath": "activities/act55side/level_act55side_08_beg"
+        },
+        {
+          "id": "prts-99297",
+          "page": "TL-8 潮湿的火焰/END",
+          "scriptPath": "activities/act55side/level_act55side_08_end"
+        },
+        {
+          "id": "prts-99299",
+          "page": "TL-9 自由的黄昏/BEG",
+          "scriptPath": "activities/act55side/level_act55side_09_beg"
+        },
+        {
+          "id": "prts-99302",
+          "page": "TL-10 活着的重量/END",
+          "scriptPath": "activities/act55side/level_act55side_10_end"
+        },
+        {
+          "id": "prts-99303",
+          "page": "TL-9 自由的黄昏/END",
+          "scriptPath": "activities/act55side/level_act55side_09_end"
+        },
+        {
+          "id": "prts-99304",
+          "page": "TL-10 活着的重量/BEG",
+          "scriptPath": "activities/act55side/level_act55side_10_beg"
+        },
+        {
+          "id": "prts-99306",
+          "page": "TL-ST-1 复生的奇迹/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st01"
+        },
+        {
+          "id": "prts-99308",
+          "page": "TL-ST-3 孱弱的团结/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st03"
+        },
+        {
+          "id": "prts-99309",
+          "page": "TL-ST-2 激越的灵魂/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st02"
+        },
+        {
+          "id": "prts-99311",
+          "page": "TL-ST-4 年轻的未来/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st04"
+        },
+        {
+          "id": "prts-99316",
+          "page": "国度/干员密录/1",
+          "scriptPath": "obt/memory/story_dminon_1_1"
+        },
+        {
+          "id": "prts-99317",
+          "page": "夜半/干员密录/2",
+          "scriptPath": "obt/memory/story_blkngt_2_1"
+        },
+        {
+          "id": "prts-99319",
+          "page": "嘉辛塔/干员密录/1",
+          "scriptPath": "obt/memory/story_jcinta_1_1"
+        },
+        {
+          "id": "prts-99320",
+          "page": "PhonoR-0/干员密录/1",
+          "scriptPath": "obt/memory/story_phonor_1_1"
+        },
+        {
+          "id": "prts-99322",
+          "page": "裁度/干员密录/1",
+          "scriptPath": "obt/memory/story_talr_1_1"
         }
       ],
       "failed": [],
@@ -2568,7 +2713,7 @@
     },
     "ja": {
       "imported": 1749,
-      "reused": 1749,
+      "reused": 1734,
       "missing": [
         {
           "id": "prts-13671",
@@ -5126,6 +5271,151 @@
           "id": "prts-98711",
           "page": "RO6-END-4/NBT",
           "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4"
+        },
+        {
+          "id": "prts-99276",
+          "page": "TL-1 庸俗的实践/BEG",
+          "scriptPath": "activities/act55side/level_act55side_01_beg"
+        },
+        {
+          "id": "prts-99278",
+          "page": "TL-2 孑遗的道路/BEG",
+          "scriptPath": "activities/act55side/level_act55side_02_beg"
+        },
+        {
+          "id": "prts-99279",
+          "page": "TL-1 庸俗的实践/END",
+          "scriptPath": "activities/act55side/level_act55side_01_end"
+        },
+        {
+          "id": "prts-99281",
+          "page": "TL-2 孑遗的道路/END",
+          "scriptPath": "activities/act55side/level_act55side_02_end"
+        },
+        {
+          "id": "prts-99282",
+          "page": "TL-3 苦难的历程/BEG",
+          "scriptPath": "activities/act55side/level_act55side_03_beg"
+        },
+        {
+          "id": "prts-99283",
+          "page": "TL-3 苦难的历程/END",
+          "scriptPath": "activities/act55side/level_act55side_03_end"
+        },
+        {
+          "id": "prts-99285",
+          "page": "TL-4 刻板的争论/BEG",
+          "scriptPath": "activities/act55side/level_act55side_04_beg"
+        },
+        {
+          "id": "prts-99287",
+          "page": "TL-5 轰鸣的沉默/END",
+          "scriptPath": "activities/act55side/level_act55side_05_end"
+        },
+        {
+          "id": "prts-99288",
+          "page": "TL-5 轰鸣的沉默/BEG",
+          "scriptPath": "activities/act55side/level_act55side_05_beg"
+        },
+        {
+          "id": "prts-99289",
+          "page": "TL-4 刻板的争论/END",
+          "scriptPath": "activities/act55side/level_act55side_04_end"
+        },
+        {
+          "id": "prts-99291",
+          "page": "TL-6 元音的长度/BEG",
+          "scriptPath": "activities/act55side/level_act55side_06_beg"
+        },
+        {
+          "id": "prts-99292",
+          "page": "TL-6 元音的长度/END",
+          "scriptPath": "activities/act55side/level_act55side_06_end"
+        },
+        {
+          "id": "prts-99293",
+          "page": "TL-7 滚烫的双眸/BEG",
+          "scriptPath": "activities/act55side/level_act55side_07_beg"
+        },
+        {
+          "id": "prts-99295",
+          "page": "TL-7 滚烫的双眸/END",
+          "scriptPath": "activities/act55side/level_act55side_07_end"
+        },
+        {
+          "id": "prts-99296",
+          "page": "TL-8 潮湿的火焰/BEG",
+          "scriptPath": "activities/act55side/level_act55side_08_beg"
+        },
+        {
+          "id": "prts-99297",
+          "page": "TL-8 潮湿的火焰/END",
+          "scriptPath": "activities/act55side/level_act55side_08_end"
+        },
+        {
+          "id": "prts-99299",
+          "page": "TL-9 自由的黄昏/BEG",
+          "scriptPath": "activities/act55side/level_act55side_09_beg"
+        },
+        {
+          "id": "prts-99302",
+          "page": "TL-10 活着的重量/END",
+          "scriptPath": "activities/act55side/level_act55side_10_end"
+        },
+        {
+          "id": "prts-99303",
+          "page": "TL-9 自由的黄昏/END",
+          "scriptPath": "activities/act55side/level_act55side_09_end"
+        },
+        {
+          "id": "prts-99304",
+          "page": "TL-10 活着的重量/BEG",
+          "scriptPath": "activities/act55side/level_act55side_10_beg"
+        },
+        {
+          "id": "prts-99306",
+          "page": "TL-ST-1 复生的奇迹/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st01"
+        },
+        {
+          "id": "prts-99308",
+          "page": "TL-ST-3 孱弱的团结/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st03"
+        },
+        {
+          "id": "prts-99309",
+          "page": "TL-ST-2 激越的灵魂/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st02"
+        },
+        {
+          "id": "prts-99311",
+          "page": "TL-ST-4 年轻的未来/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st04"
+        },
+        {
+          "id": "prts-99316",
+          "page": "国度/干员密录/1",
+          "scriptPath": "obt/memory/story_dminon_1_1"
+        },
+        {
+          "id": "prts-99317",
+          "page": "夜半/干员密录/2",
+          "scriptPath": "obt/memory/story_blkngt_2_1"
+        },
+        {
+          "id": "prts-99319",
+          "page": "嘉辛塔/干员密录/1",
+          "scriptPath": "obt/memory/story_jcinta_1_1"
+        },
+        {
+          "id": "prts-99320",
+          "page": "PhonoR-0/干员密录/1",
+          "scriptPath": "obt/memory/story_phonor_1_1"
+        },
+        {
+          "id": "prts-99322",
+          "page": "裁度/干员密录/1",
+          "scriptPath": "obt/memory/story_talr_1_1"
         }
       ],
       "failed": [],
@@ -5133,7 +5423,7 @@
     },
     "ko": {
       "imported": 1730,
-      "reused": 1730,
+      "reused": 1715,
       "missing": [
         {
           "id": "prts-13671",
@@ -7786,6 +8076,151 @@
           "id": "prts-98711",
           "page": "RO6-END-4/NBT",
           "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4"
+        },
+        {
+          "id": "prts-99276",
+          "page": "TL-1 庸俗的实践/BEG",
+          "scriptPath": "activities/act55side/level_act55side_01_beg"
+        },
+        {
+          "id": "prts-99278",
+          "page": "TL-2 孑遗的道路/BEG",
+          "scriptPath": "activities/act55side/level_act55side_02_beg"
+        },
+        {
+          "id": "prts-99279",
+          "page": "TL-1 庸俗的实践/END",
+          "scriptPath": "activities/act55side/level_act55side_01_end"
+        },
+        {
+          "id": "prts-99281",
+          "page": "TL-2 孑遗的道路/END",
+          "scriptPath": "activities/act55side/level_act55side_02_end"
+        },
+        {
+          "id": "prts-99282",
+          "page": "TL-3 苦难的历程/BEG",
+          "scriptPath": "activities/act55side/level_act55side_03_beg"
+        },
+        {
+          "id": "prts-99283",
+          "page": "TL-3 苦难的历程/END",
+          "scriptPath": "activities/act55side/level_act55side_03_end"
+        },
+        {
+          "id": "prts-99285",
+          "page": "TL-4 刻板的争论/BEG",
+          "scriptPath": "activities/act55side/level_act55side_04_beg"
+        },
+        {
+          "id": "prts-99287",
+          "page": "TL-5 轰鸣的沉默/END",
+          "scriptPath": "activities/act55side/level_act55side_05_end"
+        },
+        {
+          "id": "prts-99288",
+          "page": "TL-5 轰鸣的沉默/BEG",
+          "scriptPath": "activities/act55side/level_act55side_05_beg"
+        },
+        {
+          "id": "prts-99289",
+          "page": "TL-4 刻板的争论/END",
+          "scriptPath": "activities/act55side/level_act55side_04_end"
+        },
+        {
+          "id": "prts-99291",
+          "page": "TL-6 元音的长度/BEG",
+          "scriptPath": "activities/act55side/level_act55side_06_beg"
+        },
+        {
+          "id": "prts-99292",
+          "page": "TL-6 元音的长度/END",
+          "scriptPath": "activities/act55side/level_act55side_06_end"
+        },
+        {
+          "id": "prts-99293",
+          "page": "TL-7 滚烫的双眸/BEG",
+          "scriptPath": "activities/act55side/level_act55side_07_beg"
+        },
+        {
+          "id": "prts-99295",
+          "page": "TL-7 滚烫的双眸/END",
+          "scriptPath": "activities/act55side/level_act55side_07_end"
+        },
+        {
+          "id": "prts-99296",
+          "page": "TL-8 潮湿的火焰/BEG",
+          "scriptPath": "activities/act55side/level_act55side_08_beg"
+        },
+        {
+          "id": "prts-99297",
+          "page": "TL-8 潮湿的火焰/END",
+          "scriptPath": "activities/act55side/level_act55side_08_end"
+        },
+        {
+          "id": "prts-99299",
+          "page": "TL-9 自由的黄昏/BEG",
+          "scriptPath": "activities/act55side/level_act55side_09_beg"
+        },
+        {
+          "id": "prts-99302",
+          "page": "TL-10 活着的重量/END",
+          "scriptPath": "activities/act55side/level_act55side_10_end"
+        },
+        {
+          "id": "prts-99303",
+          "page": "TL-9 自由的黄昏/END",
+          "scriptPath": "activities/act55side/level_act55side_09_end"
+        },
+        {
+          "id": "prts-99304",
+          "page": "TL-10 活着的重量/BEG",
+          "scriptPath": "activities/act55side/level_act55side_10_beg"
+        },
+        {
+          "id": "prts-99306",
+          "page": "TL-ST-1 复生的奇迹/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st01"
+        },
+        {
+          "id": "prts-99308",
+          "page": "TL-ST-3 孱弱的团结/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st03"
+        },
+        {
+          "id": "prts-99309",
+          "page": "TL-ST-2 激越的灵魂/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st02"
+        },
+        {
+          "id": "prts-99311",
+          "page": "TL-ST-4 年轻的未来/NBT",
+          "scriptPath": "activities/act55side/level_act55side_st04"
+        },
+        {
+          "id": "prts-99316",
+          "page": "国度/干员密录/1",
+          "scriptPath": "obt/memory/story_dminon_1_1"
+        },
+        {
+          "id": "prts-99317",
+          "page": "夜半/干员密录/2",
+          "scriptPath": "obt/memory/story_blkngt_2_1"
+        },
+        {
+          "id": "prts-99319",
+          "page": "嘉辛塔/干员密录/1",
+          "scriptPath": "obt/memory/story_jcinta_1_1"
+        },
+        {
+          "id": "prts-99320",
+          "page": "PhonoR-0/干员密录/1",
+          "scriptPath": "obt/memory/story_phonor_1_1"
+        },
+        {
+          "id": "prts-99322",
+          "page": "裁度/干员密录/1",
+          "scriptPath": "obt/memory/story_talr_1_1"
         }
       ],
       "failed": [],

@@ -12674,6 +12674,300 @@
       "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_regainhope_loop.mp3",
       "bytes": 2024846,
       "sha256": "ee4466a3dd7727e68313e26cae1e7453d64ba1633b9f848683f66a83f985640a"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_breakarrow.mp3": {
+      "path": "media/audio/f224171c180860f5e3fb6e98c6955eefb9a5863e327484e12bbf3a0795e83527.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_breakarrow.mp3",
+      "bytes": 9452,
+      "sha256": "6872f554641dcf8579a9aab6ced454073e3758a4493606f5b28a664781d01a61"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/act14d0d0/m_bat_talulha_intro.mp3": {
+      "path": "media/audio/c1a196f80eecf558c6d757cb27a71ee59904d8b6b1f2c3dc2ff814dbb28f6f80.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/act14d0d0/m_bat_talulha_intro.mp3",
+      "bytes": 23658,
+      "sha256": "7a18506ae7970c4de1c09cc0174b6f71ac870c47b785344c9960cb1396e47b47"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_nervous_g2_intro.mp3": {
+      "path": "media/audio/9a01cdc913d9e799e08ddb31c951aea729b846396c3fb6d7335402bd7d0d306a.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_nervous_g2_intro.mp3",
+      "bytes": 126893,
+      "sha256": "2dc3b06b2f972569d8fafc33b2e0533726a1e11069c98b41d33e318b97039f72"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdmarch_slow_loop.mp3": {
+      "path": "media/audio/e95291f03edb1c18c8e81f1181a8353499df4b9e1e1b79f29efc141fa429ac26.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdmarch_slow_loop.mp3",
+      "bytes": 55916,
+      "sha256": "6a48642b3bf24d739012c28d98c8bfcac9680671271a4abba4646a63997cd37f"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_nervous_g2_loop.mp3": {
+      "path": "media/audio/6c5e7b210f3412e4ac27311918a239a8930dedacf87e87b02a6915c0c0fc3d96.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_nervous_g2_loop.mp3",
+      "bytes": 1443047,
+      "sha256": "fa8e03792822a16ada929766fe71a6c8ae1e53ed521bdd1fc0c2b9bf435d5042"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_prisongate_close.mp3": {
+      "path": "media/audio/436f7c99059d9d87188a2d9719e59568fc3aded5bd2c88d108527a9c5f29eef0.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_prisongate_close.mp3",
+      "bytes": 23660,
+      "sha256": "521d2bca4c2c7a58e79035da1bfea5c01b511947d404b41982dfc2a4ed10f132"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/act14d0d0/m_bat_talulha_loop.mp3": {
+      "path": "media/audio/75e065a955c21acda93098b2a112790519359d5ad95c19687471a6a60ca8402b.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/act14d0d0/m_bat_talulha_loop.mp3",
+      "bytes": 1676687,
+      "sha256": "5abc491cab2f849c8f5bc0cecfa04b48568b3256ff293a5e95722bb487df0edf"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_shakeprisongate.mp3": {
+      "path": "media/audio/fe49b341006a764271d182ab81b380900b2f1c9df622f37347dd18a6e7a3250a.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_shakeprisongate.mp3",
+      "bytes": 13100,
+      "sha256": "ff21dac3711047d2131f59aac3fd34eb96c8b969d62b19a6f55581b4c7d2a3a5"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdcharge.mp3": {
+      "path": "media/audio/9a18bc6366d4694a82e4a041ef706d32e9235b535626d3fd696a44b1067d5992.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdcharge.mp3",
+      "bytes": 56300,
+      "sha256": "b478421da6d615bca5fd37dae6be84ce032916fa82b7bc2cee01874a83cfa9d4"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_blacksnakecrawl.mp3": {
+      "path": "media/audio/93280d0daa9f65deb0fe98012859d1bd64a9b74b2f940edd9ee0b1d8bbbb41b6.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_blacksnakecrawl.mp3",
+      "bytes": 40940,
+      "sha256": "a2f61c1803a25625c80e04550912e2b8f2612de412c957cee73f21b9111f158b"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_punchwall.mp3": {
+      "path": "media/audio/2a9fa4f27cdd884d12984ea5681017fd3ed824fbc8202c1e7f05f167f82678b8.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_punchwall.mp3",
+      "bytes": 6956,
+      "sha256": "30c16482ea8db2a77b0a17f2649c4473f08521a05dbb7956c102a031a43fc8cd"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_putdownmedal.mp3": {
+      "path": "media/audio/a9dd73059de1553ab9276f0e73576ff4ef1b459d5d1627ac3d97659e2e11dd2b.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_putdownmedal.mp3",
+      "bytes": 6572,
+      "sha256": "00b1748d13efcc25e7b5b9c2532eeea6b1d69c53c15fe7c96a58e1a531dfa925"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_pushmedal.mp3": {
+      "path": "media/audio/206a33fd4e0c253d3c2e29e5d4425f78889c10c05433db4652b623f4d5037e0d.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_pushmedal.mp3",
+      "bytes": 12716,
+      "sha256": "b7c1f17d81bce8b013c9983e329e925780dcf20203f2ca30cb677c6d45305081"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_animalrunstop.mp3": {
+      "path": "media/audio/b62c3302f80d089329b3630772f20d9274a4a8ab9d629f89f9d21ecf2250e84b.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_animalrunstop.mp3",
+      "bytes": 29420,
+      "sha256": "b7616bdee4f5c6e10d92dc2fc62424d7c5a50bae8b76a6da5ad5bea86fd94493"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_swordinsertconsole.mp3": {
+      "path": "media/audio/46e995ab1619511eb7ddfb906014a537e4b6e4220981c3cadc06a56c4f5edffd.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_swordinsertconsole.mp3",
+      "bytes": 12140,
+      "sha256": "077a9edea36bf91eea2388c7df0e66c25cd1606953a73fdad025f2491f8d5158"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_originiumarts_fire_long.mp3": {
+      "path": "media/audio/6ea0c06f49a9c19f275081dca4abf6092a0a4057603183e098979729ec1d9a8b.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_originiumarts_fire_long.mp3",
+      "bytes": 65900,
+      "sha256": "06e49382609b5d72af91bb359337c1f9a57ea47f6123b867532ac954d99253a4"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_helicopterpropeller_loop.mp3": {
+      "path": "media/audio/71d56a9043644f4669e623de1c97746a1f84613b9e2896d16fa7c2750dda17cf.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_helicopterpropeller_loop.mp3",
+      "bytes": 19628,
+      "sha256": "000a930c7e66754ff0f8719c46d74b24955d5abaa3c3009de4c738d71d9e1341"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/act16main/m_sys_act16main_intro.mp3": {
+      "path": "media/audio/8f76ab80796fa3fb8aef53267d3db8fce98349c77512388a80e3a9523c83a3b5.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/act16main/m_sys_act16main_intro.mp3",
+      "bytes": 312812,
+      "sha256": "5c4981f2b4bc13081c58d0af337ee0b82be1cc746a9a03f2d2c7da0271ea527f"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth1_intro.mp3": {
+      "path": "media/audio/7497c9bcabeabe0c17d19d383d1c34256f17dd91f9eb79439c06b37d8a251e53.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth1_intro.mp3",
+      "bytes": 87605,
+      "sha256": "0cb57411025a5e09f97a49619d9830e83ed0af86ee006218977aa86e52956622"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_fallground_metalpipe.mp3": {
+      "path": "media/audio/753319eae92ad69431f842d69c4b40eee97d7691a1a8b920a7c4e51cc47ec12c.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_fallground_metalpipe.mp3",
+      "bytes": 56300,
+      "sha256": "176faef79e3ed9ba3a11f3558d35383f559874c42c3278cbe6ba7812b0375b27"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/act16main/m_sys_act16main_loop.mp3": {
+      "path": "media/audio/e59ec2685feea8ae31f8a554b6a5d6ee483758546cfbd748d9ff319904d198df.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/act16main/m_sys_act16main_loop.mp3",
+      "bytes": 2612204,
+      "sha256": "385039734fee36048652eeabba6ce9f99b636ea1e5e21828e90ff838be2548f4"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth1_loop.mp3": {
+      "path": "media/audio/a7b7504ace1c349fd2d1ae46f6c3db0bb48be5122dd563be218067b90f7ec50d.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth1_loop.mp3",
+      "bytes": 756340,
+      "sha256": "15fc1008d0dc3431b1875b25de1b7a331d078cb06b39839fe0fdc0e7b570b599"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_ironmelt_loop.mp3": {
+      "path": "media/audio/10836d94c69b76cd6899dd88b336cdb5c617952b21bc4ae1fa218b37d94db621.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_ironmelt_loop.mp3",
+      "bytes": 80876,
+      "sha256": "ae7f551b2bb7615c02e1e9f2948d1a143f95fab4b639cebbc035750f4aa894e6"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth2_intro.mp3": {
+      "path": "media/audio/3252ad7b249085ed343329aac253e5b214c4e7ed0c53a3d34ff7316202b3ed7f.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth2_intro.mp3",
+      "bytes": 347158,
+      "sha256": "da174282f31980ada4b78f38d25e78bb29cdee9c2c3fdf4a48290a7444521e34"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_burnsword.mp3": {
+      "path": "media/audio/81514faa05b04fd150b34a5d5217341f922a61c23132058c13031103e6dd3d70.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_burnsword.mp3",
+      "bytes": 16748,
+      "sha256": "c2614b2454353ee3050c9973cb67ba3153dce1b1138db8e9b5ef14efc3959936"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_crystalshatter_loop.mp3": {
+      "path": "media/audio/79e5ead8d2e89f2596143154488a02542f2119a01df5fe00f0200ad53c23fb35.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crystalshatter_loop.mp3",
+      "bytes": 74348,
+      "sha256": "b5d9fa56bde4edab0df75a8850dc8c950ef11dbfb8c05e4491a53584f5c8adcd"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_metaldaggerbreak_1.mp3": {
+      "path": "media/audio/a97f1b226ac1c3d79642111b6ebfb49ed367e01b55d46afe6e4e33eae6cdfed8.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_metaldaggerbreak_1.mp3",
+      "bytes": 13676,
+      "sha256": "16c9f2d83227eb03e84e691493b2a3d0f95ca7174aa267a0979b8b84d7707b25"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_originiumarts_fire_short.mp3": {
+      "path": "media/audio/4808a09f44b689fd9c605dab3280268af2e5db19841d8a1b2e073e7bda342640.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_originiumarts_fire_short.mp3",
+      "bytes": 39788,
+      "sha256": "f3d869aacc2cf7e50b624837a46fd7a83fd7e306adec2952fdc8ef34da10d626"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth2_loop.mp3": {
+      "path": "media/audio/2266d6d3ead63959ab75e9eaa3af59c5e44110a9c53fd13301c28784be00bcc5.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth2_loop.mp3",
+      "bytes": 1134175,
+      "sha256": "b77d3e280b8cc80064542f6d8cb1e4d3921cb42ba9f766477c031123fef3ec40"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_metaldaggerbreak_2.mp3": {
+      "path": "media/audio/5b8d2c7e5d93ad97aa9f13f12794fe56bf917409a9c87eb7d5ab4b6865bf5421.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_metaldaggerbreak_2.mp3",
+      "bytes": 12908,
+      "sha256": "372b190bfda79265d291bf626f08be8961af6ac5558b4eb771e6524c97bdcf67"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_fallground_medal.mp3": {
+      "path": "media/audio/78e62faa38aa74a6eeb65da6d07ec5d912f06f410c31c78e11f87180c6f6411e.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_fallground_medal.mp3",
+      "bytes": 53996,
+      "sha256": "6905178a13644d946beddbdf95aa690dbbe41444e9eeff0dfeefd31d080f4a29"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/act16main/m_bat2_act16main_intro.mp3": {
+      "path": "media/audio/6bbfb49b708ec3bc1d8c97eca5eeeb0499ced19065ab787616cce18ff1f0bf58.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/act16main/m_bat2_act16main_intro.mp3",
+      "bytes": 320826,
+      "sha256": "7887c502499136e9810d605b3c9ad454d00145f62c17a961b803234b600a76e6"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_yurodstvo.mp3": {
+      "path": "media/audio/0cce3399479957a27f8baf3bc690b427169f641694f69fa73494e0e65a40ce14.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_yurodstvo.mp3",
+      "bytes": 109676,
+      "sha256": "e129a04cf98c87b1b5c5f20c8b41a6c562e4475a742f8a9918602c8d42f86ebf"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_royalmemory_loop.mp3": {
+      "path": "media/audio/ce48b135a408e4c42d901d415b8f886a5a25139a66ecea67a0b0ba898662be36.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_royalmemory_loop.mp3",
+      "bytes": 2744989,
+      "sha256": "6c4c86525f626725afad32145491f04b61e9f7ee384e365989f6025fe09118f9"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/act16main/m_bat2_act16main_loop.mp3": {
+      "path": "media/audio/2431814f98c3a8ecf26e2f1960e8b330e084315bc981736bc141223e883eaad4.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/act16main/m_bat2_act16main_loop.mp3",
+      "bytes": 1920774,
+      "sha256": "838d7048ddfbac567f1d9d8fe3c33947aca6b21d95c57db458f507f8608ef091"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_slayblacksnake.mp3": {
+      "path": "media/audio/3b45652c53278977d8c46eba7239ab5965c321468f220b1a49481c1e4d6a998e.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_slayblacksnake.mp3",
+      "bytes": 50156,
+      "sha256": "a894ee63a83404a5b56441ac3e99dcaa66b5f01df29165389bfe80597fb29510"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_whip_normal.mp3": {
+      "path": "media/audio/85d755fc66d4d14ed79084710b6b4a7acefb2d74a39531601f2e1ebb23443a49.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_whip_normal.mp3",
+      "bytes": 9836,
+      "sha256": "0d28932f77f0e937c941d12b278c106ac8f6bc102b9fceeda755de7745e34a49"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_whip_heavy.mp3": {
+      "path": "media/audio/09420272260f07a46f426597d6987edac0bd0256e956fb2951ca1256bc2886d5.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_whip_heavy.mp3",
+      "bytes": 17708,
+      "sha256": "689825d07cfed60f5dff60a065708214de260960fc54716447953594c022add2"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m08kiki_loop.mp3": {
+      "path": "media/audio/e51e9edb5895e71c18a6d7727aa69087e1f0a1b4ddc6859122008fdd3e224e84.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m08kiki_loop.mp3",
+      "bytes": 2784696,
+      "sha256": "c6025df05f8d9a9d618a23b66a292e48c0511caa7435d6fe7cc7c640cc1863da"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m09serious_loop.mp3": {
+      "path": "media/audio/5a5e7fad8c600f0dded8181921e3b24522e8ae0fca1937e5882187c4eb55997e.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m09serious_loop.mp3",
+      "bytes": 4296872,
+      "sha256": "744c4f956e80ed247641d391a229c510a09db35536670589efb12dbc21748873"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowscream.mp3": {
+      "path": "media/audio/b44b2505c3bcf7f65d804056008608c51a60049c5acc84b6c01d44f673e793d2.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowscream.mp3",
+      "bytes": 30956,
+      "sha256": "eccc645331744a88b68ba7284bea6230a0af20af469e00a1f492c80a1751d2e5"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_holycrushice_magic_loop.mp3": {
+      "path": "media/audio/1cd7d9d1cfbaa92e96e67a2b67046c7557fc1b60fe01135e2117b61f21955d20.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_holycrushice_magic_loop.mp3",
+      "bytes": 80876,
+      "sha256": "6fb833b42ec08b41fc495d6a24cfd82995d628603fbb9e130811705a1595a121"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdmoan_weak_loop.mp3": {
+      "path": "media/audio/8fc95d5ea2e95f046b6c00f369308811d1a52fa7eb29aed2a65abe71fe886b12.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdmoan_weak_loop.mp3",
+      "bytes": 87404,
+      "sha256": "dc184da147dff0eca36c901268fa9f71cd610a60d9cc47698923f34d79ab9850"
+    },
+    "https://torappu.prts.wiki/assets/audio/avg/d_avg_militaryalert.mp3": {
+      "path": "media/audio/2bea33616314aacf5f06077c1f9f84fd3b82a864fcc8e490db63394d3aa275f3.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_militaryalert.mp3",
+      "bytes": 39788,
+      "sha256": "f81facfd28fb06ab22313ce01e97d37ce7b610152dcc151c58df6be13e007704"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_endingfareware_intro.mp3": {
+      "path": "media/audio/6b8ab75ecd4ea370f45f64bdbd9e665decf618fb4dc270d064c4b7a37867a386.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_endingfareware_intro.mp3",
+      "bytes": 96801,
+      "sha256": "fd3266974a109011977f59a2c56825c04d4b5b8a20084fb4b3d7b3a563594cb6"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_reunionnormal_intro.mp3": {
+      "path": "media/audio/ee94ba622edade8dde9e702c7b0d8ac5b8dcc5e19fc389f1806b570f957c7303.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_reunionnormal_intro.mp3",
+      "bytes": 310795,
+      "sha256": "582f173945f496d4b70904a93784fe2a299b219e6e4cb25731e705627460bfa5"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_reunionnormal_loop.mp3": {
+      "path": "media/audio/caeff9a05eb2b80588d7c476ac6d587a0accc0385d308d02a6c38f452efca5de.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_reunionnormal_loop.mp3",
+      "bytes": 2490870,
+      "sha256": "8614454490d68d5914c8367ffe55d4b146b810b75b1c81a7eb548dac6477defe"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m03jojo_loop.mp3": {
+      "path": "media/audio/4d3e216910be0035d57fd655eedcb169d45ceabf45385548aa4b1cadc1ff7416.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m03jojo_loop.mp3",
+      "bytes": 2417309,
+      "sha256": "96d7a12f22637ef3bd289c6223c40c8283e7bc076f61c1ea1e53af8517c6b561"
+    },
+    "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m04ojo_loop.mp3": {
+      "path": "media/audio/bfd99703b38df072b48744ab9f653ebef5d8cda7163c7b916a5aa099cab87481.mp3",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m04ojo_loop.mp3",
+      "bytes": 4476594,
+      "sha256": "22d6d118d0c5664a1757bf473f2274c12f5f384dc51dfeb24308fdf031c869f4"
     }
   },
   "references": {
@@ -14801,6 +15095,55 @@
     "audio:m_avg_regainhope_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_regainhope_loop.mp3",
     "audio:d_avg_communicationrequest": "https://torappu.prts.wiki/assets/audio/avg/d_avg_communicationrequest.mp3",
     "audio:m_sys_act18d3d0_intro": "https://torappu.prts.wiki/assets/audio/music/act18d3d0/m_sys_act18d3d0_intro.mp3",
-    "audio:m_sys_act18d3d0_loop": "https://torappu.prts.wiki/assets/audio/music/act18d3d0/m_sys_act18d3d0_loop.mp3"
+    "audio:m_sys_act18d3d0_loop": "https://torappu.prts.wiki/assets/audio/music/act18d3d0/m_sys_act18d3d0_loop.mp3",
+    "audio:d_avg_breakarrow": "https://torappu.prts.wiki/assets/audio/avg/d_avg_breakarrow.mp3",
+    "audio:nervous_g2_intro": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_nervous_g2_intro.mp3",
+    "audio:nervous_g2_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_nervous_g2_loop.mp3",
+    "audio:m_bat_talulha_intro": "https://torappu.prts.wiki/assets/audio/music/act14d0d0/m_bat_talulha_intro.mp3",
+    "audio:m_bat_talulha_loop": "https://torappu.prts.wiki/assets/audio/music/act14d0d0/m_bat_talulha_loop.mp3",
+    "audio:d_avg_crowdmarch_slow_loop": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdmarch_slow_loop.mp3",
+    "audio:d_avg_prisongate_close": "https://torappu.prts.wiki/assets/audio/avg/d_avg_prisongate_close.mp3",
+    "audio:d_avg_blacksnakecrawl": "https://torappu.prts.wiki/assets/audio/avg/d_avg_blacksnakecrawl.mp3",
+    "audio:d_avg_shakeprisongate": "https://torappu.prts.wiki/assets/audio/avg/d_avg_shakeprisongate.mp3",
+    "audio:d_avg_crowdcharge": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdcharge.mp3",
+    "audio:d_avg_punchwall": "https://torappu.prts.wiki/assets/audio/avg/d_avg_punchwall.mp3",
+    "audio:d_avg_animalrunstop": "https://torappu.prts.wiki/assets/audio/avg/d_avg_animalrunstop.mp3",
+    "audio:d_avg_putdownmedal": "https://torappu.prts.wiki/assets/audio/avg/d_avg_putdownmedal.mp3",
+    "audio:d_avg_pushmedal": "https://torappu.prts.wiki/assets/audio/avg/d_avg_pushmedal.mp3",
+    "audio:d_avg_swordinsertconsole": "https://torappu.prts.wiki/assets/audio/avg/d_avg_swordinsertconsole.mp3",
+    "audio:d_avg_OriginiumArts_fire_long": "https://torappu.prts.wiki/assets/audio/avg/d_avg_originiumarts_fire_long.mp3",
+    "audio:m_sys_act16main_intro": "https://torappu.prts.wiki/assets/audio/music/act16main/m_sys_act16main_intro.mp3",
+    "audio:m_sys_act16main_loop": "https://torappu.prts.wiki/assets/audio/music/act16main/m_sys_act16main_loop.mp3",
+    "audio:d_avg_helicopterpropeller_loop": "https://torappu.prts.wiki/assets/audio/avg/d_avg_helicopterpropeller_loop.mp3",
+    "audio:rebirth1_intro": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth1_intro.mp3",
+    "audio:rebirth1_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth1_loop.mp3",
+    "audio:d_avg_fallground_metalpipe": "https://torappu.prts.wiki/assets/audio/avg/d_avg_fallground_metalpipe.mp3",
+    "audio:d_avg_ironmelt_loop": "https://torappu.prts.wiki/assets/audio/avg/d_avg_ironmelt_loop.mp3",
+    "audio:rebirth2_intro": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth2_intro.mp3",
+    "audio:rebirth2_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_rebirth2_loop.mp3",
+    "audio:d_avg_crystalshatter_loop": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crystalshatter_loop.mp3",
+    "audio:d_avg_burnsword": "https://torappu.prts.wiki/assets/audio/avg/d_avg_burnsword.mp3",
+    "audio:d_avg_OriginiumArts_fire_short": "https://torappu.prts.wiki/assets/audio/avg/d_avg_originiumarts_fire_short.mp3",
+    "audio:d_avg_metaldaggerbreak_1": "https://torappu.prts.wiki/assets/audio/avg/d_avg_metaldaggerbreak_1.mp3",
+    "audio:d_avg_metaldaggerbreak_2": "https://torappu.prts.wiki/assets/audio/avg/d_avg_metaldaggerbreak_2.mp3",
+    "audio:d_avg_fallground_medal": "https://torappu.prts.wiki/assets/audio/avg/d_avg_fallground_medal.mp3",
+    "audio:royalmemory_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_royalmemory_loop.mp3",
+    "audio:m_bat2_act16main_intro": "https://torappu.prts.wiki/assets/audio/music/act16main/m_bat2_act16main_intro.mp3",
+    "audio:m_bat2_act16main_loop": "https://torappu.prts.wiki/assets/audio/music/act16main/m_bat2_act16main_loop.mp3",
+    "audio:d_avg_Yurodstvo": "https://torappu.prts.wiki/assets/audio/avg/d_avg_yurodstvo.mp3",
+    "audio:M09serious_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m09serious_loop.mp3",
+    "audio:M08kiki_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m08kiki_loop.mp3",
+    "audio:d_avg_slayblacksnake": "https://torappu.prts.wiki/assets/audio/avg/d_avg_slayblacksnake.mp3",
+    "audio:d_avg_whip_normal": "https://torappu.prts.wiki/assets/audio/avg/d_avg_whip_normal.mp3",
+    "audio:d_avg_whip_heavy": "https://torappu.prts.wiki/assets/audio/avg/d_avg_whip_heavy.mp3",
+    "audio:M04ojo_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m04ojo_loop.mp3",
+    "audio:d_avg_crowscream": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowscream.mp3",
+    "audio:d_avg_holycrushice_magic_loop": "https://torappu.prts.wiki/assets/audio/avg/d_avg_holycrushice_magic_loop.mp3",
+    "audio:d_avg_crowdmoan_weak_loop": "https://torappu.prts.wiki/assets/audio/avg/d_avg_crowdmoan_weak_loop.mp3",
+    "audio:d_avg_militaryalert": "https://torappu.prts.wiki/assets/audio/avg/d_avg_militaryalert.mp3",
+    "audio:m_avg_endingfareware_intro": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_endingfareware_intro.mp3",
+    "audio:ReunionNormal_intro": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_reunionnormal_intro.mp3",
+    "audio:ReunionNormal_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_reunionnormal_loop.mp3",
+    "audio:M03jojo_loop": "https://torappu.prts.wiki/assets/audio/music/avg/m_avg_m03jojo_loop.mp3"
   }
 }

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "totalStories": 2294,
+  "totalStories": 2323,
   "sources": {
-    "cn": "fe7d8d05edc36cf5678a24bfe9e84e891f6cf7ad",
+    "cn": "63c7cec73c3858d0ae913f85cc89af3cef4d744f",
     "global": "57010cb5b2afea112cae57daa756b58676ba6850"
   },
   "locales": {
     "zh-CN": {
-      "imported": 2046,
+      "imported": 2075,
       "reused": 2046,
       "preserved": 0,
       "missing": [
@@ -1755,16 +1755,16 @@
           "imported": 428
         },
         "event": {
-          "total": 1081,
-          "imported": 1080
+          "total": 1105,
+          "imported": 1104
         },
         "vignette": {
           "total": 132,
           "imported": 132
         },
         "operator": {
-          "total": 394,
-          "imported": 394
+          "total": 399,
+          "imported": 399
         },
         "roguelike": {
           "total": 36,
@@ -5992,6 +5992,209 @@
           "category": "roguelike",
           "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99276",
+          "title": "TL-1 庸俗的实践 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_01_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99278",
+          "title": "TL-2 孑遗的道路 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_02_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99279",
+          "title": "TL-1 庸俗的实践 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_01_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99281",
+          "title": "TL-2 孑遗的道路 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_02_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99282",
+          "title": "TL-3 苦难的历程 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_03_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99283",
+          "title": "TL-3 苦难的历程 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_03_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99285",
+          "title": "TL-4 刻板的争论 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_04_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99287",
+          "title": "TL-5 轰鸣的沉默 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_05_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99288",
+          "title": "TL-5 轰鸣的沉默 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_05_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99289",
+          "title": "TL-4 刻板的争论 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_04_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99291",
+          "title": "TL-6 元音的长度 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_06_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99292",
+          "title": "TL-6 元音的长度 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_06_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99293",
+          "title": "TL-7 滚烫的双眸 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_07_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99295",
+          "title": "TL-7 滚烫的双眸 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_07_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99296",
+          "title": "TL-8 潮湿的火焰 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_08_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99297",
+          "title": "TL-8 潮湿的火焰 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_08_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99299",
+          "title": "TL-9 自由的黄昏 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_09_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99302",
+          "title": "TL-10 活着的重量 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_10_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99303",
+          "title": "TL-9 自由的黄昏 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_09_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99304",
+          "title": "TL-10 活着的重量 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_10_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99306",
+          "title": "TL-ST-1 复生的奇迹",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st01",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99308",
+          "title": "TL-ST-3 孱弱的团结",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st03",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99309",
+          "title": "TL-ST-2 激越的灵魂",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st02",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99311",
+          "title": "TL-ST-4 年轻的未来",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st04",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99316",
+          "title": "国度/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_dminon_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99317",
+          "title": "夜半/干员密录/2",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_blkngt_2_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99319",
+          "title": "嘉辛塔/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_jcinta_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99320",
+          "title": "PhonoR-0/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_phonor_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99322",
+          "title": "裁度/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_talr_1_1",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -6001,7 +6204,7 @@
           "imported": 379
         },
         "event": {
-          "total": 1081,
+          "total": 1105,
           "imported": 871
         },
         "vignette": {
@@ -6009,7 +6212,7 @@
           "imported": 106
         },
         "operator": {
-          "total": 394,
+          "total": 399,
           "imported": 329
         },
         "roguelike": {
@@ -10238,6 +10441,209 @@
           "category": "roguelike",
           "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99276",
+          "title": "TL-1 庸俗的实践 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_01_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99278",
+          "title": "TL-2 孑遗的道路 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_02_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99279",
+          "title": "TL-1 庸俗的实践 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_01_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99281",
+          "title": "TL-2 孑遗的道路 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_02_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99282",
+          "title": "TL-3 苦难的历程 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_03_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99283",
+          "title": "TL-3 苦难的历程 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_03_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99285",
+          "title": "TL-4 刻板的争论 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_04_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99287",
+          "title": "TL-5 轰鸣的沉默 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_05_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99288",
+          "title": "TL-5 轰鸣的沉默 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_05_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99289",
+          "title": "TL-4 刻板的争论 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_04_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99291",
+          "title": "TL-6 元音的长度 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_06_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99292",
+          "title": "TL-6 元音的长度 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_06_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99293",
+          "title": "TL-7 滚烫的双眸 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_07_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99295",
+          "title": "TL-7 滚烫的双眸 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_07_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99296",
+          "title": "TL-8 潮湿的火焰 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_08_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99297",
+          "title": "TL-8 潮湿的火焰 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_08_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99299",
+          "title": "TL-9 自由的黄昏 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_09_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99302",
+          "title": "TL-10 活着的重量 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_10_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99303",
+          "title": "TL-9 自由的黄昏 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_09_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99304",
+          "title": "TL-10 活着的重量 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_10_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99306",
+          "title": "TL-ST-1 复生的奇迹",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st01",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99308",
+          "title": "TL-ST-3 孱弱的团结",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st03",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99309",
+          "title": "TL-ST-2 激越的灵魂",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st02",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99311",
+          "title": "TL-ST-4 年轻的未来",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st04",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99316",
+          "title": "国度/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_dminon_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99317",
+          "title": "夜半/干员密录/2",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_blkngt_2_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99319",
+          "title": "嘉辛塔/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_jcinta_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99320",
+          "title": "PhonoR-0/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_phonor_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99322",
+          "title": "裁度/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_talr_1_1",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -10247,7 +10653,7 @@
           "imported": 379
         },
         "event": {
-          "total": 1081,
+          "total": 1105,
           "imported": 871
         },
         "vignette": {
@@ -10255,7 +10661,7 @@
           "imported": 106
         },
         "operator": {
-          "total": 394,
+          "total": 399,
           "imported": 329
         },
         "roguelike": {
@@ -14617,6 +15023,209 @@
           "category": "roguelike",
           "scriptPath": "obt/roguelike/ro6/level_rogue6_ending_4",
           "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99276",
+          "title": "TL-1 庸俗的实践 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_01_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99278",
+          "title": "TL-2 孑遗的道路 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_02_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99279",
+          "title": "TL-1 庸俗的实践 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_01_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99281",
+          "title": "TL-2 孑遗的道路 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_02_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99282",
+          "title": "TL-3 苦难的历程 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_03_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99283",
+          "title": "TL-3 苦难的历程 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_03_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99285",
+          "title": "TL-4 刻板的争论 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_04_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99287",
+          "title": "TL-5 轰鸣的沉默 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_05_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99288",
+          "title": "TL-5 轰鸣的沉默 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_05_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99289",
+          "title": "TL-4 刻板的争论 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_04_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99291",
+          "title": "TL-6 元音的长度 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_06_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99292",
+          "title": "TL-6 元音的长度 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_06_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99293",
+          "title": "TL-7 滚烫的双眸 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_07_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99295",
+          "title": "TL-7 滚烫的双眸 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_07_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99296",
+          "title": "TL-8 潮湿的火焰 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_08_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99297",
+          "title": "TL-8 潮湿的火焰 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_08_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99299",
+          "title": "TL-9 自由的黄昏 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_09_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99302",
+          "title": "TL-10 活着的重量 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_10_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99303",
+          "title": "TL-9 自由的黄昏 行动后",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_09_end",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99304",
+          "title": "TL-10 活着的重量 行动前",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_10_beg",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99306",
+          "title": "TL-ST-1 复生的奇迹",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st01",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99308",
+          "title": "TL-ST-3 孱弱的团结",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st03",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99309",
+          "title": "TL-ST-2 激越的灵魂",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st02",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99311",
+          "title": "TL-ST-4 年轻的未来",
+          "category": "event",
+          "scriptPath": "activities/act55side/level_act55side_st04",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99316",
+          "title": "国度/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_dminon_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99317",
+          "title": "夜半/干员密录/2",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_blkngt_2_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99319",
+          "title": "嘉辛塔/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_jcinta_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99320",
+          "title": "PhonoR-0/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_phonor_1_1",
+          "reason": "no-upstream-summary"
+        },
+        {
+          "id": "prts-99322",
+          "title": "裁度/干员密录/1",
+          "category": "operator",
+          "scriptPath": "obt/memory/story_talr_1_1",
+          "reason": "no-upstream-summary"
         }
       ],
       "failed": [],
@@ -14626,7 +15235,7 @@
           "imported": 379
         },
         "event": {
-          "total": 1081,
+          "total": 1105,
           "imported": 852
         },
         "vignette": {
@@ -14634,7 +15243,7 @@
           "imported": 106
         },
         "operator": {
-          "total": 394,
+          "total": 399,
           "imported": 329
         },
         "roguelike": {

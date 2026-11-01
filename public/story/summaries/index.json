@@ -4,8 +4,8 @@
   "locales": {
     "zh-CN": {
       "path": "summaries/zh-CN.json",
-      "count": 2046,
-      "sourceCommit": "fe7d8d05edc36cf5678a24bfe9e84e891f6cf7ad"
+      "count": 2075,
+      "sourceCommit": "63c7cec73c3858d0ae913f85cc89af3cef4d744f"
     },
     "en": {
       "path": "summaries/en.json",
@@ -24,10 +24,10 @@
     },
     "zh-TW": {
       "path": "summaries/zh-TW.json",
-      "count": 2046,
+      "count": 2075,
       "sourceLocale": "zh-CN",
       "conversion": "opencc-cn-twp",
-      "sourceCommit": "fe7d8d05edc36cf5678a24bfe9e84e891f6cf7ad"
+      "sourceCommit": "63c7cec73c3858d0ae913f85cc89af3cef4d744f"
     }
   }
 }
