@@ -3,7 +3,7 @@
   "locales": {
     "en": {
       "imported": 1749,
-      "reused": 1734,
+      "reused": 1749,
       "missing": [
         {
           "id": "prts-13671",
@@ -2713,7 +2713,7 @@
     },
     "ja": {
       "imported": 1749,
-      "reused": 1734,
+      "reused": 1749,
       "missing": [
         {
           "id": "prts-13671",
@@ -5423,7 +5423,7 @@
     },
     "ko": {
       "imported": 1730,
-      "reused": 1715,
+      "reused": 1730,
       "missing": [
         {
           "id": "prts-13671",
