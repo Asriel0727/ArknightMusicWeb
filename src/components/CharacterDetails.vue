@@ -43,7 +43,7 @@
       <div class="operator-art-zone">
         <div class="operator-art" v-if="currentPortraitUrl">
           <img :src="currentPortraitUrl" :alt="character.name" decoding="async" fetchpriority="high"
-            @error="handlePortraitError" @load="handlePortraitLoad">
+            @error="handlePortraitError">
         </div>
         <div class="operator-skin-switcher" :class="{ expanded: isSkinSwitcherOpen }" v-if="allPortraits.length > 1">
           <button class="skin-switcher-toggle" type="button" :aria-expanded="isSkinSwitcherOpen"
@@ -589,7 +589,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCharacterAvatarUrls, getProxyImageUrl } from '../services/api.js';
+import { getCharacterAvatarUrls, getCharacterPortraitUrls, getProxyImageUrl } from '../services/api.js';
 import {
   getLocalOperatorAvatarUrl,
   getLocalModuleIconUrl,
@@ -1049,37 +1049,41 @@ const currentAvatarUrl = computed(() => {
 
 // 獲取立繪列表
 const allPortraits = computed(() => {
-  const list = [];
-  
-  console.log('[組件調試] character.portraits:', props.character.portraits);
-  
-  // 添加立繪
-  if (props.character.portraits && props.character.portraits.length > 0) {
-    props.character.portraits.forEach(p => {
-      console.log('[組件調試] 添加立繪:', p.name, 'URLs:', p.urls);
-      list.push({
-        name: p.name,
-        urls: p.urls,
-        skinId: p.skinId ?? null,
-        portraitId: p.portraitId || p.id || null,
-      });
-    });
-  }
-  
-  console.log('[組件調試] 最終allPortraits:', list);
-  
-  // 如果沒有從 API 解析出的立繪，就使用頭像多來源作為備用立繪
-  return list.length > 0 ? list : [{ name: t('character.portraitFallback'), urls: avatarUrls.value }];
+  void assetManifestVersion.value;
+  const operatorId = props.character?.id || '';
+  const list = (props.character?.portraits || []).map((portrait) => {
+    const portraitId = portrait?.portraitId || portrait?.id || portrait?.skinId || '';
+    const fallbackIds = portraitId.includes('_1') || portraitId.includes('#1')
+      ? [`${operatorId}_1`, `${operatorId}#1`]
+      : [];
+    const urls = [...new Set([
+      ...getCharacterPortraitUrls(operatorId, portraitId, fallbackIds),
+      ...(Array.isArray(portrait?.urls) ? portrait.urls : []),
+    ].filter(Boolean))];
+    return {
+      name: portrait?.name || t('character.portraitFallback'),
+      urls,
+      skinId: portrait?.skinId ?? null,
+      portraitId: portraitId || null,
+    };
+  });
+
+  // 詳情 API 尚未回傳立繪時，仍使用完整立繪候選；不要把頭像放大成主視覺。
+  if (list.length > 0) return list;
+  const fallbackPortraitId = operatorId ? `${operatorId}_1` : '';
+  return [{
+    name: t('character.portraitFallback'),
+    portraitId: fallbackPortraitId,
+    urls: operatorId
+      ? getCharacterPortraitUrls(operatorId, fallbackPortraitId, [`${operatorId}_1+`, `${operatorId}#1`])
+      : [],
+  }];
 });
 
 const currentPortraitUrl = computed(() => {
   const portrait = allPortraits.value[currentPortraitIndex.value];
-  if (!portrait || !portrait.urls) {
-    console.log('[組件調試] 當前立繪為空或無URLs');
-    return '';
-  }
+  if (!portrait || !portrait.urls?.length) return '';
   const url = portrait.urls[currentPortraitUrlIndex.value] || portrait.urls[0] || '';
-  console.log('[組件調試] 當前立繪URL:', url, '索引:', currentPortraitUrlIndex.value, '/', portrait.urls.length);
   return url ? getProxyImageUrl(url) : '';
 });
 
@@ -1103,12 +1107,10 @@ const hasHandbookContent = computed(() => {
 });
 
 const selectPortrait = (index) => {
-  console.log('[組件調試] 選擇立繪索引:', index);
   currentPortraitIndex.value = index;
   currentPortraitUrlIndex.value = 0; // 重置備用 URL 索引
   const portrait = allPortraits.value[index];
   emit('portrait-change', portrait?.portraitId || portrait?.skinId || String(index));
-  console.log('[組件調試] 重置URL索引為0');
 };
 
 const toggleStory = (index) => {
@@ -1235,49 +1237,25 @@ const portraitFailedDataUrl = () => {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 };
 
-const handlePortraitLoad = (event) => {
-  console.log('[組件調試] 立繪載入成功:', event?.target?.src);
-};
-
 const handlePortraitError = (event) => {
   const failedUrl = event.target.src;
-  console.log('[組件調試] 立繪載入失敗:', failedUrl);
-  
   const portrait = allPortraits.value[currentPortraitIndex.value];
-  console.log('[組件調試] 當前立繪索引:', currentPortraitIndex.value);
-  console.log('[組件調試] 當前立繪數據:', portrait);
-  console.log('[組件調試] 當前URL索引:', currentPortraitUrlIndex.value, '/', portrait?.urls?.length || 0);
-  
   if (portrait && portrait.urls) {
     // 檢查是否還有更多 URL 可以嘗試
     if (currentPortraitUrlIndex.value < portrait.urls.length - 1) {
       // 嘗試下一個備用 URL
       currentPortraitUrlIndex.value++;
       const nextUrl = portrait.urls[currentPortraitUrlIndex.value];
-      console.log('[組件調試] 嘗試下一個URL:', nextUrl, '索引:', currentPortraitUrlIndex.value, '/', portrait.urls.length);
-      
       if (nextUrl && nextUrl !== failedUrl) {
         event.target.src = getProxyImageUrl(nextUrl);
         return;
-        // 使用 nextTick 確保響應式更新
-        setTimeout(() => {
-          console.log('[組件調試] 設置新URL:', nextUrl);
-          // 先設置一個空白圖片，然後再設置新 URL，確保觸發載入
-          event.target.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-          setTimeout(() => {
-            event.target.src = nextUrl;
-          }, 50);
-        }, 100);
-        return; // 返回，不顯示佔位符
       }
     }
     
     // 所有 URL 都失敗，顯示佔位符
-    console.log('[組件調試] 所有URL都失敗，顯示佔位符。已嘗試:', currentPortraitUrlIndex.value + 1, '個URL');
     event.target.src = portraitFailedDataUrl();
   } else {
     // 沒有立繪數據
-    console.log('[組件調試] 沒有立繪數據');
     event.target.src = portraitFailedDataUrl();
   }
 };

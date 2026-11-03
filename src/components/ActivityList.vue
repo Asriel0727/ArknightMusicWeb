@@ -114,10 +114,12 @@
                       :key="operator.id || operator.name_i18n?.['zh-CN']"
                       class="pool-operator"
                       type="button"
-                      :disabled="!operator.id"
+                      :disabled="!resolveOperatorId(operator)"
+                      :title="resolveOperatorId(operator) ? '' : poolDetailCopy.operatorDataPending"
                       @click="viewOperator(operator)"
                     >
-                      <img v-if="operatorAvatarUrl(operator)" :src="operatorAvatarUrl(operator)" :alt="localizedOperatorName(operator)" loading="lazy">
+                      <img v-if="operatorAvatarUrl(operator)" :src="operatorAvatarUrl(operator)" :alt="localizedOperatorName(operator)" loading="lazy" @error="markOperatorImageFailed(operator)">
+                      <span v-else class="pool-operator-placeholder" :title="resolveOperatorId(operator) ? '' : poolDetailCopy.operatorDataPending"><i class="fas fa-image"></i></span>
                       <span class="pool-operator-copy">
                         <strong>{{ localizedOperatorName(operator) }}</strong>
                         <small>
@@ -154,6 +156,7 @@ import { useI18n } from 'vue-i18n';
 import { getActivityClassification } from '../data/activityCatalog.js';
 import { fetchActivities } from '../services/activityApi.js';
 import { getLocalActivityImageSource, getLocalActivityImageUrl, loadActivityAssetManifest } from '../services/activityAssetManifest.js';
+import { getCharacterAvatarUrls, getProxyImageUrl } from '../services/api.js';
 import { getLocalOperatorAvatarUrl, loadOperatorAssetManifest } from '../services/operatorAssetManifest.js';
 import { normalizeChineseMusicText } from '../utils/s2tApiText.js';
 
@@ -171,6 +174,7 @@ const error = ref('');
 const isStale = ref(false);
 const failedImageUrls = ref(new Set());
 const failedPoolImageUrls = ref(new Set());
+const failedOperatorImageIndexes = ref(new Map());
 const selectedActivity = ref(null);
 const cnOperatorNames = ref(new Map());
 
@@ -206,9 +210,9 @@ const TEXT = {
 };
 const copy = computed(() => TEXT[locale.value] || TEXT.en);
 const POOL_DETAIL_TEXT = {
-  'zh-TW': { openPool: '查看卡池', close: '關閉卡池資料', rateUpOperators: 'UP 幹員', primaryRateUp: '主要機率提升', secondaryRateUp: '額外機率提升', limited: '限定', noOperatorData: '目前沒有可顯示的幹員資料。' },
-  'zh-CN': { openPool: '查看卡池', close: '关闭卡池资料', rateUpOperators: 'UP 干员', primaryRateUp: '主要概率提升', secondaryRateUp: '额外概率提升', limited: '限定', noOperatorData: '目前没有可显示的干员资料。' },
-  en: { openPool: 'View banner', close: 'Close banner details', rateUpOperators: 'Rate-up Operators', primaryRateUp: 'Primary rate-up', secondaryRateUp: 'Secondary rate-up', limited: 'Limited', noOperatorData: 'No Operator data is available for this banner.' },
+  'zh-TW': { openPool: '查看卡池', close: '關閉卡池資料', rateUpOperators: 'UP 幹員', primaryRateUp: '主要機率提升', secondaryRateUp: '額外機率提升', limited: '限定', operatorDataPending: '資料待同步，暫時無法開啟', noOperatorData: '目前沒有可顯示的幹員資料。' },
+  'zh-CN': { openPool: '查看卡池', close: '关闭卡池资料', rateUpOperators: 'UP 干员', primaryRateUp: '主要概率提升', secondaryRateUp: '额外概率提升', limited: '限定', operatorDataPending: '资料待同步，暂时无法开启', noOperatorData: '目前没有可显示的干员资料。' },
+  en: { openPool: 'View banner', close: 'Close banner details', rateUpOperators: 'Rate-up Operators', primaryRateUp: 'Primary rate-up', secondaryRateUp: 'Secondary rate-up', limited: 'Limited', operatorDataPending: 'Data is pending; unavailable for now', noOperatorData: 'No Operator data is available for this banner.' },
 };
 const poolDetailCopy = computed(() => POOL_DETAIL_TEXT[locale.value] || POOL_DETAIL_TEXT.en);
 const POOL_TIMING_TEXT = {
@@ -446,8 +450,44 @@ function poolImageUrl(pool) {
 function markPoolImageFailed(url) {
   failedPoolImageUrls.value = new Set([...failedPoolImageUrls.value, String(url || '')]);
 }
+function normalizedOperatorName(value) {
+  return normalizeChineseMusicText(String(value || ''), 'zh-CN')
+    .toLocaleLowerCase()
+    .replace(/[\s\p{P}\p{S}_]+/gu, '');
+}
+function resolveOperatorId(operator) {
+  if (operator?.id) return String(operator.id);
+  const names = new Set(Object.values(operator?.name_i18n || {}).map(normalizedOperatorName).filter(Boolean));
+  if (!names.size) return '';
+  for (const [id, name] of cnOperatorNames.value) {
+    if (names.has(normalizedOperatorName(name))) return id;
+  }
+  return '';
+}
+function operatorImageKey(operator) {
+  return resolveOperatorId(operator) || String(localized(operator?.name_i18n) || 'unknown');
+}
+function operatorAvatarCandidates(operator) {
+  const operatorId = resolveOperatorId(operator);
+  if (!operatorId) return [];
+  return [...new Set([
+    getLocalOperatorAvatarUrl(operatorId),
+    operator?.avatarUrl,
+    ...getCharacterAvatarUrls(operatorId),
+  ].filter(Boolean))];
+}
 function operatorAvatarUrl(operator) {
-  return getLocalOperatorAvatarUrl(operator?.id);
+  const candidates = operatorAvatarCandidates(operator);
+  const failedIndex = failedOperatorImageIndexes.value.get(operatorImageKey(operator)) || 0;
+  const source = candidates[failedIndex];
+  return source ? getProxyImageUrl(source) : '';
+}
+function markOperatorImageFailed(operator) {
+  const key = operatorImageKey(operator);
+  const currentIndex = failedOperatorImageIndexes.value.get(key) || 0;
+  const nextIndexes = new Map(failedOperatorImageIndexes.value);
+  nextIndexes.set(key, currentIndex + 1);
+  failedOperatorImageIndexes.value = nextIndexes;
 }
 function openActivity(activity) {
   selectedActivity.value = activity;
@@ -456,8 +496,11 @@ function closeActivity() {
   selectedActivity.value = null;
 }
 function viewOperator(operator) {
+  const operatorId = resolveOperatorId(operator);
+  if (!operatorId) return;
   emit('view-character', {
     ...operator,
+    id: operatorId,
     name: localized(operator.name_i18n),
     avatarUrl: operatorAvatarUrl(operator),
   });
@@ -592,18 +635,27 @@ function formatRange(start, end) {
 async function loadActivities() {
   loading.value = true;
   error.value = '';
-  const needsFutureData = showFuture.value && server.value !== 'cn';
-  const [result, futureResult] = await Promise.all([
-    fetchActivities(server.value),
-    needsFutureData ? fetchActivities('cn') : Promise.resolve(null),
-    loadActivityAssetManifest(),
-    loadOperatorAssetManifest(),
-  ]);
-  activities.value = result.activities;
-  futureActivities.value = futureResult?.activities || [];
-  isStale.value = result.stale;
-  if (result.source === 'unavailable') error.value = copy.value.error;
-  loading.value = false;
+  try {
+    const needsFutureData = showFuture.value && server.value !== 'cn';
+    const [result, futureResult] = await Promise.all([
+      fetchActivities(server.value),
+      needsFutureData ? fetchActivities('cn') : Promise.resolve(null),
+    ]);
+    // 圖片 manifest 是增強資料，失敗時仍應保留活動與卡池文字資料。
+    await Promise.allSettled([
+      loadActivityAssetManifest(),
+      loadOperatorAssetManifest(),
+    ]);
+    activities.value = result.activities;
+    futureActivities.value = futureResult?.activities || [];
+    isStale.value = result.stale;
+    if (result.source === 'unavailable') error.value = copy.value.error;
+  } catch (loadError) {
+    console.error('Activity list load failed:', loadError);
+    error.value = copy.value.error;
+  } finally {
+    loading.value = false;
+  }
 }
 watch([server, showFuture], loadActivities);
 onMounted(loadActivities);
@@ -616,4 +668,5 @@ onMounted(loadActivities);
 .activity-open{display:block;width:100%;border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer}.activity-open:focus-visible{outline:2px solid var(--primary-color);outline-offset:-2px}.activity-open .activity-visual,.activity-open .activity-content{display:block}.activity-title{display:block;font-size:1.05rem;line-height:1.35}.activity-more{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:11px;border-top:1px solid rgba(255,255,255,.08);color:var(--primary-color);font-size:.76rem}.activity-dialog{width:min(920px,100%)}.activity-dialog-banner{display:block;width:100%;height:min(32vw,300px);min-height:190px;object-fit:cover;background:#0d1117}.activity-dialog-content{padding:24px}.activity-dialog-header{padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.1)}.activity-dialog-header>p{margin:0;color:var(--primary-color);font-size:.76rem}.activity-dialog-header h2{margin:5px 0 0;font-size:1.8rem}.activity-dialog-header .date-range{margin-top:10px}.activity-pools{margin-top:24px}.activity-pools>h3{margin:0 0 12px;color:var(--text-secondary);font-size:.82rem}.activity-pool-list{display:grid;gap:20px}.activity-pool-detail{overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#10151d}.activity-pool-detail .pool-dialog-banner{max-height:360px}.activity-pool-detail .pool-dialog-content h2{margin-bottom:18px}@media(max-width:700px){.activity-dialog-banner{height:190px}.activity-dialog-content{padding:16px}.activity-dialog-header h2{font-size:1.4rem}}
 .activity-type-badge{display:inline-flex;width:max-content;margin-top:8px;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:3px 7px;color:#b1bac4;font-size:.68rem;line-height:1}.activity-type-main_story{border-color:rgba(88,166,255,.55);color:#79c0ff;background:rgba(56,139,253,.12)}.activity-type-story{border-color:rgba(212,182,92,.5);color:#d4b65c;background:rgba(212,182,92,.1)}
 .pool-operator-group+.pool-operator-group{margin-top:16px}.pool-operator-group h4{margin:0 0 8px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.1);color:var(--text-secondary);font-size:.74rem;font-weight:600}.pool-operator-group:first-of-type h4{color:var(--primary-color)}
+.pool-operator-placeholder{display:grid;place-items:center;width:52px;height:52px;border-radius:7px;background:#202938;color:var(--text-secondary);font-size:1rem}
 </style>

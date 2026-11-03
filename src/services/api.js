@@ -1021,6 +1021,12 @@ export function getCharacterAvatarFallbackUrl(charId, index = 1) {
   return null;
 }
 
+/** 獲取角色立繪 URL 候選；本地 manifest 若已載入會優先於遠端來源。 */
+export function getCharacterPortraitUrls(charId, portraitId = `${charId}_1`, alternativeIds = []) {
+  if (!charId || !portraitId) return [];
+  return getLocalFirstPortraitUrls(charId, portraitId, alternativeIds);
+}
+
 // 清理描述中的特殊標籤並替換變量（保留換行，供前端 pre-line 顯示）
 function cleanDescription(text, blackboard = []) {
   if (!text) return '';
