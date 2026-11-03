@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-01T22:07:13.368Z",
+  "generatedAt": "2026-11-03T01:03:29.346Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -22,8 +22,8 @@
     "operators": 438,
     "avatars": {
       "total": 438,
-      "existing": 432,
-      "missing": 6
+      "existing": 438,
+      "missing": 0
     },
     "factions": {
       "total": 45,
@@ -37,8 +37,8 @@
     },
     "portraits": {
       "total": 1373,
-      "existing": 1356,
-      "missing": 17
+      "existing": 1373,
+      "missing": 0
     },
     "items": {
       "total": 87,
@@ -47,8 +47,8 @@
     },
     "skills": {
       "total": 911,
-      "existing": 896,
-      "missing": 15
+      "existing": 911,
+      "missing": 0
     },
     "modules": {
       "total": 511,
@@ -57,53 +57,12 @@
     }
   },
   "missing": {
-    "avatars": [
-      "public/images/operators/avatars/char_4244_tocka.png",
-      "public/images/operators/avatars/char_4246_dminon.png",
-      "public/images/operators/avatars/char_4247_oxi.png",
-      "public/images/operators/avatars/char_4245_alga.png",
-      "public/images/operators/avatars/char_4169_caledo.png",
-      "public/images/operators/avatars/char_4170_hdbell.png"
-    ],
+    "avatars": [],
     "factions": [],
     "classes": [],
-    "portraits": [
-      "public/images/operators/portraits/char_4244_tocka_1.png",
-      "public/images/operators/portraits/char_4244_tocka_2.png",
-      "public/images/operators/portraits/char_1045_svash2_sale_20-4605e70e.png",
-      "public/images/operators/portraits/char_4039_horn_epoque_59-3cd5e5ac.png",
-      "public/images/operators/portraits/char_4246_dminon_1.png",
-      "public/images/operators/portraits/char_4246_dminon_2.png",
-      "public/images/operators/portraits/char_4247_oxi_1.png",
-      "public/images/operators/portraits/char_4247_oxi_2.png",
-      "public/images/operators/portraits/char_4098_vvana_epoque_59-a05e9af0.png",
-      "public/images/operators/portraits/char_4162_cathy_kitchen_5-02d95cb6.png",
-      "public/images/operators/portraits/char_4245_alga_1.png",
-      "public/images/operators/portraits/char_4245_alga_2.png",
-      "public/images/operators/portraits/char_4169_caledo_1.png",
-      "public/images/operators/portraits/char_4169_caledo_2.png",
-      "public/images/operators/portraits/char_4178_alanna_race_3-f2c3e489.png",
-      "public/images/operators/portraits/char_4170_hdbell_1.png",
-      "public/images/operators/portraits/char_4170_hdbell_2.png"
-    ],
+    "portraits": [],
     "items": [],
-    "skills": [
-      "public/images/skills/skchr_alga_1.png",
-      "public/images/skills/skchr_alga_2.png",
-      "public/images/skills/skchr_caledo_1.png",
-      "public/images/skills/skchr_caledo_2.png",
-      "public/images/skills/skchr_dminon_1.png",
-      "public/images/skills/skchr_dminon_2.png",
-      "public/images/skills/skchr_dminon_3.png",
-      "public/images/skills/skchr_hdbell_1.png",
-      "public/images/skills/skchr_hdbell_2.png",
-      "public/images/skills/skchr_oxi_1.png",
-      "public/images/skills/skchr_oxi_2.png",
-      "public/images/skills/skchr_oxi_3.png",
-      "public/images/skills/skchr_tocka_1.png",
-      "public/images/skills/skchr_tocka_2.png",
-      "public/images/skills/skchr_tocka_3.png"
-    ],
+    "skills": [],
     "modules": [
       "public/images/modules/uniequip_002_veen.png",
       "public/images/modules/uniequip_002_tanya.png",
@@ -523,9 +482,8 @@
         "label": "冻河",
         "publicPath": "/images/operators/avatars/char_4244_tocka.png",
         "relativePath": "public/images/operators/avatars/char_4244_tocka.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/f/f4/%E5%A4%B4%E5%83%8F_%E5%86%BB%E6%B2%B3.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4244_tocka.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4244_tocka.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4244_tocka.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4244_tocka.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4244_tocka.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4244_tocka.png",
@@ -754,9 +712,8 @@
         "label": "国度",
         "publicPath": "/images/operators/avatars/char_4246_dminon.png",
         "relativePath": "public/images/operators/avatars/char_4246_dminon.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/a/ab/%E5%A4%B4%E5%83%8F_%E5%9B%BD%E5%BA%A6.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4246_dminon.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4246_dminon.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4246_dminon.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4246_dminon.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4246_dminon.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4246_dminon.png",
@@ -847,9 +804,8 @@
         "label": "塔露拉",
         "publicPath": "/images/operators/avatars/char_4247_oxi.png",
         "relativePath": "public/images/operators/avatars/char_4247_oxi.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/c/cb/%E5%A4%B4%E5%83%8F_%E5%A1%94%E9%9C%B2%E6%8B%89.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4247_oxi.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4247_oxi.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4247_oxi.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4247_oxi.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4247_oxi.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4247_oxi.png",
@@ -4367,9 +4323,8 @@
         "label": "奥尔佳",
         "publicPath": "/images/operators/avatars/char_4245_alga.png",
         "relativePath": "public/images/operators/avatars/char_4245_alga.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/b/b6/%E5%A4%B4%E5%83%8F_%E5%A5%A5%E5%B0%94%E4%BD%B3.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4245_alga.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4245_alga.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4245_alga.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4245_alga.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4245_alga.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4245_alga.png",
@@ -7565,9 +7520,8 @@
         "label": "镜匠",
         "publicPath": "/images/operators/avatars/char_4169_caledo.png",
         "relativePath": "public/images/operators/avatars/char_4169_caledo.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/7/7d/%E5%A4%B4%E5%83%8F_%E9%95%9C%E5%8C%A0.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4169_caledo.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4169_caledo.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4169_caledo.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4169_caledo.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4169_caledo.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4169_caledo.png",
@@ -9130,9 +9084,8 @@
         "label": "行铃",
         "publicPath": "/images/operators/avatars/char_4170_hdbell.png",
         "relativePath": "public/images/operators/avatars/char_4170_hdbell.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
-          "https://media.prts.wiki/6/62/%E5%A4%B4%E5%83%8F_%E8%A1%8C%E9%93%83.png",
           "https://arknights-recruit-api.molly27molly.workers.dev/api/recruit/image?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyuanyan3060%2FArknightsGameResource%2Fmain%2Favatar%2Fchar_4170_hdbell.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FArknightsAssets%2FArknightsAssets%2Fcn%2Fassets%2Ftorappu%2Fdynamicassets%2Farts%2Fcharavatars%2Fchar_4170_hdbell.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FAceship%2FArknight-Images%2Fmain%2Favatars%2Fchar_4170_hdbell.png&alt=https%3A%2F%2Fraw.githubusercontent.com%2FPuppiizSunniiz%2FArknight-Images%2Fmain%2Favatars%2Fchar_4170_hdbell.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/avatar/char_4170_hdbell.png",
           "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charavatars/char_4170_hdbell.png",
@@ -12759,7 +12712,7 @@
         "label": "冻河 - 冻河 Elite 1",
         "publicPath": "/images/operators/portraits/char_4244_tocka_1.png",
         "relativePath": "public/images/operators/portraits/char_4244_tocka_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4244_tocka_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4244_tocka_1.png",
@@ -12804,7 +12757,7 @@
         "label": "冻河 - 冻河 Elite 2",
         "publicPath": "/images/operators/portraits/char_4244_tocka_2.png",
         "relativePath": "public/images/operators/portraits/char_4244_tocka_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4244_tocka_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4244_tocka_2.png",
@@ -12899,7 +12852,7 @@
         "label": "凛御银灰 - 凛御银灰 - 雪覆伦城",
         "publicPath": "/images/operators/portraits/char_1045_svash2_sale_20-4605e70e.png",
         "relativePath": "public/images/operators/portraits/char_1045_svash2_sale_20-4605e70e.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1045_svash2_sale%2320.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1045_svash2_sale%2320.png",
@@ -13664,7 +13617,7 @@
         "label": "号角 - 号角 - 锋光初现",
         "publicPath": "/images/operators/portraits/char_4039_horn_epoque_59-3cd5e5ac.png",
         "relativePath": "public/images/operators/portraits/char_4039_horn_epoque_59-3cd5e5ac.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4039_horn_epoque%2359.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4039_horn_epoque%2359.png",
@@ -13784,7 +13737,7 @@
         "label": "国度 - 国度 Elite 1",
         "publicPath": "/images/operators/portraits/char_4246_dminon_1.png",
         "relativePath": "public/images/operators/portraits/char_4246_dminon_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4246_dminon_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4246_dminon_1.png",
@@ -13829,7 +13782,7 @@
         "label": "国度 - 国度 Elite 2",
         "publicPath": "/images/operators/portraits/char_4246_dminon_2.png",
         "relativePath": "public/images/operators/portraits/char_4246_dminon_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4246_dminon_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4246_dminon_2.png",
@@ -14164,7 +14117,7 @@
         "label": "塔露拉 - 塔露拉 Elite 1",
         "publicPath": "/images/operators/portraits/char_4247_oxi_1.png",
         "relativePath": "public/images/operators/portraits/char_4247_oxi_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4247_oxi_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4247_oxi_1.png",
@@ -14209,7 +14162,7 @@
         "label": "塔露拉 - 塔露拉 Elite 2",
         "publicPath": "/images/operators/portraits/char_4247_oxi_2.png",
         "relativePath": "public/images/operators/portraits/char_4247_oxi_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4247_oxi_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4247_oxi_2.png",
@@ -23149,7 +23102,7 @@
         "label": "薇薇安娜 - 薇薇安娜 - 还愿礼",
         "publicPath": "/images/operators/portraits/char_4098_vvana_epoque_59-a05e9af0.png",
         "relativePath": "public/images/operators/portraits/char_4098_vvana_epoque_59-a05e9af0.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4098_vvana_epoque%2359.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4098_vvana_epoque%2359.png",
@@ -27554,7 +27507,7 @@
         "label": "凯瑟琳 - 凯瑟琳 - 暖冬教室",
         "publicPath": "/images/operators/portraits/char_4162_cathy_kitchen_5-02d95cb6.png",
         "relativePath": "public/images/operators/portraits/char_4162_cathy_kitchen_5-02d95cb6.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4162_cathy_kitchen%235.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4162_cathy_kitchen%235.png",
@@ -30049,7 +30002,7 @@
         "label": "奥尔佳 - 奥尔佳 Elite 1",
         "publicPath": "/images/operators/portraits/char_4245_alga_1.png",
         "relativePath": "public/images/operators/portraits/char_4245_alga_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4245_alga_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4245_alga_1.png",
@@ -30094,7 +30047,7 @@
         "label": "奥尔佳 - 奥尔佳 Elite 2",
         "publicPath": "/images/operators/portraits/char_4245_alga_2.png",
         "relativePath": "public/images/operators/portraits/char_4245_alga_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4245_alga_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4245_alga_2.png",
@@ -43604,7 +43557,7 @@
         "label": "镜匠 - 镜匠 Elite 1",
         "publicPath": "/images/operators/portraits/char_4169_caledo_1.png",
         "relativePath": "public/images/operators/portraits/char_4169_caledo_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4169_caledo_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4169_caledo_1.png",
@@ -43649,7 +43602,7 @@
         "label": "镜匠 - 镜匠 Elite 2",
         "publicPath": "/images/operators/portraits/char_4169_caledo_2.png",
         "relativePath": "public/images/operators/portraits/char_4169_caledo_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4169_caledo_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4169_caledo_2.png",
@@ -43814,7 +43767,7 @@
         "label": "阿兰娜 - 阿兰娜 - 赤土拉力",
         "publicPath": "/images/operators/portraits/char_4178_alanna_race_3-f2c3e489.png",
         "relativePath": "public/images/operators/portraits/char_4178_alanna_race_3-f2c3e489.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4178_alanna_race%233.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4178_alanna_race%233.png",
@@ -50489,7 +50442,7 @@
         "label": "行铃 - 行铃 Elite 1",
         "publicPath": "/images/operators/portraits/char_4170_hdbell_1.png",
         "relativePath": "public/images/operators/portraits/char_4170_hdbell_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4170_hdbell_1.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4170_hdbell_1.png",
@@ -50534,7 +50487,7 @@
         "label": "行铃 - 行铃 Elite 2",
         "publicPath": "/images/operators/portraits/char_4170_hdbell_2.png",
         "relativePath": "public/images/operators/portraits/char_4170_hdbell_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_4170_hdbell_2.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_4170_hdbell_2.png",
@@ -55989,7 +55942,7 @@
         "label": "交叉施压",
         "publicPath": "/images/skills/skchr_alga_1.png",
         "relativePath": "public/images/skills/skchr_alga_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_alga_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_alga_1.png",
@@ -56021,7 +55974,7 @@
         "label": "只为我的答案",
         "publicPath": "/images/skills/skchr_alga_2.png",
         "relativePath": "public/images/skills/skchr_alga_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_alga_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_alga_2.png",
@@ -59317,7 +59270,7 @@
         "label": "无公差切割",
         "publicPath": "/images/skills/skchr_caledo_1.png",
         "relativePath": "public/images/skills/skchr_caledo_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_caledo_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_caledo_1.png",
@@ -59349,7 +59302,7 @@
         "label": "“多面镜”",
         "publicPath": "/images/skills/skchr_caledo_2.png",
         "relativePath": "public/images/skills/skchr_caledo_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_caledo_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_caledo_2.png",
@@ -61941,7 +61894,7 @@
         "label": "停步",
         "publicPath": "/images/skills/skchr_dminon_1.png",
         "relativePath": "public/images/skills/skchr_dminon_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_dminon_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_dminon_1.png",
@@ -61973,7 +61926,7 @@
         "label": "受戮",
         "publicPath": "/images/skills/skchr_dminon_2.png",
         "relativePath": "public/images/skills/skchr_dminon_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_dminon_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_dminon_2.png",
@@ -62005,7 +61958,7 @@
         "label": "无人的国度",
         "publicPath": "/images/skills/skchr_dminon_3.png",
         "relativePath": "public/images/skills/skchr_dminon_3.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_dminon_3.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_dminon_3.png",
@@ -65909,7 +65862,7 @@
         "label": "花椰菜冲击",
         "publicPath": "/images/skills/skchr_hdbell_1.png",
         "relativePath": "public/images/skills/skchr_hdbell_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_hdbell_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_hdbell_1.png",
@@ -65941,7 +65894,7 @@
         "label": "蔬菜大拼盘",
         "publicPath": "/images/skills/skchr_hdbell_2.png",
         "relativePath": "public/images/skills/skchr_hdbell_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_hdbell_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_hdbell_2.png",
@@ -73493,7 +73446,7 @@
         "label": "照霎白夜",
         "publicPath": "/images/skills/skchr_oxi_1.png",
         "relativePath": "public/images/skills/skchr_oxi_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_oxi_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_oxi_1.png",
@@ -73525,7 +73478,7 @@
         "label": "阂断骤雪",
         "publicPath": "/images/skills/skchr_oxi_2.png",
         "relativePath": "public/images/skills/skchr_oxi_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_oxi_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_oxi_2.png",
@@ -73557,7 +73510,7 @@
         "label": "日冕重烈",
         "publicPath": "/images/skills/skchr_oxi_3.png",
         "relativePath": "public/images/skills/skchr_oxi_3.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_oxi_3.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_oxi_3.png",
@@ -80533,7 +80486,7 @@
         "label": "一无所有之人",
         "publicPath": "/images/skills/skchr_tocka_1.png",
         "relativePath": "public/images/skills/skchr_tocka_1.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_tocka_1.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_tocka_1.png",
@@ -80565,7 +80518,7 @@
         "label": "意欲呼啸之心",
         "publicPath": "/images/skills/skchr_tocka_2.png",
         "relativePath": "public/images/skills/skchr_tocka_2.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_tocka_2.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_tocka_2.png",
@@ -80597,7 +80550,7 @@
         "label": "踽踽独行之春",
         "publicPath": "/images/skills/skchr_tocka_3.png",
         "relativePath": "public/images/skills/skchr_tocka_3.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/skills/skchr_tocka_3.png",
           "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/skills/skchr_tocka_3.png",
