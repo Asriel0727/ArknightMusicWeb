@@ -2,15 +2,9 @@
   <main class="story-page" :class="{ 'archive-console': screen !== 'player' }" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
     <header class="story-heading">
       <div>
-        <p class="eyebrow">{{ screen === 'player' ? `STORY / ${manifest?.storyId || selectedStory?.page || 'PRTS'}` : 'TERRA / FILM ARCHIVE' }}</p>
+        <p v-if="screen === 'player'" class="eyebrow">{{ `STORY / ${manifest?.storyId || selectedStory?.page || 'PRTS'}` }}</p>
         <h1 ref="screenHeading" tabindex="-1">{{ screen === 'player' ? localize(manifest?.title || selectedStory?.title) : screen === 'episodes' ? localize(activeCollection?.label) : labels.archive }}</h1>
         <p v-if="screen === 'player'">{{ labels.subtitle }}</p>
-        <div v-else class="console-status" :class="{ 'needs-attention': progressStorageFailed || ['expired', 'offline', 'unavailable', 'error'].includes(progressStatus) }" :aria-label="t('storyProgress.title')">
-          <span class="console-status-light" aria-hidden="true"></span>
-          <span v-if="progressOwner">{{ t('storyProgress.account', { name: authState.session?.user?.loginKey || progressOwner }) }} · </span>
-          <span role="status">{{ t('storyProgress.' + progressStatus) }}</span>
-          <span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span>
-        </div>
       </div>
       <div v-if="screen !== 'player'" ref="archiveTools" class="heading-actions console-utilities" @keydown.esc.stop.prevent="closeArchiveTools(true)">
         <button v-if="screen === 'episodes'" class="archive-back" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button>
@@ -26,6 +20,12 @@
         <details class="console-more" name="archive-tools">
           <summary :aria-label="consoleLabels.more" :title="consoleLabels.more"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></summary>
           <div class="console-more-panel">
+            <div class="console-status" :class="{ 'needs-attention': progressStorageFailed || ['expired', 'offline', 'unavailable', 'error'].includes(progressStatus) }" :aria-label="t('storyProgress.title')">
+              <span class="console-status-light" aria-hidden="true"></span>
+              <span v-if="progressOwner">{{ t('storyProgress.account', { name: authState.session?.user?.loginKey || progressOwner }) }}</span>
+              <span role="status">{{ t('storyProgress.' + progressStatus) }}</span>
+              <span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span>
+            </div>
             <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)"><i class="fas fa-sync-alt" aria-hidden="true"></i>{{ t('storyProgress.retry') }}</button>
             <a href="https://prts.wiki/w/剧情一览" target="_blank" rel="noopener noreferrer">{{ consoleLabels.source }} <span aria-hidden="true">↗</span></a>
           </div>
@@ -46,6 +46,9 @@
       <div class="projection-controls" @keydown.esc="advancedFilters = false">
       <div class="archive-toolbar">
         <div class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
+        <button v-if="screen === 'collections' && viewMode !== 'sequence' && lastOpened" type="button" class="filter-toggle" @click="openLibraryStory(lastOpened)">
+          {{ locale === 'zh-TW' ? '接續閱讀' : locale === 'zh-CN' ? '继续阅读' : 'Continue reading' }} →
+        </button>
 
         <span v-if="screen === 'episodes'">{{ completedCount }} / {{ groupStories.length }} {{ labels.read }}</span>
         <label v-if="viewMode !== 'sequence'" class="console-search"><i class="fas fa-search" aria-hidden="true"></i><input v-if="screen === 'collections'" v-model="search" type="search" :placeholder="labels.search" :aria-label="labels.search"><input v-else v-model="episodeSearch" type="search" :placeholder="labels.searchEpisodes" :aria-label="labels.searchEpisodes"></label>
@@ -64,7 +67,6 @@
         <label class="console-filter"><span>{{ labels.phase }}</span><select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select></label>
       </div>
       <div v-else class="reading-plan-heading">
-        <label v-if="screen === 'collections'">{{ labels.readingPath }}<select v-model="readingLineId" @change="guideTrail = []"><option v-for="line in archiveMetadata.lines || []" :key="line.id" :value="line.id">{{ localize(line.name) }}</option></select></label>
         <details class="compact-note"><summary>{{ mediaLabels.context }}</summary><p>{{ screen === 'collections' ? localize(readingGuideIntro(readingLineId)) : groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</p></details>
       </div>
       <div v-if="viewMode === 'sequence'" class="guide-tools">
@@ -86,6 +88,14 @@
       </div>
       <p v-if="viewMode !== 'sequence'" class="archive-breadcrumb">{{ screen === 'episodes' ? categoryLabel(activeCollection?.category) : selectedCategory ? categoryLabel(selectedCategory) : labels.allCategories }}<template v-if="screen === 'collections' && selectedSection"> / {{ localize(selectedSection) }}</template><template v-if="screen === 'episodes'"> / {{ localize(activeCollection?.label) }}</template><template v-if="screen === 'episodes' && selectedPhase"> / {{ labels.phases[selectedPhase] }}</template></p>
       </div>
+      <div class="story-line-layout" :class="{ 'with-line-rail': screen === 'collections' && viewMode === 'sequence' }">
+      <nav v-if="screen === 'collections' && viewMode === 'sequence'" class="story-line-rail" :aria-label="labels.storyLines">
+        <button v-for="line in archiveMetadata.lines || []" :key="line.id" type="button"
+          :aria-pressed="readingLineId === line.id" @click="readingLineId = line.id; guideTrail = []">
+          <img v-if="lineCover(line)" :src="coverPath(lineCover(line))" alt="" loading="lazy">
+          <span><small>{{ line.id }}</small><strong>{{ localize(line.name) }}</strong></span>
+        </button>
+      </nav>
       <div v-if="rackEntries.length" class="story-rack-shell">
         <div ref="rackElement" class="story-rack" :class="{ dragging: rackDragging, moving: rackAnimating }" :style="{ '--film-position': `${-rackIndex * rackStep + rackDragOffset}px` }" tabindex="0" role="region" aria-roledescription="carousel" :aria-label="labels.selectStory"
           @keydown.left.prevent="moveRack(-1, true)" @keydown.right.prevent="moveRack(1, true)" @keydown.home.prevent="seekRack(0)" @keydown.end.prevent="seekRack(rackEntries.length - 1)" @keydown.enter.self.prevent="activateRackCard(rackIndex)" @keydown.space.self.prevent="activateRackCard(rackIndex)"
@@ -94,12 +104,29 @@
           <div class="rack-horizon" aria-hidden="true"></div>
           <div class="film-perforations film-perforations-top" aria-hidden="true"></div><div class="film-perforations film-perforations-bottom" aria-hidden="true"></div>
           <div class="rack-line-label">{{ localize(viewMode === 'sequence' ? rackActive?.act || activeCollection?.label : rackActive?.lineName || activeCollection?.lineName) }}</div>
-          <button v-for="item in visibleRackEntries" :key="item.key" type="button" class="rack-card" :class="{ active: item.index === rackIndex }" :style="rackCardStyle(item.index)" :tabindex="item.index === rackIndex ? 0 : -1" :aria-label="localize(item.label)" @keydown.enter.stop.prevent="activateRackCard(item.index)" @keydown.space.stop.prevent="activateRackCard(item.index)" @click="activateRackCard(item.index)">
+          <template v-if="screen === 'collections' && viewMode === 'sequence'">
+            <template v-for="item in visibleRackEntries" :key="'junction-' + item.key">
+              <div v-for="(links, side) in [item.prerequisites, item.branches]" v-show="links.length"
+                :key="side" class="rack-junction" :style="{ ...rackCardStyle(item.index + (side ? .5 : -.5)), zIndex: 21 }">
+                <button v-for="link in links" :key="link.group" type="button" :disabled="link.missing || !link.routeId"
+                  :tabindex="item.index === rackIndex ? 0 : -1" @click="visitGuide(link.routeId, link.group, item.group)">
+                  ◇ {{ localize(link.group) }} ↗
+                </button>
+              </div>
+            </template>
+          </template>
+          <button v-for="item in visibleRackEntries" :key="item.key" type="button" class="rack-card" :class="{ active: item.index === rackIndex, 'rack-bridge': item.isBridge }" :style="rackCardStyle(item.index)" :tabindex="item.index === rackIndex ? 0 : -1" :aria-label="localize(item.label)" @keydown.enter.stop.prevent="activateRackCard(item.index)" @keydown.space.stop.prevent="activateRackCard(item.index)" @click="activateRackCard(item.index)">
             <span class="rack-art" :class="{ 'operator-portrait': item.operatorPortrait }"><img :src="item.operatorPortrait ? root + item.operatorPortrait : coverPath(item.cover)" :data-original-src="item.cover" :data-story-cover="coverPath(item.cover)" alt="" draggable="false" :loading="Math.abs(item.index - rackIndex) <= 1 ? 'eager' : 'lazy'" decoding="async" @error="handleCoverError"><span class="rack-number">{{ item.orderLabel }}</span></span>
             <span class="rack-caption"><small>{{ localize(item.subtitle) }}</small><strong>{{ localize(item.label) }}</strong><span v-if="screen === 'episodes'" class="reading-status" :class="{ read: completedStories[item.id] }">{{ completedStories[item.id] ? '✓ ' + labels.read : labels.unread }}</span><span v-if="screen === 'collections' && !item.missing" class="collection-open">{{ item.count }} {{ labels.stories }}</span><span class="rack-open">{{ item.missing ? labels.notCollected : screen === 'collections' ? labels.browseEpisodes : labels.playStory }} <span v-if="!item.missing" aria-hidden="true">→</span></span></span>
           </button>
         </div>
-        <section v-if="viewMode === 'sequence' && rackActive" class="reading-detail" aria-live="polite">
+        <div v-if="viewMode === 'sequence' && rackActive" class="archive-chapter-summary">
+          <div><small>{{ localize(readingLineName) }}</small><strong>{{ localize(rackActive.label) }}</strong></div>
+          <p>{{ screen === 'collections' ? localize(rackActive.note) : labels.chooseEpisode }}</p>
+          <button type="button" :disabled="rackActive.missing" @click="activateRackCard(rackIndex)">{{ screen === 'collections' ? labels.browseEpisodes : labels.playStory }} →</button>
+        </div>
+        <details v-if="viewMode === 'sequence' && rackActive" class="reading-detail">
+          <summary>{{ labels.branchReading }} · {{ mediaLabels.context }}</summary>
           <template v-if="screen === 'collections'">
             <div class="reading-detail-title"><span>{{ localize(rackActive.role) }}</span><strong>{{ localize(rackActive.act) }}</strong><small>{{ labels.routeStation }} {{ rackIndex + 1 }} / {{ rackEntries.length }}</small></div>
             <details class="compact-note guide-description"><summary>{{ mediaLabels.context }}</summary><p>{{ localize(rackActive.note) }}</p></details>
@@ -129,11 +156,12 @@
             <a class="guide-source" :href="readingGuideSource" target="_blank" rel="noopener noreferrer">{{ labels.guideSource }} ↗</a>
           </template>
           <template v-else><p>{{ rackActive.phase === 'branch' ? labels.branchNote : labels.segmentNote }}</p><div class="reading-neighbors"><span>{{ labels.readBefore }}：{{ localize(groupStories[Number(episodeNumber(rackActive)) - 2]?.title) || labels.routeStart }}</span><span>{{ labels.readAfter }}：{{ localize(groupStories[Number(episodeNumber(rackActive))]?.title) || labels.routeEnd }}</span></div></template>
-        </section>
+        </details>
         <div class="rack-navigation"><button type="button" :disabled="rackIndex === 0" :aria-label="labels.previousReel" @click="moveRack(-1)">←</button><span aria-live="polite">{{ rackIndex + 1 }} <small>/ {{ rackEntries.length }}</small></span><button type="button" :disabled="rackIndex + 1 >= rackEntries.length" :aria-label="labels.nextReel" @click="moveRack(1)">→</button></div>
         <div class="rack-scrubber"><span>{{ labels.swipeHint }}</span><input v-if="rackEntries.length > 1" :value="rackIndex" @input="scrubRack" type="range" min="0" :max="rackEntries.length - 1" :aria-label="labels.selectStory" :aria-valuetext="localize(rackActive?.label)"></div>
       </div>
       <p v-else class="library-empty">{{ labels.noResults }}</p>
+      </div>
       <p class="progress-note">{{ t('storyProgress.completionNote') }}</p>
     </section>
 
@@ -318,7 +346,7 @@ function storedPreference(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 }
 function savePreference(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* Reading works when storage is disabled. */ } }
-const savedView = storedPreference('story-archive-view-v2', 'banner');
+const savedView = storedPreference('story-archive-view-v3', 'sequence');
 copies['zh-TW'].views = { banner: '劇情典藏', sequence: '敘事脈絡' };
 copies['zh-CN'].views = { banner: '剧情典藏', sequence: '叙事脉络' };
 copies.en.views = { banner: 'Story Archive', sequence: 'Narrative Paths' };
@@ -350,7 +378,7 @@ const readingLineId = ref('MS');
 const readingOffset = ref(0);
 const archiveMetadata = ref({});
 const { completed: completedStories, owner: progressOwner, status: progressStatus, syncing: progressSyncing, storageFailed: progressStorageFailed, importCount: progressImportCount, markCompleted, importGuest: importGuestProgress, sync: syncReadingProgress } = useStoryReadingProgress();
-watch(viewMode, value => savePreference('story-archive-view-v2', value));
+watch(viewMode, value => savePreference('story-archive-view-v3', value));
 const screen = ref('collections');
 const activeCollection = ref(null);
 const catalogError = ref('');
@@ -404,6 +432,10 @@ const availableLines = computed(() => {
 const readingRoute = computed(() => buildReadingRoute(archiveMetadata.value.lines?.find(line => line.id === readingLineId.value), allCollections.value, archiveMetadata.value.lines || []));
 const guideTrail = ref([]);
 const readingLineName = computed(() => archiveMetadata.value.lines?.find(line => line.id === readingLineId.value)?.name || '');
+function lineCover(line) {
+  return allCollections.value.find(collection => collection.storyLine === line.id && collection.cover)?.cover
+    || allCollections.value.find(collection => line.groups?.includes(collection.group) && collection.cover)?.cover;
+}
 const activeGuideNode = computed(() => readingRoute.value.find(node => node.group === activeCollection.value?.group));
 const nextGuideNode = computed(() => {
   if (viewMode.value !== 'sequence' || !activeGuideNode.value || activeGuideNode.value.independent) return null;
@@ -426,9 +458,9 @@ async function showGuide(id, group) {
   readingOffset.value = Math.max(0, readingRoute.value.findIndex(node => node.group === group));
   focusScreenHeading();
 }
-function visitGuide(id, group) {
+function visitGuide(id, group, origin = rackActive.value?.group || activeCollection.value?.group) {
   if (!id) return;
-  guideTrail.value.push({ line: readingLineId.value, group: rackActive.value?.group || activeCollection.value?.group });
+  guideTrail.value.push({ line: readingLineId.value, group: origin });
   showGuide(id, group);
 }
 function returnToGuide() {
@@ -448,10 +480,20 @@ const groups = computed(() => {
 });
 const filteredCollections = computed(() => {
   const query = search.value.trim().toLowerCase();
-  return groups.value.filter(collection => (!selectedCollectionFilter.value || collection.key === selectedCollectionFilter.value) && (!query || [collection.label, ...collection.stories.map(story => `${story.title} ${story.group} ${story.page}`)].some(text => text.toLowerCase().includes(query) || localize(text).toLowerCase().includes(query))));
+  return groups.value.filter(collection => (!selectedCollectionFilter.value || collection.key === selectedCollectionFilter.value) && (!query || [collection.label, ...collection.stories.map(story => `${story.title} ${story.group} ${story.page} ${story.storyCode || ''}`)].some(text => text.toLowerCase().includes(query) || localize(text).toLowerCase().includes(query))));
 });
 const groupStories = computed(() => catalog.value.filter(story => groupKey(story) === selectedGroup.value).sort(compareStoryOrder));
 const completedCount = computed(() => groupStories.value.filter(story => completedStories.value[story.id]).length);
+const lastOpenedId = ref(storedPreference('story-library-last-opened', ''));
+const lastOpened = computed(() => catalog.value.find(story => story.id === lastOpenedId.value));
+function openLibraryStory(story) {
+  if (screen.value === 'collections') {
+    const collection = allCollections.value.find(item => item.key === groupKey(story));
+    if (!collection) return;
+    openCollection(collection);
+  }
+  selectStoryId(story.id);
+}
 function episodeNumber(story) { return String(groupStories.value.findIndex(entry => entry.id === story?.id) + 1).padStart(3, '0'); }
 const previousStory = computed(() => groupStories.value[groupStories.value.findIndex(story => story.id === selectedStoryId.value) - 1]);
 const nextStory = computed(() => groupStories.value[groupStories.value.findIndex(story => story.id === selectedStoryId.value) + 1]);
@@ -497,7 +539,7 @@ let rackWheelDelta = 0;
 function rackCardStyle(index) {
   const offset = index - rackIndex.value;
   const distance = Math.abs(offset + rackDragOffset.value / rackStep.value);
-  return { '--rack-x': `${offset * rackStep.value + rackDragOffset.value}px`, '--rack-scale': 1 - Math.min(1, distance) * .05, '--rack-turn': '0deg', '--rack-depth': '0px', '--rack-brightness': Math.max(.6, 1 - distance * .12), zIndex: 10 - distance };
+  return { '--rack-x': `${offset * rackStep.value + rackDragOffset.value}px`, '--rack-scale': 1 - Math.min(1, distance) * .20, '--rack-turn': '0deg', '--rack-depth': '0px', '--rack-brightness': Math.max(.6, 1 - distance * .12), zIndex: 10 - distance };
 }
 function rackPosition() { return rackIndex.value - rackDragOffset.value / rackStep.value; }
 function clampRack(position) { return Math.max(0, Math.min(rackEntries.value.length - 1, position)); }
@@ -542,6 +584,10 @@ function activateRackCard(index) {
   if (index !== rackIndex.value) { seekRack(index); return; }
   const entry = rackActive.value;
   if (!entry || entry.missing) return;
+  if (viewMode.value === 'sequence' && screen.value === 'collections' && entry.isBridge && entry.relatedLine) {
+    visitGuide(entry.relatedLine, entry.group, entry.group);
+    return;
+  }
   if (screen.value === 'collections') openCollection(entry.collectionKey ? allCollections.value.find(collection => collection.key === entry.collectionKey) : entry);
   else selectStoryId(entry.id);
 }
@@ -1191,6 +1237,8 @@ async function loadStory() {
 function selectStoryId(id) {
   if (screen.value === 'player' && selectedStoryId.value === id) return;
   selectedStoryId.value = id;
+  lastOpenedId.value = id;
+  savePreference('story-library-last-opened', id);
   screen.value = 'player';
   loadStory();
   focusScreenHeading();
@@ -1305,7 +1353,57 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.story-page{width:min(1180px,calc(100% - 32px));margin:18px auto 60px;color:#f4f7fa}
+.story-line-layout.with-line-rail {
+  display: grid;
+  grid-template-columns: clamp(96px, 20%, 210px) minmax(0, 1fr);
+  gap: 12px;
+}
+.story-line-rail {
+  max-height: min(430px, 58vh);
+  overflow-y: auto;
+  align-self: start;
+  border-inline-start: 1px solid #716951;
+}
+.story-line-rail button, .rack-junction button {
+  display: grid;
+  gap: 4px;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid transparent;
+  background: #131c26;
+  color: #e1eaf0;
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
+}
+.story-line-rail button { width: 100%; overflow-wrap: anywhere; }
+.story-line-rail button[aria-pressed="true"], .rack-junction button { border-color: #9a865e; color: #f4dfb6; }
+.story-line-rail small { font-size: .65rem; }
+.rack-junction {
+  position: absolute;
+  top: 35px;
+  left: 50%;
+  display: grid;
+  gap: 4px;
+  transform: translateX(calc(-50% + var(--rack-x)));
+}
+.rack-junction::after, .archive-console .rack-card.rack-bridge::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 22px;
+  margin-inline: auto;
+  background: #d8bc82;
+  pointer-events: none;
+}
+.rack-junction button { min-height: 36px; padding: 5px 8px; font-size: .7rem; }
+.rack-junction button:disabled { opacity: .55; cursor: default; }
+.archive-console .rack-card.rack-bridge {
+  top: 44%;
+  width: clamp(116px, 36%, 210px);
+  border-color: #9a865e;
+}
+.archive-console .rack-card.rack-bridge .rack-art { height: 90px; }
 .story-heading{position:relative;top:auto;z-index:auto;box-sizing:border-box;width:auto;padding:0;margin-bottom:16px;text-align:left;background:transparent;backdrop-filter:none;box-shadow:none;display:flex;flex-direction:row;justify-content:space-between;align-items:end;gap:16px}
 .story-heading h1{font-size:clamp(1.6rem,4vw,2.5rem);margin:2px 0 4px;scroll-margin-top:100px}
 .story-heading p{margin:0;color:#abb8c6}.story-heading .eyebrow{color:#62b9d3;letter-spacing:.25em;font-size:.72rem}
@@ -1454,7 +1552,7 @@ onUnmounted(() => {
 .archive-console .story-heading {
   align-items: center;
   gap: 20px;
-  padding: 0 0 24px;
+  padding: 0 0 16px;
   margin: 0;
   border: 0;
   background: transparent;
@@ -1462,7 +1560,7 @@ onUnmounted(() => {
 }
 .archive-console .story-heading > div:first-child { min-width: 0; flex: 1; }
 .archive-console .story-heading .eyebrow { color: var(--console-muted); font: 10px monospace; letter-spacing: .22em; }
-.archive-console .story-heading h1 { margin: 6px 0 8px; font-size: 1.35rem; font-weight: 600; line-height: 1.4; }
+.archive-console .story-heading h1 { margin: 0; font-size: 1.35rem; font-weight: 600; line-height: 1.4; color: var(--text-color); }
 .console-status { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; color: var(--console-muted); font-size: .68rem; line-height: 1.6; }
 .console-status-light, .utility-indicator { display: inline-block; flex: none; width: 5px; height: 5px; border-radius: 50%; background: #687585; }
 .console-status-light { margin-right: 3px; }
@@ -1640,5 +1738,95 @@ onUnmounted(() => {
 }
 @media (prefers-reduced-motion: reduce) {
   .archive-console .film-perforations, .archive-console .filter-toggle .fa-chevron-down { transition: none; }
+}
+
+/* Film archive: the selected frame, line index and chapter notes share one surface. */
+.archive-console .story-line-layout.with-line-rail {
+  grid-template-columns: clamp(170px, 23%, 270px) minmax(0, 1fr);
+  gap: 20px;
+}
+.archive-console .story-line-rail {
+  max-height: 580px;
+  padding: 4px 10px 4px 0;
+  border: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #9b8962 #12191e;
+}
+.story-line-rail button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 76px;
+  margin-bottom: 7px;
+  padding: 12px;
+  border: 1px solid #74766d66;
+  background: #10171c;
+}
+.story-line-rail button img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .6;
+}
+.story-line-rail button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, #10171c22, #10171ce8 58%);
+}
+.story-line-rail button > span { display: grid; gap: 3px; margin-left: 35%; }
+.story-line-rail strong { font-size: 1rem; font-weight: 500; }
+.story-line-rail button[aria-pressed="true"] {
+  border-color: #e5c98d;
+  box-shadow: inset 3px 0 #ead39a, 0 0 15px #e0be7026;
+  color: #fff2d5;
+}
+.archive-console .story-rack { height: 450px; min-height: 450px; border-color: #ac98764d; background: #10171bb3; }
+.archive-console .rack-card { width: min(420px, calc(100% - 56px)); border-color: #9b9d9577; border-radius: 2px; background: #171d20; }
+.archive-console .rack-card.active { border-color: #efd39c; box-shadow: 0 0 0 1px #c5aa7266, 0 0 20px #e4c17a33, 0 16px 36px #0008; }
+.archive-console .rack-art { height: 195px; }
+.archive-console .rack-art::after { background: linear-gradient(transparent 45%, #171d20); }
+.archive-console .rack-caption { padding: 10px 20px 14px; }
+.archive-console .rack-caption > strong { font-family: Georgia, 'Noto Serif TC', serif; font-size: 1.5rem; }
+.archive-console .rack-open { color: #f0d8a5; border-color: #bfa77566; }
+.archive-console .rack-number { border-color: #bfa775; background: #1b2024e6; color: #f1d7a2; }
+.archive-console .film-perforations { opacity: .65; }
+.archive-console .rack-navigation { padding-top: 10px; }
+.archive-console .rack-navigation button { border-color: #a58f65; color: #eed6a3; border-radius: 2px; }
+.archive-console .rack-scrubber input { accent-color: #dfbe7e; }
+.archive-chapter-summary {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(150px, 1.5fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border-block: 1px solid #b49d694d;
+  background: linear-gradient(120deg, #263139b3, #11191ee6);
+}
+.archive-chapter-summary > div { display: grid; gap: 8px; }
+.archive-chapter-summary small { color: #dec490; }
+.archive-chapter-summary strong { font-size: 1.2rem; font-family: Georgia, 'Noto Serif TC', serif; }
+.archive-chapter-summary p { color: #b8c0c4; font-size: .75rem; line-height: 1.8; margin: 0; }
+.archive-chapter-summary button { min-height: 44px; padding: 8px 12px; border: 1px solid #bca475; background: #172027; color: #f1ddb4; cursor: pointer; font: inherit; font-size: .75rem; }
+.archive-chapter-summary button:disabled { opacity: .45; cursor: default; }
+.archive-console .reading-detail { padding: 12px 20px; }
+.reading-detail > summary { cursor: pointer; font-size: .75rem; color: #c8b78f; }
+@media (max-width: 700px) {
+  .archive-console .story-line-layout.with-line-rail { grid-template-columns: 100px minmax(0, 1fr); gap: 8px; }
+  .archive-console .story-line-rail { max-height: 450px; padding-right: 4px; }
+  .story-line-rail button { min-height: 70px; padding: 8px; }
+  .story-line-rail button > span { margin-left: 0; }
+  .story-line-rail strong { font-size: .8rem; }
+  .story-line-rail button::after { background: #10171cb3; }
+  .archive-console .rack-art { height: 155px; }
+  .archive-console .rack-caption { padding: 10px 12px; }
+  .archive-console .rack-caption > strong { font-size: 1rem; }
+  .archive-chapter-summary { grid-template-columns: 1fr; gap: 10px; padding: 12px; }
 }
 </style>

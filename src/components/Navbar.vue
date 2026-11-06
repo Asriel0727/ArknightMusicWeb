@@ -426,10 +426,25 @@ onMounted(() => {
 
 /* Keep the tab strip from painting underneath the account and locale controls
    at laptop widths where the desktop labels no longer fit side by side. */
-@media (max-width: 1200px) {
+@media (max-width: 1350px) {
   .main-navbar {
     padding: 12px 15px;
     gap: 8px;
+  }
+
+  .navbar-left {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .navbar-left::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tabs {
+    width: max-content;
   }
   
   .nav-tab {
@@ -446,8 +461,12 @@ onMounted(() => {
   }
 
   .nav-utility-panel {
-    grid-template-columns: minmax(150px, auto) auto;
+    grid-template-columns: auto auto;
     gap: 10px;
+  }
+
+  .auth-email {
+    display: none;
   }
 }
 

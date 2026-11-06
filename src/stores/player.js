@@ -6,6 +6,7 @@ import {
   fetchAlbumDetails,
   fetchLyrics,
   fetchSongDetails,
+  getProxyImageUrl,
   getProxyAudioUrl,
 } from '../services/api.js';
 
@@ -249,12 +250,19 @@ export function initAudioPlayer(audioElement) {
       if (!song) return null;
       const album = song.album || (albumState.currentAlbumDetails?.cid === song.albumCid
         ? albumState.currentAlbumDetails : null);
-      const cover = song.coverUrl || album?.coverUrl;
+      const artwork = [...new Set([
+        album?.coverDeUrl,
+        song.coverDeUrl,
+        album?.coverUrl,
+        song.coverUrl,
+      ].filter(Boolean))].map((source) => ({
+        src: getProxyImageUrl(source),
+      }));
       return {
         title: song.name || '',
         artist: Array.isArray(song.artistes) ? song.artistes.join(' / ') : song.artistes || '',
         album: album?.name || '',
-        artwork: cover ? [{ src: cover }] : [],
+        artwork,
       };
     },
     previous: playPreviousSong,

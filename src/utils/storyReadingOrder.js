@@ -103,6 +103,7 @@ export function buildReadingRoute(line, collections, lines = []) {
     return {
       ...(collection || {}), key: `route:${line.id}:${index}`, collectionKey: collection?.key,
       group: node.group, label: collection?.label || node.group,
+      isBridge: Boolean(bridge),
       orderLabel: String(index + 1).padStart(2, '0'), act, note, previous, next,
       role: bridge ? '此处补读' : independentLines.has(line.id) ? '独立选读' : index === 0 ? '本线起点' : '本线接续',
       independent: independentLines.has(line.id),

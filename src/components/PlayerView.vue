@@ -16,7 +16,10 @@
             <div v-else class="no-cover">{{ t('common.noCover') }}</div>
             <span class="vinyl-spindle" aria-hidden="true"></span>
           </div>
-          <span class="vinyl-tonearm" :class="{ playing: playerState.isPlaying }" aria-hidden="true"></span>
+          <span class="vinyl-tonearm" :class="{ playing: playerState.isPlaying }" aria-hidden="true">
+            <span class="vinyl-cartridge"></span>
+            <span class="vinyl-needle"></span>
+          </span>
           <div class="player-info">
             <h4>{{ playerState.currentSong?.name || t('common.unknownSong') }}</h4>
             <p>{{ playerState.currentSong?.artistes?.join(', ') || t('common.unknownArtist') }}</p>
@@ -102,12 +105,12 @@
     <div v-if="hasRightPanel" class="player-view-right" :class="{ 'has-video': !!characterEp, 'has-lyrics': hasLyrics }">
       <div v-if="characterEp" class="player-visual-panel">
         <div class="character-ep-visual"
-          :class="{ expanded: isCharacterEpExpanded, 'manual-start': isManualEpStart }">
+          :class="{ expanded: isCharacterEpExpanded }">
           <div v-if="isYoutubeCharacterEp && playerState.isPlaying && !isCharacterEpWaiting" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
           </div>
           <iframe v-else-if="!isCharacterEpWaiting && (playerState.isPlaying || isBilibiliSyncPending)" :key="epIframeKey" class="character-ep-frame"
-            :tabindex="isManualEpStart ? 0 : -1"
+            tabindex="-1"
             :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
             allow="autoplay" referrerpolicy="strict-origin-when-cross-origin" @load="handleBilibiliFrameLoad"></iframe>
           <div v-else class="character-ep-paused">
@@ -124,14 +127,6 @@
           <a class="character-ep-link" :href="characterEp.sourceUrl" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-up-right-from-square"></i> {{ t('player.openVideo') }}
           </a>
-        </div>
-        <div v-if="isMobileLayout && playerState.isPlaying && !isCharacterEpWaiting" class="character-ep-start-help"
-          :class="{ expanded: isCharacterEpExpanded }">
-          <p v-if="isManualEpStart" role="status">{{ t('player.epManualStartHint') }}</p>
-          <button type="button" :aria-pressed="isManualEpStart" @click="isManualEpStart = !isManualEpStart">
-            {{ t(isManualEpStart ? 'player.epManualStartDone' : 'player.epManualStart') }}
-          </button>
-          <button v-if="isManualEpStart" type="button" @click="restartCharacterEp()">{{ t('player.epRetry') }}</button>
         </div>
         <div v-if="isCharacterEpExpanded" class="character-ep-preview-backdrop" aria-hidden="true"
           @click.self="closeCharacterEpPreview"></div>
@@ -295,10 +290,8 @@ const isCreatePlaylistDialogOpen = ref(false);
 const newPlaylistName = ref('');
 const isAddingToPlaylist = ref(false);
 const characterEp = ref(null);
-const isCharacterEpLoading = ref(false);
 const isBilibiliSyncPending = ref(false);
 const isCharacterEpExpanded = ref(false);
-const isManualEpStart = ref(false);
 // Video playback follows MV availability; lyrics remain visible alongside it.
 const visualMode = computed(() => characterEp.value ? 'ep' : 'cover');
 const epIframeKey = ref(0);
@@ -308,6 +301,7 @@ let youtubePlayer = null;
 let youtubePlayerPromise = null;
 let youtubeDriftTimer = null;
 let youtubePlayerGeneration = 0;
+let characterEpLoadToken = 0;
 let bilibiliPendingIframeKey = -1;
 let bilibiliSyncTimeout = null;
 let pendingSeekSyncCleanup = null;
@@ -339,9 +333,6 @@ const cancelPendingSeekSync = () => {
 const resyncCharacterEpAfterPageReturn = () => {
   if (
     document.visibilityState !== 'visible'
-    // Returning focus from a real iframe tap must not destroy the newly
-    // unlocked player before the user can finish manual activation.
-    || isManualEpStart.value
     || visualMode.value !== 'ep'
     || !characterEp.value
     || !playerState.isPlaying
@@ -721,6 +712,23 @@ const clearYoutubePlayer = () => {
   youtubePlayer = null;
 };
 
+const clearBilibiliSyncState = () => {
+  if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
+  bilibiliSyncTimeout = null;
+  isBilibiliSyncPending.value = false;
+  bilibiliPendingIframeKey = -1;
+};
+
+const disableCharacterEpForMobile = () => {
+  characterEpLoadToken += 1;
+  characterEp.value = null;
+  clearCharacterEpWaitWatchdog();
+  cancelPendingSeekSync();
+  clearBilibiliSyncState();
+  clearYoutubePlayer();
+  closeCharacterEpPreview();
+};
+
 const handleTogglePlay = () => {
   // Keep this request in the real click handler; a synthetic click cannot
   // grant user activation. Bilibili exposes no equivalent documented API.
@@ -918,7 +926,6 @@ const closeCharacterEpPreview = () => {
 
 const handleMobileLayoutChange = (event) => {
   isMobileLayout.value = event.matches;
-  if (!event.matches) isManualEpStart.value = false;
 };
 
 const toggleCharacterEpPreview = () => {
@@ -1144,7 +1151,6 @@ watch(() => playerState.isPlaying, (isPlaying) => {
     startLyricsSync();
     if (isCharacterEpWaiting.value) startCharacterEpWaitWatchdog();
   } else {
-    isManualEpStart.value = false;
     resetCharacterEpWaitState();
     stopLyricsSync();
     if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
@@ -1189,8 +1195,26 @@ watch([visualMode, characterEp], () => {
   }
 });
 
-watch(() => playerState.currentSong, async (newSong) => {
-  isManualEpStart.value = false;
+const loadCharacterEpForSong = async (requestedSongId) => {
+  const loadToken = ++characterEpLoadToken;
+  if (!requestedSongId || isMobileLayout.value) {
+    return;
+  }
+
+  try {
+    const ep = await fetchCharacterEp(requestedSongId);
+    if (
+      loadToken !== characterEpLoadToken
+      || isMobileLayout.value
+      || playerState.currentSong?.cid !== requestedSongId
+    ) return;
+    characterEp.value = ep;
+  } catch (error) {
+    console.warn('Character EP lookup failed:', error.message);
+  }
+};
+
+watch(() => playerState.currentSong, (newSong) => {
   resetCharacterEpWaitState();
   cancelPendingSeekSync();
   activeLyricIndex.value = -1;
@@ -1203,31 +1227,22 @@ watch(() => playerState.currentSong, async (newSong) => {
   }
   characterEp.value = null;
   closeCharacterEpPreview();
-  isCharacterEpLoading.value = Boolean(newSong?.cid);
-  if (bilibiliSyncTimeout) {
-    clearTimeout(bilibiliSyncTimeout);
-    bilibiliSyncTimeout = null;
-  }
-  isBilibiliSyncPending.value = false;
-  bilibiliPendingIframeKey = -1;
+  clearBilibiliSyncState();
   epStartTime.value = getAudioCurrentTime();
   const requestedSongId = newSong?.cid;
-  if (!requestedSongId) {
-    isCharacterEpLoading.value = false;
+  loadCharacterEpForSong(requestedSongId);
+}, { immediate: true });
+
+watch(isMobileLayout, (isMobile) => {
+  if (isMobile) {
+    disableCharacterEpForMobile();
     return;
   }
-  try {
-    const ep = await fetchCharacterEp(requestedSongId);
-    if (playerState.currentSong?.cid !== requestedSongId) return;
-    characterEp.value = ep;
-  } catch (error) {
-    console.warn('Character EP lookup failed:', error.message);
-  } finally {
-    if (playerState.currentSong?.cid === requestedSongId) {
-      isCharacterEpLoading.value = false;
-    }
+
+  if (playerState.currentSong?.cid && !characterEp.value) {
+    loadCharacterEpForSong(playerState.currentSong.cid);
   }
-}, { immediate: true });
+});
 
 watch(() => playerState.lyrics, (newLyrics) => {
   // 歌�??�新?��?置�?亮索�?
@@ -1419,40 +1434,68 @@ defineExpose({ closeCharacterEpPreview });
 
 .vinyl-tonearm {
   position: absolute;
-  top: 20px;
-  left: calc(50% + 92px);
-  width: 7px;
-  height: 132px;
+  top: calc(var(--record-size, 250px) * 0.08);
+  left: calc(50% + var(--record-size, 250px) * 0.36 - 2px);
+  z-index: 2;
+  width: 4px;
+  height: calc(var(--record-size, 250px) * 0.50);
   border-radius: 4px;
   background: linear-gradient(90deg, #78828b, #e0e5e9 45%, #68717a);
-  transform: rotate(-22deg);
-  transform-origin: 50% 12px;
+  transform: rotate(-26deg);
+  transform-origin: 50% 0;
   transition: transform 500ms ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
   pointer-events: none;
 }
 
-.vinyl-tonearm.playing { transform: rotate(-8deg); }
+.vinyl-tonearm.playing { transform: rotate(-3deg); }
 .vinyl-tonearm::before {
   content: '';
   position: absolute;
-  top: -9px;
-  left: -7px;
-  width: 21px;
-  height: 21px;
-  border: 3px solid #30373d;
+  top: 0;
+  left: 50%;
+  width: 17px;
+  height: 17px;
+  transform: translate(-50%, -50%);
+  border: 2px solid #49545e;
   border-radius: 50%;
-  background: #aeb6bd;
+  background: radial-gradient(circle at 35% 30%, #e8edf0, #82909b 72%);
 }
-.vinyl-tonearm::after {
+.vinyl-cartridge {
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 8px;
+  height: 12px;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(90deg, #65727b, #bac4cb 48%, #66737c);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.55);
+}
+
+.vinyl-needle {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: calc(var(--record-size, 250px) * 0.10);
+  border-radius: 2px;
+  background: linear-gradient(90deg, #737e86, #f1f5f7 48%, #68747c);
+  transform: translateX(-50%);
+  transform-origin: top center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.vinyl-needle::after {
   content: '';
   position: absolute;
-  left: -5px;
-  bottom: -9px;
-  width: 18px;
-  height: 24px;
-  border-radius: 2px;
-  background: #31383e;
+  left: -1px;
+  bottom: -1px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #dce4e8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .player-cover .no-cover {
@@ -1747,46 +1790,6 @@ defineExpose({ closeCharacterEpPreview });
 .character-ep-frame {
   pointer-events: none;
   user-select: none;
-}
-
-.character-ep-visual.manual-start .character-ep-frame {
-  pointer-events: auto;
-}
-
-.character-ep-start-help {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.character-ep-start-help p {
-  flex-basis: 100%;
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-}
-
-.character-ep-start-help button {
-  min-height: 44px;
-  padding: 8px 12px;
-  border: 1px solid rgba(126, 198, 255, 0.28);
-  border-radius: 6px;
-  color: var(--text-primary);
-  background: rgba(24, 66, 84, 0.45);
-  cursor: pointer;
-}
-
-.character-ep-start-help.expanded {
-  position: fixed;
-  right: 16px;
-  bottom: max(12px, env(safe-area-inset-bottom));
-  left: 16px;
-  z-index: 1101;
-  padding: 10px;
-  border-radius: 8px;
-  background: rgba(5, 9, 14, 0.96);
 }
 
 .character-ep-youtube-frame {

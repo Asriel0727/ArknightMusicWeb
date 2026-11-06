@@ -942,17 +942,6 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
   margin: 0 0 min(20px, 3cqh);
   padding: min(27px, 3cqw, 5cqh);
 }
-.projection-player-body :deep(.embedded-player-view .vinyl-tonearm) {
-  display: block;
-  top: calc(var(--record-size) * 0.08);
-  left: calc(50% + var(--record-size) * 0.36);
-  z-index: 2;
-  height: calc(var(--record-size) * 0.46);
-  transform: rotate(22deg);
-}
-.projection-player-body :deep(.embedded-player-view .vinyl-tonearm.playing) {
-  transform: rotate(4deg);
-}
 .projection-player-body :deep(.embedded-player-view .player-info) {
   min-width: 0;
   text-align: center;
@@ -1434,7 +1423,6 @@ button:focus-visible { outline: 2px solid #c1efff; outline-offset: 3px; }
     max-height: none;
     padding: 12px;
   }
-  .projection-player-body :deep(.embedded-player-view .vinyl-tonearm) { display: none; }
   .projection-player-body :deep(.embedded-player-view.single-panel) { grid-template-rows: minmax(0, 1fr); }
   .projection-player-queue {
     position: static;
