@@ -5,7 +5,7 @@
     "zh-CN": {
       "path": "summaries/zh-CN.json",
       "count": 2075,
-      "sourceCommit": "63c7cec73c3858d0ae913f85cc89af3cef4d744f"
+      "sourceCommit": "6f63c14e27b847ef74b53b00fe51fc322b3cd7ff"
     },
     "en": {
       "path": "summaries/en.json",
@@ -27,7 +27,7 @@
       "count": 2075,
       "sourceLocale": "zh-CN",
       "conversion": "opencc-cn-twp",
-      "sourceCommit": "63c7cec73c3858d0ae913f85cc89af3cef4d744f"
+      "sourceCommit": "6f63c14e27b847ef74b53b00fe51fc322b3cd7ff"
     }
   }
 }
