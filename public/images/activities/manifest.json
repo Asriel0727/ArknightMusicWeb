@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-06T07:01:58.324Z",
+  "generatedAt": "2026-11-13T06:58:47.623Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -36,7 +36,7 @@
       "contentType": "image/png",
       "size": 395044,
       "hash": "655590d90c922cec1477a4ea80cadb8a62a10853cc3cc03febc03b19b25fb724",
-      "syncedAt": "2026-11-06T07:01:52.862Z"
+      "syncedAt": "2026-11-11T06:48:18.074Z"
     },
     "wiki-magic-and-friendship": {
       "publicPath": "/images/activities/wiki-magic-and-friendship.png",
@@ -45,7 +45,7 @@
       "contentType": "image/png",
       "size": 351032,
       "hash": "47caf3a1a1e6e26345ef50f19a4cc0e81aa4b2ab19fae80acab6025cc99cc08e",
-      "syncedAt": "2026-11-06T07:01:53.259Z"
+      "syncedAt": "2026-11-11T06:48:18.466Z"
     },
     "prts-13nxmnx": {
       "publicPath": "/images/activities/prts-13nxmnx.jpg",
@@ -81,16 +81,16 @@
       "contentType": "image/jpeg",
       "size": 274199,
       "hash": "562cef184f6b19cd2d7b7ea3ad3016ff7805060a63938b0e605c9c3434644324",
-      "syncedAt": "2026-11-06T07:01:53.528Z"
+      "syncedAt": "2026-11-11T06:48:19.282Z"
     },
     "wiki-thunder-in-the-azure-dream": {
-      "publicPath": "/images/activities/wiki-thunder-in-the-azure-dream.webp",
-      "relativePath": "public/images/activities/wiki-thunder-in-the-azure-dream.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Thunder_in_the_Azure_Dream_banner.png?37c120",
-      "contentType": "image/webp",
-      "size": 975730,
-      "hash": "e415137fd24431f445443ba9a95846b949c942059b3ce82773089a80a79f8f57",
-      "syncedAt": "2026-10-30T10:01:58.775Z"
+      "publicPath": "/images/activities/wiki-thunder-in-the-azure-dream.jpg",
+      "relativePath": "public/images/activities/wiki-thunder-in-the-azure-dream.jpg",
+      "sourceUrl": "https://media.prts.wiki/4/4b/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E6%B3%A1%E5%BD%B1%E8%8B%8D%E9%9C%86_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 347529,
+      "hash": "1d0294f2bb7ccee9503da09c092bc4cfccd47e8e999a1109034de39de684bc9a",
+      "syncedAt": "2026-11-12T07:28:46.453Z"
     },
     "prts-syri4j": {
       "publicPath": "/images/activities/prts-syri4j.jpg",
@@ -216,7 +216,7 @@
       "contentType": "image/jpeg",
       "size": 471348,
       "hash": "8be10006032610874d92f735b46283b4e5e95509c3e8973ec4f53c89ab78437e",
-      "syncedAt": "2026-11-06T07:01:53.867Z"
+      "syncedAt": "2026-11-13T06:58:44.611Z"
     },
     "prts-1m42naa": {
       "publicPath": "/images/activities/prts-1m42naa.jpg",
@@ -243,7 +243,7 @@
       "contentType": "image/jpeg",
       "size": 432667,
       "hash": "121524b8cb3c3aab55cfd041ce5ecc002389f0f67307440eee0206e5b66480c7",
-      "syncedAt": "2026-11-06T07:01:54.235Z"
+      "syncedAt": "2026-11-13T06:58:45.203Z"
     },
     "prts-1cqt5uv": {
       "publicPath": "/images/activities/prts-1cqt5uv.jpg",
@@ -279,7 +279,7 @@
       "contentType": "image/jpeg",
       "size": 301776,
       "hash": "9b1bff71c6f1987551df0a0ee0f9fb5562cb66006efc2e4062dfb8417faf5070",
-      "syncedAt": "2026-11-06T07:01:54.613Z"
+      "syncedAt": "2026-11-13T06:58:45.714Z"
     },
     "prts-17xyioi": {
       "publicPath": "/images/activities/prts-17xyioi.jpg",
@@ -1089,7 +1089,7 @@
       "contentType": "image/jpeg",
       "size": 330324,
       "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
-      "syncedAt": "2026-11-05T20:08:31.623Z"
+      "syncedAt": "2026-11-13T06:58:47.623Z"
     },
     "prts-6rbm0p": {
       "publicPath": "/images/activities/prts-6rbm0p.jpg",
@@ -3231,7 +3231,7 @@
       "contentType": "image/webp",
       "size": 303800,
       "hash": "3e665cb4832a701f24069d67e3079261a6d67bab9f3c3c03865d0d2bd2b2de04",
-      "syncedAt": "2026-11-05T20:08:27.898Z"
+      "syncedAt": "2026-11-13T06:58:45.926Z"
     },
     "wiki-babel-event-rerun": {
       "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
@@ -3240,7 +3240,7 @@
       "contentType": "image/jpeg",
       "size": 330324,
       "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
-      "syncedAt": "2026-11-05T20:08:30.195Z"
+      "syncedAt": "2026-11-13T06:58:46.228Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.png",
@@ -3249,7 +3249,7 @@
       "contentType": "image/png",
       "size": 913153,
       "hash": "7132c2b19a41b6902eaf03f80b4305ce4cbdb432133900bf36b583ea6f898073",
-      "syncedAt": "2026-11-05T20:08:30.461Z"
+      "syncedAt": "2026-11-13T06:58:46.521Z"
     },
     "wiki-stronghold-protocol-event": {
       "publicPath": "/images/activities/wiki-stronghold-protocol-event.jpg",
@@ -3258,7 +3258,7 @@
       "contentType": "image/jpeg",
       "size": 244822,
       "hash": "fc0cf14d60bbb5ba2410a4e812d9ec37dbfd7f9a2024cb50aa1b8b05fa752031",
-      "syncedAt": "2026-11-05T20:08:30.820Z"
+      "syncedAt": "2026-11-13T06:58:46.981Z"
     },
     "wiki-ending-a-grand-overture": {
       "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
@@ -3267,7 +3267,7 @@
       "contentType": "image/jpeg",
       "size": 280529,
       "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
-      "syncedAt": "2026-11-05T20:08:31.306Z"
+      "syncedAt": "2026-11-13T06:58:47.323Z"
     },
     "wiki-vector-breakthrough-event": {
       "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
@@ -3294,7 +3294,7 @@
       "contentType": "image/jpeg",
       "size": 28887,
       "hash": "4a20bef2bcfb4c7c3649f151989f1608de5ef8654cf991a2c4b00b142b669b1a",
-      "syncedAt": "2026-11-06T07:01:54.861Z"
+      "syncedAt": "2026-11-09T22:38:20.379Z"
     },
     "wiki-contingency-contract-underdawn": {
       "publicPath": "/images/activities/wiki-contingency-contract-underdawn.webp",
@@ -3330,7 +3330,7 @@
       "contentType": "image/jpeg",
       "size": 36432,
       "hash": "93f32765107d9eb191bc678e68b886e31d7ec3ff755f3a22ce2a6ed9c257d3e7",
-      "syncedAt": "2026-11-06T07:01:55.100Z"
+      "syncedAt": "2026-11-09T22:38:20.788Z"
     },
     "wiki-tactical-support-1": {
       "publicPath": "/images/activities/wiki-tactical-support-1.jpg",
@@ -3339,7 +3339,7 @@
       "contentType": "image/jpeg",
       "size": 31555,
       "hash": "85111475429f75cb464c6697f437b67723ad23cad4e181e15280491312e85654",
-      "syncedAt": "2026-11-06T07:01:55.338Z"
+      "syncedAt": "2026-11-09T22:38:20.975Z"
     },
     "wiki-contingency-contract-fake-waves": {
       "publicPath": "/images/activities/wiki-contingency-contract-fake-waves.jpg",
@@ -3348,7 +3348,7 @@
       "contentType": "image/jpeg",
       "size": 55976,
       "hash": "ce3d8f1bc86441885b3daa4e9e6013237dd793ca8120469e153ef986fe2b617a",
-      "syncedAt": "2026-11-06T07:01:55.587Z"
+      "syncedAt": "2026-11-09T22:38:21.165Z"
     },
     "wiki-contingency-contract-ashring": {
       "publicPath": "/images/activities/wiki-contingency-contract-ashring.jpg",
@@ -3357,7 +3357,7 @@
       "contentType": "image/jpeg",
       "size": 47497,
       "hash": "98099772c46d8d29b0f3cc84f74baf5725337dc05981a37fd860d975842fe73d",
-      "syncedAt": "2026-11-06T07:01:55.806Z"
+      "syncedAt": "2026-11-09T22:38:21.354Z"
     },
     "wiki-trials-for-navigator-1": {
       "publicPath": "/images/activities/wiki-trials-for-navigator-1.jpg",
@@ -3366,7 +3366,7 @@
       "contentType": "image/jpeg",
       "size": 33519,
       "hash": "d30bc3426719e89bacb369ae9724f3c16a65cb7b529726daebc101e1f23312c6",
-      "syncedAt": "2026-11-06T07:01:56.034Z"
+      "syncedAt": "2026-11-09T22:38:21.542Z"
     },
     "wiki-contingency-contract-deepness": {
       "publicPath": "/images/activities/wiki-contingency-contract-deepness.jpg",
@@ -3375,7 +3375,7 @@
       "contentType": "image/jpeg",
       "size": 40019,
       "hash": "1fc446b09c72c5b45ae9c50392322d52c53509bc12c0bbced5f39e29ce7fe792",
-      "syncedAt": "2026-11-06T07:01:56.253Z"
+      "syncedAt": "2026-11-09T22:38:21.731Z"
     },
     "wiki-contingency-contract-dawnseeker": {
       "publicPath": "/images/activities/wiki-contingency-contract-dawnseeker.jpg",
@@ -3384,7 +3384,7 @@
       "contentType": "image/jpeg",
       "size": 40963,
       "hash": "4270135fba6043fb6b75bd857c35f45ca3730f11135c32bdcf5fb43725b82b3a",
-      "syncedAt": "2026-11-06T07:01:56.482Z"
+      "syncedAt": "2026-11-09T22:38:21.920Z"
     },
     "wiki-maria-nearl-rerun": {
       "aliasOf": "wiki-maria-nearl",
@@ -3398,7 +3398,7 @@
       "contentType": "image/jpeg",
       "size": 43494,
       "hash": "e36f5c64d1311de369ee8ceb414de88a76cb78d875ca33efb4a954a7a34ca5ce",
-      "syncedAt": "2026-11-06T07:01:56.705Z"
+      "syncedAt": "2026-11-09T22:38:22.110Z"
     },
     "wiki-contingency-contract-spectrum": {
       "publicPath": "/images/activities/wiki-contingency-contract-spectrum.jpg",
@@ -3407,7 +3407,7 @@
       "contentType": "image/jpeg",
       "size": 49760,
       "hash": "eebc2a9b8ef4c7d02c4ff94581dd2fd88e0afcd56625e63b2cd71e80a91006dd",
-      "syncedAt": "2026-11-06T07:01:56.957Z"
+      "syncedAt": "2026-11-09T22:38:22.305Z"
     },
     "wiki-contingency-contract-lead-seal": {
       "publicPath": "/images/activities/wiki-contingency-contract-lead-seal.jpg",
@@ -3416,7 +3416,7 @@
       "contentType": "image/jpeg",
       "size": 63703,
       "hash": "1307f23004c44619457921c98923572529a5d738ab27d2e847351cc040e8a14f",
-      "syncedAt": "2026-11-06T07:01:57.181Z"
+      "syncedAt": "2026-11-09T22:38:22.499Z"
     },
     "wiki-contingency-contract-cinder": {
       "publicPath": "/images/activities/wiki-contingency-contract-cinder.jpg",
@@ -3425,7 +3425,7 @@
       "contentType": "image/jpeg",
       "size": 41888,
       "hash": "2d725acefb0eb973827f922bc99358aacbb18cef00226f8dc1ee6824424964c4",
-      "syncedAt": "2026-11-06T07:01:57.401Z"
+      "syncedAt": "2026-11-09T22:38:22.816Z"
     },
     "wiki-fan-appreciation-event": {
       "publicPath": "/images/activities/wiki-fan-appreciation-event.jpg",
@@ -3434,7 +3434,7 @@
       "contentType": "image/jpeg",
       "size": 25007,
       "hash": "8fca3ad650b2e9874765de534048d31f2c90ae37b61006d056a6d624e1927819",
-      "syncedAt": "2026-11-06T07:01:57.629Z"
+      "syncedAt": "2026-11-09T22:38:23.006Z"
     },
     "wiki-children-of-ursus": {
       "publicPath": "/images/activities/wiki-children-of-ursus.jpg",
@@ -3443,7 +3443,7 @@
       "contentType": "image/jpeg",
       "size": 44858,
       "hash": "0b2f2200af529576907cdd724409911372337cfa41a168cd3257028c0c60dca9",
-      "syncedAt": "2026-11-06T07:01:57.886Z"
+      "syncedAt": "2026-11-09T22:38:23.199Z"
     },
     "wiki-contingency-contract-pyrite": {
       "publicPath": "/images/activities/wiki-contingency-contract-pyrite.jpg",
@@ -3452,7 +3452,7 @@
       "contentType": "image/jpeg",
       "size": 62096,
       "hash": "67826c86d0bce5af9bbca4b2099ace2a8d54ed7ad505c84ff23b7a1ef14fe0d0",
-      "syncedAt": "2026-11-06T07:01:58.113Z"
+      "syncedAt": "2026-11-09T22:38:23.390Z"
     },
     "wiki-1st-anniversary-celebration": {
       "publicPath": "/images/activities/wiki-1st-anniversary-celebration.svg",
@@ -3470,7 +3470,7 @@
       "contentType": "image/jpeg",
       "size": 101446,
       "hash": "aa36de0c8d2940c50d5db06aa9a08da7c8b43a044df615a38effefa18ef71df0",
-      "syncedAt": "2026-11-06T07:01:58.324Z"
+      "syncedAt": "2026-11-09T22:38:23.586Z"
     },
     "wiki-heart-of-surging-flame-part-1": {
       "publicPath": "/images/activities/wiki-heart-of-surging-flame-part-1.svg",
@@ -3551,7 +3551,7 @@
       "contentType": "image/jpeg",
       "size": 425729,
       "hash": "461001915ae35f0ec823bfd894f610d4f0a39a697356b1e79e12f335025eeecd",
-      "syncedAt": "2026-11-06T07:01:52.574Z"
+      "syncedAt": "2026-11-11T06:48:17.654Z"
     },
     "prts-s9wqxn": {
       "publicPath": "/images/activities/prts-s9wqxn.jpg",
@@ -3578,7 +3578,7 @@
       "contentType": "image/jpeg",
       "size": 197023,
       "hash": "5f17c4f86132a66fd9b79dc9256b6cc3ec636c2dcd4f7893d279988537a08e06",
-      "syncedAt": "2026-11-06T07:01:52.240Z"
+      "syncedAt": "2026-11-11T06:48:17.233Z"
     },
     "prts-1en990k": {
       "publicPath": "/images/activities/prts-1en990k.jpg",
@@ -3614,7 +3614,7 @@
       "contentType": "image/jpeg",
       "size": 433865,
       "hash": "0c3beda5ba348163402f33767cf4f871cea0d116c8b675e8c1099dddeddea731",
-      "syncedAt": "2026-11-06T07:01:51.808Z"
+      "syncedAt": "2026-11-11T06:48:16.942Z"
     },
     "prts-1ad6ofx": {
       "publicPath": "/images/activities/prts-1ad6ofx.jpg",
@@ -3641,7 +3641,7 @@
       "contentType": "image/jpeg",
       "size": 230208,
       "hash": "6af88cd7ab132af58c201ec6864a603c9286ce396a691e021b867a1c9fcae2df",
-      "syncedAt": "2026-11-06T07:01:51.478Z"
+      "syncedAt": "2026-11-11T06:48:15.569Z"
     },
     "prts-1cpfmn2": {
       "publicPath": "/images/activities/prts-1cpfmn2.jpg",
@@ -3695,7 +3695,7 @@
       "contentType": "image/jpeg",
       "size": 458324,
       "hash": "5470cceccb438b0099693249fa6c077733feb41941a0414e86b7751f1b3c7272",
-      "syncedAt": "2026-11-06T07:01:50.605Z"
+      "syncedAt": "2026-11-11T06:48:15.138Z"
     },
     "wiki-footprints": {
       "publicPath": "/images/activities/wiki-footprints.webp",
@@ -3740,7 +3740,7 @@
       "contentType": "image/jpeg",
       "size": 424203,
       "hash": "f2a277cecd0134f11a4c193e4b8d31b9ead355f6b8aa57bc3cef72b9414bbc3b",
-      "syncedAt": "2026-11-06T07:01:50.158Z"
+      "syncedAt": "2026-11-11T06:48:14.657Z"
     },
     "prts-1vwk3x0": {
       "publicPath": "/images/activities/prts-1vwk3x0.jpg",
@@ -3767,7 +3767,7 @@
       "contentType": "image/jpeg",
       "size": 447932,
       "hash": "fede06a11a5923b74c74360b151b3dc9224b30a4370202192e2db5cf6d4586d8",
-      "syncedAt": "2026-11-06T07:01:49.793Z"
+      "syncedAt": "2026-11-11T06:48:14.217Z"
     },
     "prts-1f0xrt0": {
       "publicPath": "/images/activities/prts-1f0xrt0.jpg",
@@ -3794,7 +3794,7 @@
       "contentType": "image/jpeg",
       "size": 322358,
       "hash": "6a5f5d14346eb18237d6974b6ff1eb6ff7a19f3a5f85b186d75d35542c5d4ea2",
-      "syncedAt": "2026-11-06T07:01:49.432Z"
+      "syncedAt": "2026-11-11T06:48:13.722Z"
     },
     "wiki-contingency-contract-annihilation": {
       "publicPath": "/images/activities/wiki-contingency-contract-annihilation.webp",
