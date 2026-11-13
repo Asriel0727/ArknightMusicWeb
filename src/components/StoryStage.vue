@@ -1,5 +1,5 @@
 <template>
-  <main class="story-page" :class="{ 'archive-console': screen !== 'player' }" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
+  <main class="story-page" :class="{ 'archive-console': screen !== 'player', 'film-archive': isFilmArchive }" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
     <header class="story-heading">
       <div>
         <p v-if="screen === 'player'" class="eyebrow">{{ `STORY / ${manifest?.storyId || selectedStory?.page || 'PRTS'}` }}</p>
@@ -42,7 +42,7 @@
 
     <Transition name="archive-screen" mode="out-in">
     <div :key="screen" class="archive-screen">
-    <section v-if="catalog.length && screen !== 'player'" class="story-library" :class="`view-${viewMode}`" :aria-label="labels.selectStory">
+    <section v-if="catalog.length && screen !== 'player'" class="story-library" :class="[`view-${viewMode}`, { 'collection-browser': isCollectionBrowser }]" :aria-label="labels.selectStory">
       <div class="projection-controls" @keydown.esc="advancedFilters = false">
       <div class="archive-toolbar">
         <div class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
@@ -66,13 +66,12 @@
       <div v-else-if="viewMode !== 'sequence'" class="library-filters">
         <label class="console-filter"><span>{{ labels.phase }}</span><select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select></label>
       </div>
-      <div v-else class="reading-plan-heading">
+      <div v-else-if="!isFilmArchive" class="reading-plan-heading">
         <details class="compact-note"><summary>{{ mediaLabels.context }}</summary><p>{{ screen === 'collections' ? localize(readingGuideIntro(readingLineId)) : groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</p></details>
       </div>
-      <div v-if="viewMode === 'sequence'" class="guide-tools">
+      <div v-if="viewMode === 'sequence' && (!isFilmArchive || guideTrail.length)" class="guide-tools">
         <button v-if="guideTrail.length" type="button" @click="returnToGuide">← {{ labels.returnGuide }} · {{ localize(guideTrail[guideTrail.length - 1].group) }}</button>
-        <button v-if="screen === 'collections' && readingResumeIndex >= 0" type="button" @click="seekRack(readingResumeIndex)">{{ labels.resumeGuide }} → {{ localize(readingRoute[readingResumeIndex]?.label) }}</button>
-        <details class="compact-note"><summary>{{ mediaLabels.details }}</summary><p>{{ labels.routeBasis }}</p></details>
+        <details v-if="!isFilmArchive" class="compact-note"><summary>{{ mediaLabels.details }}</summary><p>{{ labels.routeBasis }}</p></details>
       </div>
       <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" id="console-advanced-filters" class="library-filters advanced-filters">
         <label class="console-filter"><span>{{ labels.series }}</span><select v-model="selectedLine"><option value="">{{ labels.allSeries }}</option><option v-for="line in availableLines" :key="line.id" :value="line.id">{{ localize(line.name) }} ({{ line.count }})</option></select></label>
@@ -86,16 +85,27 @@
         <p>{{ labels.orderNote }} <span>{{ groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</span></p>
         <details v-if="activeRoute.length > 1"><summary>{{ labels.storyLines }} / {{ labels.order }}</summary><nav :aria-label="labels.lineOrder"><template v-for="(node, index) in activeRoute" :key="`${index}-${node.group}`"><span v-if="index" class="route-arrow" aria-hidden="true">{{ node.independent ? '·' : '→' }}</span><button type="button" :disabled="!findCollection(node.group)" :class="{ current: node.group === activeCollection.group, intersection: node.intersection }" @click="openCollection(findCollection(node.group))">{{ localize(node.group) }}<small v-if="node.intersection">{{ labels.intersection }}</small></button></template></nav></details>
       </div>
-      <p v-if="viewMode !== 'sequence'" class="archive-breadcrumb">{{ screen === 'episodes' ? categoryLabel(activeCollection?.category) : selectedCategory ? categoryLabel(selectedCategory) : labels.allCategories }}<template v-if="screen === 'collections' && selectedSection"> / {{ localize(selectedSection) }}</template><template v-if="screen === 'episodes'"> / {{ localize(activeCollection?.label) }}</template><template v-if="screen === 'episodes' && selectedPhase"> / {{ labels.phases[selectedPhase] }}</template></p>
+      <p v-if="viewMode !== 'sequence' && (!isCollectionBrowser || selectedSection)" class="archive-breadcrumb">{{ screen === 'episodes' ? categoryLabel(activeCollection?.category) : selectedCategory ? categoryLabel(selectedCategory) : labels.allCategories }}<template v-if="screen === 'collections' && selectedSection"> / {{ localize(selectedSection) }}</template><template v-if="screen === 'episodes'"> / {{ localize(activeCollection?.label) }}</template><template v-if="screen === 'episodes' && selectedPhase"> / {{ labels.phases[selectedPhase] }}</template></p>
       </div>
       <div class="story-line-layout" :class="{ 'with-line-rail': screen === 'collections' && viewMode === 'sequence' }">
-      <nav v-if="screen === 'collections' && viewMode === 'sequence'" class="story-line-rail" :aria-label="labels.storyLines">
-        <button v-for="line in archiveMetadata.lines || []" :key="line.id" type="button"
-          :aria-pressed="readingLineId === line.id" @click="readingLineId = line.id; guideTrail = []">
-          <img v-if="lineCover(line)" :src="coverPath(lineCover(line))" alt="" loading="lazy">
-          <span><small>{{ line.id }}</small><strong>{{ localize(line.name) }}</strong></span>
+      <TransitionGroup v-if="screen === 'collections' && viewMode === 'sequence'" tag="nav" name="story-line-list" class="story-line-rail" :aria-label="labels.storyLines">
+        <button v-for="line in availableReadingLines" :key="line.id" type="button"
+          :class="{ 'reel-retracting': pendingReadingLine === line.id }"
+          @click="selectReadingLine(line.id, $event.currentTarget)">
+          <span class="story-reel-film">
+            <img v-if="lineCover(line)" :src="coverPath(lineCover(line))" alt="" loading="lazy">
+            <span class="story-line-caption"><small>{{ line.id }}</small><strong>{{ localize(line.name) }}</strong></span>
+          </span>
+          <span class="story-line-reel" aria-hidden="true"><i class="story-reel-canister"></i></span>
         </button>
-      </nav>
+      </TransitionGroup>
+      <div v-if="screen === 'collections' && viewMode === 'sequence'" ref="storyReelReaderElement" class="story-reel-reader" :class="{ loaded: readingLineId && reelReaderState !== 'inserting' }" aria-hidden="true">
+        <span class="story-reel-reader-shell">
+          <span class="story-reel-reader-slot"><i class="story-reel-canister"></i></span>
+          <i class="story-reel-reader-latch"></i>
+          <span class="story-reel-reader-controls"><i class="story-reel-reader-aperture"></i><i class="story-reel-reader-grille"></i></span>
+        </span>
+      </div>
       <div v-if="rackEntries.length" class="story-rack-shell">
         <div ref="rackElement" class="story-rack" :class="{ dragging: rackDragging, moving: rackAnimating }" :style="{ '--film-position': `${-rackIndex * rackStep + rackDragOffset}px` }" tabindex="0" role="region" aria-roledescription="carousel" :aria-label="labels.selectStory"
           @keydown.left.prevent="moveRack(-1, true)" @keydown.right.prevent="moveRack(1, true)" @keydown.home.prevent="seekRack(0)" @keydown.end.prevent="seekRack(rackEntries.length - 1)" @keydown.enter.self.prevent="activateRackCard(rackIndex)" @keydown.space.self.prevent="activateRackCard(rackIndex)"
@@ -103,23 +113,15 @@
           <Transition name="ambient-fade" mode="out-in"><img v-if="rackActive" :key="rackActive.key" class="rack-ambient" :src="coverPath(rackActive.cover)" alt="" aria-hidden="true" @error="event => { event.target.style.visibility = 'hidden'; }"></Transition>
           <div class="rack-horizon" aria-hidden="true"></div>
           <div class="film-perforations film-perforations-top" aria-hidden="true"></div><div class="film-perforations film-perforations-bottom" aria-hidden="true"></div>
+          <div class="story-rack-content">
           <div class="rack-line-label">{{ localize(viewMode === 'sequence' ? rackActive?.act || activeCollection?.label : rackActive?.lineName || activeCollection?.lineName) }}</div>
-          <template v-if="screen === 'collections' && viewMode === 'sequence'">
-            <template v-for="item in visibleRackEntries" :key="'junction-' + item.key">
-              <div v-for="(links, side) in [item.prerequisites, item.branches]" v-show="links.length"
-                :key="side" class="rack-junction" :style="{ ...rackCardStyle(item.index + (side ? .5 : -.5)), zIndex: 21 }">
-                <button v-for="link in links" :key="link.group" type="button" :disabled="link.missing || !link.routeId"
-                  :tabindex="item.index === rackIndex ? 0 : -1" @click="visitGuide(link.routeId, link.group, item.group)">
-                  ◇ {{ localize(link.group) }} ↗
-                </button>
-              </div>
-            </template>
-          </template>
           <button v-for="item in visibleRackEntries" :key="item.key" type="button" class="rack-card" :class="{ active: item.index === rackIndex, 'rack-bridge': item.isBridge }" :style="rackCardStyle(item.index)" :tabindex="item.index === rackIndex ? 0 : -1" :aria-label="localize(item.label)" @keydown.enter.stop.prevent="activateRackCard(item.index)" @keydown.space.stop.prevent="activateRackCard(item.index)" @click="activateRackCard(item.index)">
             <span class="rack-art" :class="{ 'operator-portrait': item.operatorPortrait }"><img :src="item.operatorPortrait ? root + item.operatorPortrait : coverPath(item.cover)" :data-original-src="item.cover" :data-story-cover="coverPath(item.cover)" alt="" draggable="false" :loading="Math.abs(item.index - rackIndex) <= 1 ? 'eager' : 'lazy'" decoding="async" @error="handleCoverError"><span class="rack-number">{{ item.orderLabel }}</span></span>
             <span class="rack-caption"><small>{{ localize(item.subtitle) }}</small><strong>{{ localize(item.label) }}</strong><span v-if="screen === 'episodes'" class="reading-status" :class="{ read: completedStories[item.id] }">{{ completedStories[item.id] ? '✓ ' + labels.read : labels.unread }}</span><span v-if="screen === 'collections' && !item.missing" class="collection-open">{{ item.count }} {{ labels.stories }}</span><span class="rack-open">{{ item.missing ? labels.notCollected : screen === 'collections' ? labels.browseEpisodes : labels.playStory }} <span v-if="!item.missing" aria-hidden="true">→</span></span></span>
           </button>
+          </div>
         </div>
+        <template v-if="screen !== 'collections' || viewMode !== 'sequence'">
         <div v-if="viewMode === 'sequence' && rackActive" class="archive-chapter-summary">
           <div><small>{{ localize(readingLineName) }}</small><strong>{{ localize(rackActive.label) }}</strong></div>
           <p>{{ screen === 'collections' ? localize(rackActive.note) : labels.chooseEpisode }}</p>
@@ -157,12 +159,18 @@
           </template>
           <template v-else><p>{{ rackActive.phase === 'branch' ? labels.branchNote : labels.segmentNote }}</p><div class="reading-neighbors"><span>{{ labels.readBefore }}：{{ localize(groupStories[Number(episodeNumber(rackActive)) - 2]?.title) || labels.routeStart }}</span><span>{{ labels.readAfter }}：{{ localize(groupStories[Number(episodeNumber(rackActive))]?.title) || labels.routeEnd }}</span></div></template>
         </details>
-        <div class="rack-navigation"><button type="button" :disabled="rackIndex === 0" :aria-label="labels.previousReel" @click="moveRack(-1)">←</button><span aria-live="polite">{{ rackIndex + 1 }} <small>/ {{ rackEntries.length }}</small></span><button type="button" :disabled="rackIndex + 1 >= rackEntries.length" :aria-label="labels.nextReel" @click="moveRack(1)">→</button></div>
-        <div class="rack-scrubber"><span>{{ labels.swipeHint }}</span><input v-if="rackEntries.length > 1" :value="rackIndex" @input="scrubRack" type="range" min="0" :max="rackEntries.length - 1" :aria-label="labels.selectStory" :aria-valuetext="localize(rackActive?.label)"></div>
+        <div v-if="!isCollectionBrowser" class="rack-navigation"><button type="button" :disabled="rackIndex === 0" :aria-label="labels.previousReel" @click="moveRack(-1)">←</button><span aria-live="polite">{{ rackIndex + 1 }} <small>/ {{ rackEntries.length }}</small></span><button type="button" :disabled="rackIndex + 1 >= rackEntries.length" :aria-label="labels.nextReel" @click="moveRack(1)">→</button></div>
+        <div v-if="!isCollectionBrowser" class="rack-scrubber"><span>{{ labels.swipeHint }}</span><input v-if="rackEntries.length > 1" :value="rackIndex" @input="scrubRack" type="range" min="0" :max="rackEntries.length - 1" :aria-label="labels.selectStory" :aria-valuetext="localize(rackActive?.label)"></div>
+        </template>
+      </div>
+      <div v-else-if="screen === 'collections' && viewMode === 'sequence' && !readingLineId" class="story-rack story-rack-standby">
+        <div class="film-perforations film-perforations-top" aria-hidden="true"></div>
+        <p>{{ reelSelectionHint }}</p>
+        <div class="film-perforations film-perforations-bottom" aria-hidden="true"></div>
       </div>
       <p v-else class="library-empty">{{ labels.noResults }}</p>
       </div>
-      <p class="progress-note">{{ t('storyProgress.completionNote') }}</p>
+      <p v-if="!isFilmArchive && !isCollectionBrowser" class="progress-note">{{ t('storyProgress.completionNote') }}</p>
     </section>
 
     <template v-if="screen === 'player'">
@@ -374,7 +382,16 @@ const viewMode = ref(['banner', 'sequence'].includes(savedView) ? savedView : 'b
 const collectionSort = ref('line');
 const selectedLine = ref('');
 const selectedCollectionFilter = ref('');
-const readingLineId = ref('MS');
+const readingLineId = ref('');
+const isFilmArchive = computed(() => screen.value === 'collections' && viewMode.value === 'sequence');
+const isCollectionBrowser = computed(() => screen.value === 'collections' && viewMode.value === 'banner');
+const availableReadingLines = computed(() => (archiveMetadata.value.lines || []).filter(line => line.id !== readingLineId.value));
+const reelSelectionHint = computed(() => ({
+  'zh-TW': '選擇左側膠捲以開啟章節',
+  'zh-CN': '选择左侧胶卷以打开章节',
+  ja: '左側のフィルムを選んで章を開く',
+  ko: '왼쪽 필름을 선택해 챕터를 여세요',
+})[locale.value] || 'Select a reel to open its chapters');
 const readingOffset = ref(0);
 const archiveMetadata = ref({});
 const { completed: completedStories, owner: progressOwner, status: progressStatus, syncing: progressSyncing, storageFailed: progressStorageFailed, importCount: progressImportCount, markCompleted, importGuest: importGuestProgress, sync: syncReadingProgress } = useStoryReadingProgress();
@@ -441,7 +458,6 @@ const nextGuideNode = computed(() => {
   if (viewMode.value !== 'sequence' || !activeGuideNode.value || activeGuideNode.value.independent) return null;
   return readingRoute.value[readingRoute.value.indexOf(activeGuideNode.value) + 1] || null;
 });
-const readingResumeIndex = computed(() => readingRoute.value.findIndex(node => !node.missing && node.stories?.some(story => !completedStories.value[story.id])));
 function collectionReadLabel(group) {
   const collection = findCollection(group);
   if (!collection) return labels.value.notCollected;
@@ -455,7 +471,7 @@ async function showGuide(id, group) {
   await nextTick();
   readingLineId.value = id;
   await nextTick();
-  readingOffset.value = Math.max(0, readingRoute.value.findIndex(node => node.group === group));
+  readingOffset.value = Math.max(0, readingRackEntries.value.findIndex(node => !node.branchLink && node.group === group));
   focusScreenHeading();
 }
 function visitGuide(id, group, origin = rackActive.value?.group || activeCollection.value?.group) {
@@ -506,8 +522,30 @@ const filteredStories = computed(() => {
 });
 const collectionOffset = ref(0);
 const reelOffset = ref(0);
+const readingRackEntries = computed(() => readingRoute.value.flatMap(node => {
+  const makeCard = (link, index) => {
+    const collection = findCollection(link.group);
+    return {
+      ...collection,
+      key: `${node.key}:${link.kind}:${index}`,
+      group: link.group,
+      label: collection?.label || link.group,
+      subtitle: link.kind === 'prerequisite' ? labels.value.readFirst : labels.value.relatedRoute,
+      act: node.act,
+      isBridge: true,
+      missing: link.missing || !link.routeId,
+      branchLink: link,
+      originGroup: node.group,
+    };
+  };
+  return [
+    ...node.prerequisites.map(makeCard),
+    { ...node, subtitle: node.role },
+    ...node.branches.map(makeCard),
+  ];
+}));
 const rackEntries = computed(() => screen.value === 'collections'
-  ? viewMode.value === 'sequence' ? readingRoute.value.map(node => ({ ...node, subtitle: node.role })) : filteredCollections.value.map(collection => ({ ...collection, subtitle: `${collection.orderLabel} · ${categoryLabel(collection.category)}` }))
+  ? viewMode.value === 'sequence' ? readingRackEntries.value : filteredCollections.value.map(collection => ({ ...collection, subtitle: `${collection.orderLabel} · ${categoryLabel(collection.category)}` }))
   : (viewMode.value === 'sequence' ? groupStories.value : filteredStories.value).map(story => ({ ...story, key: story.id, label: story.title, orderLabel: episodeNumber(story), subtitle: `${story.storyCode || episodeNumber(story)} · ${labels.value.phases[story.phase]}` })));
 const rackIndex = computed({
   get: () => screen.value === 'collections' ? viewMode.value === 'sequence' ? readingOffset.value : collectionOffset.value : reelOffset.value,
@@ -521,8 +559,115 @@ const rackIndex = computed({
 const rackActive = computed(() => rackEntries.value[rackIndex.value]);
 const visibleRackEntries = computed(() => rackEntries.value.slice(Math.max(0, rackIndex.value - 3), rackIndex.value + 4).map((entry, index) => ({ ...entry, index: Math.max(0, rackIndex.value - 3) + index })));
 const rackElement = ref(null);
+const storyReelReaderElement = ref(null);
+const reelReaderState = ref('idle');
+const pendingReadingLine = ref('');
+const reelRetractDuration = 360;
+let reelReaderAnimation = null;
+let reelReaderFlight = null;
+let reelReaderTransitionResolve = null;
+let reelReaderTransitionToken = 0;
+
+function clearReelReaderFlight() {
+  reelReaderFlight?.remove();
+  reelReaderFlight = null;
+  reelReaderAnimation = null;
+}
+
+function stopReelReaderTransition({ reset = false } = {}) {
+  reelReaderTransitionToken += 1;
+  reelReaderAnimation?.cancel();
+  clearReelReaderFlight();
+  reelReaderTransitionResolve?.();
+  reelReaderTransitionResolve = null;
+  pendingReadingLine.value = '';
+  if (reset) reelReaderState.value = 'idle';
+}
+
+function animateReelToReader(id, button) {
+  stopReelReaderTransition();
+  const token = reelReaderTransitionToken;
+  reelReaderState.value = 'inserting';
+
+  const sourceReel = button?.querySelector('.story-reel-canister');
+  const targetReel = storyReelReaderElement.value?.querySelector('.story-reel-reader-slot .story-reel-canister');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!sourceReel || !targetReel || reduceMotion) {
+    reelReaderState.value = 'idle';
+    return { token, promise: Promise.resolve() };
+  }
+
+  const source = sourceReel.getBoundingClientRect();
+  const target = targetReel.getBoundingClientRect();
+  pendingReadingLine.value = id;
+  button.style.setProperty('--reel-retract-duration', `${reelRetractDuration}ms`);
+  const flight = sourceReel.cloneNode(true);
+  flight.classList.add('story-reel-flight');
+  Object.assign(flight.style, {
+    position: 'fixed',
+    left: `${source.left}px`,
+    top: `${source.top}px`,
+    width: `${source.width}px`,
+    height: `${source.height}px`,
+    margin: '0',
+    zIndex: '100',
+    pointerEvents: 'none',
+    transform: 'none',
+  });
+  document.body.append(flight);
+  reelReaderFlight = flight;
+
+  const deltaX = target.left + target.width / 2 - (source.left + source.width / 2);
+  const deltaY = target.top + target.height / 2 - (source.top + source.height / 2);
+  const targetScale = target.width / source.width;
+  const promise = new Promise(resolve => {
+    reelReaderTransitionResolve = resolve;
+    flight.style.opacity = '0';
+    reelReaderAnimation = flight.animate([
+      { transform: 'translate3d(0, 0, 0) scale(1)', opacity: 1 },
+      { transform: 'translate3d(3px, 0, 0) scale(1)', opacity: 1, offset: .12 },
+      { transform: `translate3d(${deltaX - 12}px, ${deltaY}px, 0) scale(${targetScale})`, opacity: 1, offset: .76 },
+      { transform: `translate3d(${deltaX}px, ${deltaY}px, 0) scale(${targetScale})`, opacity: .55 },
+    ], { delay: reelRetractDuration, duration: 500, easing: 'cubic-bezier(.16,.8,.22,1)', fill: 'forwards' });
+
+    const finish = () => {
+      if (token !== reelReaderTransitionToken) return;
+      clearReelReaderFlight();
+      reelReaderState.value = 'idle';
+      pendingReadingLine.value = '';
+      reelReaderTransitionResolve = null;
+      resolve();
+    };
+    reelReaderAnimation.finished.then(finish, finish);
+  });
+
+  return { token, promise };
+}
+
+async function selectReadingLine(id, button) {
+  if (id === readingLineId.value || id === pendingReadingLine.value) return;
+  const reelTransition = animateReelToReader(id, button);
+  await reelTransition.promise;
+  if (reelTransition.token !== reelReaderTransitionToken || !button.isConnected) return;
+
+  const nextFocus = document.activeElement === button
+    ? button.nextElementSibling || button.previousElementSibling
+    : null;
+  readingLineId.value = id;
+  guideTrail.value = [];
+  if (nextFocus) {
+    await nextTick();
+    if (document.activeElement === document.body) nextFocus.focus({ preventScroll: true });
+  }
+}
+
 const rackWidth = ref(1000);
-const rackStep = computed(() => Math.max(160, Math.min(390, rackWidth.value * .68)));
+const rackStep = computed(() => {
+  const isStoryLineRack = screen.value === 'collections' && viewMode.value === 'sequence';
+  return isStoryLineRack
+    ? Math.max(160, Math.min(720, rackWidth.value - 40) * .94 + 12)
+    : Math.max(160, Math.min(390, rackWidth.value * .68));
+});
 const rackDragging = ref(false);
 const rackDragOffset = ref(0);
 const rackAnimating = ref(false);
@@ -584,6 +729,10 @@ function activateRackCard(index) {
   if (index !== rackIndex.value) { seekRack(index); return; }
   const entry = rackActive.value;
   if (!entry || entry.missing) return;
+  if (entry.branchLink) {
+    visitGuide(entry.branchLink.routeId, entry.group, entry.originGroup);
+    return;
+  }
   if (viewMode.value === 'sequence' && screen.value === 'collections' && entry.isBridge && entry.relatedLine) {
     visitGuide(entry.relatedLine, entry.group, entry.group);
     return;
@@ -672,6 +821,7 @@ watch(rackElement, element => {
   rackObserver.observe(element);
 }, { flush: 'post' });
 watch([screen, search, episodeSearch, selectedCategory, selectedSection, selectedLine, selectedCollectionFilter, collectionSort, selectedPhase, readingLineId, viewMode], cancelRackDrag);
+watch([screen, viewMode], () => stopReelReaderTransition({ reset: true }));
 watch(readingLineId, () => { readingOffset.value = 0; });
 watch(viewMode, () => {
   reelOffset.value = 0;
@@ -1236,6 +1386,7 @@ async function loadStory() {
 
 function selectStoryId(id) {
   if (screen.value === 'player' && selectedStoryId.value === id) return;
+  stopReelReaderTransition({ reset: true });
   selectedStoryId.value = id;
   lastOpenedId.value = id;
   savePreference('story-library-last-opened', id);
@@ -1246,9 +1397,10 @@ function selectStoryId(id) {
 
 function openCollection(collection) {
   if (!collection) return;
+  stopReelReaderTransition({ reset: true });
   activeCollection.value = collection;
   if (viewMode.value === 'sequence') {
-    const index = readingRoute.value.findIndex(node => node.group === collection.group);
+    const index = readingRackEntries.value.findIndex(node => !node.branchLink && node.group === collection.group);
     if (index >= 0) readingOffset.value = index;
   }
   selectedGroup.value = collection.key;
@@ -1281,12 +1433,14 @@ function clearPlayback() {
 }
 
 function returnToEpisodes() {
+  stopReelReaderTransition({ reset: true });
   clearPlayback();
   screen.value = activeCollection.value ? 'episodes' : 'collections';
   focusScreenHeading();
 }
 
 function returnToCollections() {
+  stopReelReaderTransition({ reset: true });
   screen.value = 'collections';
   focusScreenHeading();
 }
@@ -1334,6 +1488,7 @@ onUnmounted(() => {
   closeSkip(false);
   summaryRequest++;
   cancelRackDrag();
+  stopReelReaderTransition({ reset: true });
   rackObserver?.disconnect();
   clearTimeout(rackClickTimer);
   memorySound.close();
@@ -1354,6 +1509,8 @@ onUnmounted(() => {
 
 <style scoped>
 .story-line-layout.with-line-rail {
+  position: relative;
+  --story-line-rail-width: clamp(96px, 20%, 210px);
   display: grid;
   grid-template-columns: clamp(96px, 20%, 210px) minmax(0, 1fr);
   gap: 12px;
@@ -1741,73 +1898,344 @@ onUnmounted(() => {
 }
 
 /* Film archive: the selected frame, line index and chapter notes share one surface. */
-.archive-console .story-line-layout.with-line-rail {
-  grid-template-columns: clamp(170px, 23%, 270px) minmax(0, 1fr);
-  gap: 20px;
+.story-page {
+  --console-accent: var(--primary-color, #58a6ff);
+  --console-edge: #4d88b04d;
+  --console-ink: #e2edf5;
+  --console-muted: #a0b5c4;
+  --text-color: var(--console-ink);
+  --text-secondary: var(--console-muted);
 }
+.archive-console .guide-tools button {
+  border-color: var(--console-edge);
+  background: #132c3b;
+  color: var(--console-ink);
+}
+.film-archive .story-line-rail button { color: var(--console-ink); }
+.film-archive .story-line-rail small,
+.archive-console .rack-line-label,
+.archive-console .rack-caption > small,
+.archive-console .rack-caption .collection-open { color: var(--console-muted); }
+.archive-console .story-line-layout.with-line-rail {
+  position: relative;
+  --story-line-rail-width: clamp(170px, 23%, 270px);
+  --reader-width: clamp(74px, 8.5vw, 120px);
+  --reader-height: clamp(200px, 21vw, 288px);
+  --player-frame-height: 450px;
+  --loaded-reel-scale: 2.2;
+  grid-template-columns: var(--story-line-rail-width) var(--reader-width) minmax(0, 1fr);
+  --archive-column-gap: 8px;
+  column-gap: var(--archive-column-gap);
+}
+.archive-console .story-line-layout.with-line-rail::before {
+  content: '';
+  grid-area: 1 / 2 / 2 / 4;
+  height: var(--player-frame-height);
+  box-sizing: border-box;
+  border: 1px solid #4b819f;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 12% 0%, #59acdf33, transparent 42%),
+    linear-gradient(160deg, #183e56dc, #091a28f0 68%, #15354be8),
+    url('/images/story-player-brass.jpg') center / cover no-repeat,
+    #142838;
+  box-shadow: inset 0 0 0 3px #07141fa8, inset 0 0 0 4px #78b8df40, 0 14px 28px #0007;
+  pointer-events: none;
+}
+.with-line-rail > .story-line-rail { grid-area: 1 / 1; }
+.with-line-rail > .story-reel-reader { grid-area: 1 / 2; }
+.with-line-rail > :is(.story-rack-shell, .story-rack-standby, .library-empty) { grid-area: 1 / 3; }
+.story-rack-content { position: absolute; inset: 0; }
 .archive-console .story-line-rail {
-  max-height: 580px;
+  height: var(--player-frame-height);
+  max-height: var(--player-frame-height);
+  box-sizing: border-box;
   padding: 4px 10px 4px 0;
   border: 0;
   scrollbar-width: thin;
-  scrollbar-color: #9b8962 #12191e;
+  scrollbar-color: #477691 #101e29;
 }
 .story-line-rail button {
   position: relative;
   display: flex;
   align-items: center;
   isolation: isolate;
+  --film-edge: 26px;
   overflow: hidden;
   min-height: 76px;
   margin-bottom: 7px;
-  padding: 12px;
-  border: 1px solid #74766d66;
-  background: #10171c;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
-.story-line-rail button img {
+.story-line-caption {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 0 10px;
+}
+.story-line-rail strong { font-size: 1rem; font-weight: 500; }
+.story-line-rail button:hover {
+  color: #c7e6ff;
+}
+.story-line-list-move { transition: transform .18s ease-out; }
+.story-line-list-enter-active { transition: opacity .18s ease-out; }
+.story-line-list-enter-from { opacity: 0; }
+.story-line-list-leave-active {
+  position: absolute !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.story-line-rail button > .story-line-reel {
   position: absolute;
   inset: 0;
-  z-index: -2;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: .6;
+  display: block;
+  margin: 0;
+  z-index: 1;
+  pointer-events: none;
 }
-.story-line-rail button::after {
+.story-reel-film {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  width: calc(100% - var(--film-edge));
+  min-height: inherit;
+  box-sizing: border-box;
+  margin-left: var(--film-edge);
+  padding: 12px 0 12px 4px;
+  border-block: 1px solid #537990;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 5px, #789aad 5px 11px, transparent 11px 16px) left 3px / 100% 5px no-repeat,
+    repeating-linear-gradient(90deg, transparent 0 5px, #789aad 5px 11px, transparent 11px 16px) left bottom 3px / 100% 5px no-repeat,
+    #152936;
+  clip-path: inset(0);
+}
+.story-reel-film img,
+.story-reel-film::before {
+  position: absolute;
+  inset: 11px 0;
+  width: 100%;
+  height: calc(100% - 22px);
+}
+.story-reel-film img { z-index: -2; object-fit: cover; }
+.story-reel-film::before {
+  content: '';
+  z-index: -1;
+  background: linear-gradient(90deg, #121719f2, #12171973);
+}
+.story-line-rail button.reel-retracting .story-reel-film {
+  animation: reel-wind-in var(--reel-retract-duration) cubic-bezier(.28, .75, .35, 1) both;
+}
+.story-line-rail button.reel-retracting .story-reel-film::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0 auto 0 100%;
+  width: 18px;
+  border-radius: 45% 0 0 45%;
+  background: linear-gradient(90deg, transparent, #0a1923aa 40%, #8cc9ed99 78%, #1a394d);
+  transform: translateX(-100%);
+  animation:
+    reel-wind-edge var(--reel-retract-duration) cubic-bezier(.28, .75, .35, 1) both,
+    reel-wind-glint var(--reel-retract-duration) ease-in both;
+}
+@keyframes reel-wind-in {
+  from { clip-path: inset(0); }
+  to { clip-path: inset(0 100% 0 0); }
+}
+@keyframes reel-wind-edge {
+  from { left: 100%; }
+  to { left: 0; }
+}
+@keyframes reel-wind-glint {
+  0%, 55% { width: 18px; opacity: 1; }
+  100% { width: 2px; opacity: 0; }
+}
+.story-line-rail button.reel-retracting .story-reel-canister {
+  opacity: 0;
+  transition: opacity 0s var(--reel-retract-duration);
+}
+.story-line-reel .story-reel-canister { left: 3px; width: 34px; height: 62.33px; }
+.story-reel-canister {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  width: 24px;
+  height: 44px;
+  box-sizing: border-box;
+  background: url('/images/story-film-cartridge-blue.png') center / contain no-repeat;
+  filter: drop-shadow(0 2px 3px #000a);
+  transform: translateY(-50%);
+}
+.story-reel-flight { pointer-events: none !important; transform-origin: center !important; }
+.story-reel-reader {
+  position: relative;
+  align-self: start;
+  z-index: 32;
+  width: var(--reader-width);
+  height: var(--player-frame-height);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.story-reel-reader-shell {
+  position: absolute;
+  inset: 50% 8% auto 16%;
+  height: var(--reader-height);
+  transform: translateY(-50%);
+  display: block;
+  border-radius: 12px;
+}
+.story-reel-reader-shell::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  left: 6px;
+  height: 6px;
+  background: radial-gradient(circle at 3px 50%, #b29b6e 1px, #151719 2px, transparent 3px),
+    radial-gradient(circle at calc(100% - 3px) 50%, #b29b6e 1px, #151719 2px, transparent 3px);
+}
+.story-reel-reader-shell::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  left: 6px;
+  height: 1px;
+  background: #c4aa6c44;
+}
+.story-reel-reader-slot {
+  position: absolute;
+  inset: 8% 5% 21%;
+  overflow: hidden;
+  border: 1px solid #608aa2;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #07111a 8%, #294353 10% 14%, #0b1720 17% 83%, #294353 86% 90%, #07111a 92%);
+  box-shadow: inset 0 0 14px 4px #000, 0 0 0 3px #0d1922, 0 0 0 4px #547a9288;
+}
+.story-reel-reader-slot::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background: linear-gradient(90deg, #10171c22, #10171ce8 58%);
+  background: linear-gradient(110deg, #0b0b0ce8 0 20%, #b7a28229 40%, #0b0b0c9c 72%, #080909e8 92%);
 }
-.story-line-rail button > span { display: grid; gap: 3px; margin-left: 35%; }
-.story-line-rail strong { font-size: 1rem; font-weight: 500; }
-.story-line-rail button[aria-pressed="true"] {
-  border-color: #e5c98d;
-  box-shadow: inset 3px 0 #ead39a, 0 0 15px #e0be7026;
-  color: #fff2d5;
+.story-reel-reader-latch {
+  position: absolute;
+  left: -18px;
+  bottom: 17%;
+  width: 58%;
+  height: 13px;
+  border: 1px solid #608aa2;
+  border-radius: 4px 2px 2px 4px;
+  background:
+    linear-gradient(#648a9e, #335164 48%, #152a39 55%);
+  box-shadow: 0 4px 6px #0009;
+  transform-origin: right center;
+  transition: transform .2s ease-out;
 }
+.story-reel-reader.loaded .story-reel-reader-latch { transform: translateX(5px) rotate(-8deg); }
+.story-reel-reader-slot .story-reel-canister {
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(var(--loaded-reel-scale));
+  transition: opacity .16s ease;
+}
+.story-reel-reader.loaded .story-reel-reader-slot .story-reel-canister {
+  opacity: 1;
+}
+.story-reel-reader-controls {
+  position: absolute;
+  inset: auto 14% 8%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 8px;
+}
+.story-reel-reader-aperture {
+  flex: 0 0 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #36566d;
+  box-shadow: 0 0 0 2px #101112;
+}
+.story-reel-reader-grille {
+  flex: 1;
+  height: 7px;
+  background: repeating-linear-gradient(90deg, #090a0b 0 2px, #77664d 2px 3px, transparent 3px 5px);
+}
+.story-reel-reader.loaded .story-reel-reader-aperture { background: var(--console-accent); box-shadow: 0 0 8px var(--console-accent); }
 .archive-console .story-rack { height: 450px; min-height: 450px; border-color: #ac98764d; background: #10171bb3; }
+.with-line-rail > :is(.story-rack-shell, .story-rack-standby) {
+  position: relative;
+  align-self: start;
+  min-width: 0;
+  margin: 9px 9px 9px 0;
+}
+.archive-console .with-line-rail > .story-rack-shell {
+  border: 1px solid var(--console-edge);
+  border-radius: 12px;
+  background: #101e29;
+}
+.archive-console .with-line-rail .story-rack-shell > .story-rack {
+  border: 0;
+  border-radius: 0;
+}
+.archive-console .with-line-rail .story-rack {
+  height: calc(var(--player-frame-height) - 18px);
+  min-height: calc(var(--player-frame-height) - 18px);
+  box-sizing: border-box;
+  border-color: var(--console-edge);
+  border-radius: 12px;
+  background: #101e29;
+  box-shadow: inset 0 0 16px #58a6ff1a;
+}
+.story-rack-standby {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--console-ink);
+  text-align: center;
+}
 .archive-console .rack-card { width: min(420px, calc(100% - 56px)); border-color: #9b9d9577; border-radius: 2px; background: #171d20; }
 .archive-console .rack-card.active { border-color: #efd39c; box-shadow: 0 0 0 1px #c5aa7266, 0 0 20px #e4c17a33, 0 16px 36px #0008; }
 .archive-console .rack-art { height: 195px; }
+.archive-console .with-line-rail .rack-card:not(.rack-bridge) {
+  width: min(720px, calc(100% - 40px));
+  border-radius: 6px;
+}
+.archive-console .with-line-rail .rack-card:not(.rack-bridge) .rack-art { height: 228px; }
 .archive-console .rack-art::after { background: linear-gradient(transparent 45%, #171d20); }
 .archive-console .rack-caption { padding: 10px 20px 14px; }
 .archive-console .rack-caption > strong { font-family: Georgia, 'Noto Serif TC', serif; font-size: 1.5rem; }
 .archive-console .rack-open { color: #f0d8a5; border-color: #bfa77566; }
 .archive-console .rack-number { border-color: #bfa775; background: #1b2024e6; color: #f1d7a2; }
+.archive-console .rack-card { border-color: var(--console-edge); background: #102432; }
+.archive-console .rack-card.active {
+  border-color: var(--console-accent);
+  box-shadow: 0 0 0 1px #58a6ff55, 0 0 22px #58a6ff40, 0 16px 36px #0008;
+}
+.archive-console .rack-art::after { background: linear-gradient(transparent 45%, #102432); }
+.archive-console .rack-number { border-color: var(--console-edge); background: #102432e6; color: var(--console-ink); }
+.archive-console .rack-card.active .rack-number { background: var(--console-accent); color: #0d1c27; }
+.archive-console .rack-open { color: #a1cef4; border-color: var(--console-edge); }
+.archive-console .film-perforations {
+  background-image: repeating-linear-gradient(90deg, transparent 0 12px, #8fadc0 12px 26px, transparent 26px 40px);
+}
 .archive-console .film-perforations { opacity: .65; }
 .archive-console .rack-navigation { padding-top: 10px; }
 .archive-console .rack-navigation button { border-color: #a58f65; color: #eed6a3; border-radius: 2px; }
 .archive-console .rack-scrubber input { accent-color: #dfbe7e; }
 .archive-chapter-summary {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) minmax(150px, 1.5fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto;
   align-items: center;
   gap: 18px;
   padding: 20px;
   border-block: 1px solid #b49d694d;
   background: linear-gradient(120deg, #263139b3, #11191ee6);
+  overflow-wrap: anywhere;
 }
 .archive-chapter-summary > div { display: grid; gap: 8px; }
 .archive-chapter-summary small { color: #dec490; }
@@ -1817,16 +2245,185 @@ onUnmounted(() => {
 .archive-chapter-summary button:disabled { opacity: .45; cursor: default; }
 .archive-console .reading-detail { padding: 12px 20px; }
 .reading-detail > summary { cursor: pointer; font-size: .75rem; color: #c8b78f; }
+.archive-console .story-rack {
+  border-color: var(--console-edge);
+  border-radius: 12px;
+  background: #101e29;
+}
+.archive-console .rack-navigation button,
+.archive-chapter-summary button {
+  border-color: var(--console-edge);
+  background: #132c3b;
+  color: var(--console-ink);
+  border-radius: 6px;
+}
+.archive-console .rack-scrubber input { accent-color: var(--console-accent); }
+.archive-chapter-summary {
+  border-color: var(--console-edge);
+  background: #101e29;
+}
+.archive-chapter-summary small,
+.reading-detail > summary { color: var(--console-muted); }
+.story-page:not(.archive-console) {
+  width: min(1600px, calc(100% - 48px));
+  margin: 24px auto 32px;
+}
+.story-shell { border-color: var(--console-edge); background: #0d1924; }
+.story-controls { background: #101e29; color: var(--console-muted); }
+.story-controls button,
+.story-controls .story-skip,
+.story-page .heading-actions button {
+  border-color: var(--console-edge);
+  background: #132c3b;
+  color: var(--console-ink);
+  border-radius: 6px;
+}
+.story-controls button:focus-visible,
+.story-page .heading-actions button:focus-visible { outline: 2px solid var(--console-accent); outline-offset: 2px; }
+.story-volume input { accent-color: var(--console-accent); }
 @media (max-width: 700px) {
-  .archive-console .story-line-layout.with-line-rail { grid-template-columns: 100px minmax(0, 1fr); gap: 8px; }
-  .archive-console .story-line-rail { max-height: 450px; padding-right: 4px; }
-  .story-line-rail button { min-height: 70px; padding: 8px; }
-  .story-line-rail button > span { margin-left: 0; }
+  .story-page:not(.archive-console) { width: calc(100% - 24px); margin-block: 12px 24px; }
+  .archive-console .story-line-layout.with-line-rail {
+    --story-line-rail-width: 100px;
+    --reader-width: 38px;
+    --reader-height: 130px;
+    --loaded-reel-scale: 1.15;
+    --archive-column-gap: 5px;
+  }
+  .archive-console .story-line-rail { padding-right: 4px; }
+  .story-line-rail button { min-height: 70px; --film-edge: 20px; }
+  .story-line-caption { padding-inline: 7px; }
+  .story-line-reel .story-reel-canister { width: 26px; height: 47.67px; }
   .story-line-rail strong { font-size: .8rem; }
-  .story-line-rail button::after { background: #10171cb3; }
   .archive-console .rack-art { height: 155px; }
+  .archive-console .with-line-rail .rack-card:not(.rack-bridge) .rack-art { height: 155px; }
+  .story-reel-reader-latch { left: -4px; }
   .archive-console .rack-caption { padding: 10px 12px; }
   .archive-console .rack-caption > strong { font-size: 1rem; }
   .archive-chapter-summary { grid-template-columns: 1fr; gap: 10px; padding: 12px; }
+}
+@media (min-height: 540px) {
+  .archive-console:not(.film-archive) {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+    margin-block: 8px 10px;
+  }
+  .archive-console:not(.film-archive) > .story-heading { flex: none; margin-bottom: 4px; padding-bottom: 4px; }
+  .archive-console:not(.film-archive) > .archive-screen {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+    overflow: auto;
+  }
+  .archive-console:not(.film-archive) .story-library {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+  .archive-console:not(.film-archive) .projection-controls { flex: none; padding-bottom: 6px; }
+  .archive-console:not(.film-archive) .story-line-layout,
+  .archive-console:not(.film-archive) .story-rack-shell {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .archive-console:not(.film-archive) .story-rack-shell { overflow: auto; }
+  .archive-console:not(.film-archive) .story-rack {
+    flex: 1 0 230px;
+    height: auto;
+    min-height: 230px;
+    max-height: none;
+    container-type: size;
+  }
+  .archive-console:not(.film-archive) .rack-card {
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    width: min(420px, calc(100% - 40px));
+    max-height: calc(100cqh - 48px);
+  }
+  .archive-console:not(.film-archive) .rack-art { flex: 1 1 auto; min-height: 0; aspect-ratio: 16 / 9; height: auto; }
+  .archive-console:not(.film-archive) .rack-caption { flex: none; padding-block: 6px 8px; }
+  @container (max-height: 350px) and (min-width: 420px) {
+    .archive-console:not(.film-archive) .rack-card {
+      flex-direction: row;
+      align-items: center;
+    }
+    .archive-console:not(.film-archive) .rack-art { flex: 0 0 48%; }
+    .archive-console:not(.film-archive) .rack-caption {
+      flex: 1 1 0;
+      min-width: 0;
+      padding-inline: 12px;
+    }
+  }
+  @container (max-height: 350px) and (max-width: 419px) {
+    .archive-console:not(.film-archive) .rack-card { height: calc(100cqh - 48px); }
+  }
+  .archive-console:not(.film-archive) .archive-chapter-summary { padding-block: 8px; }
+  .archive-console:not(.film-archive) .progress-note { margin-block: 4px 0; }
+  .archive-console .collection-browser .archive-categories { margin-top: 6px; padding-top: 2px; }
+  .archive-console .collection-browser .rack-card { flex-direction: column; align-items: stretch; }
+  .archive-console .collection-browser .rack-art { flex: 1 1 auto; }
+  .archive-console .collection-browser .rack-caption { flex: none; }
+  .archive-console.film-archive {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+    margin-block: 8px 10px;
+  }
+  .film-archive > .story-heading { flex: none; padding-bottom: 8px; }
+  .film-archive > .archive-screen,
+  .film-archive .story-library {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .film-archive .projection-controls { flex: none; }
+  .archive-console.film-archive .with-line-rail {
+    --player-frame-height: 100%;
+    flex: 1 1 0;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .film-archive .with-line-rail > :is(.story-rack-shell, .story-rack-standby) {
+    align-self: stretch;
+  }
+  .archive-console.film-archive .with-line-rail .story-rack {
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    container-type: size;
+  }
+  .film-archive .story-reel-reader-shell { max-height: 88%; }
+  .archive-console.film-archive .with-line-rail .rack-card:not(.rack-bridge) {
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    height: min(560px, calc(100cqh - 56px));
+  }
+  .archive-console.film-archive .with-line-rail .rack-card:not(.rack-bridge) .rack-art {
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+  }
+  .film-archive .rack-caption { flex: 0 0 auto; }
+  .film-archive .rack-caption { padding-block: 7px 9px; }
+  .film-archive .rack-caption > small { margin-bottom: 3px; }
+  .film-archive .rack-caption .collection-open { margin-top: 4px; }
+  .film-archive .rack-open { margin-top: 6px; padding-top: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-line-list-move,
+  .story-line-list-enter-active { transition: none; }
+  .story-reel-reader-slot .story-reel-canister,
+  .story-reel-reader-latch { transition: none; }
 }
 </style>

@@ -411,6 +411,19 @@ onMounted(() => {
   height: 100dvh;
   min-height: 0;
 }
+@media (min-height: 540px) {
+  #app:has(> .story-page.archive-console) {
+    height: 100dvh;
+    min-height: 0;
+  }
+  #app:has(> .story-page.archive-console) > :is(.main-navbar, footer) {
+    flex: none;
+  }
+  #app:has(> .story-page.archive-console) > footer {
+    padding: 6px 12px;
+    font-size: .75rem;
+  }
+}
 #app.album-page > .main-navbar,
 #app.album-page > .topbar-section,
 #app.album-page > footer {
