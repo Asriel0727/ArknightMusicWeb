@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-15T22:54:53.868Z",
+  "generatedAt": "2026-11-17T01:54:19.311Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -36,9 +36,9 @@
       "missing": 0
     },
     "portraits": {
-      "total": 1373,
+      "total": 1375,
       "existing": 1373,
-      "missing": 0
+      "missing": 2
     },
     "items": {
       "total": 87,
@@ -60,7 +60,10 @@
     "avatars": [],
     "factions": [],
     "classes": [],
-    "portraits": [],
+    "portraits": [
+      "public/images/operators/portraits/char_1047_halo2_striker_4-cb86cfdd.png",
+      "public/images/operators/portraits/char_248_mgllan_epoque_60-41a234d7.png"
+    ],
     "items": [],
     "skills": [],
     "modules": [
@@ -18868,6 +18871,31 @@
       },
       {
         "type": "portrait",
+        "id": "char_1047_halo2_striker#4",
+        "label": "溯光星源 - 溯光星源 - 暗能质子",
+        "publicPath": "/images/operators/portraits/char_1047_halo2_striker_4-cb86cfdd.png",
+        "relativePath": "public/images/operators/portraits/char_1047_halo2_striker_4-cb86cfdd.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1047_halo2_striker%234.png",
+          "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1047_halo2_striker%234.png",
+          "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/characters/char_1047_halo2_striker%234.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charportraits/char_1047_halo2_striker%234.png",
+          "https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main/portraits/char_1047_halo2_striker%234.png",
+          "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main/characters/char_1047_halo2_striker%234.png",
+          "https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/char_1047_halo2_striker%234.png",
+          "https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/char_1047_halo2_striker%234.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/char_1047_halo2_striker%234.png",
+          "https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/char_1047_halo2_striker%234.png"
+        ],
+        "operatorId": "char_1047_halo2",
+        "skinId": "char_1047_halo2@striker#4",
+        "portraitId": "char_1047_halo2_striker#4",
+        "category": "skin",
+        "phase": null
+      },
+      {
+        "type": "portrait",
         "id": "char_377_gdglow_1",
         "label": "澄闪 - 澄闪 Elite 1",
         "publicPath": "/images/operators/portraits/char_377_gdglow_1.png",
@@ -25670,6 +25698,31 @@
         "portraitId": "char_248_mgllan_2",
         "category": "elite",
         "phase": 2
+      },
+      {
+        "type": "portrait",
+        "id": "char_248_mgllan_epoque#60",
+        "label": "麦哲伦 - 麦哲伦 - 绿影之下",
+        "publicPath": "/images/operators/portraits/char_248_mgllan_epoque_60-41a234d7.png",
+        "relativePath": "public/images/operators/portraits/char_248_mgllan_epoque_60-41a234d7.png",
+        "exists": false,
+        "sourceUrls": [
+          "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_248_mgllan_epoque%2360.png",
+          "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_248_mgllan_epoque%2360.png",
+          "https://cdn.jsdelivr.net/gh/Aceship/Arknight-Images@main/characters/char_248_mgllan_epoque%2360.png",
+          "https://cdn.jsdelivr.net/gh/ArknightsAssets/ArknightsAssets@cn/assets/torappu/dynamicassets/arts/charportraits/char_248_mgllan_epoque%2360.png",
+          "https://cdn.jsdelivr.net/gh/ak-cn-archive/arknights-operator-image@main/portraits/char_248_mgllan_epoque%2360.png",
+          "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-Images/main/characters/char_248_mgllan_epoque%2360.png",
+          "https://raw.githubusercontent.com/yuanyan3060/ArknightsGameResource/main/charportraits/char_248_mgllan_epoque%2360.png",
+          "https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/char_248_mgllan_epoque%2360.png",
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets/cn/assets/torappu/dynamicassets/arts/charportraits/char_248_mgllan_epoque%2360.png",
+          "https://raw.githubusercontent.com/ak-cn-archive/arknights-operator-image/main/portraits/char_248_mgllan_epoque%2360.png"
+        ],
+        "operatorId": "char_248_mgllan",
+        "skinId": "char_248_mgllan@epoque#60",
+        "portraitId": "char_248_mgllan_epoque#60",
+        "category": "skin",
+        "phase": null
       },
       {
         "type": "portrait",
