@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-17T08:09:32.726Z",
+  "generatedAt": "2026-11-17T21:06:53.568Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -3806,9 +3806,22 @@
       "syncedAt": "2026-11-03T07:01:21.762Z"
     },
     "wiki-retracing-our-steps-rerun": {
-      "aliasOf": "wiki-retracing-our-steps",
-      "sourceUrl": "alias:wiki-retracing-our-steps",
-      "syncedAt": "2026-11-16T06:50:41.811Z"
+      "publicPath": "/images/activities/wiki-retracing-our-steps-rerun.webp",
+      "relativePath": "public/images/activities/wiki-retracing-our-steps-rerun.webp",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Retracing_Our_Steps_Rerun_banner.png?6c782a",
+      "contentType": "image/webp",
+      "size": 1250860,
+      "hash": "240310cd70c198ee07b25960b91f6d25469a816a56edfda95eea47a326170de3",
+      "syncedAt": "2026-11-17T21:06:51.099Z"
+    },
+    "prts-1n9rlg6": {
+      "publicPath": "/images/activities/prts-1n9rlg6.jpg",
+      "relativePath": "public/images/activities/prts-1n9rlg6.jpg",
+      "sourceUrl": "https://media.prts.wiki/b/bd/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%9B%AA%E5%B1%B1%E9%99%8D%E4%B8%B41101_2026_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 474210,
+      "hash": "bff0aa56c3871455adb708c078c459c8c717733ae8784a06e5b703049004a319",
+      "syncedAt": "2026-11-17T21:06:53.568Z"
     }
   }
 }
