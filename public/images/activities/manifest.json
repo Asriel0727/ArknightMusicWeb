@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-19T07:41:07.791Z",
+  "generatedAt": "2026-11-19T20:50:36.540Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -1083,13 +1083,13 @@
       "syncedAt": "2026-07-17T03:50:25.804Z"
     },
     "wiki-babel-event": {
-      "publicPath": "/images/activities/wiki-babel-event.webp",
-      "relativePath": "public/images/activities/wiki-babel-event.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_banner.png?633a64",
-      "contentType": "image/webp",
-      "size": 834100,
-      "hash": "761383b404cad188fff132bcd1f7722b03b26b6310071f077f0f018e64576280",
-      "syncedAt": "2026-11-19T07:41:07.791Z"
+      "publicPath": "/images/activities/wiki-babel-event.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-11-19T20:50:36.540Z"
     },
     "prts-6rbm0p": {
       "publicPath": "/images/activities/prts-6rbm0p.jpg",
@@ -2894,11 +2894,11 @@
     "wiki-medjehtiqedti-bound": {
       "publicPath": "/images/activities/wiki-medjehtiqedti-bound.webp",
       "relativePath": "public/images/activities/wiki-medjehtiqedti-bound.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/EN_Medjehtiqedti_Bound_banner.png?372bd9",
+      "sourceUrl": "https://arknights.wiki.gg/images/CN_Medjehtiqedti_Bound_banner.png?7edb09",
       "contentType": "image/webp",
-      "size": 937618,
-      "hash": "976f271280b33315706608a217db8cc5144ce5a28f99752c525657a164a323fb",
-      "syncedAt": "2026-11-19T07:40:36.480Z"
+      "size": 820454,
+      "hash": "f4bfbd8959f044238e6741d8c7135e610b0c83669cbae72d3eed12b3eded4d4f",
+      "syncedAt": "2026-11-19T20:50:23.616Z"
     },
     "wiki-trials-for-navigator-6": {
       "publicPath": "/images/activities/wiki-trials-for-navigator-6.png",
@@ -3261,13 +3261,13 @@
       "syncedAt": "2026-11-18T07:44:47.608Z"
     },
     "wiki-ending-a-grand-overture": {
-      "publicPath": "/images/activities/wiki-ending-a-grand-overture.webp",
-      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Ending_a_Grand_Overture_banner.png?e80c0c",
-      "contentType": "image/webp",
-      "size": 847718,
-      "hash": "4527335cd9b23ecc2df1c83a0b12bd3fb37fbb4d745804e14b6c46f17110a11f",
-      "syncedAt": "2026-11-18T07:44:47.634Z"
+      "publicPath": "/images/activities/wiki-ending-a-grand-overture.jpg",
+      "relativePath": "public/images/activities/wiki-ending-a-grand-overture.jpg",
+      "sourceUrl": "https://media.prts.wiki/1/1f/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BF%BD%E8%BF%B9%E6%97%A5%E8%90%BD%E4%BB%A5%E8%A5%BF_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 280529,
+      "hash": "e565c07f4af19d886d6d5173f5335fd5060caecfba788de7420e6c2d26fe8885",
+      "syncedAt": "2026-11-19T20:50:35.631Z"
     },
     "wiki-vector-breakthrough-event": {
       "publicPath": "/images/activities/wiki-vector-breakthrough-event.jpg",
@@ -3288,13 +3288,13 @@
       "syncedAt": "2026-08-10T08:11:20.109Z"
     },
     "prts-1khulg4": {
-      "publicPath": "/images/activities/prts-1khulg4.svg",
-      "relativePath": "public/images/activities/prts-1khulg4.svg",
-      "sourceUrl": "generated:activity-fallback:v1",
-      "contentType": "image/svg+xml",
-      "size": 822,
-      "hash": "dd24107c90bdb88fdb5a537862c4163fde572a4d8ae8bd70a377db5bbadcffe7",
-      "syncedAt": "2026-11-18T07:44:47.635Z"
+      "publicPath": "/images/activities/prts-1khulg4.jpg",
+      "relativePath": "public/images/activities/prts-1khulg4.jpg",
+      "sourceUrl": "https://media.prts.wiki/thumb/0/03/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%86%94%E7%82%89%E2%80%9C%E8%BF%98%E9%AD%82%E2%80%9D%E8%AE%B0_12.jpg/650px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E7%86%94%E7%82%89%E2%80%9C%E8%BF%98%E9%AD%82%E2%80%9D%E8%AE%B0_12.jpg?v=lveqzdbhbuqwyma7v4tlnqb0irhk020",
+      "contentType": "image/jpeg",
+      "size": 28887,
+      "hash": "4a20bef2bcfb4c7c3649f151989f1608de5ef8654cf991a2c4b00b142b669b1a",
+      "syncedAt": "2026-11-19T20:50:36.054Z"
     },
     "wiki-contingency-contract-underdawn": {
       "publicPath": "/images/activities/wiki-contingency-contract-underdawn.webp",
