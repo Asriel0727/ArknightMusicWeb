@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-17T01:54:19.311Z",
+  "generatedAt": "2026-11-20T00:41:15.248Z",
   "output": "public/images/manifest/operator-assets-audit.json",
   "options": {
     "apiBase": "https://arknights-recruit-api.molly27molly.workers.dev",
@@ -37,8 +37,8 @@
     },
     "portraits": {
       "total": 1375,
-      "existing": 1373,
-      "missing": 2
+      "existing": 1375,
+      "missing": 0
     },
     "items": {
       "total": 87,
@@ -60,10 +60,7 @@
     "avatars": [],
     "factions": [],
     "classes": [],
-    "portraits": [
-      "public/images/operators/portraits/char_1047_halo2_striker_4-cb86cfdd.png",
-      "public/images/operators/portraits/char_248_mgllan_epoque_60-41a234d7.png"
-    ],
+    "portraits": [],
     "items": [],
     "skills": [],
     "modules": [
@@ -18875,7 +18872,7 @@
         "label": "溯光星源 - 溯光星源 - 暗能质子",
         "publicPath": "/images/operators/portraits/char_1047_halo2_striker_4-cb86cfdd.png",
         "relativePath": "public/images/operators/portraits/char_1047_halo2_striker_4-cb86cfdd.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_1047_halo2_striker%234.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_1047_halo2_striker%234.png",
@@ -25705,7 +25702,7 @@
         "label": "麦哲伦 - 麦哲伦 - 绿影之下",
         "publicPath": "/images/operators/portraits/char_248_mgllan_epoque_60-41a234d7.png",
         "relativePath": "public/images/operators/portraits/char_248_mgllan_epoque_60-41a234d7.png",
-        "exists": false,
+        "exists": true,
         "sourceUrls": [
           "https://cdn.jsdelivr.net/gh/PuppiizSunniiz/Arknight-Images@main/characters/char_248_mgllan_epoque%2360.png",
           "https://cdn.jsdelivr.net/gh/yuanyan3060/ArknightsGameResource@main/charportraits/char_248_mgllan_epoque%2360.png",
