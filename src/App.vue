@@ -424,6 +424,12 @@ onMounted(() => {
     font-size: .75rem;
   }
 }
+@media (min-width: 701px) {
+  #app:has(> .story-page.film-archive) {
+    height: auto;
+    min-height: 100dvh;
+  }
+}
 #app.album-page > .main-navbar,
 #app.album-page > .topbar-section,
 #app.album-page > footer {
