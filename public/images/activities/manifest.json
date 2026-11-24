@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-22T19:52:39.893Z",
+  "generatedAt": "2026-11-24T00:05:18.518Z",
   "assets": {
     "prts-123fgas": {
       "publicPath": "/images/activities/prts-123fgas.jpg",
@@ -39,13 +39,13 @@
       "syncedAt": "2026-11-22T19:52:37.814Z"
     },
     "wiki-magic-and-friendship": {
-      "publicPath": "/images/activities/wiki-magic-and-friendship.webp",
-      "relativePath": "public/images/activities/wiki-magic-and-friendship.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Magic_and_Friendship_banner.png?d6babc",
-      "contentType": "image/webp",
-      "size": 231786,
-      "hash": "545b0c96213e620dc8443f76627e5996933874487ecfbb3fbd23e8f38fd692db",
-      "syncedAt": "2026-11-21T07:27:22.882Z"
+      "publicPath": "/images/activities/wiki-magic-and-friendship.png",
+      "relativePath": "public/images/activities/wiki-magic-and-friendship.png",
+      "sourceUrl": "https://media.prts.wiki/2/28/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%AD%94%E6%B3%95%E4%B8%8E%E5%8F%8B%E8%B0%8A_01.png",
+      "contentType": "image/png",
+      "size": 351032,
+      "hash": "47caf3a1a1e6e26345ef50f19a4cc0e81aa4b2ab19fae80acab6025cc99cc08e",
+      "syncedAt": "2026-11-24T00:05:17.398Z"
     },
     "prts-13nxmnx": {
       "publicPath": "/images/activities/prts-13nxmnx.jpg",
@@ -210,13 +210,13 @@
       "syncedAt": "2026-07-17T03:49:57.942Z"
     },
     "wiki-crossing": {
-      "publicPath": "/images/activities/wiki-crossing.webp",
-      "relativePath": "public/images/activities/wiki-crossing.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Crossing_banner.png?51dbf8",
-      "contentType": "image/webp",
-      "size": 937546,
-      "hash": "e02ea03bd5b74af9cf529ee70acbb002e97fdcaf59e4a02780c090b5a6b8a16e",
-      "syncedAt": "2026-11-18T07:44:26.658Z"
+      "publicPath": "/images/activities/wiki-crossing.jpg",
+      "relativePath": "public/images/activities/wiki-crossing.jpg",
+      "sourceUrl": "https://media.prts.wiki/7/79/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%8D%81%E5%AD%97%E8%B7%AF%E5%8F%A3_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 471348,
+      "hash": "8be10006032610874d92f735b46283b4e5e95509c3e8973ec4f53c89ab78437e",
+      "syncedAt": "2026-11-24T00:05:17.933Z"
     },
     "prts-1m42naa": {
       "publicPath": "/images/activities/prts-1m42naa.jpg",
@@ -237,13 +237,13 @@
       "syncedAt": "2026-07-17T03:49:58.701Z"
     },
     "wiki-first-of-a-thousand-autumns": {
-      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.webp",
-      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.webp",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_First_of_A_Thousand_Autumns_banner.png?72d32f",
-      "contentType": "image/webp",
-      "size": 1285088,
-      "hash": "a345cc93d50c3b7da92bfb9f20c64428e3e70169d2f735fa4e64ac16ff5c11dc",
-      "syncedAt": "2026-11-18T07:44:26.686Z"
+      "publicPath": "/images/activities/wiki-first-of-a-thousand-autumns.jpg",
+      "relativePath": "public/images/activities/wiki-first-of-a-thousand-autumns.jpg",
+      "sourceUrl": "https://media.prts.wiki/d/d4/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E8%BE%9E%E5%B2%81%E8%A1%8C_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 432667,
+      "hash": "121524b8cb3c3aab55cfd041ce5ecc002389f0f67307440eee0206e5b66480c7",
+      "syncedAt": "2026-11-24T00:05:18.233Z"
     },
     "prts-1cqt5uv": {
       "publicPath": "/images/activities/prts-1cqt5uv.jpg",
@@ -3234,13 +3234,13 @@
       "syncedAt": "2026-11-22T19:52:38.721Z"
     },
     "wiki-babel-event-rerun": {
-      "publicPath": "/images/activities/wiki-babel-event-rerun.png",
-      "relativePath": "public/images/activities/wiki-babel-event-rerun.png",
-      "sourceUrl": "https://arknights.wiki.gg/images/CN_Babel_Rerun_banner.png?b0dc17",
-      "contentType": "image/png",
-      "size": 1101120,
-      "hash": "10f4219a4968923762faddf0a6d8dae3ebb25da18c57b5da4cc42f99a53f05d6",
-      "syncedAt": "2026-11-18T07:44:37.266Z"
+      "publicPath": "/images/activities/wiki-babel-event-rerun.jpg",
+      "relativePath": "public/images/activities/wiki-babel-event-rerun.jpg",
+      "sourceUrl": "https://media.prts.wiki/2/2a/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%B7%B4%E5%88%AB%E5%A1%94_01.jpg",
+      "contentType": "image/jpeg",
+      "size": 330324,
+      "hash": "58abeeb904a6107c0a5ad81a73f9c31b00fc05f1fbae2448a0bead2f4707df4e",
+      "syncedAt": "2026-11-24T00:05:18.518Z"
     },
     "wiki-icebreaker-games-1": {
       "publicPath": "/images/activities/wiki-icebreaker-games-1.jpg",
