@@ -10,14 +10,14 @@ import {
 test('uses the configured Bilibili intro offset', () => {
   const characterEp = {
     sourceUrl: 'https://www.bilibili.com/video/BV1example/',
-    videoOffsetSeconds: 5.25,
+    sync: { calibrationStatus: 'manual', manualOffsetSeconds: 5.25 },
   };
 
   assert.equal(getCharacterEpVideoOffsetSeconds(characterEp), 5.25);
   assert.equal(getCharacterEpVideoTime(20, 5.25), 25.25);
 });
 
-test('falls back to the five-second Bilibili estimate when the API field is absent', () => {
+test('does not invent a five-second offset when calibration is absent', () => {
   assert.equal(
     getCharacterEpVideoOffsetSeconds({ sourceUrl: 'https://www.bilibili.com/video/BV1example/' }),
     DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS,
@@ -32,19 +32,19 @@ test('does not add a Bilibili offset to YouTube videos by default', () => {
   assert.equal(getCharacterEpVideoTime(20, 0), 20);
 });
 
-test('prefers the explicit offset instead of inferring a start delay from durations', () => {
-  const ep = { durationSeconds: 197, videoOffsetSeconds: 5 };
+test('uses a manual correction instead of inferring an offset from durations', () => {
+  const ep = { durationSeconds: 197, sync: { calibrationStatus: 'manual', manualOffsetSeconds: 5 } };
   assert.equal(getCharacterEpVideoOffsetSeconds(ep), 5);
   assert.equal(getCharacterEpVideoTime(20, getCharacterEpVideoOffsetSeconds(ep)), 25);
   assert.equal(getCharacterEpVideoOffsetSeconds(ep), 5);
 });
 
-test('uses the configured offset or platform fallback without requiring durations', () => {
+test('does not trust the legacy numeric field without a sync source', () => {
   const ep = { durationSeconds: 201, videoOffsetSeconds: 2 };
-  assert.equal(getCharacterEpVideoOffsetSeconds(ep), 2);
-  assert.equal(getCharacterEpVideoOffsetSeconds({ ...ep, durationSeconds: 0 }), 2);
-  assert.equal(getCharacterEpVideoOffsetSeconds({ ...ep, durationSeconds: Infinity }), 2);
-  assert.equal(getCharacterEpVideoOffsetSeconds({ sourceUrl: 'https://www.bilibili.com/video/BV1example/' }), 5);
+  assert.equal(getCharacterEpVideoOffsetSeconds(ep), 0);
+  assert.equal(getCharacterEpVideoOffsetSeconds({ ...ep, durationSeconds: 0 }), 0);
+  assert.equal(getCharacterEpVideoOffsetSeconds({ ...ep, durationSeconds: Infinity }), 0);
+  assert.equal(getCharacterEpVideoOffsetSeconds({ sourceUrl: 'https://www.bilibili.com/video/BV1example/' }), 0);
   assert.equal(getCharacterEpVideoOffsetSeconds({ sourceUrl: 'https://www.youtube.com/watch?v=example' }), 0);
 });
 
@@ -68,8 +68,8 @@ test('only a verified negative sync offset creates an initial wait', () => {
   assert.equal(getCharacterEpVideoOffsetSeconds({ durationSeconds: 197 }), 0);
 });
 
-test('supports signed fallback values and never seeks to negative or nonfinite video time', () => {
-  assert.equal(getCharacterEpVideoOffsetSeconds({ videoOffsetSeconds: -2 }), -2);
+test('supports signed manual corrections and never seeks to negative or nonfinite video time', () => {
+  assert.equal(getCharacterEpVideoOffsetSeconds({ sync: { manualOffsetSeconds: -2 } }), -2);
   assert.equal(getCharacterEpVideoTime(0, -2), 0);
   assert.equal(getCharacterEpVideoTime(20, -2), 18);
   assert.equal(getCharacterEpVideoDelaySeconds(0, 5), 0);

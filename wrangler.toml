@@ -19,8 +19,8 @@ tag = "auth-state-v1"
 new_sqlite_classes = ["AuthState"]
 
 [triggers]
-# Keep heavyweight sync jobs in separate Worker invocations. Subrequests from
-# concurrent waitUntil tasks share one invocation's quota.
+# Cloudflare Free allows five Cron triggers per account. Jobs inside one
+# trigger are ordered by the Worker queue configuration.
 crons = [
   "0 */6 * * *",
   "5 */6 * * *",

@@ -109,10 +109,18 @@
           <div v-if="isYoutubeCharacterEp && playerState.isPlaying && !isCharacterEpWaiting" class="character-ep-frame character-ep-youtube-frame">
             <div ref="youtubePlayerContainer" class="youtube-player-host"></div>
           </div>
-          <iframe v-else-if="!isCharacterEpWaiting && (playerState.isPlaying || isBilibiliSyncPending)" :key="epIframeKey" class="character-ep-frame"
-            tabindex="-1"
-            :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
-            allow="autoplay" referrerpolicy="strict-origin-when-cross-origin" @load="handleBilibiliFrameLoad"></iframe>
+          <div v-else-if="!isCharacterEpWaiting && (playerState.isPlaying || isBilibiliSyncPending)"
+            class="character-ep-frame-shell">
+            <iframe :key="epIframeKey" class="character-ep-frame"
+              tabindex="-1"
+              :src="characterEpIframeSrc" :title="characterEp.title || t('player.characterEp')"
+              allow="autoplay" referrerpolicy="strict-origin-when-cross-origin" @load="handleBilibiliFrameLoad"></iframe>
+            <div v-if="isBilibiliCharacterEp && isBilibiliSyncPending" class="character-ep-sync-overlay"
+              role="status" aria-live="polite">
+              <img v-if="characterEp.coverUrl" :src="characterEp.coverUrl" :alt="characterEp.title || ''">
+              <span>{{ t('player.epWaiting') }}</span>
+            </div>
+          </div>
           <div v-else class="character-ep-paused">
             <img v-if="characterEp.coverUrl" :src="characterEp.coverUrl" :alt="characterEp.title || t('player.characterEp')">
             <i v-else class="fas fa-film" aria-hidden="true"></i>
@@ -127,6 +135,10 @@
           <a class="character-ep-link" :href="characterEp.sourceUrl" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-up-right-from-square"></i> {{ t('player.openVideo') }}
           </a>
+          <span class="character-ep-sync-status" :class="`is-${characterEpSyncState.calibrationStatus}`"
+            :title="characterEpSyncState.errorCode || characterEpSyncLabel">
+            <i class="fas fa-link" aria-hidden="true"></i> {{ characterEpSyncLabel }}
+          </span>
         </div>
         <div v-if="isCharacterEpExpanded" class="character-ep-preview-backdrop" aria-hidden="true"
           @click.self="closeCharacterEpPreview"></div>
@@ -147,13 +159,6 @@
         </div>
         <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationError" class="lyrics-translation-error" role="alert">
           {{ playerState.lyricTranslationError }}
-        </p>
-        <p v-if="playerState.showLyricTranslation && playerState.lyricTranslationSaveStatus === 'failed'" class="lyrics-save-status" role="status">
-          {{ t('player.translationSaveFailed') }}
-          <button v-if="playerState.lyricTranslationSaveStatus === 'failed'" type="button"
-            :disabled="playerState.isTranslatingLyrics" @click="refreshLyricTranslations()">
-            {{ t('player.retryTranslationSave') }}
-          </button>
         </p>
         <div v-if="playerState.lyrics && playerState.lyrics.length > 0" class="lyrics-container" ref="lyricsContainerRef"
           @scroll="handleLyricsScroll">
@@ -245,7 +250,7 @@ import { fetchCharacterEp, getProxyImageUrl } from '../services/api.js';
 import { authState } from '../services/auth.js';
 import { addFavoriteSong, addSongToPlaylist, createPlaylist, fetchFavoriteSongs, fetchPlaylists, removeFavoriteSong, removeSongFromPlaylist } from '../services/userLibrary.js';
 import { formatTime } from '../utils/time.js';
-import { getCharacterEpVideoOffsetSeconds, getCharacterEpVideoTime, getCharacterEpVideoDelaySeconds } from '../utils/characterEpPlayback.js';
+import { getCharacterEpSyncState, getCharacterEpVideoOffsetSeconds, getCharacterEpVideoTime, getCharacterEpVideoDelaySeconds } from '../utils/characterEpPlayback.js';
 
 const { t, locale } = useI18n();
 const playerProps = defineProps({
@@ -304,6 +309,8 @@ let youtubePlayerGeneration = 0;
 let characterEpLoadToken = 0;
 let bilibiliPendingIframeKey = -1;
 let bilibiliSyncTimeout = null;
+let bilibiliSyncStartedAtAudio = 0;
+let bilibiliLoadResyncAttempts = 0;
 let pendingSeekSyncCleanup = null;
 let lyricsAnimationFrame = null;
 let isUserScrolling = false;
@@ -314,8 +321,13 @@ const libraryActionStatusQueue = [];
 
 const LYRICS_TIME_OFFSET = 0.5;
 const BILIBILI_SYNC_TIMEOUT_MS = 15000;
+const BILIBILI_POST_LOAD_DRIFT_THRESHOLD_SECONDS = 0.35;
+const BILIBILI_MAX_POST_LOAD_RESYNCS = 2;
+const YOUTUBE_SYNC_DRIFT_THRESHOLD_SECONDS = 0.75;
+const YOUTUBE_SYNC_INTERVAL_MS = 3000;
 const AUDIO_SEEK_SYNC_FALLBACK_MS = 750;
 const PAGE_RETURN_RESYNC_DEDUPE_MS = 500;
+const PAGE_RETURN_RESYNC_SETTLE_MS = 220;
 const CHARACTER_EP_WAIT_WATCHDOG_INTERVAL_MS = 1000;
 const CHARACTER_EP_WAIT_STALL_TIMEOUT_MS = 15000;
 
@@ -324,6 +336,9 @@ let characterEpWaitWatchdog = null;
 let characterEpWaitLastAudioTime = 0;
 let characterEpWaitStalledAt = 0;
 let lastPageReturnResyncAt = -Infinity;
+let pageReturnResyncTimer = null;
+let pageHiddenAt = 0;
+let pageReturnNeedsResync = false;
 
 const cancelPendingSeekSync = () => {
   pendingSeekSyncCleanup?.();
@@ -331,30 +346,53 @@ const cancelPendingSeekSync = () => {
 };
 
 const resyncCharacterEpAfterPageReturn = () => {
-  if (
-    document.visibilityState !== 'visible'
-    || visualMode.value !== 'ep'
-    || !characterEp.value
-    || !playerState.isPlaying
-  ) {
-    return;
-  }
+  if (document.visibilityState !== 'visible') return;
+  pageReturnNeedsResync = false;
+  if (visualMode.value !== 'ep' || !characterEp.value || !playerState.isPlaying) return;
 
   const now = performance.now();
   if (now - lastPageReturnResyncAt < PAGE_RETURN_RESYNC_DEDUPE_MS) return;
   lastPageReturnResyncAt = now;
 
-  const audioTime = getAudioCurrentTime();
   if (isYoutubeCharacterEp.value) {
     nextTick(() => {
+      // Recreate first, then let onReady seek from the latest audio clock.
+      // Calling syncYoutubeToAudio immediately here races the async YT API and
+      // can run while youtubePlayer is still null.
       createYoutubePlayer();
-      syncYoutubeToAudio(true, audioTime);
     });
     return;
   }
 
   // Bilibili's embedded player cannot seek through a public API, so recreate it at the live audio time.
-  startBilibiliSync(audioTime);
+  startBilibiliSync(getAudioCurrentTime());
+};
+
+const schedulePageReturnResync = () => {
+  if (pageReturnResyncTimer) {
+    clearTimeout(pageReturnResyncTimer);
+    pageReturnResyncTimer = null;
+  }
+  if (document.visibilityState !== 'visible') return;
+
+  pageReturnResyncTimer = window.setTimeout(() => {
+    pageReturnResyncTimer = null;
+    resyncCharacterEpAfterPageReturn();
+  }, PAGE_RETURN_RESYNC_SETTLE_MS);
+};
+
+const handlePageVisibilityChange = () => {
+  if (document.visibilityState === 'hidden') {
+    pageHiddenAt = performance.now();
+    pageReturnNeedsResync = true;
+    if (pageReturnResyncTimer) {
+      clearTimeout(pageReturnResyncTimer);
+      pageReturnResyncTimer = null;
+    }
+    return;
+  }
+
+  if (pageReturnNeedsResync || pageHiddenAt > 0) schedulePageReturnResync();
 };
 
 const clearLibraryActionStatus = ({ clearQueue = true } = {}) => {
@@ -607,6 +645,16 @@ const characterEpIframeSrc = computed(() => {
 
 const isYoutubeCharacterEp = computed(() => /(?:youtube\.com|youtu\.be)/i.test(characterEp.value?.sourceUrl || ''));
 const isBilibiliCharacterEp = computed(() => Boolean(characterEp.value) && !isYoutubeCharacterEp.value);
+const characterEpSyncState = computed(() => getCharacterEpSyncState(characterEp.value));
+const characterEpSyncLabel = computed(() => {
+  switch (characterEpSyncState.value.calibrationStatus) {
+    case 'measured': return t('player.epSyncMeasured');
+    case 'review': return t('player.epSyncReview');
+    case 'manual': return t('player.epSyncManual');
+    case 'failed': return t('player.epSyncFailed');
+    default: return t('player.epSyncUnavailable');
+  }
+});
 const characterEpVideoOffsetSeconds = computed(() => getCharacterEpVideoOffsetSeconds(characterEp.value));
 // Follow the audio clock so pausing, seeking and backgrounding cannot exhaust
 // a wall-clock delay while the song itself is stopped.
@@ -669,6 +717,8 @@ watch(isCharacterEpWaiting, (waiting) => {
     bilibiliSyncTimeout = null;
     isBilibiliSyncPending.value = false;
     bilibiliPendingIframeKey = -1;
+    bilibiliSyncStartedAtAudio = 0;
+    bilibiliLoadResyncAttempts = 0;
   } else if (visualMode.value === 'ep' && characterEp.value && playerState.isPlaying) {
     clearCharacterEpWaitWatchdog();
     nextTick(() => {
@@ -717,6 +767,8 @@ const clearBilibiliSyncState = () => {
   bilibiliSyncTimeout = null;
   isBilibiliSyncPending.value = false;
   bilibiliPendingIframeKey = -1;
+  bilibiliSyncStartedAtAudio = 0;
+  bilibiliLoadResyncAttempts = 0;
 };
 
 const disableCharacterEpForMobile = () => {
@@ -746,7 +798,9 @@ const syncYoutubeToAudio = (force = false, audioTimeOverride = null) => {
     : (playerState.audioPlayer.currentTime || 0);
   const videoTime = youtubePlayer.getCurrentTime?.() || 0;
   const expectedVideoTime = getCharacterEpVideoTime(audioTime, characterEpVideoOffsetSeconds.value);
-  if (force || Math.abs(videoTime - expectedVideoTime) > 2.5) youtubePlayer.seekTo(expectedVideoTime, true);
+  if (force || Math.abs(videoTime - expectedVideoTime) > YOUTUBE_SYNC_DRIFT_THRESHOLD_SECONDS) {
+    youtubePlayer.seekTo(expectedVideoTime, true);
+  }
 };
 
 const createYoutubePlayer = async () => {
@@ -780,7 +834,7 @@ const createYoutubePlayer = async () => {
         onStateChange: (event) => { if (event.data === YT.PlayerState.PLAYING) syncYoutubeToAudio(); },
       },
     });
-    youtubeDriftTimer = window.setInterval(syncYoutubeToAudio, 10000);
+    youtubeDriftTimer = window.setInterval(syncYoutubeToAudio, YOUTUBE_SYNC_INTERVAL_MS);
   } catch (error) {
     console.warn('YouTube Player API initialization failed:', error.message);
   }
@@ -862,7 +916,7 @@ const getAudioCurrentTime = () => {
   return Number.isFinite(playerState.currentTime) ? playerState.currentTime : 0;
 };
 
-const startBilibiliSync = (audioTimeOverride = null) => {
+const startBilibiliSync = (audioTimeOverride = null, { resetResyncAttempts = true } = {}) => {
   if (!isBilibiliCharacterEp.value) {
     if (bilibiliSyncTimeout) {
       clearTimeout(bilibiliSyncTimeout);
@@ -874,6 +928,7 @@ const startBilibiliSync = (audioTimeOverride = null) => {
   }
 
   if (bilibiliSyncTimeout) clearTimeout(bilibiliSyncTimeout);
+  if (resetResyncAttempts) bilibiliLoadResyncAttempts = 0;
   epStartTime.value = Number.isFinite(audioTimeOverride)
     ? Math.max(0, audioTimeOverride)
     : getAudioCurrentTime();
@@ -881,8 +936,11 @@ const startBilibiliSync = (audioTimeOverride = null) => {
     bilibiliSyncTimeout = null;
     isBilibiliSyncPending.value = false;
     bilibiliPendingIframeKey = -1;
+    bilibiliSyncStartedAtAudio = 0;
+    bilibiliLoadResyncAttempts = 0;
     return;
   }
+  bilibiliSyncStartedAtAudio = epStartTime.value;
   isBilibiliSyncPending.value = true;
   epIframeKey.value += 1;
   bilibiliPendingIframeKey = epIframeKey.value;
@@ -894,10 +952,34 @@ const startBilibiliSync = (audioTimeOverride = null) => {
       return;
     }
 
+    // Background tabs can defer the iframe load event. Do not accept the
+    // original start time after returning from a hidden page; let the normal
+    // visibility handler rebase it to the live audio clock.
+    if (document.visibilityState !== 'visible') {
+      pageReturnNeedsResync = true;
+      isBilibiliSyncPending.value = false;
+      bilibiliPendingIframeKey = -1;
+      bilibiliSyncTimeout = null;
+      bilibiliSyncStartedAtAudio = 0;
+      return;
+    }
+
+    if (
+      playerState.isPlaying
+      && !isCharacterEpWaiting.value
+      && bilibiliLoadResyncAttempts < BILIBILI_MAX_POST_LOAD_RESYNCS
+    ) {
+      bilibiliLoadResyncAttempts += 1;
+      startBilibiliSync(getAudioCurrentTime(), { resetResyncAttempts: false });
+      return;
+    }
+
     console.warn('Bilibili iframe sync timed out; keeping audio playback uninterrupted.');
     isBilibiliSyncPending.value = false;
     bilibiliPendingIframeKey = -1;
     bilibiliSyncTimeout = null;
+    bilibiliSyncStartedAtAudio = 0;
+    bilibiliLoadResyncAttempts = 0;
   }, BILIBILI_SYNC_TIMEOUT_MS);
 };
 
@@ -914,8 +996,25 @@ const handleBilibiliFrameLoad = () => {
     clearTimeout(bilibiliSyncTimeout);
     bilibiliSyncTimeout = null;
   }
+
+  const loadDrift = Math.abs(getAudioCurrentTime() - bilibiliSyncStartedAtAudio);
+  if (
+    playerState.isPlaying
+    && loadDrift > BILIBILI_POST_LOAD_DRIFT_THRESHOLD_SECONDS
+    && bilibiliLoadResyncAttempts < BILIBILI_MAX_POST_LOAD_RESYNCS
+  ) {
+    // Bilibili's iframe has no reliable public seek API. If it took long
+    // enough to load that the audio clock moved, recreate it once at the live
+    // audio position instead of accepting a visible startup lag.
+    bilibiliLoadResyncAttempts += 1;
+    startBilibiliSync(getAudioCurrentTime(), { resetResyncAttempts: false });
+    return;
+  }
+
   isBilibiliSyncPending.value = false;
   bilibiliPendingIframeKey = -1;
+  bilibiliSyncStartedAtAudio = 0;
+  bilibiliLoadResyncAttempts = 0;
 };
 
 const closeCharacterEpPreview = () => {
@@ -1265,8 +1364,9 @@ onMounted(() => {
     fitEmbeddedPlayerContent();
   }
   window.addEventListener('keydown', handleCharacterEpPreviewKeydown);
-  window.addEventListener('focus', resyncCharacterEpAfterPageReturn);
-  document.addEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
+  window.addEventListener('focus', schedulePageReturnResync);
+  window.addEventListener('pageshow', schedulePageReturnResync);
+  document.addEventListener('visibilitychange', handlePageVisibilityChange);
   refreshFavoriteState().catch(() => { });
   loadUserPlaylists().catch(() => { });
   if (playerState.isPlaying) {
@@ -1279,8 +1379,13 @@ onUnmounted(() => {
   mobileLayoutQuery.removeEventListener('change', handleMobileLayoutChange);
   embeddedLayoutObserver?.disconnect();
   window.removeEventListener('keydown', handleCharacterEpPreviewKeydown);
-  window.removeEventListener('focus', resyncCharacterEpAfterPageReturn);
-  document.removeEventListener('visibilitychange', resyncCharacterEpAfterPageReturn);
+  window.removeEventListener('focus', schedulePageReturnResync);
+  window.removeEventListener('pageshow', schedulePageReturnResync);
+  document.removeEventListener('visibilitychange', handlePageVisibilityChange);
+  if (pageReturnResyncTimer) {
+    clearTimeout(pageReturnResyncTimer);
+    pageReturnResyncTimer = null;
+  }
   cancelPendingSeekSync();
   clearYoutubePlayer();
   clearCharacterEpWaitWatchdog();
@@ -1787,9 +1892,53 @@ defineExpose({ closeCharacterEpPreview });
   border: 0;
 }
 
+.character-ep-frame-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #10151c;
+}
+
 .character-ep-frame {
   pointer-events: none;
   user-select: none;
+}
+
+.character-ep-sync-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--text-secondary);
+  background: #10151c;
+}
+
+.character-ep-sync-overlay::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: rgba(5, 9, 14, 0.48);
+}
+
+.character-ep-sync-overlay img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+}
+
+.character-ep-sync-overlay span {
+  position: relative;
+  z-index: 1;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(5, 9, 14, 0.8);
+  font-size: 0.8rem;
 }
 
 .character-ep-youtube-frame {
@@ -1867,6 +2016,27 @@ defineExpose({ closeCharacterEpPreview });
   text-decoration: none;
 }
 
+.character-ep-sync-status {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 5px;
+  background: rgba(5, 9, 14, 0.78);
+  color: #c7d4df;
+  font-size: 0.72rem;
+}
+
+.character-ep-sync-status.is-measured { color: #a5e7c0; }
+.character-ep-sync-status.is-review { color: #ffd08a; }
+.character-ep-sync-status.is-manual { color: #a8d7ff; }
+.character-ep-sync-status.is-failed,
+.character-ep-sync-status.is-unavailable { color: #ffd08a; }
+
 .player-view-grid.single-panel {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -1935,25 +2105,6 @@ defineExpose({ closeCharacterEpPreview });
   to {
     transform: rotate(360deg);
   }
-}
-
-
-.lyrics-save-status {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-}
-
-.lyrics-save-status button {
-  min-height: 44px;
-  margin-left: 8px;
-  padding: 4px 8px;
-  border: 1px solid var(--primary-color);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--primary-color);
-  font: inherit;
-  cursor: pointer;
 }
 
 @media (max-width: 900px) {

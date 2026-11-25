@@ -5,13 +5,13 @@ import { getSupabaseHeaders } from './supabase-headers.mjs';
 import { fetchBilibiliVideoMetadata } from './bilibili-video-duration.mjs';
 import { updateAudioSync } from './character-ep-audio-sync.mjs';
 import { getVerifiedAudioSyncOffset } from '../shared/character-ep-audio-sync.mjs';
+import { buildCharacterEpSync } from '../shared/character-ep-sync.mjs';
 
 const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const supabaseServiceRoleKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 const musicApiOrigin = String(process.env.MUSIC_API_ORIGIN || 'https://monster-siren.hypergryph.com').replace(/\/$/, '');
 const applyChanges = process.argv.includes('--apply');
 const sourceKey = 'prts:music';
-const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
 
 if (!supabaseUrl || !supabaseServiceRoleKey) {
   throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.');
@@ -22,10 +22,11 @@ function isManualMatch(video) {
 }
 
 function getVideoOffsetSeconds(video) {
-  const value = video?.video_offset_seconds;
-  if (value === null || value === undefined || value === '') return DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS;
-  const offset = Number(value);
-  return Number.isFinite(offset) && offset >= 0 ? offset : DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS;
+  // The numeric column is retained for older clients, but guessed offsets are
+  // no longer written. Only an explicit non-negative manual correction may be
+  // mirrored there; measured/signed values live in raw.sync.
+  const offset = Number(video?.raw?.sync?.manualOffsetSeconds);
+  return Number.isFinite(offset) && offset >= 0 && offset <= 3600 ? offset : 0;
 }
 
 async function getSupabaseRows(table, query) {
@@ -140,7 +141,7 @@ async function mapWithConcurrency(items, limit, callback) {
   return results;
 }
 
-function findExactSongForPrtsEntry(entry, songs) {
+function findExactSongForPrtsEntry(entry, songs, existingSongId = '') {
   const normalizedTitles = new Set(entry.titles.map(normalizeMatchText).filter((title) => title.length >= 2));
   const exactMatches = songs
     .filter((song) => normalizedTitles.has(normalizeMatchText(song.name)))
@@ -149,7 +150,8 @@ function findExactSongForPrtsEntry(entry, songs) {
     // duplicate exact titles instead of depending on array order.
     .sort((left, right) => Number(right.id) - Number(left.id));
   if (exactMatches.length) {
-    const exact = exactMatches[0];
+    const existing = exactMatches.find((song) => String(song.id) === String(existingSongId));
+    const exact = existing || exactMatches[0];
     return { songId: String(exact.id), songName: exact.name, score: 100 };
   }
 
@@ -215,7 +217,8 @@ try {
       pagesWithoutBilibiliVideo.push(entry);
       continue;
     }
-    const song = findExactSongForPrtsEntry(entry, songs);
+    const existing = existingByBvid.get(video.videoId);
+    const song = findExactSongForPrtsEntry(entry, songs, existing?.song_id);
     if (!song) {
       unmatchedSongPages.push({ ...entry, video });
       continue;
@@ -224,7 +227,6 @@ try {
       matchedSongsMissingFromSupabase.push({ ...entry, video, song });
       continue;
     }
-    const existing = existingByBvid.get(video.videoId);
     const shouldPreserveManualMatch = isManualMatch(existing) && existing?.song_id && String(existing.song_id) !== song.songId;
     rows.push({
       id: `prts:bili:${video.videoIdType}:${video.videoId}`,
@@ -273,6 +275,16 @@ try {
     const status = await updateAudioSync(row, { musicApiOrigin, request: context.request });
     audioSyncStats[status] += 1;
     if (status === 'accepted' || status === 'failed') analysisAttempts += 1;
+  }
+
+  // Keep one canonical sync contract in raw.sync while retaining audioSync for
+  // compatibility with older Worker deployments and existing audit data.
+  for (const row of rows) {
+    row.raw.sync = buildCharacterEpSync(row.raw, {
+      songId: row.song_id,
+      videoId: row.bvid,
+      mappingStatus: 'verified',
+    });
   }
 
   const matchedBvids = new Set(rows.map((row) => row.bvid));

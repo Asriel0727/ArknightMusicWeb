@@ -1,6 +1,7 @@
 import { sha256 as authSha256, tokenAccountId, validateCredentials } from './auth-state.js';
 import { readJsonBody, RequestError } from './request-security.js';
 import { getVerifiedAudioSyncOffset } from '../shared/character-ep-audio-sync.mjs';
+import { buildCharacterEpSync } from '../shared/character-ep-sync.mjs';
 import verifiedActivityPools from '../src/data/verifiedActivityPools.js';
 import { activityExpectsRecruitmentPool, attachCuratedActivityRecruitmentPools, getActivityClassification } from '../src/data/activityCatalog.js';
 import { identity as verifiedPoolIdentity, parseBannerRows as parseVerifiedBannerRows, matchActivityBanner, localDate as poolLocalDate, dateDistance as poolDateDistance } from '../shared/activity-pool-matching.mjs';
@@ -35,12 +36,14 @@ const MUSIC_SONG_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:song-detail-c
 const MUSIC_ALBUM_DETAIL_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:album-detail-cursor`;
 const MUSIC_LYRICS_TRANSLATION_CURSOR_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-translation-cursor`;
 const MUSIC_LYRICS_KNOWN_SONGS_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-known-songs`;
+const MUSIC_LYRICS_RETRY_STATE_KEY = `${MUSIC_CACHE_PREFIX}prewarm:lyrics-retry-state`;
 const LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:server:v1:';
 const SYNC_STATUS_KEY_PREFIX = 'sync-status:v1:';
 const SCHEDULED_SYNC_JOBS = [
   'recruit-operators',
   'operator-catalog',
   'music-cache',
+  'lyrics-translation',
   'operator-release-dates',
   'activities-cn',
   'activities-global',
@@ -49,6 +52,10 @@ const SCHEDULED_SYNC_JOBS = [
 const SONG_LYRICS_TRANSLATION_CACHE_PREFIX = 'lyricsTranslation:song:v3:';
 const SONG_LYRICS_TRANSLATION_CACHE_TTL_SECONDS = 60 * 60 * 24 * 90;
 const SONG_LYRICS_TRANSLATION_SCHEMA_VERSION = 1;
+const SONG_LYRICS_TRANSLATION_PROVIDERS = new Set([
+  'google-translate',
+  'google-translate-browser',
+]);
 const GOOGLE_TRANSLATE_ENDPOINTS = [
   'https://translate.googleapis.com/translate_a/single',
   'https://translate.google.com/translate_a/single',
@@ -77,7 +84,12 @@ const SCHEDULED_SYNC_CRONS = {
   '5 */6 * * *': ['activities-global', 'activities-tw'],
   '10 */6 * * *': ['recruit-operators', 'operator-release-dates'],
   '15 */6 * * *': ['operator-catalog'],
-  '20 */6 * * *': ['music-cache'],
+  // Cloudflare Free supports five triggers. Keep music metadata and lyric
+  // translation in one ordered queue so the second job starts after the first.
+  '20 */6 * * *': ['music-cache', 'lyrics-translation'],
+};
+const SCHEDULED_SYNC_MODES = {
+  '20 */6 * * *': 'sequential',
 };
 const ACTIVITY_IMAGE_OVERRIDES = {
   'wiki-sui-s-garden-of-grotesqueries-mission-event': 'https://arknights.wiki.gg/images/EN_Sui%27s_Garden_of_Grotesqueries_Mission_Event_banner.png?d46d74',
@@ -112,11 +124,14 @@ const DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT = 5;
 const MAX_ALBUM_DETAIL_PREWARM_LIMIT = 5;
 const DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT = 5;
 const MAX_LYRICS_TRANSLATION_PREWARM_LIMIT = 5;
+const LYRICS_RETRY_BASE_DELAY_MS = 15 * 60 * 1000;
+const LYRICS_RETRY_MAX_DELAY_MS = 24 * 60 * 60 * 1000;
+const LYRICS_RETRY_MAX_ATTEMPTS = 8;
 const DEFAULT_LYRICS_TRANSLATION_PREWARM_LOCALES = ['zh-TW', 'zh-CN', 'en', 'ja', 'ko'];
 const MUSIC_COLLECTION_MAX_AGE_MS = 60 * 60 * 1000;
 const MUSIC_ALBUM_DETAIL_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const MUSIC_SONG_DETAIL_MAX_AGE_MS = 60 * 1000;
-const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
+const LEGACY_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
 
 const worker = {
   async fetch(request, env, ctx) {
@@ -183,6 +198,7 @@ const worker = {
         albumDetailLimit,
         lyricsTranslationLimit,
         lyricsTranslationLocales,
+        includeLyrics: true,
       });
       return json({
         ok: true,
@@ -261,8 +277,17 @@ const worker = {
     if (url.pathname === '/api/admin/sync-status') {
       const unauthorized = requireAdminToken(request, env);
       if (unauthorized) return unauthorized;
-      const statuses = await Promise.all(SCHEDULED_SYNC_JOBS.map(async (job) => [job, await getSyncStatus(env, job)]));
+      const statuses = await Promise.all(SCHEDULED_SYNC_JOBS.map(async (job) => [
+        job,
+        toSyncHealthStatus(await getSyncStatus(env, job)),
+      ]));
       return json({ ok: true, jobs: Object.fromEntries(statuses), time: new Date().toISOString() });
+    }
+
+    if (url.pathname === '/api/admin/character-ep-sync-status') {
+      const unauthorized = requireAdminToken(request, env);
+      if (unauthorized) return unauthorized;
+      return json({ ok: true, ...(await getCharacterEpSyncStatus(env)), time: new Date().toISOString() });
     }
 
     if (url.pathname === '/api/admin/prewarm-music-albums') {
@@ -273,12 +298,14 @@ const worker = {
 
       const limit = parseAlbumPrewarmLimit(url.searchParams.get('limit'));
       const albums = await fetchMusicJson('/api/albums');
-      await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
-      await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumRows(albums.data));
+      const cacheSaved = await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
+      const tableResult = await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumRows(albums.data));
       const result = await prewarmMusicAlbumDetails(env, albums.data, { limit });
 
       return json({
-        ok: true,
+        ok: cacheSaved && (tableResult.ok || tableResult.skipped) && result.errors === 0,
+        cacheSaved,
+        tableResult,
         ...result,
         time: new Date().toISOString(),
       });
@@ -525,6 +552,11 @@ const worker = {
     const jobs = SCHEDULED_SYNC_CRONS[event.cron];
     if (!jobs) {
       console.warn('Ignoring unrecognized scheduled cron:', event.cron);
+      return;
+    }
+
+    if (SCHEDULED_SYNC_MODES[event.cron] === 'sequential') {
+      scheduleConfiguredSyncJobsSequentially(ctx, env, jobs);
       return;
     }
 
@@ -841,61 +873,204 @@ async function writeSyncStatus(env, job, status) {
   }
 }
 
-function scheduleSyncTask(ctx, env, job, task) {
-  ctx.waitUntil((async () => {
-    const startedAt = new Date().toISOString();
-    await writeSyncStatus(env, job, { state: 'running', startedAt, lastError: null });
-    try {
-      const result = await task();
-      await writeSyncStatus(env, job, { state: 'success', startedAt, completedAt: new Date().toISOString(), result, lastError: null });
-      console.info({ message: 'Scheduled sync completed', job, result });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      await writeSyncStatus(env, job, { state: 'failed', startedAt, completedAt: new Date().toISOString(), lastError: message });
-      console.warn(`Scheduled sync failed for ${job}; retaining previous data:`, message);
+function summarizeSyncResult(result) {
+  const summary = {
+    attempted: 0,
+    saved: 0,
+    failed: 0,
+    skipped: 0,
+    pending: 0,
+  };
+  const visited = new Set();
+
+  const visit = (value, key = '') => {
+    if (value == null || typeof value !== 'object' || visited.has(value)) return;
+    visited.add(value);
+    if (Array.isArray(value)) {
+      if (key === 'failures') summary.failed += value.length;
+      value.forEach((item) => visit(item, key));
+      return;
     }
-  })());
+
+    const hasFailureCount = Object.keys(value).some((field) => (
+      field === 'errors' || field === 'failed' || field === 'failedCount'
+    ));
+    const isSkipped = value.skipped === true;
+    for (const [field, fieldValue] of Object.entries(value)) {
+      if (typeof fieldValue === 'number' && Number.isFinite(fieldValue)) {
+        if (field === 'attempted') summary.attempted += fieldValue;
+        if (['stored', 'translated', 'saved', 'synced', 'cacheHits'].includes(field)) {
+          summary.saved += fieldValue;
+        }
+        if (['errors', 'failed', 'failedCount'].includes(field)) summary.failed += fieldValue;
+        if (field === 'pending' || field === 'pendingRetry') summary.pending += fieldValue;
+      }
+      if (field === 'skipped' && fieldValue === true) summary.skipped += 1;
+      if (field === 'skipped' && typeof fieldValue === 'number') summary.skipped += fieldValue;
+      if (field === 'ok' && fieldValue === false && !hasFailureCount && !isSkipped) summary.failed += 1;
+      visit(fieldValue, field);
+    }
+  };
+
+  visit(result);
+  return summary;
 }
 
-function scheduleConfiguredSyncJob(ctx, env, job) {
+function getSyncResultError(result) {
+  const visited = new Set();
+  let message = '';
+  const visit = (value) => {
+    if (message || value == null || typeof value !== 'object' || visited.has(value)) return;
+    visited.add(value);
+    if (Array.isArray(value)) {
+      value.forEach(visit);
+      return;
+    }
+    for (const [key, fieldValue] of Object.entries(value)) {
+      if (typeof fieldValue === 'string' && /error|reason/i.test(key) && fieldValue.trim()) {
+        message = fieldValue.trim();
+        return;
+      }
+      visit(fieldValue);
+      if (message) return;
+    }
+  };
+  visit(result);
+  return message || null;
+}
+
+function classifySyncResult(result) {
+  if (result?.status === 'skipped' || result?.skipped === true) return 'skipped';
+  if (result?.status === 'failed') return 'failed';
+  if (result?.status === 'partial') return 'partial';
+  if (result?.status === 'success') return 'success';
+  if (result?.ok === false) return 'failed';
+
+  const summary = summarizeSyncResult(result);
+  if (summary.failed === 0) return 'success';
+  const successfulWork = summary.saved > 0 || summary.skipped > 0;
+  return successfulWork ? 'partial' : 'failed';
+}
+
+function toSyncHealthStatus(status) {
+  if (!status) return null;
+  return {
+    ...status,
+    health: {
+      state: status.state || 'unknown',
+      lastAttemptAt: status.lastAttemptAt || status.startedAt || null,
+      lastSuccessAt: status.lastSuccessAt || null,
+      counts: status.summary || null,
+      pending: status.summary?.pending ?? null,
+      error: status.lastError || null,
+    },
+  };
+}
+
+async function runSyncTask(env, job, task) {
+    const startedAt = new Date().toISOString();
+    const previous = await getSyncStatus(env, job);
+    await writeSyncStatus(env, job, {
+      state: 'running',
+      startedAt,
+      lastAttemptAt: startedAt,
+      lastSuccessAt: previous?.lastSuccessAt || null,
+      lastError: null,
+    });
+    try {
+      const result = await task();
+      const state = classifySyncResult(result);
+      const completedAt = new Date().toISOString();
+      const summary = summarizeSyncResult(result);
+      const lastError = state === 'success' || state === 'skipped'
+        ? null
+        : getSyncResultError(result) || `Sync completed with state: ${state}`;
+      await writeSyncStatus(env, job, {
+        state,
+        startedAt,
+        completedAt,
+        lastAttemptAt: startedAt,
+        lastSuccessAt: state === 'success' ? completedAt : (previous?.lastSuccessAt || null),
+        result,
+        summary,
+        lastError,
+      });
+      console.info({ message: 'Scheduled sync completed', job, state, summary, result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      await writeSyncStatus(env, job, {
+        state: 'failed',
+        startedAt,
+        completedAt: new Date().toISOString(),
+        lastAttemptAt: startedAt,
+        lastSuccessAt: previous?.lastSuccessAt || null,
+        summary: { attempted: 0, saved: 0, failed: 1, skipped: 0, pending: null },
+        lastError: message,
+      });
+      console.warn(`Scheduled sync failed for ${job}; retaining previous data:`, message);
+    }
+}
+
+function scheduleSyncTask(ctx, env, job, task) {
+  ctx.waitUntil(runSyncTask(env, job, task));
+}
+
+function getConfiguredSyncTask(env, job) {
   if (job === 'recruit-operators') {
-    scheduleSyncTask(ctx, env, job, async () => {
+    return async () => {
       const data = await buildRecruitOperators(env.RECRUIT_API_BASE || DEFAULT_PUBLIC_API_BASE);
       await env.ARKNIGHTS_DATA.put(RECRUIT_OPERATORS_KEY, JSON.stringify(data));
       return { count: data.operators.length };
-    });
-    return;
+    };
   }
 
   if (!hasSupabaseConfig(env)) {
     console.warn(`Skipping ${job}; Supabase is not configured.`);
-    return;
+    return null;
   }
 
   if (job === 'operator-catalog') {
-    scheduleSyncTask(ctx, env, job, () => syncOperatorCatalog(env));
-    return;
+    return () => syncOperatorCatalog(env);
   }
 
   if (job === 'operator-release-dates') {
-    scheduleSyncTask(ctx, env, job, () => syncOperatorReleaseDates(env));
-    return;
+    return () => syncOperatorReleaseDates(env);
   }
 
   if (job === 'music-cache') {
-    scheduleSyncTask(ctx, env, job, () => syncMusicCache(env, {
+    return () => syncMusicCache(env, {
       songDetailLimit: 10,
       albumDetailLimit: 5,
-    }));
-    return;
+    });
+  }
+
+  if (job === 'lyrics-translation') {
+    return () => syncMusicLyricsTranslations(env, {
+      limit: DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT,
+      locales: parseTranslationPrewarmLocales(env.LYRICS_PREWARM_LOCALES),
+    });
   }
 
   const server = job.replace('activities-', '');
-  scheduleSyncTask(ctx, env, job, async () => {
+  return async () => {
     const activities = await syncActivities(env, [server]);
     const pools = await syncActivityRecruitmentPools(env, server);
     return { activities, pools };
-  });
+  };
+}
+
+function scheduleConfiguredSyncJob(ctx, env, job) {
+  const task = getConfiguredSyncTask(env, job);
+  if (task) scheduleSyncTask(ctx, env, job, task);
+}
+
+function scheduleConfiguredSyncJobsSequentially(ctx, env, jobs) {
+  ctx.waitUntil((async () => {
+    for (const job of jobs) {
+      const task = getConfiguredSyncTask(env, job);
+      if (task) await runSyncTask(env, job, task);
+    }
+  })());
 }
 
 async function fetchWikiActivityWindows(server, limit = ACTIVITY_SYNC_SOURCE_LIMIT) {
@@ -1588,6 +1763,22 @@ async function writeSupabaseCache(env, key, data, source) {
   }
 
   return true;
+}
+
+async function readMusicSongCoverage(env) {
+  if (!hasSupabaseConfig(env)) return new Map();
+  try {
+    const endpoint = `${getSupabaseUrl(env)}/rest/v1/music_songs?select=id,source_url,lyric_url,mv_url&limit=5000`;
+    const response = await fetch(endpoint, { headers: supabaseHeaders(env) });
+    if (!response.ok) throw new Error(`Supabase music_songs coverage read failed: ${response.status}`);
+    const rows = await response.json();
+    return new Map((rows || []).filter((row) => row?.id).map((row) => [String(row.id), row]));
+  } catch (error) {
+    // Coverage is an optimization signal. A transient read failure must not
+    // prevent the circular prewarm from continuing with its last checkpoint.
+    console.warn('Supabase music song coverage read failed:', error.message);
+    return new Map();
+  }
 }
 
 async function upsertSupabaseRows(env, tableName, rows) {
@@ -2694,7 +2885,7 @@ function normalizeSearchText(value) {
   return String(value || '').trim().toLowerCase();
 }
 
-async function handleLyricsTranslateRequest(request, env, ctx) {
+async function handleLyricsTranslateRequest(request, env, ctx, options = {}) {
   const payload = await readJsonBody(request, 64 * 1024);
   if (payload.lines !== undefined && (!Array.isArray(payload.lines) || payload.lines.length > 200
     || payload.lines.some(line => typeof line !== 'string' && (!line || typeof line.text !== 'string')))) {
@@ -2702,6 +2893,13 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
   }
   if (payload.text !== undefined && (typeof payload.text !== 'string' || payload.text.length > 8000)) {
     return json({ ok: false, error: 'Invalid translation text' }, 400);
+  }
+  if (options.allowSubmittedTranslations && (
+    !Array.isArray(payload.translations)
+    || payload.translations.length > 200
+    || payload.translations.some((translation) => typeof translation !== 'string')
+  )) {
+    return json({ ok: false, error: 'Invalid translated lyric lines' }, 400);
   }
   const rateLimit = await enforceRequestRateLimit(request, env, 'translation', 30, 60);
   if (rateLimit) return rateLimit;
@@ -2750,6 +2948,40 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
         persistence: persisted.persistence || { database: 'saved' },
       }, 200, 3600);
     }
+  }
+
+  if (options.allowSubmittedTranslations) {
+    if (!songId) {
+      return json({ ok: false, error: 'Song ID is required when saving translations' }, 400);
+    }
+    if (!isValidSongTranslationRecord({
+      lyricsHash,
+      targetLocale,
+      translations: payload.translations,
+    }, lyricsHash, targetLocale, lines)) {
+      return json({ ok: false, error: 'Incomplete or invalid translated lyrics' }, 400);
+    }
+
+    const persisted = await writeSongLyricsTranslation(env, {
+      songId,
+      lyricsHash,
+      targetLocale,
+      lines,
+      translations: payload.translations,
+      provider: 'google-translate-browser',
+    });
+    const saved = persisted.persistence.database === 'saved';
+    return json({
+      ok: saved,
+      songId,
+      lyricsHash,
+      targetLocale,
+      translations: persisted.translations,
+      translation: persisted.translations[0] || '',
+      source: 'browser-submitted',
+      persistence: persisted.persistence,
+      error: saved ? undefined : 'Translation database write failed',
+    }, saved ? 200 : 503, 3600);
   }
 
   const translatedLines = await translateServerLines(env, lines, targetLocale, {
@@ -2818,8 +3050,9 @@ async function handleLyricsTranslateRequest(request, env, ctx) {
 }
 
 async function handleLyricsSaveRequest(request, env) {
-  // A browser can request a retry, but can never supply shared translated text.
-  return handleLyricsTranslateRequest(request, env);
+  return handleLyricsTranslateRequest(request, env, undefined, {
+    allowSubmittedTranslations: true,
+  });
 }
 
 function normalizeTranslationSongId(value) {
@@ -2877,7 +3110,7 @@ async function readSongLyricsTranslation(env, songId, lyricsHash, targetLocale, 
     console.warn('Lyric translation KV read failed:', error.message);
   }
   if (
-    cached?.provider === 'google-translate' &&
+    SONG_LYRICS_TRANSLATION_PROVIDERS.has(cached?.provider) &&
     isValidSongTranslationRecord(
       cached,
       lyricsHash,
@@ -2916,7 +3149,7 @@ async function readSongLyricsTranslation(env, songId, lyricsHash, targetLocale, 
       databaseSaved: true,
     } : null;
 
-    if (record?.provider !== 'google-translate' || !isValidSongTranslationRecord(
+    if (!SONG_LYRICS_TRANSLATION_PROVIDERS.has(record?.provider) || !isValidSongTranslationRecord(
       record,
       lyricsHash,
       targetLocale,
@@ -3330,12 +3563,20 @@ async function syncMusicCache(env, options = {}) {
     options.songDetailLimit ?? DEFAULT_SONG_DETAIL_PREWARM_LIMIT;
   const albumDetailLimit =
     options.albumDetailLimit ?? DEFAULT_ALBUM_DETAIL_PREWARM_LIMIT;
-  const lyricsTranslationLimit =
-    options.lyricsTranslationLimit ?? DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT;
+  const failures = [];
   const albums = await fetchMusicJson('/api/albums');
-  await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}albums`, albums.data, albums.sourceUrl);
+  const albumCacheSaved = await writeSupabaseCache(
+    env,
+    `${MUSIC_CACHE_PREFIX}albums`,
+    albums.data,
+    albums.sourceUrl
+  );
+  if (!albumCacheSaved) failures.push({ target: `${MUSIC_CACHE_PREFIX}albums`, reason: 'cache-write-failed' });
   const normalizedAlbums = normalizeMusicAlbumRows(albums.data);
   const albumTableResult = await upsertSupabaseRows(env, 'music_albums', normalizedAlbums);
+  if (!albumTableResult.ok && !albumTableResult.skipped) {
+    failures.push({ target: 'music_albums', ...albumTableResult });
+  }
   synced.push({
     key: `${MUSIC_CACHE_PREFIX}albums`,
     count: Array.isArray(albums.data?.data) ? albums.data.data.length : null,
@@ -3351,11 +3592,21 @@ async function syncMusicCache(env, options = {}) {
     key: `${MUSIC_CACHE_PREFIX}album:{albumId}`,
     ...albumDetails,
   });
+  if (albumDetails.errors > 0) failures.push({ target: 'music_albums:details', errors: albumDetails.errors });
 
   const songs = await fetchMusicJson('/api/songs');
-  await writeSupabaseCache(env, `${MUSIC_CACHE_PREFIX}songs`, songs.data, songs.sourceUrl);
+  const songCacheSaved = await writeSupabaseCache(
+    env,
+    `${MUSIC_CACHE_PREFIX}songs`,
+    songs.data,
+    songs.sourceUrl
+  );
+  if (!songCacheSaved) failures.push({ target: `${MUSIC_CACHE_PREFIX}songs`, reason: 'cache-write-failed' });
   const normalizedSongs = normalizeMusicSongListRows(songs.data);
   const songTableResult = await upsertSupabaseRows(env, 'music_songs', normalizedSongs);
+  if (!songTableResult.ok && !songTableResult.skipped) {
+    failures.push({ target: 'music_songs', ...songTableResult });
+  }
   synced.push({
     key: `${MUSIC_CACHE_PREFIX}songs`,
     count: Array.isArray(songs.data?.data?.list) ? songs.data.data.list.length : null,
@@ -3372,21 +3623,62 @@ async function syncMusicCache(env, options = {}) {
     key: `${MUSIC_CACHE_PREFIX}song:{songId}`,
     ...songDetails,
   });
+  if (songDetails.errors > 0) failures.push({ target: 'music_songs:details', errors: songDetails.errors });
 
-  const lyricTranslations = await prewarmMusicLyricsTranslations(env, songs.data, {
-    limit: lyricsTranslationLimit,
-    locales: options.lyricsTranslationLocales || parseTranslationPrewarmLocales(
-      env.LYRICS_PREWARM_LOCALES
-    ),
-  });
-  synced.push({
-    key: `${SONG_LYRICS_TRANSLATION_CACHE_PREFIX}{songId}:{lyricsHash}:{locale}`,
-    ...lyricTranslations,
-  });
+  if (options.includeLyrics) {
+    const lyricTranslations = await prewarmMusicLyricsTranslations(env, songs.data, {
+      limit: options.lyricsTranslationLimit ?? DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT,
+      locales: options.lyricsTranslationLocales || parseTranslationPrewarmLocales(
+        env.LYRICS_PREWARM_LOCALES
+      ),
+    });
+    synced.push({
+      key: `${SONG_LYRICS_TRANSLATION_CACHE_PREFIX}{songId}:{lyricsHash}:{locale}`,
+      ...lyricTranslations,
+    });
+    if (lyricTranslations.errors > 0) failures.push({ target: 'music_lyric_translations', errors: lyricTranslations.errors });
+  }
+
+  const successfulWrites = synced.some((item) => (
+    item.ok === true
+    || Number(item.stored) > 0
+    || Number(item.translated) > 0
+    || Number(item.cacheHits) > 0
+  ));
+  const status = failures.length === 0 ? 'success' : successfulWrites ? 'partial' : 'failed';
 
   return {
+    ok: status === 'success',
+    status,
     synced,
+    failures,
     supabaseConfigured: true,
+  };
+}
+
+async function syncMusicLyricsTranslations(env, options = {}) {
+  if (!hasSupabaseConfig(env)) {
+    return {
+      ok: false,
+      status: 'skipped',
+      synced: 'music:lyric-translations',
+      skipped: true,
+      reason: 'Supabase is not configured',
+    };
+  }
+
+  const songs = await getMusicJson(env, `${MUSIC_CACHE_PREFIX}songs`, '/api/songs');
+  const result = await prewarmMusicLyricsTranslations(env, songs.data, {
+    limit: options.limit ?? DEFAULT_LYRICS_TRANSLATION_PREWARM_LIMIT,
+    locales: options.locales || parseTranslationPrewarmLocales(env.LYRICS_PREWARM_LOCALES),
+  });
+  const status = result.errors > 0
+    ? (result.translated > 0 || result.cacheHits > 0 || result.skipped > 0 ? 'partial' : 'failed')
+    : 'success';
+  return {
+    ...result,
+    ok: status === 'success',
+    status,
   };
 }
 
@@ -3408,9 +3700,10 @@ async function getCharacterEpForSong(env, songId) {
     rows = await supabaseRestRequest(env, 'music_character_ep_videos', { query: `?${params}` });
   } catch (error) {
     // Keep old deployments readable during the short window before the
-    // migration is applied. The frontend has the same 5-second fallback.
+    // migration is applied. The frontend treats the canonical sync contract as
+    // unavailable until a measured or manual result exists.
     if (!/video_offset_seconds|column .* does not exist/i.test(error.message || '')) throw error;
-    console.warn('Character EP offset column is not available yet; using the default offset.');
+    console.warn('Character EP offset column is not available yet; using the legacy field.');
     params.set('select', 'bvid,song_id,title,cover_url,duration_seconds,published_at,source_url,raw');
     rows = await supabaseRestRequest(env, 'music_character_ep_videos', { query: `?${params}` });
   }
@@ -3419,6 +3712,11 @@ async function getCharacterEpForSong(env, songId) {
   const numericOffset = Number(row.video_offset_seconds);
   const audioSync = row.raw?.audioSync;
   const verifiedAudioOffset = getVerifiedAudioSyncOffset(audioSync, { songId: row.song_id, videoId: row.bvid });
+  const sync = buildCharacterEpSync(row.raw || {}, {
+    songId: row.song_id,
+    videoId: row.bvid,
+    mappingStatus: row.raw?.sync?.mappingStatus || (row.raw?.matchSource === 'prts' ? 'verified' : 'unknown'),
+  });
   return {
     bvid: row.bvid,
     songId: row.song_id,
@@ -3429,13 +3727,72 @@ async function getCharacterEpForSong(env, songId) {
     sourceUrl: row.source_url,
     videoOffsetSeconds: Number.isFinite(numericOffset) && numericOffset >= 0
       ? numericOffset
-      : DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS,
+      : LEGACY_BILIBILI_VIDEO_OFFSET_SECONDS,
+    // `sync` is the canonical public contract. Keep the legacy numeric field
+    // for older clients during the migration, but clients must not treat it as
+    // verified unless sync.calibrationStatus says so.
+    sync,
     // Return only public calibration fields, never the rest of raw metadata.
     audioSync: verifiedAudioOffset === null ? null : {
       status: 'accepted', algorithmVersion: audioSync.algorithmVersion,
       songId: row.song_id, videoId: row.bvid, offsetSeconds: verifiedAudioOffset,
       confidence: audioSync.confidence, analyzedAt: audioSync.analyzedAt,
     },
+  };
+}
+
+async function getCharacterEpSyncStatus(env) {
+  if (!hasSupabaseConfig(env)) {
+    return { supabaseConfigured: false, total: 0, counts: {}, entries: [] };
+  }
+
+  const params = new URLSearchParams({
+    select: 'song_id,bvid,title,is_visible,author_mid,source_url,raw',
+    author_mid: 'eq.prts:music',
+    source_url: 'like.https://www.bilibili.com/%',
+    limit: '5000',
+  });
+  const rows = await supabaseRestRequest(env, 'music_character_ep_videos', { query: `?${params}` });
+  const counts = {
+    total: 0,
+    visible: 0,
+    measured: 0,
+    review: 0,
+    manual: 0,
+    unavailable: 0,
+    failed: 0,
+  };
+  const entries = [];
+
+  for (const row of rows || []) {
+    counts.total += 1;
+    if (!row.is_visible) continue;
+    counts.visible += 1;
+    const sync = buildCharacterEpSync(row.raw || {}, {
+      songId: row.song_id,
+      videoId: row.bvid,
+      mappingStatus: row.raw?.sync?.mappingStatus || (row.raw?.matchSource === 'prts' ? 'verified' : 'unknown'),
+    });
+    counts[sync.calibrationStatus] = (counts[sync.calibrationStatus] || 0) + 1;
+    if (sync.calibrationStatus !== 'measured') {
+      entries.push({
+        songId: row.song_id,
+        videoId: row.bvid,
+        title: row.title,
+        status: sync.calibrationStatus,
+        offsetSeconds: sync.offsetSeconds,
+        confidence: sync.confidence,
+        errorCode: sync.errorCode,
+        analyzedAt: sync.analyzedAt,
+      });
+    }
+  }
+
+  return {
+    supabaseConfigured: true,
+    total: counts.total,
+    counts,
+    entries: entries.slice(0, 200),
   };
 }
 
@@ -3536,7 +3893,25 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
 
   const cursorRow = await readSupabaseCache(env, MUSIC_SONG_DETAIL_CURSOR_KEY);
   const startIndex = normalizeCursorIndex(cursorRow?.data?.nextIndex, songs.length);
-  const candidates = buildCircularBatch(songs, startIndex, limit);
+  const coverage = await readMusicSongCoverage(env);
+  const missingCandidates = songs
+    .filter((item) => {
+      const row = coverage.get(String(item?.cid || ''));
+      return item?.cid && (!row || !row.source_url);
+    })
+    .slice(0, limit)
+    .map((item, index) => ({ item, index, isMissing: true }));
+  const recentCandidates = songs
+    .slice(0, limit)
+    .map((item, index) => ({ item, index, isRecent: true }));
+  const rotatingCandidates = buildCircularBatch(songs, startIndex, limit);
+  const candidates = [...new Map([...missingCandidates, ...recentCandidates, ...rotatingCandidates]
+    .filter((candidate) => candidate.item?.cid)
+    .map((candidate) => [String(candidate.item.cid), candidate])).values()]
+    .slice(0, limit);
+  const selectedRotatingCount = rotatingCandidates.filter((candidate) => (
+    candidates.some((selected) => selected.item?.cid === candidate.item?.cid)
+  )).length;
   let stored = 0;
   let errors = 0;
 
@@ -3548,17 +3923,23 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
 
     try {
       const detail = await fetchMusicJson(`/api/song/${encodeURIComponent(songId)}`);
-      await writeSupabaseCache(
+      const cacheSaved = await writeSupabaseCache(
         env,
         `${MUSIC_CACHE_PREFIX}song:${songId}`,
         detail.data,
         detail.sourceUrl
       );
-      await upsertSupabaseRows(
+      if (!cacheSaved) {
+        throw new Error(`Supabase cache write failed for song ${songId}`);
+      }
+      const rowResult = await upsertSupabaseRows(
         env,
         'music_songs',
         normalizeMusicSongDetailRow(detail.data)
       );
+      if (!rowResult.ok) {
+        throw new Error(`Supabase music_songs write failed for song ${songId}`);
+      }
       stored += 1;
     } catch (error) {
       errors += 1;
@@ -3568,15 +3949,17 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
 
   const nextIndex = songs.length === 0
     ? 0
-    : (startIndex + candidates.length) % songs.length;
-  const wrapped = didCircularBatchWrap(startIndex, candidates.length, songs.length);
-  await writeSupabaseCache(
+    : (startIndex + selectedRotatingCount) % songs.length;
+  const wrapped = didCircularBatchWrap(startIndex, selectedRotatingCount, songs.length);
+  const cursorSaved = await writeSupabaseCache(
     env,
     MUSIC_SONG_DETAIL_CURSOR_KEY,
     {
       nextIndex,
       total: songs.length,
       lastBatchSize: candidates.length,
+      lastRotatingBatchSize: selectedRotatingCount,
+      lastMissing: missingCandidates.length,
       lastStored: stored,
       lastErrors: errors,
       lastWrapped: wrapped,
@@ -3584,6 +3967,7 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
     },
     'worker:sync-music'
   );
+  if (!cursorSaved) errors += 1;
 
   return {
     attempted: candidates.length,
@@ -3593,6 +3977,9 @@ async function prewarmMusicSongDetails(env, songsPayload, options = {}) {
     startIndex,
     nextIndex,
     wrapped,
+    missing: missingCandidates.length,
+    rotating: selectedRotatingCount,
+    checkpointWriteFailed: !cursorSaved,
     done: wrapped,
   };
 }
@@ -3609,6 +3996,65 @@ function parseTranslationLinesFromLrc(lyricsText) {
     .filter(Boolean)
     .slice(0, 200)
     .map((text, index) => ({ index, text }));
+}
+
+function getLyricsRetryDelayMs(attemptCount) {
+  const exponent = Math.max(0, Math.min(6, Number(attemptCount || 1) - 1));
+  return Math.min(LYRICS_RETRY_MAX_DELAY_MS, LYRICS_RETRY_BASE_DELAY_MS * (2 ** exponent));
+}
+
+function selectLyricsPrewarmCandidates(songs, startIndex, limit, knownSongIds, retryState, now = Date.now()) {
+  const retryPool = songs
+    .filter((song) => {
+      const record = retryState[String(song?.cid)];
+      if (!song?.cid || knownSongIds.has(song.cid) || !record) return false;
+      const nextRetryAt = Date.parse(record.nextRetryAt || '');
+      return !Number.isFinite(nextRetryAt) || nextRetryAt <= now;
+    })
+    .sort((left, right) => Date.parse(retryState[left.cid]?.nextRetryAt || '')
+      - Date.parse(retryState[right.cid]?.nextRetryAt || ''))
+    .map((item, index) => ({ index, item, isRetry: true }));
+  const newPool = songs
+    .filter((song) => song?.cid && !knownSongIds.has(song.cid) && !retryState[String(song.cid)])
+    .map((item, index) => ({ index, item, isNew: true }));
+  const rotationPool = buildCircularBatch(songs, startIndex, Math.min(songs.length, limit))
+    .filter((candidate) => candidate.item?.cid
+      && !retryState[String(candidate.item.cid)]
+      && !newPool.some((newCandidate) => newCandidate.item?.cid === candidate.item?.cid));
+
+  const retrySlots = limit >= 3 ? Math.max(1, Math.floor(limit / 3)) : 0;
+  const newSlots = limit >= 3 ? Math.max(1, Math.ceil(limit * 0.6)) : limit;
+  const oldSlots = Math.max(0, limit - retrySlots - newSlots);
+  const candidates = [];
+  const selectedIds = new Set();
+  const rotatingCandidates = [];
+
+  const add = (candidate) => {
+    const id = String(candidate.item?.cid || '');
+    if (!id || selectedIds.has(id) || candidates.length >= limit) return false;
+    selectedIds.add(id);
+    candidates.push(candidate);
+    if (!candidate.isNew && !candidate.isRetry) rotatingCandidates.push(candidate);
+    return true;
+  };
+  const take = (pool, count) => pool.slice(0, count).forEach(add);
+
+  take(newPool, newSlots);
+  take(retryPool, retrySlots);
+  take(rotationPool.filter((candidate) => !selectedIds.has(String(candidate.item.cid))), oldSlots);
+
+  // Borrow unused reserved slots so a small queue does not waste a run, while
+  // retaining the priority order new -> due retry -> rotation.
+  for (const pool of [newPool, retryPool, rotationPool]) {
+    for (const candidate of pool) add(candidate);
+  }
+
+  return {
+    candidates,
+    newCandidates: candidates.filter((candidate) => candidate.isNew),
+    retryCandidates: candidates.filter((candidate) => candidate.isRetry),
+    rotatingCandidates,
+  };
 }
 
 async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
@@ -3643,18 +4089,13 @@ async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
   const knownSongIds = new Set(
     (await env.ARKNIGHTS_DATA.get(MUSIC_LYRICS_KNOWN_SONGS_KEY, 'json')) || []
   );
-  const newCandidates = songs
-    .filter((song) => song?.cid && !knownSongIds.has(song.cid))
-    .slice(0, limit)
-    .map((item, index) => ({ index, item, isNew: true }));
-  const rotatingCandidates = buildCircularBatch(
-    songs,
-    startIndex,
-    Math.max(0, limit - newCandidates.length)
-  ).filter((candidate) => !newCandidates.some(
-    (newCandidate) => newCandidate.item?.cid === candidate.item?.cid
-  ));
-  const candidates = [...newCandidates, ...rotatingCandidates].slice(0, limit);
+  const retryState = (await env.ARKNIGHTS_DATA.get(MUSIC_LYRICS_RETRY_STATE_KEY, 'json')) || {};
+  const {
+    candidates,
+    newCandidates,
+    retryCandidates,
+    rotatingCandidates,
+  } = selectLyricsPrewarmCandidates(songs, startIndex, limit, knownSongIds, retryState);
   const completedSongIds = [];
   let translated = 0;
   let cacheHits = 0;
@@ -3678,6 +4119,7 @@ async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
       if (!song.lyricUrl) {
         skipped += 1;
         completedSongIds.push(songId);
+        delete retryState[String(songId)];
         continue;
       }
 
@@ -3686,6 +4128,7 @@ async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
       if (lines.length === 0) {
         skipped += 1;
         completedSongIds.push(songId);
+        delete retryState[String(songId)];
         continue;
       }
 
@@ -3725,8 +4168,21 @@ async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
         translated += 1;
       }
       completedSongIds.push(songId);
+      delete retryState[String(songId)];
     } catch (error) {
       errors += 1;
+      const retryKey = String(songId);
+      const previous = retryState[retryKey] || {};
+      const attemptCount = Math.min(
+        LYRICS_RETRY_MAX_ATTEMPTS,
+        Math.max(0, Number(previous.attemptCount) || 0) + 1
+      );
+      retryState[retryKey] = {
+        attemptCount,
+        lastError: error.message,
+        nextRetryAt: new Date(Date.now() + getLyricsRetryDelayMs(attemptCount)).toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
       console.warn('Music lyric translation prewarm failed:', songId, error.message);
     }
   }
@@ -3736,10 +4192,14 @@ async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
     MUSIC_LYRICS_KNOWN_SONGS_KEY,
     JSON.stringify([...knownSongIds])
   );
+  await env.ARKNIGHTS_DATA.put(
+    MUSIC_LYRICS_RETRY_STATE_KEY,
+    JSON.stringify(retryState)
+  );
 
   const nextIndex = (startIndex + rotatingCandidates.length) % songs.length;
   const wrapped = didCircularBatchWrap(startIndex, rotatingCandidates.length, songs.length);
-  await writeSupabaseCache(
+  const cursorSaved = await writeSupabaseCache(
     env,
     MUSIC_LYRICS_TRANSLATION_CURSOR_KEY,
     {
@@ -3751,12 +4211,15 @@ async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
       lastSkipped: skipped,
       lastErrors: errors,
       lastNewSongs: newCandidates.length,
+      lastRetrySongs: retryCandidates.length,
+      pendingRetry: Object.keys(retryState).length,
       lastWrapped: wrapped,
       locales,
       updatedAt: new Date().toISOString(),
     },
     'worker:prewarm-lyric-translations'
   );
+  if (!cursorSaved) errors += 1;
 
   return {
     synced: 'music:lyric-translations',
@@ -3766,6 +4229,9 @@ async function prewarmMusicLyricsTranslations(env, songsPayload, options = {}) {
     skipped,
     errors,
     newSongs: newCandidates.length,
+    retrySongs: retryCandidates.length,
+    pendingRetry: Object.keys(retryState).length,
+    checkpointWriteFailed: !cursorSaved,
     total: songs.length,
     locales,
     startIndex,
@@ -3810,14 +4276,23 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
 
     try {
       const detail = await fetchMusicJson(`/api/album/${encodeURIComponent(cid)}/detail`);
-      await writeSupabaseCache(
+      const cacheSaved = await writeSupabaseCache(
         env,
         `${MUSIC_CACHE_PREFIX}album:${cid}`,
         detail.data,
         detail.sourceUrl
       );
-      await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumDetailRow(detail.data));
-      await upsertSupabaseRows(env, 'music_songs', normalizeMusicAlbumSongRows(detail.data));
+      if (!cacheSaved) {
+        throw new Error(`Supabase cache write failed for album ${cid}`);
+      }
+      const albumResult = await upsertSupabaseRows(env, 'music_albums', normalizeMusicAlbumDetailRow(detail.data));
+      if (!albumResult.ok) {
+        throw new Error(`Supabase music_albums write failed for album ${cid}`);
+      }
+      const songResult = await upsertSupabaseRows(env, 'music_songs', normalizeMusicAlbumSongRows(detail.data));
+      if (!songResult.ok && !songResult.skipped) {
+        throw new Error(`Supabase music_songs write failed for album ${cid}`);
+      }
       stored += 1;
     } catch (error) {
       errors += 1;
@@ -3829,7 +4304,7 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
     ? 0
     : (startIndex + rotatingCandidates.length) % albums.length;
   const wrapped = didCircularBatchWrap(startIndex, rotatingCandidates.length, albums.length);
-  await writeSupabaseCache(
+  const cursorSaved = await writeSupabaseCache(
     env,
     MUSIC_ALBUM_DETAIL_CURSOR_KEY,
     {
@@ -3844,6 +4319,7 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
     },
     'worker:prewarm-music-albums'
   );
+  if (!cursorSaved) errors += 1;
 
   return {
     synced: 'music:album-details',
@@ -3854,6 +4330,7 @@ async function prewarmMusicAlbumDetails(env, albumsPayload, options = {}) {
     startIndex,
     nextIndex,
     recentAttempted: recentCandidates.length,
+    checkpointWriteFailed: !cursorSaved,
     wrapped,
     done: wrapped,
   };

@@ -1,28 +1,17 @@
-import { getVerifiedAudioSyncOffset } from '../../shared/character-ep-audio-sync.mjs';
+import { resolveCharacterEpSync } from '../../shared/character-ep-sync.mjs';
 
-const BILIBILI_SOURCE_PATTERN = /(?:bilibili\.com|player\.bilibili\.com)/i;
+// An uncalibrated MV must not silently use a guessed five-second offset. The
+// caller can inspect syncStatus and decide whether to show a warning or use a
+// manual correction instead.
+export const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 0;
 
-export const DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS = 5;
+export function getCharacterEpSyncState(characterEp) {
+  return resolveCharacterEpSync(characterEp);
+}
 
 export function getCharacterEpVideoOffsetSeconds(characterEp) {
-  const verifiedOffset = getVerifiedAudioSyncOffset(characterEp?.audioSync, {
-    songId: characterEp?.songId, videoId: characterEp?.bvid,
-  });
-  if (verifiedOffset !== null) return verifiedOffset;
-
-  const configuredOffset = characterEp?.videoOffsetSeconds;
-  const hasConfiguredOffset = configuredOffset !== null
-    && configuredOffset !== undefined
-    && configuredOffset !== '';
-  const numericOffset = Number(configuredOffset);
-
-  if (hasConfiguredOffset && Number.isFinite(numericOffset)) {
-    return numericOffset;
-  }
-
-  return BILIBILI_SOURCE_PATTERN.test(characterEp?.sourceUrl || '')
-    ? DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS
-    : 0;
+  const sync = getCharacterEpSyncState(characterEp);
+  return sync.offsetSeconds ?? DEFAULT_BILIBILI_VIDEO_OFFSET_SECONDS;
 }
 
 export function getCharacterEpVideoTime(audioTime, videoOffsetSeconds = 0) {

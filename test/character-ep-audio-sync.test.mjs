@@ -26,13 +26,13 @@ test('accepted audio alignment takes priority over duration estimates, including
   assert.equal(await updateAudioSync(row, { ...options, analyze: () => assert.fail('must reuse cached result') }), 'cached');
 });
 
-test('low confidence or an unrelated mapping falls back to the configured offset', () => {
+test('low confidence or an unrelated mapping remains uncalibrated', () => {
   for (const invalid of [{ confidence: 0.2 }, { videoId: 'other' }, { songId: 'other' },
     { offsetSeconds: null }, { offsetSeconds: Infinity }, { offsetSeconds: 80 }, { algorithmVersion: 99 }]) {
     const audioSync = { ...measured, songId: 'song1', videoId: 'video1', ...invalid };
     assert.equal(getCharacterEpVideoOffsetSeconds({
       songId: 'song1', bvid: 'video1', durationSeconds: 200, videoOffsetSeconds: 10, audioSync,
-    }), 10);
+    }), 0);
   }
 });
 
@@ -87,9 +87,13 @@ test('the Worker exposes only verified public alignment fields from raw', async 
   const body = await response.json();
   assert.equal(body.data.audioSync.offsetSeconds, -2.34);
   assert.equal(body.data.audioSync.sourceKey, undefined);
+  assert.equal(body.data.sync.calibrationStatus, 'measured');
+  assert.equal(body.data.sync.offsetSeconds, -2.34);
+  assert.equal(body.data.sync.offsetSource, 'audio-correlation');
   assert.equal(body.data.raw, undefined);
   mismatched = true;
   assert.equal((await (await call()).json()).data.audioSync, null);
+  assert.equal((await (await call()).json()).data.sync.calibrationStatus, 'unavailable');
 });
 
 test('API acquisition failure still permits extractor fallback', async () => {
