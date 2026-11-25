@@ -1,8 +1,12 @@
 <template>
   <article class="shared-operator" v-if="character">
     <section class="shared-art-panel">
+      <ImageViewer ref="portraitViewer" :src="currentPortraitUrl"
+        :alt="`${character.name} — ${portraits[portraitIndex]?.name || ''}`"
+        :portraits="viewerPortraits" :selected-index="portraitIndex" @select="portraitIndex = $event" />
       <div class="shared-art" v-if="currentPortraitUrl">
-        <img :src="currentPortraitUrl" :alt="character.name" decoding="async" fetchpriority="high">
+        <img :src="currentPortraitUrl" :alt="character.name" decoding="async" fetchpriority="high"
+          @click="portraitViewer?.open()" style="cursor: zoom-in">
       </div>
       <div class="shared-identity">
         <span class="shared-rarity">{{ rarityStars }}★</span>
@@ -66,6 +70,7 @@
 </template>
 
 <script setup>
+import ImageViewer from './ImageViewer.vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getProxyImageUrl } from '../services/api.js';
@@ -78,6 +83,7 @@ const props = defineProps({
 const emit = defineEmits(['portrait-change']);
 const { t, te } = useI18n();
 const portraitIndex = ref(0);
+const portraitViewer = ref(null);
 const skillIndex = ref(0);
 const manifestReady = ref(false);
 
@@ -97,6 +103,11 @@ const getPortraitUrl = (portrait) => {
 };
 const getPortraitId = (portrait, index) => String(portrait?.portraitId || portrait?.skinId || index);
 const currentPortraitUrl = computed(() => getPortraitUrl(portraits.value[portraitIndex.value]));
+const viewerPortraits = computed(() => portraits.value.map((portrait, index) => ({
+  id: getPortraitId(portrait, index),
+  name: portrait.name,
+  src: getPortraitUrl(portrait),
+})));
 const getSkillIcon = (skill) => {
   void manifestReady.value;
   const url = getLocalSkillIconUrl(skill?.iconId || skill?.id) || skill?.iconUrls?.[0] || skill?.iconUrl || '';

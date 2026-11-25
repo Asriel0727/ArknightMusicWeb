@@ -1,4 +1,13 @@
 {
+  "imageViewer": {
+    "open": "画像を拡大",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小",
+    "reset": "リセット",
+    "close": "画像を閉じる",
+    "portraits": "立ち絵／コーデ",
+    "hint": "ホイール・ピンチで拡大縮小 · ドラッグで移動 · コーデを選択して切替 · Esc で閉じる"
+  },
   "nav": {
     "albums": "モンスターサイレン",
     "characters": "オペレーター",

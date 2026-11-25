@@ -1,4 +1,13 @@
 {
+  "imageViewer": {
+    "open": "放大看圖",
+    "zoomIn": "放大",
+    "zoomOut": "縮小",
+    "reset": "重設",
+    "close": "關閉大圖",
+    "portraits": "立繪／時裝",
+    "hint": "滾輪／雙指縮放 · 按住拖曳移動 · 點選時裝切換 · Esc 關閉"
+  },
   "nav": {
     "albums": "塞壬唱片",
     "characters": "幹員圖鑑",

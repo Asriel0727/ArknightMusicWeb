@@ -1,4 +1,13 @@
 {
+  "imageViewer": {
+    "open": "이미지 확대",
+    "zoomIn": "확대",
+    "zoomOut": "축소",
+    "reset": "초기화",
+    "close": "이미지 닫기",
+    "portraits": "일러스트 / 스킨",
+    "hint": "휠 또는 두 손가락으로 확대/축소 · 드래그로 이동 · 스킨 선택으로 전환 · Esc로 닫기"
+  },
   "nav": {
     "albums": "몬스터 사이렌",
     "characters": "오퍼레이터",

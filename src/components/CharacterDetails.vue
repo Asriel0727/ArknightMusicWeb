@@ -41,9 +41,13 @@
 
     <section class="operator-game-stage">
       <div class="operator-art-zone">
+        <ImageViewer ref="portraitViewer" :src="currentPortraitUrl"
+          :alt="`${character.name} — ${allPortraits[currentPortraitIndex]?.name || ''}`"
+          :portraits="viewerPortraits" :selected-index="currentPortraitIndex"
+          @select="selectPortrait" @error="handlePortraitError" />
         <div class="operator-art" v-if="currentPortraitUrl">
           <img :src="currentPortraitUrl" :alt="character.name" decoding="async" fetchpriority="high"
-            @error="handlePortraitError">
+            @error="handlePortraitError" @click="portraitViewer?.open()" style="cursor: zoom-in">
         </div>
         <div class="operator-skin-switcher" :class="{ expanded: isSkinSwitcherOpen }" v-if="allPortraits.length > 1">
           <button class="skin-switcher-toggle" type="button" :aria-expanded="isSkinSwitcherOpen"
@@ -587,6 +591,7 @@
 </template>
 
 <script setup>
+import ImageViewer from './ImageViewer.vue';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getCharacterAvatarUrls, getCharacterPortraitUrls, getProxyImageUrl } from '../services/api.js';
@@ -615,6 +620,7 @@ const props = defineProps({
 const emit = defineEmits(['portrait-change']);
 
 const currentPortraitIndex = ref(0);
+const portraitViewer = ref(null);
 const currentPortraitUrlIndex = ref(0);
 const isSkinSwitcherOpen = ref(false);
 const activeDetailTab = ref('overview');
@@ -1091,6 +1097,12 @@ const getPortraitPreviewUrl = (portrait) => {
   const url = portrait?.urls?.[0] || '';
   return url ? getProxyImageUrl(url) : '';
 };
+
+const viewerPortraits = computed(() => allPortraits.value.map((portrait, index) => ({
+  id: portrait.portraitId || portrait.skinId || String(index),
+  name: portrait.name,
+  src: getPortraitPreviewUrl(portrait),
+})));
 
 const getModuleIconUrl = (module) => {
   const url = getLocalModuleIconUrl(module?.uniEquipIcon || module?.id)

@@ -1,6 +1,6 @@
 <template>
-  <div class="modal" :class="{ show: modalState.isOpen }" @click="handleBackdropClick">
-    <div class="modal-content" :class="{ 'character-share-modal': modalState.currentView === 'character-share' }" @click.stop>
+  <div class="modal" :class="{ show: modalState.isOpen, 'operator-overlay': isCharacterView }" @click="handleBackdropClick">
+    <div class="modal-content" :class="{ 'character-modal': isCharacterView, 'operator-modal-frame': isCharacterView, 'character-share-modal': modalState.currentView === 'character-share' }" @click.stop>
       <div class="modal-action-bar" :class="`view-${modalState.currentView}`" :aria-label="navText.actions">
         <div class="modal-action-group right">
           <button
@@ -236,6 +236,11 @@ watch(() => playerState.currentSong, (newSong) => {
   pointer-events: auto;
 }
 
+.modal.operator-overlay {
+  background: rgba(3, 12, 16, 0.32);
+  backdrop-filter: blur(6px);
+}
+
 .modal-content {
   background: var(--card-bg);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -250,12 +255,62 @@ watch(() => playerState.currentSong, (newSong) => {
   overflow-y: auto;
 }
 
-.modal-action-bar.view-character-share + #modal-body {
-  min-height: min(720px, calc(90vh - 110px));
+.modal-content.character-modal {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 78px 18px 18px;
+  overflow: hidden;
 }
 
-.modal-content.character-share-modal {
-  max-width: 1180px;
+.modal-content.character-modal #modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.character-modal :deep(.character-details),
+.character-modal :deep(.shared-operator) {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+}
+
+.character-modal :deep(.character-details),
+.character-modal :deep(.shared-operator) {
+  background: rgba(8, 18, 24, 0.12);
+  border-color: var(--operator-panel-border);
+}
+
+.character-modal :deep(.operator-game-stage),
+.character-modal :deep(.shared-art-panel) {
+  background-color: transparent;
+}
+
+.character-modal :deep(.operator-info-console),
+.character-modal :deep(.shared-data-panel) {
+  background: var(--operator-panel-surface);
+  border-color: var(--operator-panel-border);
+  backdrop-filter: none;
+}
+
+.character-modal :deep(.operator-data-nav) {
+  background: rgba(9, 22, 28, 0.35);
+  border-color: var(--operator-panel-border);
+}
+
+@media (max-width: 760px) {
+  .character-modal :deep(.shared-operator) {
+    height: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .character-modal :deep(.character-details) {
+    height: auto;
+    overflow: visible;
+  }
 }
 
 .modal-loading {

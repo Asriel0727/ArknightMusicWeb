@@ -1,0 +1,51 @@
+/* Keep native text, resize and touch behavior; theme desktop pointing states only. */
+@media (any-hover: hover) and (any-pointer: fine) {
+  :root {
+    --prts-cursor-normal: url('../assets/cursors/prts-v4/normal.cur'), default;
+    --prts-cursor-link: url('../assets/cursors/prts-v4/link.cur'), pointer;
+    --prts-cursor-move: url('../assets/cursors/prts-v4/move.cur'), grab;
+    --prts-cursor-denied: url('../assets/cursors/prts-v4/denied.cur'), not-allowed;
+  }
+
+  html,
+  body {
+    cursor: var(--prts-cursor-normal);
+  }
+
+  /* Cursor-only overrides take precedence over component-scoped native cursors. */
+  :where(
+    button, a[href], summary, select, label[for],
+    input[type='button'], input[type='submit'], input[type='reset'],
+    input[type='checkbox'], input[type='radio'], input[type='range'],
+    [role='button'], [role='tab'], [role='checkbox'], [role='switch'],
+    .clickable, .character-card, .character-list-manager-item,
+    .playlist-manager-item, .playlist-list-main, .character-list-main,
+    .character-row, .character-chip, .playlist-chip.more,
+    .story-title, .story-stage, .dialogue-box, .operator-token,
+    .progress-container, .lyrics-translation-toggle,
+    .now-playing-dropdown, .dropdown-song-item, #now-playing-title,
+    .character-ep-preview-backdrop, .nav-locale-wrap,
+    .operator-art img, .shared-art img
+  ),
+  :where(button, a[href], summary, label[for], [role='button'], .character-card, .character-row, .clickable) * {
+    cursor: var(--prts-cursor-link) !important;
+  }
+
+  :where(.albums-container, .story-rack, .portrait-layer, .viewer-viewport),
+  :where(.portrait-layer, .viewer-viewport) *,
+  :where(.albums-container.is-dragging, .story-rack.dragging),
+  :where(.albums-container.is-dragging, .story-rack.dragging) * {
+    cursor: var(--prts-cursor-move) !important;
+  }
+
+  :where(input:not([type]), input[type='text'], input[type='search'],
+    input[type='email'], input[type='password'], input[type='number'],
+    input[type='url'], input[type='tel'], textarea, [contenteditable='true']) {
+    cursor: text !important;
+  }
+
+  :where(button:disabled, input:disabled, select:disabled, textarea:disabled, [aria-disabled='true']),
+  :where(button:disabled, [aria-disabled='true']) * {
+    cursor: var(--prts-cursor-denied) !important;
+  }
+}

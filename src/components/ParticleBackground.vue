@@ -1,6 +1,5 @@
 <template>
   <canvas ref="canvasRef" class="particle-canvas"></canvas>
-  <canvas ref="mouseCanvasRef" class="mouse-canvas"></canvas>
 </template>
 
 <script setup>
@@ -8,9 +7,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { getRecruitFactionLogoUrl, RECRUIT_FACTION_LOGO_OPTIONS } from '../utils/recruitCard.js';
 
 const canvasRef = ref(null);
-const mouseCanvasRef = ref(null);
 let ctx = null;
-let mouseCtx = null;
 let particles = [];
 let targets = [];
 let mouseX = null;
@@ -18,7 +15,6 @@ let mouseY = null;
 let timer = null;
 let nowImg = 0;
 let animationFrameId = null;
-let circleAnimationId = null;
 let lastDrawTime = 0;
 
 // 檢測是否為觸摸設備（沒有精確指針）
@@ -38,8 +34,6 @@ const PARTICLE_HEIGHT = 200;
 // 使用 Vite 的 BASE_URL 来支持 GitHub Pages 的 base 路径
 const imgList = RECRUIT_FACTION_LOGO_OPTIONS.map((logoKey) => getRecruitFactionLogoUrl(logoKey));
 
-// 鼠标周围圆的半径
-const circleR = 20;
 // 总运动时间
 const duration = 300;
 // 最大生效距离
@@ -51,12 +45,6 @@ const initCanvasSize = () => {
   // 粒子画布固定在右下角，固定大小
   canvasRef.value.width = PARTICLE_WIDTH;
   canvasRef.value.height = PARTICLE_HEIGHT;
-  
-  // 鼠标圆圈画布覆盖全屏
-  if (mouseCanvasRef.value) {
-    mouseCanvasRef.value.width = window.innerWidth;
-    mouseCanvasRef.value.height = window.innerHeight;
-  }
 };
 
 // 清空画布
@@ -278,30 +266,6 @@ const update = (failedAttempts = 0) => {
   };
 };
 
-// 存储全局鼠标坐标（用于圆圈显示）
-let globalMouseX = null;
-let globalMouseY = null;
-
-// 给鼠标周围加上圆圈（在独立的鼠标画布上）
-const circle = () => {
-  if (!mouseCtx || !mouseCanvasRef.value || globalMouseX === null || globalMouseY === null) {
-    circleAnimationId = requestAnimationFrame(circle);
-    return;
-  }
-
-  // 清空鼠标画布
-  mouseCtx.clearRect(0, 0, mouseCanvasRef.value.width, mouseCanvasRef.value.height);
-  
-  // 绘制鼠标圆圈（使用全局坐标）
-  mouseCtx.beginPath();
-  mouseCtx.arc(globalMouseX, globalMouseY, circleR, 0, 2 * Math.PI);
-  mouseCtx.strokeStyle = "rgb(255,255,255)";
-  mouseCtx.lineWidth = 2;
-  mouseCtx.stroke();
-  mouseCtx.closePath();
-  circleAnimationId = requestAnimationFrame(circle);
-};
-
 // 获取粒子画布的位置
 const getCanvasPosition = () => {
   if (!canvasRef.value) return { x: 0, y: 0 };
@@ -316,10 +280,6 @@ const getCanvasPosition = () => {
 
 // 鼠标移动事件
 const handleMouseMove = (e) => {
-  // 始终记录全局坐标（用于圆圈显示）
-  globalMouseX = e.clientX;
-  globalMouseY = e.clientY;
-  
   const canvasPos = getCanvasPosition();
   // 将鼠标坐标转换为相对于粒子画布的坐标
   const relativeX = e.clientX - canvasPos.x;
@@ -372,11 +332,6 @@ const run = () => {
   update();
   timer = setInterval(update, 5000);
   draw();
-  
-  // 只在非觸摸設備上顯示鼠標圓圈
-  if (!isTouchDevice()) {
-    circle();
-  }
 };
 
 onMounted(() => {
@@ -388,11 +343,6 @@ onMounted(() => {
     ctx = canvasRef.value.getContext("2d", {
       willReadFrequently: true
     });
-  }
-  
-  // 只在非觸摸設備上初始化鼠標畫布
-  if (mouseCanvasRef.value && !isTouchDevice()) {
-    mouseCtx = mouseCanvasRef.value.getContext("2d");
   }
   
   if (canvasRef.value) {
@@ -413,9 +363,6 @@ onUnmounted(() => {
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId);
   }
-  if (circleAnimationId) {
-    cancelAnimationFrame(circleAnimationId);
-  }
   window.removeEventListener("mousemove", handleMouseMove);
   document.removeEventListener("visibilitychange", handleVisibilityChange);
   window.removeEventListener("resize", handleResize);
@@ -431,23 +378,6 @@ onUnmounted(() => {
   height: 200px;
   z-index: 1;
   pointer-events: none;
-}
-
-.mouse-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  pointer-events: none;
-}
-
-/* 在觸摸設備上隱藏鼠標圓圈 */
-@media (hover: none) and (pointer: coarse) {
-  .mouse-canvas {
-    display: none;
-  }
 }
 
 @media (max-width: 768px) {
@@ -469,8 +399,7 @@ onUnmounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .particle-canvas,
-  .mouse-canvas {
+  .particle-canvas {
     display: none;
   }
 }

@@ -9,6 +9,10 @@ export default defineConfig({
   plugins: [vue()],
   // GitHub 仓库名：ArknightMusicWeb
   base: process.env.NODE_ENV === 'production' ? '/ArknightMusicWeb/' : '/',
+  // Scan the app entry, not temporary previews or alternate build outputs.
+  optimizeDeps: {
+    entries: ['index.html'],
+  },
   server: {
     port: 3000,
     // 3000 被占用時自動改用下一個可用埠（終端機會印出實際網址）

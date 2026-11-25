@@ -1,4 +1,13 @@
 {
+  "imageViewer": {
+    "open": "View artwork",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "reset": "Reset",
+    "close": "Close viewer",
+    "portraits": "Artwork / Outfits",
+    "hint": "Scroll or pinch to zoom · Drag to pan · Select an outfit to switch · Esc to close"
+  },
   "nav": {
     "albums": "Monster Siren",
     "characters": "Operators",

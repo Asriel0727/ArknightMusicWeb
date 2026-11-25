@@ -1,7 +1,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import { i18n } from './i18n/index.js';
-import '/public/styles.css';
+import './styles/operatorModal.css';
+import './styles/cursors.css';
 import textGlitchDirective from './directives/textGlitch.js';
 
 const app = createApp(App);
