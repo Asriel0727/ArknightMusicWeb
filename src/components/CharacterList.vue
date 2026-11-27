@@ -51,6 +51,21 @@
           </button>
         </div>
       </div>
+      <div class="filter-group branch-filter-group">
+        <label>{{ t('character.branch') }}</label>
+        <p v-if="selectedProfession === null" class="branch-hint">{{ t('character.selectProfessionFirst') }}</p>
+        <div v-else class="filter-buttons" role="group" :aria-label="t('character.branch')">
+          <button type="button" :class="{ active: selectedBranch === null }"
+            :aria-pressed="selectedBranch === null" @click="selectedBranch = null">
+            {{ t('character.allBranches') }}
+          </button>
+          <button v-for="branch in branchOptions" :key="branch.id" type="button"
+            :class="{ active: selectedBranch === branch.id }" :aria-pressed="selectedBranch === branch.id"
+            @click="selectedBranch = selectedBranch === branch.id ? null : branch.id">
+            {{ branch.label }}
+          </button>
+        </div>
+      </div>
       <div class="filter-group faction-filter-group">
         <label>{{ t('character.nation') }}</label>
         <div class="faction-filter-controls">
@@ -143,6 +158,7 @@
     </div>
 
     <!-- 角色列表 -->
+    <p v-else-if="filteredCharacters.length === 0" class="branch-empty" role="status">{{ t('character.noMatchingOperators') }}</p>
     <div v-else class="character-grid">
       <div 
         v-for="char in filteredCharacters" 
@@ -167,7 +183,7 @@
         </div>
         <div class="character-info">
           <h3 class="character-name">{{ char.name }}</h3>
-          <p class="character-class">{{ getProfessionName(char.profession) }}</p>
+          <p class="character-class">{{ getProfessionName(char.profession) }}<span v-if="char.subProfessionName"> / {{ char.subProfessionName }}</span></p>
           <p v-if="getFactionLabel(char.factionId)" class="character-nation" :title="getFactionLabel(char.factionId)">
             {{ getFactionLabel(char.factionId) }}
           </p>
@@ -200,6 +216,31 @@ const error = ref(null);
 const searchQuery = ref('');
 const selectedRarity = ref([]); // 改為數組，支援多選
 const selectedProfession = ref(null);
+const selectedBranch = ref(null);
+
+watch(selectedProfession, () => {
+  selectedBranch.value = null;
+}, { flush: 'sync' });
+
+// 選項不受搜尋與星級影響，避免篩選時分支按鈕突然消失。
+const branchOptions = computed(() => {
+  const branches = new Map();
+  for (const char of characters.value) {
+    if (char.profession !== selectedProfession.value || !char.subProfessionId) continue;
+    branches.set(char.subProfessionId, {
+      id: char.subProfessionId,
+      label: char.subProfessionName || char.subProfessionId,
+      order: char.subProfessionOrder ?? 9999,
+    });
+  }
+  return [...branches.values()].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+});
+
+watch(branchOptions, (options) => {
+  if (selectedBranch.value && !options.some((option) => option.id === selectedBranch.value)) {
+    selectedBranch.value = null;
+  }
+});
 const isFactionFilterExpanded = ref(false);
 const assetManifestVersion = ref(0);
 const selectedFactions = ref([]);
@@ -333,6 +374,10 @@ const filteredCharacters = computed(() => {
 
     // 職業篩選
     if (selectedProfession.value !== null && char.profession !== selectedProfession.value) {
+      return false;
+    }
+
+    if (selectedBranch.value !== null && char.subProfessionId !== selectedBranch.value) {
       return false;
     }
     
@@ -546,6 +591,22 @@ watch(releaseServer, () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.branch-filter-group {
+  flex-basis: 100%;
+  min-width: 0;
+}
+
+.branch-hint, .branch-empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.branch-empty {
+  padding: 32px 16px;
+  text-align: center;
 }
 
 .faction-filter-controls {

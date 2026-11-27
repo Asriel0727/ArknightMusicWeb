@@ -412,14 +412,17 @@ onMounted(() => {
   min-height: 0;
 }
 @media (min-height: 540px) {
-  #app:has(> .story-page.archive-console) {
+  #app:has(> .story-page.archive-console),
+  #app:has(> .story-page.player-console) {
     height: 100dvh;
     min-height: 0;
   }
-  #app:has(> .story-page.archive-console) > :is(.main-navbar, footer) {
+  #app:has(> .story-page.archive-console) > :is(.main-navbar, footer),
+  #app:has(> .story-page.player-console) > :is(.main-navbar, footer) {
     flex: none;
   }
-  #app:has(> .story-page.archive-console) > footer {
+  #app:has(> .story-page.archive-console) > footer,
+  #app:has(> .story-page.player-console) > footer {
     padding: 6px 12px;
     font-size: .75rem;
   }

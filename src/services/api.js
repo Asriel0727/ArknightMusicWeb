@@ -592,6 +592,7 @@ function normalizeWorkerOperator(operator) {
     name: toTraditionalGameDataText(operator.name || ''),
     appellation: operator.appellation || '',
     profession: operator.profession || 'PIONEER',
+    subProfessionId: operator.subProfessionId || '',
     rarity: operator.rarity ?? 0,
     position: operator.position || '',
     tagList: (operator.tagList || []).map((tag) => toTraditionalGameDataText(tag)),
@@ -629,17 +630,17 @@ export async function fetchRecruitCharacters(releaseServer = null) {
   let operators;
   try {
     if (shouldUseRecruitWorkerApi()) {
-      const [data, sourceResponse] = await Promise.all([
+      const [data, sourceTable] = await Promise.all([
         fetchRecruitApiJson('/api/recruit/operators'),
-        fetch(`${getGameDataExcelBase()}/character_table.json`),
+        getGameDataJson(`${getGameDataExcelBase()}/character_table.json`, {}),
       ]);
       if (!Array.isArray(data.operators)) {
         throw new Error('Recruit API operators payload is invalid');
       }
-      const sourceTable = sourceResponse.ok ? await sourceResponse.json() : {};
       const releaseOrder = new Map(Object.keys(sourceTable).map((id, index) => [id, index]));
       operators = data.operators.map((operator) => normalizeWorkerOperator({
         ...operator,
+        subProfessionId: sourceTable[operator.id]?.subProfessionId || operator.subProfessionId || '',
         releaseOrder: releaseOrder.get(operator.id) ?? 0,
       }));
 
@@ -725,7 +726,7 @@ export async function fetchRecruitCharacters(releaseServer = null) {
       existingIds.add(fallback.id);
     }
 
-    return operators.map((operator) => {
+    operators = operators.map((operator) => {
       const release = findOperatorRelease(releaseMap, operator);
       const cnRelease = findOperatorRelease(cnReleaseMap, operator);
       const timestamp = release?.release_at ? Date.parse(release.release_at) : NaN;
@@ -747,8 +748,26 @@ export async function fetchRecruitCharacters(releaseServer = null) {
     });
   } catch (error) {
     console.warn('Operator release dates unavailable:', error);
-    return operators;
   }
+
+  // 補齊 Worker 快照與跨服未實裝幹員的分支；表格沿用既有記憶體快取。
+  const excel = getGameDataExcelBase();
+  const [characterTable, uniequipTable] = await Promise.all([
+    operators.some((operator) => !operator.subProfessionId)
+      ? getGameDataJson(`${getCnGameDataExcelBase()}/character_table.json`, {})
+      : Promise.resolve({}),
+    getGameDataJson(`${excel}/uniequip_table.json`, {}),
+  ]);
+  return operators.map((operator) => {
+    const subProfessionId = operator.subProfessionId || characterTable[operator.id]?.subProfessionId || '';
+    const branch = uniequipTable.subProfDict?.[subProfessionId];
+    return {
+      ...operator,
+      subProfessionId,
+      subProfessionName: toTraditionalGameDataText(branch?.subProfessionName || subProfessionId),
+      subProfessionOrder: branch?.subProfessionCatagory ?? 9999,
+    };
+  });
 }
 
 export async function fetchRecruitReleaseSnapshot(server) {
@@ -973,6 +992,7 @@ export async function fetchCharacters() {
           name: toTraditionalGameDataText(resolveCharacterTableDisplayName(char)),
           appellation: char.appellation, // 代號/英文名
           profession: char.profession,   // 職業
+          subProfessionId: char.subProfessionId || '',
           rarity: rarity,                // 稀有度 (0-5 對應 1-6星)
           position: char.position,       // 位置 (MELEE/RANGED)
           tagList: (char.tagList || []).map((tag) => toTraditionalGameDataText(tag)),   // 標籤
@@ -1707,6 +1727,9 @@ export async function fetchCharacterDetails(charId, excelOverride = '') {
       appellation: charData.appellation,
       profession: charData.profession,
       subProfessionId: charData.subProfessionId || '',
+      subProfessionName: toTraditionalGameDataText(
+        uniequipTable?.subProfDict?.[charData.subProfessionId]?.subProfessionName || charData.subProfessionId || ''
+      ),
       rarity: rarity,
       position: charData.position,
       tagList: (charData.tagList || []).map((tag) => toTraditionalGameDataText(tag)),

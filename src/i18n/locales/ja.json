@@ -123,6 +123,10 @@
     "back": "戻る"
   },
   "character": {
+    "branch": "職分",
+    "allBranches": "すべての職分",
+    "selectProfessionFirst": "職業を選択すると職分が表示されます。",
+    "noMatchingOperators": "条件に一致するオペレーターはいません。",
     "pageTitle": "オペレーター図鑑",
     "rarity": "レアリティ",
     "nation": "陣営",

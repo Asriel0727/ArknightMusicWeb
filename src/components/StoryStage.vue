@@ -1,11 +1,11 @@
 <template>
-  <main class="story-page" :class="{ 'archive-console': screen !== 'player', 'film-archive': isFilmArchive }" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
+  <main class="story-page" :class="{ 'archive-console': screen !== 'player', 'film-archive': isFilmArchive, 'episode-console': screen === 'episodes', 'player-console': screen === 'player' }" @pointerdown.capture="unlockMemorySound" @keydown.capture="unlockMemorySound" @wheel.capture="unlockMemorySound">
     <header class="story-heading">
       <div>
-        <p v-if="screen === 'player'" class="eyebrow">{{ `STORY / ${manifest?.storyId || selectedStory?.page || 'PRTS'}` }}</p>
+        <p v-if="screen === 'player'" class="eyebrow">{{ localize(activeCollection?.label) }}</p>
         <h1 ref="screenHeading" tabindex="-1">{{ screen === 'player' ? localize(manifest?.title || selectedStory?.title) : screen === 'episodes' ? localize(activeCollection?.label) : labels.archive }}</h1>
-        <p v-if="screen === 'player'">{{ labels.subtitle }}</p>
       </div>
+      <span v-if="screen === 'episodes'" class="episode-section-label">{{ labels.episodeSegments }}</span>
       <div v-if="isFilmArchive" class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
       <div v-if="screen !== 'player'" ref="archiveTools" class="heading-actions console-utilities" @keydown.esc.stop.prevent="closeArchiveTools(true)">
         <button v-if="screen === 'episodes'" class="archive-back" type="button" @click="returnToCollections">← {{ labels.backToCollections }}</button>
@@ -18,63 +18,91 @@
         </details>
         <button v-if="progressImportCount" type="button" :disabled="progressSyncing" @click="importGuestProgress">{{ t('storyProgress.import', { count: progressImportCount }) }}</button>
       </div>
-      <div v-else class="heading-actions"><button type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button><a :href="manifest?.sourcePage || selectedStory?.sourcePage" target="_blank" rel="noopener noreferrer">PRTS ↗</a></div>
+      <div v-else ref="playerUtilities" class="heading-actions player-utilities" @keydown.esc.stop.prevent="closePlayerUtilities(true)">
+        <button type="button" @click="returnToEpisodes">← {{ labels.backToEpisodes }}</button>
+        <details class="player-sync-menu">
+          <summary :class="{ 'needs-attention': progressStorageFailed || ['expired', 'offline', 'unavailable', 'error'].includes(progressStatus) }"><span class="console-status-light" aria-hidden="true"></span>{{ t('storyProgress.title') }}</summary>
+          <section class="story-progress-sync player-popover" :aria-label="t('storyProgress.title')">
+            <div><strong v-if="progressOwner">{{ t('storyProgress.account', { name: authState.session?.user?.loginKey || progressOwner }) }}</strong><span role="status">{{ t('storyProgress.' + progressStatus) }}</span><span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span></div>
+            <button v-if="!progressOwner || progressStatus === 'expired'" type="button" @click="emit('sign-in')">{{ t('storyProgress.signIn') }}</button>
+            <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)">{{ t('storyProgress.retry') }}</button>
+            <button v-if="progressImportCount" type="button" :disabled="progressSyncing" @click="importGuestProgress">{{ t('storyProgress.import', { count: progressImportCount }) }}</button>
+          </section>
+        </details>
+        <a :href="manifest?.sourcePage || selectedStory?.sourcePage" target="_blank" rel="noopener noreferrer">PRTS ↗</a>
+      </div>
     </header>
-    <section v-if="screen === 'player'" class="story-progress-sync" :aria-label="t('storyProgress.title')">
-      <div><strong v-if="progressOwner">{{ t('storyProgress.account', { name: authState.session?.user?.loginKey || progressOwner }) }}</strong><span role="status">{{ t('storyProgress.' + progressStatus) }}</span><span v-if="progressStorageFailed" class="progress-storage-warning">{{ t('storyProgress.storageFailed') }}</span></div>
-      <button v-if="!progressOwner || progressStatus === 'expired'" type="button" @click="emit('sign-in')">{{ t('storyProgress.signIn') }}</button>
-      <button v-if="progressOwner" type="button" :disabled="progressSyncing" @click="syncReadingProgress(true)">{{ t('storyProgress.retry') }}</button>
-      <button v-if="progressImportCount" type="button" :disabled="progressSyncing" @click="importGuestProgress">{{ t('storyProgress.import', { count: progressImportCount }) }}</button>
-    </section>
 
     <Transition name="archive-screen" mode="out-in">
     <div :key="screen" class="archive-screen">
     <section v-if="catalog.length && screen !== 'player'" class="story-library" :class="[`view-${viewMode}`, { 'collection-browser': isCollectionBrowser }]" :aria-label="labels.selectStory">
-      <div class="projection-controls" @keydown.esc="advancedFilters = false">
+      <div ref="projectionControls" class="projection-controls" @keydown.esc.stop.prevent="closeFilters(true)">
       <div class="archive-toolbar">
-        <div v-if="!isFilmArchive" class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
+        <div v-if="!isFilmArchive && screen !== 'episodes'" class="view-switch" role="group" :aria-label="labels.view"><button v-for="mode in ['banner', 'sequence']" :key="mode" type="button" :class="{ active: viewMode === mode }" :aria-pressed="viewMode === mode" @click="viewMode = mode">{{ labels.views[mode] }}</button></div>
         <button v-if="screen === 'collections' && viewMode !== 'sequence' && lastOpened" type="button" class="filter-toggle" @click="openLibraryStory(lastOpened)">
           {{ locale === 'zh-TW' ? '接續閱讀' : locale === 'zh-CN' ? '继续阅读' : 'Continue reading' }} →
         </button>
 
         <span v-if="screen === 'episodes'">{{ completedCount }} / {{ groupStories.length }} {{ labels.read }}</span>
-        <label v-if="viewMode !== 'sequence'" class="console-search"><i class="fas fa-search" aria-hidden="true"></i><input v-if="screen === 'collections'" v-model="search" type="search" :placeholder="labels.search" :aria-label="labels.search"><input v-else v-model="episodeSearch" type="search" :placeholder="labels.searchEpisodes" :aria-label="labels.searchEpisodes"></label>
-        <button v-if="screen === 'collections' && viewMode !== 'sequence'" class="filter-toggle" type="button" :class="{ 'has-filters': refinementCount > 0 }" :aria-expanded="advancedFilters" aria-controls="console-advanced-filters" @click="advancedFilters = !advancedFilters"><i class="fas fa-sliders-h" aria-hidden="true"></i>{{ consoleLabels.filters }}<span v-if="refinementCount" class="filter-count">{{ refinementCount }}</span><i class="fas fa-chevron-down" :class="{ expanded: advancedFilters }" aria-hidden="true"></i></button>
+        <label v-if="screen === 'episodes'" class="episode-phase"><select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select></label>
+        <label v-if="screen === 'episodes' || viewMode !== 'sequence'" class="console-search"><i class="fas fa-search" aria-hidden="true"></i><input v-if="screen === 'collections'" v-model="search" type="search" :placeholder="isOperatorBrowser ? operatorSearchLabel : labels.search" :aria-label="isOperatorBrowser ? operatorSearchLabel : labels.search"><input v-else v-model="episodeSearch" type="search" :placeholder="labels.searchEpisodes" :aria-label="labels.searchEpisodes"></label>
+        <button v-if="isCollectionBrowser" class="filter-toggle" type="button" :class="{ 'has-filters': refinementCount > 0 }" :aria-expanded="advancedFilters" aria-controls="console-advanced-filters" @click="advancedFilters = !advancedFilters"><i class="fas fa-sliders-h" aria-hidden="true"></i>{{ consoleLabels.filters }}<span v-if="refinementCount" class="filter-count">{{ refinementCount }}</span><i class="fas fa-chevron-down" :class="{ expanded: advancedFilters }" aria-hidden="true"></i></button>
+      </div>
+      <div v-if="isCollectionBrowser" class="active-filter-strip" :aria-label="filterLabels.applied">
+        <span v-if="!activeFilterChips.length">{{ filterLabels.noFilters }}</span>
+        <button v-for="chip in activeFilterChips" :key="chip.key" type="button" :aria-label="`${filterLabels.remove}: ${chip.label}`" @click="clearFilter(chip.key)">{{ chip.label }} <span aria-hidden="true">×</span></button>
+        <button v-if="activeFilterChips.length" type="button" @click="resetRefinements">{{ consoleLabels.reset }}</button>
       </div>
       <div class="library-heading">
         <div><span class="eyebrow">{{ screen === 'collections' ? '01 / SELECT CHAPTER OR EVENT' : '02 / SELECT STORY' }}</span><p>{{ screen === 'collections' ? labels.collectionNames : localize(activeCollection?.label) }} <span>{{ screen === 'collections' ? filteredCollections.length : groupStories.length }}</span></p></div>
         <span class="archive-hint">{{ screen === 'collections' ? labels.chooseCollection : labels.chooseEpisode }}</span>
       </div>
-      <div v-if="screen === 'collections' && viewMode !== 'sequence'" class="archive-categories" role="group" :aria-label="labels.category">
-        <button type="button" :class="{ active: !selectedCategory }" :aria-pressed="!selectedCategory" @click="selectedCategory = ''">{{ consoleLabels.all }}</button>
-        <button v-for="category in primaryCategories" :key="category.id" type="button" :class="{ active: selectedCategory === category.id }" :aria-pressed="selectedCategory === category.id" @click="selectedCategory = category.id">{{ categoryLabel(category.id) }}</button>
-        <label v-if="secondaryCategories.length" class="archive-other-category" :class="{ active: secondaryCategories.some(category => category.id === selectedCategory) }"><select :value="secondaryCategories.some(category => category.id === selectedCategory) ? selectedCategory : ''" :aria-label="consoleLabels.otherCategories" @change="selectedCategory = $event.target.value"><option value="" disabled>{{ consoleLabels.otherCategories }}</option><option v-for="category in secondaryCategories" :key="category.id" :value="category.id">{{ categoryLabel(category.id) }}</option></select></label>
-      </div>
-      <div v-else-if="viewMode !== 'sequence'" class="library-filters">
-        <label class="console-filter"><span>{{ labels.phase }}</span><select v-model="selectedPhase" :aria-label="labels.phase"><option value="">{{ labels.allPhases }}</option><option v-for="phase in phases" :key="phase" :value="phase">{{ labels.phases[phase] }}</option></select></label>
-      </div>
       <div v-if="viewMode === 'sequence' && guideTrail.length" class="guide-tools">
         <button v-if="guideTrail.length" type="button" @click="returnToGuide">← {{ labels.returnGuide }} · {{ localize(guideTrail[guideTrail.length - 1].group) }}</button>
       </div>
-      <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" id="console-advanced-filters" class="library-filters advanced-filters">
-        <label class="console-filter"><span>{{ labels.series }}</span><select v-model="selectedLine"><option value="">{{ labels.allSeries }}</option><option v-for="line in availableLines" :key="line.id" :value="line.id">{{ localize(line.name) }} ({{ line.count }})</option></select></label>
-        <label class="console-filter"><span>{{ labels.collectionNames }}</span><select v-model="selectedCollectionFilter"><option value="">{{ labels.allCollections }}</option><option v-for="collection in groups" :key="collection.key" :value="collection.key">{{ localize(collection.label) }}</option></select></label>
-        <label v-if="sections.length > 1" class="console-filter"><span>{{ labels.section }}</span><select v-model="selectedSection"><option value="">{{ labels.allSections }}</option><option v-for="section in sections" :key="section" :value="section">{{ localize(section) }}</option></select></label>
-        <label class="console-filter"><span>{{ labels.sort }}</span><select v-model="collectionSort"><option value="line">{{ labels.lineOrder }}</option><option value="release">{{ labels.releaseOrder }}</option><option value="name">{{ labels.nameOrder }}</option></select></label>
-        <button v-if="refinementCount" type="button" class="filter-reset" @click="resetRefinements">{{ consoleLabels.reset }}</button>
+      <Transition name="filter-reveal"><div v-if="screen === 'collections' && viewMode !== 'sequence' && advancedFilters" id="console-advanced-filters" class="library-filters advanced-filters" role="region" :aria-label="consoleLabels.filters">
+        <label v-if="typeOptions.length" class="console-filter"><span>{{ labels.category }}</span><select v-model="selectedType"><option value="">{{ labels.allCategories }}</option><option v-for="type in typeOptions" :key="type.id" :value="type.id">{{ categoryLabel(type.id) }}</option></select></label>
+        <label v-if="['main', 'events'].includes(selectedCategory) && sections.length > 1" class="console-filter"><span>{{ selectedCategory === 'main' ? filterLabels.act : labels.section }}</span><select v-model="selectedSection"><option value="">{{ labels.allSections }}</option><option v-for="section in sections" :key="section" :value="section">{{ localize(section) }}</option></select></label>
+        <label v-if="selectedCategory === 'events'" class="console-filter"><span>{{ labels.series }}</span><select v-model="selectedLine"><option value="">{{ labels.allSeries }}</option><option v-for="line in availableLines" :key="line.id" :value="line.id">{{ localize(line.name) }}</option></select></label>
+        <label class="console-filter"><span>{{ browserLabels.progress }}</span><select v-model="operatorReadFilter"><option value="">{{ consoleLabels.all }}</option><option value="unfinished">{{ browserLabels.unfinished }}</option><option value="complete">{{ browserLabels.complete }}</option></select></label>
+        <div class="filter-panel-actions"><button v-if="refinementCount" type="button" class="filter-reset" @click="resetRefinements">{{ consoleLabels.reset }}</button><button type="button" class="filter-done" @click="closeFilters(true)">{{ locale === 'zh-TW' ? '完成' : locale === 'zh-CN' ? '完成' : 'Done' }}</button></div>
       </div></Transition>
       <div v-if="screen === 'episodes' && viewMode === 'sequence'" class="reading-route">
         <button v-if="activeGuideNode" type="button" class="guide-context" :title="labels.currentGuide" @click="showGuide(readingLineId, activeCollection.group)">{{ localize(readingLineName) }} ↗</button>
-        <details class="episode-reading-guide">
-        <summary>{{ mediaLabels.context }}</summary>
-        <p>{{ labels.orderNote }} <span>{{ groupStories.every(story => story.orderSource === 'game') ? labels.gameOrder : labels.catalogOrder }}</span></p>
-        <p>{{ labels.routeBasis }}</p>
-        <details v-if="activeRoute.length > 1"><summary>{{ labels.storyLines }} / {{ labels.order }}</summary><nav :aria-label="labels.lineOrder"><template v-for="(node, index) in activeRoute" :key="`${index}-${node.group}`"><span v-if="index" class="route-arrow" aria-hidden="true">{{ node.independent ? '·' : '→' }}</span><button type="button" :disabled="!findCollection(node.group)" :class="{ current: node.group === activeCollection.group, intersection: node.intersection }" @click="openCollection(findCollection(node.group))">{{ localize(node.group) }}<small v-if="node.intersection">{{ labels.intersection }}</small></button></template></nav></details>
-        </details>
+        <div v-if="activeRoute.length" class="episode-reading-guide" :aria-label="labels.storyLines">
+          <div class="episode-storyline-strip">
+            <span class="episode-storyline-label">
+              <strong>{{ labels.storyLines }}</strong>
+              <small>{{ labels.order }}</small>
+            </span>
+            <nav class="episode-storyline-nav" :aria-label="labels.lineOrder">
+              <template v-for="(node, index) in activeRoute" :key="`${index}-${node.group}`">
+                <span v-if="index" class="route-arrow" aria-hidden="true">{{ node.independent ? '·' : '→' }}</span>
+                <button type="button" :disabled="!findCollection(node.group)" :class="{ current: node.group === activeCollection.group, intersection: node.intersection }" @click="openCollection(findCollection(node.group))">
+                  {{ localize(node.group) }}<small v-if="node.intersection">{{ labels.intersection }}</small>
+                </button>
+              </template>
+            </nav>
+          </div>
+        </div>
       </div>
       <p v-if="viewMode !== 'sequence' && (!isCollectionBrowser || selectedSection)" class="archive-breadcrumb">{{ screen === 'episodes' ? categoryLabel(activeCollection?.category) : selectedCategory ? categoryLabel(selectedCategory) : labels.allCategories }}<template v-if="screen === 'collections' && selectedSection"> / {{ localize(selectedSection) }}</template><template v-if="screen === 'episodes'"> / {{ localize(activeCollection?.label) }}</template><template v-if="screen === 'episodes' && selectedPhase"> / {{ labels.phases[selectedPhase] }}</template></p>
       </div>
-      <div class="story-line-layout" :class="{ 'with-line-rail': screen === 'collections' && viewMode === 'sequence' }">
+      <div class="story-line-layout" :class="{ 'with-line-rail': screen === 'collections', 'episode-layout': screen === 'episodes' }">
+      <nav v-if="isOperatorBrowser" class="story-line-rail operator-index" :aria-label="browserLabels.allOperators">
+        <button type="button" class="operator-index-back" @click="selectedCategory = ''">← {{ labels.category }}</button>
+        <button v-for="(operator, index) in filteredCollections" :key="operator.key" type="button" :aria-pressed="rackIndex === index" @click="seekRack(index)">
+          <img v-if="operator.operatorPortrait" :src="root + operator.operatorPortrait" alt="" loading="lazy" @error="$event.target.hidden = true">
+          <span><strong>{{ localize(operator.label) }}</strong><small>{{ operatorCompletedCount(operator) }} / {{ operator.count }} {{ labels.read }}</small></span>
+        </button>
+        <p v-if="!filteredCollections.length">{{ labels.noResults }}</p>
+      </nav>
+      <nav v-else-if="isCollectionBrowser" class="story-line-rail category-reel-rail" :aria-label="labels.category">
+        <button v-for="category in categoryReels" :key="category.id" type="button" :aria-pressed="selectedCategory === category.id" :class="{ 'reel-retracting': pendingReadingLine === `category:${category.id}` }" @click="selectCategoryReel(category.id, $event.currentTarget)">
+          <span class="story-reel-film"><img v-if="category.cover" :src="coverPath(category.cover)" alt="" loading="lazy"><span class="story-line-caption"><small>{{ category.count }} {{ category.id === 'operator' ? browserLabels.operators : labels.collections }}</small><strong>{{ category.label }}</strong></span></span>
+          <span class="story-line-reel" aria-hidden="true"><i class="story-reel-canister"></i></span>
+        </button>
+      </nav>
       <TransitionGroup v-if="screen === 'collections' && viewMode === 'sequence'" tag="nav" name="story-line-list" class="story-line-rail" :aria-label="labels.storyLines">
         <button v-for="line in availableReadingLines" :key="line.id" type="button"
           :class="{ 'reel-retracting': pendingReadingLine === line.id }"
@@ -86,7 +114,7 @@
           <span class="story-line-reel" aria-hidden="true"><i class="story-reel-canister"></i></span>
         </button>
       </TransitionGroup>
-      <div v-if="screen === 'collections' && viewMode === 'sequence'" ref="storyReelReaderElement" class="story-reel-reader" :class="{ loaded: readingLineId && reelReaderState !== 'inserting' }" aria-hidden="true">
+      <div v-if="screen === 'collections'" ref="storyReelReaderElement" class="story-reel-reader" :class="{ loaded: (isCollectionBrowser || readingLineId) && reelReaderState !== 'inserting' }" aria-hidden="true">
         <span class="story-reel-reader-shell">
           <span class="story-reel-reader-slot"><i class="story-reel-canister"></i></span>
           <i class="story-reel-reader-latch"></i>
@@ -104,44 +132,10 @@
           <div class="rack-line-label">{{ localize(viewMode === 'sequence' ? rackActive?.act || activeCollection?.label : rackActive?.lineName || activeCollection?.lineName) }}</div>
           <button v-for="item in visibleRackEntries" :key="item.key" type="button" class="rack-card" :class="{ active: item.index === rackIndex, 'rack-bridge': item.isBridge }" :style="rackCardStyle(item.index)" :tabindex="item.index === rackIndex ? 0 : -1" :aria-label="localize(item.label)" @keydown.enter.stop.prevent="activateRackCard(item.index)" @keydown.space.stop.prevent="activateRackCard(item.index)" @click="activateRackCard(item.index)">
             <span class="rack-art" :class="{ 'operator-portrait': item.operatorPortrait }"><img :src="item.operatorPortrait ? root + item.operatorPortrait : coverPath(item.cover)" :data-original-src="item.cover" :data-story-cover="coverPath(item.cover)" alt="" draggable="false" :loading="Math.abs(item.index - rackIndex) <= 1 ? 'eager' : 'lazy'" decoding="async" @error="handleCoverError"><span class="rack-number">{{ item.orderLabel }}</span></span>
-            <span class="rack-caption"><small>{{ localize(item.subtitle) }}</small><strong>{{ localize(item.label) }}</strong><span v-if="screen === 'episodes'" class="reading-status" :class="{ read: completedStories[item.id] }">{{ completedStories[item.id] ? '✓ ' + labels.read : labels.unread }}</span><span v-if="screen === 'collections' && !item.missing" class="collection-open">{{ item.count }} {{ labels.stories }}</span><span class="rack-open">{{ item.missing ? labels.notCollected : screen === 'collections' ? labels.browseEpisodes : labels.playStory }} <span v-if="!item.missing" aria-hidden="true">→</span></span></span>
+            <span class="rack-caption"><small>{{ localize(item.subtitle) }}</small><strong>{{ localize(item.label) }}</strong><span v-if="screen === 'episodes'" class="reading-status" :class="{ read: completedStories[item.id] }">{{ completedStories[item.id] ? '✓ ' + labels.read : labels.unread }}</span><span v-if="screen === 'collections' && !item.missing" class="collection-open">{{ item.count }} {{ item.categoryEntry ? (item.id === 'operator' ? browserLabels.operators : labels.collections) : labels.stories }}</span><span class="rack-open">{{ item.categoryEntry ? browserLabels.browseCategory : item.missing ? labels.notCollected : screen === 'collections' ? labels.browseEpisodes : labels.playStory }} <span v-if="!item.missing" aria-hidden="true">→</span></span></span>
           </button>
           </div>
         </div>
-        <template v-if="screen !== 'collections' || viewMode !== 'sequence'">
-        <details v-if="viewMode === 'sequence' && rackActive" class="reading-detail">
-          <summary>{{ labels.branchReading }} · {{ mediaLabels.context }}</summary>
-          <template v-if="screen === 'collections'">
-            <div class="reading-detail-title"><span>{{ localize(rackActive.role) }}</span><strong>{{ localize(rackActive.act) }}</strong><small>{{ labels.routeStation }} {{ rackIndex + 1 }} / {{ rackEntries.length }}</small></div>
-            <details class="compact-note guide-description"><summary>{{ mediaLabels.context }}</summary><p>{{ localize(rackActive.note) }}</p></details>
-            <div v-if="rackActive.prerequisites.length" class="guide-connections">
-              <h3>{{ labels.readFirst }}</h3>
-              <div v-for="link in rackActive.prerequisites" :key="link.group" class="guide-connection">
-                <button type="button" :disabled="link.missing || !link.routeId" @click="visitGuide(link.routeId, link.group)">{{ localize(link.group) }} ↗ <small>{{ collectionReadLabel(link.group) }}</small></button>
-                <p>{{ localize(link.note) }}<span v-if="link.missing"> {{ labels.notCollected }}</span></p>
-              </div>
-            </div>
-            <div v-if="rackActive.supplements.length" class="guide-connections guide-supplements">
-              <h3>{{ labels.extraContext }}</h3>
-              <div v-for="link in rackActive.supplements" :key="link.group" class="guide-connection">
-                <button type="button" :disabled="link.missing || !link.routeId" @click="visitGuide(link.routeId, link.group)">{{ localize(link.group) }} ↗ <small>{{ collectionReadLabel(link.group) }}</small></button>
-                <p>{{ labels.extraContextNote }}</p>
-              </div>
-            </div>
-            <div class="reading-neighbors">
-              <button v-if="rackActive.previous" type="button" @click="moveRack(-1)">← {{ rackActive.independent ? labels.relatedReading : labels.readBefore }}：{{ localize(rackActive.previous) }}</button><span v-else>{{ labels.routeStart }}</span>
-              <button v-if="rackActive.next" type="button" @click="moveRack(1)">{{ rackActive.independent ? labels.relatedReading : labels.continueGuide }}：{{ localize(rackActive.next) }} →</button><span v-else>{{ labels.routeEnd }}</span>
-            </div>
-            <details v-if="rackActive.branches.length || rackActive.relatedLine" class="guide-branches">
-              <summary>{{ labels.branchReading }}</summary>
-              <button v-for="link in rackActive.branches" :key="link.group" type="button" :disabled="link.missing || !link.routeId" @click="visitGuide(link.routeId, link.group)">{{ localize(link.group) }} ↗</button>
-              <button v-if="rackActive.relatedLine" type="button" @click="visitGuide(rackActive.relatedLine, rackActive.group)">{{ labels.relatedRoute }}：{{ localize(archiveMetadata.lines?.find(line => line.id === rackActive.relatedLine)?.name) }} ↗</button>
-            </details>
-            <a class="guide-source" :href="readingGuideSource" target="_blank" rel="noopener noreferrer">{{ labels.guideSource }} ↗</a>
-          </template>
-          <template v-else><p>{{ rackActive.phase === 'branch' ? labels.branchNote : labels.segmentNote }}</p><div class="reading-neighbors"><span>{{ labels.readBefore }}：{{ localize(groupStories[Number(episodeNumber(rackActive)) - 2]?.title) || labels.routeStart }}</span><span>{{ labels.readAfter }}：{{ localize(groupStories[Number(episodeNumber(rackActive))]?.title) || labels.routeEnd }}</span></div></template>
-        </details>
-        </template>
       </div>
       <div v-else-if="screen === 'collections' && viewMode === 'sequence' && !readingLineId" class="story-rack story-rack-standby">
         <div class="film-perforations film-perforations-top" aria-hidden="true"></div>
@@ -222,7 +216,10 @@
         <button type="button" :disabled="!canGoBack" @click="goBack">← {{ labels.previous }}</button>
         <span class="story-line-progress">{{ frame.command?.line || commandCount }} / {{ commandCount }}</span>
         <button type="button" :aria-pressed="audioEnabled" @click="toggleAudio">{{ audioEnabled ? labels.audioOn : labels.audioOff }}</button>
-        <label class="story-volume">{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label>
+        <details ref="playerSettings" class="player-settings" @keydown.esc.stop.prevent="closePlayerUtilities(true)"><summary>{{ consoleLabels.more }}</summary><div class="player-popover">
+          <label class="story-volume">{{ mediaLabels.volume }}<input v-model.number="audioVolume" type="range" min="0" max="1" step=".01" :aria-label="mediaLabels.volume"><output>{{ Math.round(audioVolume * 100) }}%</output></label>
+          <details class="compact-note"><summary>{{ mediaLabels.credits }}</summary><p>{{ labels.note }}</p></details>
+        </div></details>
         <button type="button" :aria-expanded="logOpen" aria-controls="story-log" @click="openLog">{{ mediaLabels.log }}</button>
         <button type="button" class="story-skip" :disabled="frame.type === 'end'" @click="openSkip()">{{ summaryLabels.skip }}</button>
         <button type="button" :disabled="frame.type !== 'dialogue'" @click="advance">{{ labels.next }} →</button>
@@ -231,7 +228,6 @@
         {{ mediaLabels[audioProblem] }} <button type="button" @click="retryAudio">{{ audioProblem === 'blocked' ? mediaLabels.enable : mediaLabels.retry }}</button>
       </p>
       <nav class="episode-navigation" :aria-label="labels.order"><button type="button" :disabled="!previousStory" @click="selectStoryId(previousStory.id)">← {{ labels.previousStory }}</button><span>{{ episodeNumber(selectedStory) }} / {{ groupStories.length }} · {{ localize(activeCollection?.label) }}</span><button type="button" :disabled="!nextStory" @click="openSkip(nextStory.id)">{{ labels.nextStory }} →</button></nav>
-      <details class="story-note compact-note"><summary>{{ mediaLabels.credits }}</summary><p>{{ labels.note }}</p></details>
     </section>
     </template>
     <div v-else-if="catalogError" class="story-message" role="alert">{{ catalogError }}</div>
@@ -311,6 +307,15 @@ const consoleLabels = computed(() => ({
   'zh-CN': { audio: '音效设置', more: '更多选项', source: '剧情资料来源・PRTS 剧情一览', filters: '筛选', all: '全部', otherCategories: '其他类型', reset: '重置筛选' },
 }[locale.value] || { audio: 'Audio settings', more: 'More options', source: 'Story source · PRTS Story Index', filters: 'Filters', all: 'All', otherCategories: 'More types', reset: 'Reset filters' }));
 const archiveTools = ref(null);
+const playerUtilities = ref(null);
+const playerSettings = ref(null);
+function closePlayerUtilities(restoreFocus = false) {
+  for (const element of [playerUtilities.value?.querySelector('details[open]'), playerSettings.value?.open ? playerSettings.value : null]) {
+    if (!element) continue;
+    element.open = false;
+    if (restoreFocus) element.querySelector('summary')?.focus();
+  }
+}
 function closeArchiveTools(restoreFocus = false) {
   archiveTools.value?.querySelectorAll('details[open]').forEach(details => {
     details.open = false;
@@ -318,7 +323,9 @@ function closeArchiveTools(restoreFocus = false) {
   });
 }
 function dismissArchiveTools(event) {
+  if (!playerUtilities.value?.contains(event.target) && !playerSettings.value?.contains(event.target)) closePlayerUtilities();
   if (!archiveTools.value?.contains(event.target)) closeArchiveTools();
+  if (advancedFilters.value && !projectionControls.value?.contains(event.target)) closeFilters();
 }
 const copies = {
   'zh-TW': { title: '劇情', subtitle: '明日方舟 · 劇情演出', loading: '正在載入本地劇情…', narrator: '旁白', continue: '點擊或按空白鍵繼續', choose: '選擇回應', finished: '劇情結束', battle: '可以重新播放或選擇其他劇情。', restart: '重新播放', previous: '上一句', next: '下一句', audioOn: '🔊 音效開啟', audioOff: '🔇 開啟音效', videoHint: '影片播放完畢後繼續。', selectStory: '選擇劇情', note: '劇情及素材出處：明日方舟／PRTS。劇本與已匯入影音由本站載入，未匯入素材可能連線至 PRTS；部分表情與鏡頭指令仍未完整重現。' },
@@ -347,9 +354,12 @@ function storedPreference(key, fallback) {
 }
 function savePreference(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* Reading works when storage is disabled. */ } }
 const savedView = storedPreference('story-archive-view-v3', 'sequence');
-copies['zh-TW'].views = { banner: '劇情典藏', sequence: '敘事脈絡' };
-copies['zh-CN'].views = { banner: '剧情典藏', sequence: '叙事脉络' };
-copies.en.views = { banner: 'Story Archive', sequence: 'Narrative Paths' };
+copies['zh-TW'].views = { banner: '分類瀏覽', sequence: '故事線' };
+copies['zh-CN'].views = { banner: '分类浏览', sequence: '故事线' };
+copies.en.views = { banner: 'Browse categories', sequence: 'Story lines' };
+copies['zh-TW'].episodeSegments = '劇情段落';
+copies['zh-CN'].episodeSegments = '剧情段落';
+copies.en.episodeSegments = 'Story segments';
 Object.assign(copies['zh-TW'], { series: '故事線／系列', allSeries: '全部故事線／系列', readingPath: '選擇閱讀路徑', routeBasis: '依章節與樂章交點編排，穿插相關活動。這是閱讀建議，並非故事內年代排序。', readBefore: '前一篇', readAfter: '下一篇', routeStart: '從這裡開始', routeEnd: '本路徑結束', relatedRoute: '查看這篇所屬的完整路徑', notCollected: '尚未收錄', segmentNote: '依本章段落順序閱讀；行動前、行動後及幕間各自保留位置。', branchNote: '此段為分支內容。請先讀同章主要段落，再依分支閱讀；列表位置不代表所有分支連續發生。' });
 Object.assign(copies['zh-CN'], { series: '故事线／系列', allSeries: '全部故事线／系列', readingPath: '选择阅读路径', routeBasis: '按章节与乐章交点编排，穿插相关活动。这是阅读建议，并非故事内年代排序。', readBefore: '前一篇', readAfter: '下一篇', routeStart: '从这里开始', routeEnd: '本路径结束', relatedRoute: '查看这篇所属的完整路径', notCollected: '尚未收录', segmentNote: '按本章段落顺序阅读；行动前、行动后及幕间各自保留位置。', branchNote: '此段为分支内容。请先读同章主要段落，再按分支阅读；列表位置不代表所有分支连续发生。' });
 Object.assign(copies.en, { series: 'Story line / series', allSeries: 'All story lines / series', readingPath: 'Reading route', routeBasis: 'A reading guide following chapter order and story-line intersections, with related events inserted. Not an in-world timeline.', readBefore: 'Previous', readAfter: 'Next', routeStart: 'Start here', routeEnd: 'End of route', relatedRoute: 'Explore the full related route', notCollected: 'Not collected yet', segmentNote: 'Follow chapter segment order, including before/after operation and interludes.', branchNote: 'This is a branch. Read the main chapter first; separate branches do not necessarily occur consecutively.' });
@@ -364,6 +374,11 @@ Object.assign(copies['zh-TW'], { routeBasis: '左右依站閱讀；跨線前置�
 Object.assign(copies['zh-CN'], { routeBasis: '左右按站阅读；跨线前置另列。章内按段落顺序，系列选读不强制先后。', extraContext: '建议补充', extraContextNote: '先补充相关人物背景，再接本篇；这是导读建议，不是必须完成的解锁条件。', returnGuide: '回到原阅读位置', resumeGuide: '接续未读', routeStation: '阅读站', readFirst: '读这一篇之前，先补齐', continueGuide: '接下来读', branchReading: '读完后可延伸的故事线', relatedReading: '同系列选读', currentGuide: '当前阅读路径', guideSource: '关联来源：PRTS 曲谱；导读文字为本站编排' });
 Object.assign(copies.en, { routeBasis: 'Follow the route sideways. Cross-line prerequisites are listed separately; anthology entries are optional.', extraContext: 'Recommended background', extraContextNote: 'Read this for additional character context. This is reading advice, not an unlock requirement.', returnGuide: 'Return to reading position', resumeGuide: 'Continue unread stories', routeStation: 'Route stop', readFirst: 'Read these before starting', continueGuide: 'Read next', branchReading: 'Related routes to explore afterward', relatedReading: 'Another standalone story', currentGuide: 'Current reading route', guideSource: 'Connections: PRTS Score; reading guidance curated by this site' });
 const advancedFilters = ref(false);
+const projectionControls = ref(null);
+function closeFilters(restoreFocus = false) {
+  advancedFilters.value = false;
+  if (restoreFocus) projectionControls.value?.querySelector('[aria-controls="console-advanced-filters"]')?.focus();
+}
 copies['zh-TW'].allCollections = '全部活動／章節／干員';
 copies['zh-CN'].allCollections = '全部活动／章节／干员';
 copies.en.allCollections = 'All events / chapters / operators';
@@ -375,7 +390,7 @@ const collectionSort = ref('line');
 const selectedLine = ref('');
 const selectedCollectionFilter = ref('');
 const readingLineId = ref('');
-const isFilmArchive = computed(() => screen.value === 'collections' && viewMode.value === 'sequence');
+const isFilmArchive = computed(() => screen.value === 'collections');
 const isCollectionBrowser = computed(() => screen.value === 'collections' && viewMode.value === 'banner');
 const availableReadingLines = computed(() => (archiveMetadata.value.lines || []).filter(line => line.id !== readingLineId.value));
 const reelSelectionHint = computed(() => ({
@@ -397,21 +412,53 @@ const selectedStory = computed(() => catalog.value.find(story => story.id === se
 const search = ref('');
 const episodeSearch = ref('');
 const selectedCategory = ref('');
+const selectedType = ref('');
+const operatorReadFilter = ref('');
+const isOperatorBrowser = computed(() => isCollectionBrowser.value && selectedCategory.value === 'operator');
+const browserLabels = computed(() => locale.value.startsWith('zh')
+  ? { allOperators: '全部幹員', operators: '位幹員', browseCategory: '瀏覽此分類', unfinished: '未讀完', complete: '已讀完', progress: '閱讀狀態', events: '活動故事', gameplay: '玩法劇情', special: '特別收錄' }
+  : { allOperators: 'All operators', operators: 'operators', browseCategory: 'Browse category', unfinished: 'Unfinished', complete: 'Completed', progress: 'Reading progress', events: 'Story events', gameplay: 'Game mode stories', special: 'Special archives' });
+// Keep the operator search separate from chapter/event terminology.
+const operatorSearchLabels = { 'zh-TW': '搜尋幹員姓名或密錄篇目…', 'zh-CN': '搜索干员姓名或密录篇目…', en: 'Search operator names or records…' };
+const operatorSearchLabel = computed(() => operatorSearchLabels[locale.value] || operatorSearchLabels.en);
+function categoryMatches(category, selected = selectedCategory.value) {
+  if (!selected) return true;
+  if (selected === 'events') return ['event', 'vignette'].includes(category);
+  if (selected === 'gameplay') return ['roguelike', 'reclamation', 'contract'].includes(category);
+  if (selected === 'extras') return ['special', 'beta'].includes(category);
+  return category === selected;
+}
+function operatorCompletedCount(collection) { return collection.stories.filter(story => completedStories.value[story.id]).length; }
 const selectedSection = ref('');
 const selectedGroup = ref('');
 const selectedPhase = ref('');
 const categories = computed(() => storyCategories.map(category => ({ ...category, count: catalog.value.filter(story => story.archiveCategory === category.id).length })).filter(category => category.count));
-const primaryCategories = computed(() => categories.value.filter(category => ['main', 'event', 'vignette', 'operator'].includes(category.id)));
-const secondaryCategories = computed(() => categories.value.filter(category => !['main', 'event', 'vignette', 'operator'].includes(category.id)));
-const refinementCount = computed(() => [selectedLine.value, selectedCollectionFilter.value, selectedSection.value, collectionSort.value !== 'line'].filter(Boolean).length);
+const filterLabels = computed(() => locale.value.startsWith('zh')
+  ? { applied: '已套用條件', noFilters: '未限定條件', remove: '移除條件', act: '主線篇章', chapter: '章節順序' }
+  : { applied: 'Active filters', noFilters: 'No filters applied', remove: 'Remove filter', act: 'Story arc', chapter: 'Chapter order' });
+const typeOptions = computed(() => ['main', 'events', 'operator'].includes(selectedCategory.value) ? [] : categories.value.filter(type => categoryMatches(type.id)));
+const activeFilterChips = computed(() => [
+  { key: 'type', value: selectedType.value, label: categoryLabel(selectedType.value) },
+  { key: 'section', value: selectedSection.value, label: localize(selectedSection.value) },
+  { key: 'line', value: selectedLine.value, label: localize(availableLines.value.find(line => line.id === selectedLine.value)?.name || '') },
+  { key: 'progress', value: operatorReadFilter.value, label: operatorReadFilter.value === 'complete' ? browserLabels.value.complete : browserLabels.value.unfinished },
+].filter(chip => chip.value));
+const refinementCount = computed(() => activeFilterChips.value.length);
+function clearFilter(key) {
+  if (key === 'type') selectedType.value = '';
+  if (key === 'section') selectedSection.value = '';
+  if (key === 'line') { selectedLine.value = ''; selectedSection.value = ''; }
+  if (key === 'progress') operatorReadFilter.value = '';
+}
 function resetRefinements() {
+  selectedType.value = '';
+  operatorReadFilter.value = '';
   selectedLine.value = '';
   selectedCollectionFilter.value = '';
   selectedSection.value = '';
-  collectionSort.value = 'line';
 }
 function categoryLabel(id) { const category = storyCategories.find(category => category.id === id); return category?.labels[locale.value] || category?.labels.en || ''; }
-const categoryStories = computed(() => catalog.value.filter(story => !selectedCategory.value || story.archiveCategory === selectedCategory.value));
+const categoryStories = computed(() => catalog.value.filter(story => categoryMatches(story.archiveCategory) && (!selectedType.value || story.archiveCategory === selectedType.value)));
 const sections = computed(() => [...new Set(categoryStories.value.filter(story => !selectedLine.value || collectionFamily({ ...story, category: story.archiveCategory }).id === selectedLine.value).map(story => story.section))]);
 const sectionStories = computed(() => categoryStories.value.filter(story => !selectedSection.value || story.section === selectedSection.value));
 function groupKey(story) { return `${story.archiveCategory}/${story.archiveCategory === 'beta' ? `${story.section}/` : ''}${story.group}`; }
@@ -428,10 +475,15 @@ const allCollections = computed(() => {
   }
   return [...entries.values()].map(collection => ({ ...collection, stories: collection.stories.sort(compareStoryOrder), orderLabel: collection.collectionOrder == null ? 'ARCHIVE' : `${collection.storyLine === 'MS' ? 'EP' : collection.storyLine} ${String(collection.collectionOrder + (collection.storyLine === 'MS' ? 0 : 1)).padStart(2, '0')}` }));
 });
+const categoryReels = computed(() => [{ id: '', label: consoleLabels.value.all }, { id: 'main', label: categoryLabel('main') }, { id: 'events', label: browserLabels.value.events }, { id: 'operator', label: categoryLabel('operator') }, { id: 'gameplay', label: browserLabels.value.gameplay }, { id: 'extras', label: browserLabels.value.special }].map(category => {
+  const collections = allCollections.value.filter(collection => categoryMatches(collection.category, category.id));
+  return { ...category, count: collections.length, cover: collections.find(collection => collection.cover)?.cover || '' };
+}));
 const availableLines = computed(() => {
   const families = new Map();
   for (const collection of allCollections.value) {
-    if (selectedCategory.value && collection.category !== selectedCategory.value) continue;
+    if (!categoryMatches(collection.category)) continue;
+    if (selectedCategory.value === 'events' && !collection.storyLine) continue;
     const family = collectionFamily(collection);
     if (!families.has(family.id)) families.set(family.id, { ...family, count: 0 });
     families.get(family.id).count++;
@@ -488,7 +540,13 @@ const groups = computed(() => {
 });
 const filteredCollections = computed(() => {
   const query = search.value.trim().toLowerCase();
-  return groups.value.filter(collection => (!selectedCollectionFilter.value || collection.key === selectedCollectionFilter.value) && (!query || [collection.label, ...collection.stories.map(story => `${story.title} ${story.group} ${story.page} ${story.storyCode || ''}`)].some(text => text.toLowerCase().includes(query) || localize(text).toLowerCase().includes(query))));
+  return groups.value.filter(collection => {
+    if (operatorReadFilter.value) {
+      const complete = operatorCompletedCount(collection) === collection.count;
+      if (complete !== (operatorReadFilter.value === 'complete')) return false;
+    }
+    return (!selectedCollectionFilter.value || collection.key === selectedCollectionFilter.value) && (!query || [collection.label, ...collection.stories.map(story => `${story.title} ${story.group} ${story.page} ${story.storyCode || ''}`)].some(text => text.toLowerCase().includes(query) || localize(text).toLowerCase().includes(query)));
+  });
 });
 const groupStories = computed(() => catalog.value.filter(story => groupKey(story) === selectedGroup.value).sort(compareStoryOrder));
 const completedCount = computed(() => groupStories.value.filter(story => completedStories.value[story.id]).length);
@@ -537,8 +595,11 @@ const readingRackEntries = computed(() => readingRoute.value.flatMap(node => {
   ];
 }));
 const rackEntries = computed(() => screen.value === 'collections'
-  ? viewMode.value === 'sequence' ? readingRackEntries.value : filteredCollections.value.map(collection => ({ ...collection, subtitle: `${collection.orderLabel} · ${categoryLabel(collection.category)}` }))
-  : (viewMode.value === 'sequence' ? groupStories.value : filteredStories.value).map(story => ({ ...story, key: story.id, label: story.title, orderLabel: episodeNumber(story), subtitle: `${story.storyCode || episodeNumber(story)} · ${labels.value.phases[story.phase]}` })));
+  ? viewMode.value === 'sequence' ? readingRackEntries.value
+    : !selectedCategory.value && !search.value.trim() && !refinementCount.value
+      ? categoryReels.value.filter(category => category.id).map(category => ({ ...category, key: `category:${category.id}`, categoryEntry: true, orderLabel: '', subtitle: labels.value.category }))
+      : filteredCollections.value.map(collection => ({ ...collection, subtitle: collection.category === 'operator' ? `${operatorCompletedCount(collection)} / ${collection.count} ${labels.value.read}` : `${collection.orderLabel} · ${categoryLabel(collection.category)}` }))
+  : filteredStories.value.map(story => ({ ...story, key: story.id, label: story.title, orderLabel: episodeNumber(story), subtitle: `${story.storyCode || episodeNumber(story)} · ${labels.value.phases[story.phase]}` })));
 const rackIndex = computed({
   get: () => screen.value === 'collections' ? viewMode.value === 'sequence' ? readingOffset.value : collectionOffset.value : reelOffset.value,
   set: value => {
@@ -653,9 +714,24 @@ async function selectReadingLine(id, button) {
   }
 }
 
+async function selectCategoryReel(id, button) {
+  const key = `category:${id}`;
+  if (id === selectedCategory.value || key === pendingReadingLine.value) return;
+  const transition = animateReelToReader(key, button);
+  await transition.promise;
+  if (transition.token !== reelReaderTransitionToken || !button.isConnected) return;
+  selectedCategory.value = id;
+}
+
 const rackWidth = ref(1000);
 const rackStep = computed(() => {
-  const isStoryLineRack = screen.value === 'collections' && viewMode.value === 'sequence';
+  const isStoryLineRack = screen.value === 'collections';
+  const isEpisodeRack = screen.value === 'episodes';
+  if (isEpisodeRack) {
+    // Episode 卡片已放大到與主頁同級，位移必須以實際卡片寬度計算，避免相鄰卡片重疊。
+    const cardWidth = Math.min(720, Math.max(0, rackWidth.value - 40));
+    return Math.max(220, cardWidth + 24);
+  }
   return isStoryLineRack
     ? Math.max(160, Math.min(720, rackWidth.value - 40) * .94 + 12)
     : Math.max(160, Math.min(390, rackWidth.value * .68));
@@ -721,6 +797,7 @@ function activateRackCard(index) {
   if (index !== rackIndex.value) { seekRack(index); return; }
   const entry = rackActive.value;
   if (!entry || entry.missing) return;
+  if (entry.categoryEntry) { selectedCategory.value = entry.id; return; }
   if (entry.branchLink) {
     visitGuide(entry.branchLink.routeId, entry.group, entry.originGroup);
     return;
@@ -813,7 +890,11 @@ watch(rackElement, element => {
   rackObserver.observe(element);
 }, { flush: 'post' });
 watch([screen, search, episodeSearch, selectedCategory, selectedSection, selectedLine, selectedCollectionFilter, collectionSort, selectedPhase, readingLineId, viewMode], cancelRackDrag);
-watch([screen, viewMode], () => stopReelReaderTransition({ reset: true }));
+watch([screen, viewMode], () => {
+  closeFilters();
+  closePlayerUtilities();
+  stopReelReaderTransition({ reset: true });
+});
 watch(readingLineId, () => { readingOffset.value = 0; });
 watch(viewMode, () => {
   reelOffset.value = 0;
@@ -825,11 +906,12 @@ watch(viewMode, () => {
 let prtsVariables = {};
 const thumbnailIndex = ref({});
 const originalImages = new Set();
-watch(selectedCategory, () => { selectedSection.value = ''; selectedLine.value = ''; selectedCollectionFilter.value = ''; selectedGroup.value = ''; selectedPhase.value = ''; });
+watch(selectedCategory, () => { resetRefinements(); collectionSort.value = 'line'; selectedGroup.value = ''; selectedPhase.value = ''; search.value = ''; closeFilters(); });
+watch(selectedType, () => { selectedLine.value = ''; selectedSection.value = ''; });
 watch(selectedLine, () => { selectedSection.value = ''; selectedCollectionFilter.value = ''; });
 watch(selectedSection, () => { selectedCollectionFilter.value = ''; selectedGroup.value = ''; selectedPhase.value = ''; });
 watch(selectedGroup, () => { selectedPhase.value = ''; });
-watch([search, selectedCategory, selectedSection, selectedLine, selectedCollectionFilter, collectionSort], () => { collectionOffset.value = 0; });
+watch([search, selectedCategory, selectedType, selectedSection, selectedLine, selectedCollectionFilter, collectionSort, operatorReadFilter], () => { cancelRackDrag(); collectionOffset.value = 0; });
 watch([episodeSearch, selectedGroup, selectedPhase], () => { reelOffset.value = 0; });
 function coverPath(url) {
   if (!url || url === storyCoverPlaceholder) return `${root}${storyCoverPlaceholder}`;
@@ -1820,12 +1902,63 @@ onUnmounted(() => {
   padding: 6px 0 0;
 }
 .archive-console .reading-route .episode-reading-guide {
-  flex: 1 1 180px;
+  flex: 1 1 100%;
   min-width: 0;
   padding: 0;
   border: 0;
 }
-.episode-reading-guide > summary { padding: 7px 0; }
+.episode-storyline-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 0 5px;
+  border-block: 1px solid var(--console-edge);
+}
+.episode-storyline-label {
+  display: inline-flex;
+  flex: none;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--console-ink);
+  font-size: .68rem;
+  white-space: nowrap;
+}
+.episode-storyline-label small {
+  color: var(--console-muted);
+  font-size: .6rem;
+}
+.episode-storyline-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 4px !important;
+  padding: 1px 0 3px !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--console-edge) transparent;
+}
+.episode-storyline-nav button {
+  min-height: 28px;
+  padding: 4px 7px;
+  border-color: var(--console-edge);
+  border-radius: 3px;
+  background: rgba(13, 17, 23, .36);
+  color: var(--console-muted);
+  font-size: .64rem;
+  line-height: 1.2;
+}
+.episode-storyline-nav button.current {
+  border-color: var(--console-accent);
+  background: rgba(88, 166, 255, .12);
+  color: var(--console-ink);
+}
+.episode-storyline-nav button.intersection { color: #dec490; }
+.episode-storyline-nav button small {
+  display: inline;
+  margin: 0 0 0 4px;
+  color: inherit;
+  font-size: .55rem;
+}
+.episode-storyline-nav .route-arrow { font-size: .65rem; }
 .archive-console .reading-route > .guide-context { min-height: 32px; padding: 5px 10px; }
 .archive-console .story-library { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
 .archive-console .projection-controls { position: relative; z-index: 25; padding: 0 0 16px; border: 0; background: transparent; }
@@ -1925,6 +2058,8 @@ onUnmounted(() => {
   .archive-console .rack-line-label { left: 16px; }
   .archive-console .reading-plan-heading { flex-wrap: wrap; }
   .archive-console .reading-plan-heading label { flex-wrap: wrap; }
+  .episode-storyline-strip { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .episode-storyline-nav { width: 100%; }
 }
 @media (max-width: 420px) {
   .archive-console .story-heading > div:first-child { flex-basis: 100%; }
@@ -2244,6 +2379,11 @@ onUnmounted(() => {
   border-radius: 6px;
 }
 .archive-console .with-line-rail .rack-card:not(.rack-bridge) .rack-art { height: 228px; }
+.archive-console .story-line-layout.episode-layout .rack-card:not(.rack-bridge) {
+  width: min(720px, calc(100% - 40px));
+  border-radius: 6px;
+}
+.archive-console .story-line-layout.episode-layout .rack-card:not(.rack-bridge) .rack-art { height: 228px; }
 .archive-console .rack-art::after { background: linear-gradient(transparent 45%, #171d20); }
 .archive-console .rack-caption { padding: 10px 20px 14px; }
 .archive-console .rack-caption > strong { font-family: Georgia, 'Noto Serif TC', serif; font-size: 1.5rem; }
@@ -2335,6 +2475,8 @@ onUnmounted(() => {
   .story-line-rail strong { font-size: .8rem; }
   .archive-console .rack-art { height: 155px; }
   .archive-console .with-line-rail .rack-card:not(.rack-bridge) .rack-art { height: 155px; }
+  .archive-console .story-line-layout.episode-layout .rack-card:not(.rack-bridge) { width: min(720px, calc(100% - 32px)); }
+  .archive-console .story-line-layout.episode-layout .rack-card:not(.rack-bridge) .rack-art { height: 155px; }
   .story-reel-reader-latch { left: -4px; }
   .archive-console .rack-caption { padding: 10px 12px; }
   .archive-console .rack-caption > strong { font-size: 1rem; }
@@ -2444,6 +2586,49 @@ onUnmounted(() => {
   .archive-console.film-archive .with-line-rail > .story-rack.story-rack-standby {
     height: auto;
   }
+  /* Episode 閱讀視窗使用完整直式卡片；不要套用短容器的左右壓縮規則。 */
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout {
+    display: flex;
+    --episode-rack-height: clamp(420px, calc(100svh - 330px), 560px);
+    flex: 0 0 var(--episode-rack-height);
+    flex-direction: column;
+    min-height: var(--episode-rack-height);
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .story-rack-shell {
+    display: block;
+    flex: 0 0 var(--episode-rack-height);
+    height: var(--episode-rack-height);
+    min-height: var(--episode-rack-height);
+    overflow: hidden;
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .story-rack {
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    container-type: normal;
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .rack-card:not(.rack-bridge) {
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    height: min(420px, calc(100% - 36px));
+    max-height: calc(100% - 36px);
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .rack-art {
+    flex: 1 1 auto;
+    min-height: 150px;
+    max-height: 220px;
+    aspect-ratio: auto;
+    height: auto;
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .rack-caption {
+    flex: 0 0 auto;
+    padding-block: 8px 10px;
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .rack-open {
+    margin-top: 8px;
+    padding-top: 7px;
+  }
   .film-archive .story-reel-reader-shell { max-height: 88%; }
   .archive-console.film-archive .with-line-rail .rack-card:not(.rack-bridge) {
     top: 50%;
@@ -2462,6 +2647,29 @@ onUnmounted(() => {
   .film-archive .rack-caption .collection-open { margin-top: 4px; }
   .film-archive .rack-open { margin-top: 6px; padding-top: 6px; }
 }
+@media (max-width: 700px) {
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .story-rack {
+    height: 420px;
+    min-height: 420px;
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout {
+    --episode-rack-height: 420px;
+    flex-basis: var(--episode-rack-height);
+    min-height: var(--episode-rack-height);
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .story-rack-shell {
+    flex-basis: var(--episode-rack-height);
+    height: var(--episode-rack-height);
+    min-height: var(--episode-rack-height);
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .rack-card:not(.rack-bridge) {
+    width: min(720px, calc(100% - 32px));
+  }
+  .archive-console:not(.film-archive) .story-line-layout.episode-layout .rack-art {
+    height: 155px;
+    max-height: 155px;
+  }
+}
 @media (min-width: 701px) {
   .archive-console.film-archive,
   .film-archive > .archive-screen,
@@ -2476,6 +2684,141 @@ onUnmounted(() => {
     --player-frame-height: max(340px, calc(var(--archive-screen-width) * 9 / 16 + 18px));
     flex: none;
   }
+}
+/* Performance uses the archive palette and shares the viewport with its controls. */
+.story-page.player-console { display: flex; flex: 1 1 0; flex-direction: column; min-height: 0; margin: 8px auto 10px; }
+.player-console .story-heading { flex: none; align-items: center; margin: 0 0 8px; gap: 12px; }
+.player-console .story-heading > div:first-child { min-width: 0; }
+.player-console .story-heading h1 { margin: 0; color: var(--console-ink); font-size: clamp(1rem, 1.5vw, 1.3rem); line-height: 1.4; overflow-wrap: anywhere; }
+.player-console .story-heading .eyebrow { margin: 0 0 2px; color: var(--console-muted); font-size: .65rem; letter-spacing: .06em; }
+.player-console .heading-actions { flex: none; gap: 10px; }
+.player-console .heading-actions a { font-size: .75rem; }
+.player-console .heading-actions button, .player-console .story-controls button { min-height: 36px; padding: 7px 12px; border: 1px solid var(--console-edge); border-radius: 6px; background: #102432aa; color: var(--console-ink); font: inherit; font-size: .75rem; }
+.player-console button:not(:disabled):hover { border-color: var(--console-accent); background: #58a6ff18; }
+.player-console button:focus-visible, .player-console summary:focus-visible { outline: 2px solid var(--console-accent); outline-offset: 2px; }
+.player-console > .archive-screen { display: flex; flex: 1 1 0; flex-direction: column; min-height: 0; }
+.player-console .story-shell { display: flex; flex: 1 1 0; flex-direction: column; min-height: 0; border-color: var(--console-edge); background: #102432a6; box-shadow: 0 12px 32px #0004; }
+.player-console .stage-wrap { display: grid; grid-template-rows: minmax(0, 1fr); flex: 1 1 0; min-height: 0; padding-block: 22px 0; border: 0; background: #091620; }
+.player-console .stage-wrap::before { height: 9px; top: 7px; background: repeating-linear-gradient(90deg, transparent 0 12px, #8fadc0 12px 26px, transparent 26px 40px); }
+.player-console .stage-wrap::after { display: none; }
+.player-console .story-stage { height: 100%; min-height: 0; aspect-ratio: auto; }
+.player-console .story-dialogue-panel { position: absolute; z-index: 5; inset: auto 2% 12px; min-height: 0; pointer-events: none; }
+.player-console :is(.dialogue-box, .decision-box, .end-box) { position: relative; inset: auto; box-sizing: border-box; margin: 0; border: 1px solid var(--console-edge); border-top-color: var(--console-accent); border-radius: 8px; box-shadow: 0 8px 24px #0005; background: linear-gradient(120deg, #102432d9, #0d1924b8); backdrop-filter: blur(8px); pointer-events: auto; }
+.player-console .stage-wrap.video-mode { grid-template-rows: minmax(0, 1fr) auto; }
+.player-console .video-mode .story-dialogue-panel { position: relative; inset: auto; }
+.player-console .dialogue-box { min-height: 125px; padding: 14px 24px 28px; }
+.player-console .speaker { color: var(--console-accent); font-size: .85rem; }
+.player-console .dialogue-box p { margin: 8px 0 0; max-height: 90px; overflow-y: auto; font-size: clamp(.95rem, 1.3vw, 1.15rem); line-height: 1.6; }
+.player-console .continue-hint { bottom: 7px; font-size: .65rem; color: var(--console-muted); }
+.player-console :is(.decision-box, .end-box) { max-height: 220px; overflow-y: auto; padding: 12px 24px; }
+.player-console .story-controls { flex: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: #102432cc; }
+.player-console .story-line-progress { margin-right: auto; padding-inline: 6px; font-size: .65rem; color: var(--console-muted); }
+.player-console .story-controls .story-skip { margin-left: 0; }
+.player-console .episode-navigation { flex: none; padding: 6px 12px; gap: 8px; font-size: .65rem; border-color: var(--console-edge); background: #0d1924aa; }
+.player-console .episode-navigation button { padding: 6px 10px; min-height: 32px; border: 1px solid var(--console-edge); border-radius: 5px; background: transparent; color: var(--console-muted); font: inherit; }
+.player-console .story-note { flex: none; margin: 0; padding: 6px 12px; font-size: .7rem; }
+.player-console .translation-notice { flex: none; margin: 0 0 6px; padding: 5px 10px; font-size: .65rem; }
+.player-sync-menu, .player-settings { position: relative; }
+.player-console :is(.player-sync-menu, .player-settings) > summary { display: flex; align-items: center; gap: 6px; min-height: 36px; box-sizing: border-box; padding: 7px 10px; border: 1px solid var(--console-edge); border-radius: 6px; font-size: .7rem; color: var(--console-muted); cursor: pointer; list-style: none; }
+.player-console summary::-webkit-details-marker { display: none; }
+.player-console .needs-attention .console-status-light { background: #e6a971; }
+.player-popover { position: absolute; z-index: 60; right: 0; box-sizing: border-box; width: min(340px, calc(100vw - 48px)); max-height: 50svh; overflow-y: auto; padding: 16px; border: 1px solid var(--console-edge); border-radius: 10px; background: #102432f5; backdrop-filter: blur(16px); box-shadow: 0 12px 36px #0008; }
+.player-sync-menu .player-popover { top: calc(100% + 8px); margin: 0; }
+.player-settings .player-popover { bottom: calc(100% + 8px); }
+.player-settings .story-volume { margin: 0 0 14px; flex-wrap: wrap; }
+.player-settings .compact-note p { max-width: 100%; line-height: 1.7; }
+@media (max-width: 700px), (max-height: 539px) {
+  .story-page.player-console { flex: none; margin-block: 12px 20px; }
+  .player-console .story-heading { flex-wrap: wrap; }
+  .player-console .heading-actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+  .player-console .story-stage { height: clamp(340px, 62svh, 540px); aspect-ratio: auto; }
+  .player-console .stage-wrap { flex: none; grid-template-rows: auto; }
+  .player-console .dialogue-box { min-height: 115px; padding-inline: 16px; }
+  .player-console .dialogue-box p { max-height: 120px; }
+  .player-console .story-controls { justify-content: flex-start; }
+  .player-console .story-controls button { flex: 1 0 auto; }
+  .player-console .episode-navigation { flex-wrap: wrap; }
+  .player-console .episode-navigation > span { order: -1; flex-basis: 100%; }
+  .player-console .player-popover { position: fixed; inset: auto 16px 20px; width: auto; max-height: 55svh; }
+}
+/* Desktop episode controls share a compact header so the reel fits the viewport. */
+.active-filter-strip { display: flex; align-items: center; gap: 6px; height: 30px; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; color: var(--console-muted); font-size: .65rem; }
+.active-filter-strip > span { opacity: .7; }
+.active-filter-strip button { flex: none; padding: 3px 8px; border: 1px solid var(--console-edge); border-radius: 4px; background: #58a6ff15; color: var(--console-ink); font: inherit; cursor: pointer; }
+.active-filter-strip button:hover { border-color: var(--console-accent); }
+.archive-console .collection-browser .archive-toolbar { gap: 10px; }
+.archive-console .collection-browser .console-search { max-width: 360px; }
+.archive-console .collection-browser .archive-breadcrumb { display: none; }
+@media (min-width: 701px) {
+  .archive-console.film-archive .collection-browser .with-line-rail {
+    --player-frame-height: max(300px, min(calc(var(--archive-screen-width) * 9 / 16 + 18px), calc(100svh - 390px)));
+  }
+}
+.archive-console .projection-controls .advanced-filters {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  box-sizing: border-box;
+  width: min(600px, 100%);
+  max-height: min(440px, calc(100svh - 260px));
+  overflow-y: auto;
+  margin: 0;
+  padding: 18px;
+  gap: 16px;
+  background: #102432f5;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 16px 36px #0008;
+}
+.advanced-filters .filter-panel-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
+.filter-done { min-height: 36px; padding: 6px 20px; border: 1px solid var(--console-accent); border-radius: 6px; background: #58a6ff22; color: var(--console-ink); font: inherit; font-size: .75rem; cursor: pointer; }
+@media (max-width: 420px) {
+  .archive-console .projection-controls .advanced-filters { grid-template-columns: 1fr; max-height: calc(100svh - 240px); }
+}
+.category-reel-rail button[aria-pressed="true"] .story-reel-film { box-shadow: inset 0 0 0 1px var(--console-accent); }
+.archive-console .operator-index { padding: 4px 10px 4px 0; }
+.archive-console .operator-index button { display: flex; align-items: center; gap: 10px; min-height: 64px; margin: 0 0 5px; padding: 8px; border: 1px solid var(--console-edge); border-radius: 6px; background: #102432aa; }
+.archive-console .operator-index button[aria-pressed="true"] { border-color: var(--console-accent); background: #58a6ff20; }
+.operator-index img { width: 44px; height: 48px; object-fit: contain; flex: none; }
+.operator-index span { display: grid; gap: 4px; min-width: 0; }
+.operator-index strong { font-size: .85rem; }
+.operator-index small { color: var(--console-muted); font-size: .65rem; }
+.archive-console .operator-index .operator-index-back { min-height: 36px; position: sticky; top: 0; z-index: 2; background: #102432; }
+.operator-read-filter { min-height: 40px; padding: 8px; border: 1px solid var(--console-edge); border-radius: 6px; color: var(--console-ink); background: #102432; font: inherit; font-size: .75rem; }
+.category-reel-rail button[aria-pressed="true"] .story-line-caption strong { color: var(--console-accent); }
+.episode-section-label { color: var(--console-muted); font-size: .75rem; white-space: nowrap; }
+.episode-console .archive-breadcrumb { display: none; }
+.archive-console.episode-console .archive-toolbar { gap: 8px 12px; justify-content: flex-end; }
+.episode-console .episode-phase select { min-height: 32px; padding: 5px 8px; border: 1px solid var(--console-edge); border-radius: 6px; background: #132c3b; color: var(--console-ink); font: inherit; font-size: .7rem; max-width: 160px; }
+.episode-console .console-search { flex: 0 1 220px; min-width: 120px; min-height: 32px; margin: 0; padding-inline: 10px; }
+.episode-console .console-search input { padding-block: 6px; font-size: .7rem; }
+@media (max-width: 700px) {
+  .episode-console .episode-section-label { display: none; }
+  .episode-console .console-search { flex: 1 1 140px; }
+}
+@media (min-width: 701px) and (min-height: 640px) {
+  .archive-console.episode-console > .story-heading { gap: 24px; margin-bottom: 8px; }
+  .episode-console > .story-heading > div:first-child { flex: 0 1 auto; }
+  .episode-console > .story-heading .console-utilities { margin-left: auto; }
+  .episode-console > .archive-screen { overflow: visible; }
+  .episode-console .archive-toolbar { justify-content: flex-end; }
+  .episode-console .archive-toolbar > span { font-size: .65rem; }
+  .archive-console.episode-console .reading-route:has(.episode-reading-guide) { flex-wrap: nowrap; align-items: center; padding: 0; }
+  .archive-console.episode-console .reading-route .episode-reading-guide { flex: 1; }
+  .episode-console .episode-storyline-strip { border-top: 0; }
+  .archive-console.episode-console .story-line-layout.episode-layout {
+    --episode-rack-height: clamp(280px, calc(100svh - 380px), 620px);
+  }
+  .archive-console.episode-console .story-line-layout.episode-layout .rack-card:not(.rack-bridge) {
+    height: calc(100% - 64px);
+    max-height: 460px;
+    top: 53%;
+    box-sizing: border-box;
+  }
+  .archive-console.episode-console .story-line-layout.episode-layout .rack-art { height: 0; max-height: none; min-height: 100px; flex: 1 1 0; }
+  .episode-console .rack-art img { position: absolute; inset: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .story-line-list-move,

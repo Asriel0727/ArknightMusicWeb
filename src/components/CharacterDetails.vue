@@ -17,6 +17,7 @@
         <p class="character-appellation">{{ character.appellation || character.id }}</p>
         <div class="character-tags">
           <span class="tag profession">{{ getProfessionName(character.profession) }}</span>
+          <span v-if="character.subProfessionName || character.subProfessionId" class="tag">{{ character.subProfessionName || character.subProfessionId }}</span>
           <span class="tag position">{{ character.position === 'MELEE' ? t('character.melee') : t('character.ranged') }}</span>
           <span v-if="getFactionLabel(character.factionId)" class="tag nation">{{ getFactionLabel(character.factionId) }}</span>
         </div>
@@ -74,6 +75,7 @@
           <p>{{ character.appellation || character.id }}</p>
           <div class="operator-role-line">
             <span>{{ getProfessionName(character.profession) }}</span>
+            <span v-if="character.subProfessionName || character.subProfessionId">{{ character.subProfessionName || character.subProfessionId }}</span>
             <span>{{ character.position === 'MELEE' ? t('character.melee') : t('character.ranged') }}</span>
             <span v-if="getFactionLabel(character.factionId)">{{ getFactionLabel(character.factionId) }}</span>
             <span v-if="obtainTagLabel" class="operator-obtain-tag" :title="character.obtainApproach">

@@ -123,6 +123,10 @@
     "back": "返回"
   },
   "character": {
+    "branch": "职业分支",
+    "allBranches": "全部分支",
+    "selectProfessionFirst": "请先选择职业，查看对应分支。",
+    "noMatchingOperators": "没有符合当前筛选条件的干员。",
     "pageTitle": "干员图鉴",
     "rarity": "稀有度",
     "nation": "阵营",

@@ -123,6 +123,10 @@
     "back": "Back"
   },
   "character": {
+    "branch": "Class branch",
+    "allBranches": "All branches",
+    "selectProfessionFirst": "Select a class to see its branches.",
+    "noMatchingOperators": "No operators match the current filters.",
     "pageTitle": "Operator archive",
     "rarity": "Rarity",
     "nation": "Faction",

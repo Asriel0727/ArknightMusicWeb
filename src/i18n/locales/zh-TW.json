@@ -123,6 +123,10 @@
     "back": "返回"
   },
   "character": {
+    "branch": "職業分支",
+    "allBranches": "全部分支",
+    "selectProfessionFirst": "請先選擇職業，查看對應分支。",
+    "noMatchingOperators": "沒有符合目前篩選條件的幹員。",
     "pageTitle": "幹員圖鑑",
     "rarity": "稀有度",
     "nation": "陣營",

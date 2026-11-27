@@ -123,6 +123,10 @@
     "back": "뒤로"
   },
   "character": {
+    "branch": "세부 직군",
+    "allBranches": "모든 세부 직군",
+    "selectProfessionFirst": "직군을 선택하면 세부 직군이 표시됩니다.",
+    "noMatchingOperators": "현재 필터와 일치하는 오퍼레이터가 없습니다.",
     "pageTitle": "오퍼레이터 도감",
     "rarity": "희귀도",
     "nation": "진영",
